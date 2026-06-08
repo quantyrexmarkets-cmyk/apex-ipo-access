@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" fill="none">
+  <!-- The X -->
+  <path d="M 20 25 L 100 75 L 180 25 L 165 25 L 100 60 L 35 25 Z" fill="#FF1E1E"/>
+  <path d="M 20 75 L 100 25 L 180 75 L 165 75 L 100 40 L 35 75 Z" fill="#FF1E1E"/>
+  <!-- The swoosh trail -->
+  <path d="M 95 35 Q 140 15 195 8 Q 155 18 100 38 Z" fill="#FF1E1E"/>
+</svg>

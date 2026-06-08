@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Apex IPO Access — Initial Public Offering Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<header class="nav">
+  <a href="/" class="logo">
+    <img src="assets/spacex-logo.png" class="logo-x" alt="X" />
+    <div class="logo-text-stack">
+      <span class="logo-line1">APEX</span>
+      <span class="logo-line2">IPO ACCESS</span>
+      <span class="logo-tagline">INVESTMENT INTELLIGENCE</span>
+    </div>
+  </a>
+  <div class="nav-right">
+    <a href="#signin" class="btn-signin">Sign In</a>
+    <button class="hamburger" id="hamburger" aria-label="Menu" type="button">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<nav class="side-menu" id="sideMenu">
+  <button class="menu-close" id="menuClose" aria-label="Close" type="button">✕</button>
+
+  <div class="menu-items">
+    <a href="#trading" class="menu-item">Trading & Investing<svg class="chev-svg" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#7A8699" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
+    <a href="#research" class="menu-item">Research<svg class="chev-svg" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#7A8699" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
+    <a href="#ipo" class="menu-item">IPO Opportunities<svg class="chev-svg" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#7A8699" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
+    <a href="#private" class="menu-item">Private Markets<svg class="chev-svg" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#7A8699" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
+    <a href="#pricing" class="menu-item">Pricing</a>
+    <a href="#support" class="menu-item-sub">Customer Support<svg class="chev-svg sm" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#7A8699" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
+  </div>
+
+  <a href="#signup" class="menu-cta">Open an Account</a>
+</nav>
+<div class="menu-backdrop" id="menuBackdrop"></div>
+
+<section class="hero">
+  <div class="eyebrow"><span class="line"></span>Investment Intelligence Platform<span class="line"></span></div>
+  <h1><span class="caps">Invest</span><img src="assets/spacex-x.png" class="x-logo" alt="X"/> in the Future of <span class="glow">Innovation</span>.</h1>
+  <p class="sub">Exclusive market intelligence on public offerings across Elon Musk's portfolio of transformative companies — <b>aerospace, artificial intelligence, energy, and advanced technology</b>.</p>
+  <p class="sub-tagline">Strategic Research · Valuation Insight · Market Conviction</p>
+  <div class="hero-cta">
+    <a href="#signup" class="btn-getstarted">Get Started <span>→</span></a>
+  </div>
+  
+</section>
+
+<div class="hero-image">
+  <div class="hero-image-wrap">
+    <div class="slideshow">
+      <img src="assets/elon-starlink.jpg" class="slide active" alt="Elon Musk · Starlink"/>
+      <img src="assets/elon-jared.jpeg" class="slide" alt="Elon Musk and Jared Birchall"/>
+      <img src="assets/spacex-ipo-hero.png" class="slide" alt="Musk SpaceX IPO"/>
+      </div>
+    <div class="hero-image-caption">
+      <div class="caption-divider"></div>
+      <div class="caption-slide active">
+        <p class="caption-title">Elon Musk — Founder & Chief Engineer, SpaceX</p>
+        <p class="caption-sub">Architect of the most valuable private company in history.</p>
+      </div>
+      <div class="caption-slide">
+        <p class="caption-title">Elon Musk × Jared Birchall</p>
+        <p class="caption-sub">The visionary and the operator behind the $2 trillion empire.</p>
+      </div>
+      <div class="caption-slide">
+        <p class="caption-title">The $2 Trillion Event</p>
+        <p class="caption-sub">Reserve your pre-IPO allocation today.</p>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<section class="stats">
+  <div class="stats-eyebrow"><span class="line"></span>By The Numbers<span class="line"></span></div>
+  <h2 class="stats-title">A <span class="glow">Historic</span> Market Opportunity</h2>
+  <div class="stats-grid">
+    <div class="stat">
+      <h2 class="stat-value">$2<span class="stat-unit">Trillion</span></h2>
+      <p class="stat-label">Projected Valuation</p>
+      <p class="stat-sub">Estimated post-offering market capitalization</p>
+    </div>
+    <div class="stat stat-highlight">
+      <h2 class="stat-value">$100<span class="stat-unit">Billion</span></h2>
+      <p class="stat-label">Capital Raise Target</p>
+      <p class="stat-sub">Potential primary offering size</p>
+    </div>
+    <div class="stat">
+      <h2 class="stat-value">#1</h2>
+      <p class="stat-label">Largest IPO on Record</p>
+      <p class="stat-sub">Positioned to exceed all previous public offerings</p>
+    </div>
+  </div>
+</section>
+
+<section class="duo">
+  <div class="duo-eyebrow"><span class="line"></span>The Architects<span class="line"></span></div>
+  <h2 class="duo-title">The Visionary & <span class="glow">The Operator</span></h2>
+  <p class="duo-sub">Behind every trillion-dollar empire stand two figures — one who imagines the future, and one who builds the capital structure to fund it.</p>
+
+  <div class="duo-image-wrap">
+    <img src="assets/elon-jared.jpeg" alt="Elon Musk and Jared Birchall" class="duo-image"/>
+    <div class="duo-overlay"></div>
+    <div class="duo-labels">
+      <div class="duo-label left">
+        <span class="duo-name">ELON MUSK</span>
+        <span class="duo-role">The Visionary</span>
+      </div>
+      <div class="duo-label right">
+        <span class="duo-name">JARED BIRCHALL</span>
+        <span class="duo-role">The Operator</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="offer">
+  <h2 class="section-title">Inside Your Investor Briefing</h2>
+  <ul class="benefits">
+    <li><b>S-1 Filing Breakdown</b> — Every key metric, decoded</li>
+    <li><b>3 Pre-IPO Entry Strategies</b> — Legal, vetted, accessible</li>
+    <li><b>Valuation Models</b> — DCF, comparables, post-IPO targets</li>
+    <li><b>Live IPO Alerts</b> — The moment shares hit the market</li>
+    <li><b>Network Intelligence</b> — Founders Fund, a16z, Birchall</li>
+  </ul>
+</section>
+
+<section class="final-cta" id="cta">
+  <h2>The Opening Bell Hasn't Rung.<br/><span class="glow">Be Ready When It Does.</span></h2>
+  <form class="cta-form" id="ctaForm2">
+    <input type="email" placeholder="your@email.com" required/>
+    <button type="submit">Claim Investor Access →</button>
+  </form>
+  <p class="micro">Free · Institutional-grade · Delivered weekly</p>
+</section>
+
+<footer>
+  <p>© 2026 Apex IPO Access · Independent investment research · Not affiliated with SpaceX, Tesla, or Elon Musk · For informational purposes only · Not financial advice</p>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>
