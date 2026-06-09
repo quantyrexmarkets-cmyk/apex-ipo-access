@@ -8,151 +8,107 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&family=Inter:wght@300;400;500;600&family=Orbitron:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html, body { background:#000; color:#fff; font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased; }
-  a { color:inherit; text-decoration:none; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
 
-  .site-header {
-    position:sticky; top:0; z-index:100;
-    background:rgba(0,0,0,0.85); backdrop-filter:blur(20px);
+  .site-header{
+    position:sticky;top:0;z-index:100;
+    background:rgba(0,0,0,0.85);backdrop-filter:blur(20px);
     border-bottom:1px solid rgba(255,255,255,0.08);
-    padding:18px 28px;
-    display:flex; justify-content:space-between; align-items:center;
+    padding:18px 24px;
+    display:flex;justify-content:space-between;align-items:center;
   }
-  .logo {
-    font-family:'Plus Jakarta Sans',sans-serif; font-weight:700;
-    font-size:20px; letter-spacing:2px; color:#cfd8e8;
+  .logo{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#cfd8e8}
+  .logo span{color:#4a9eff}
+  .header-actions{display:flex;align-items:center;gap:18px}
+  .signin{color:#4a9eff;font-size:14px;font-weight:500}
+  .menu-btn{width:38px;height:38px;border-radius:50%;background:#4a9eff;color:#000;border:none;font-size:18px;cursor:pointer;font-weight:700}
+
+  .container{max-width:680px;margin:0 auto;padding:0 20px}
+
+  .hero{padding:48px 20px 32px;max-width:680px;margin:0 auto}
+  .hero h1{
+    font-family:'Plus Jakarta Sans',sans-serif;font-weight:300;
+    font-size:clamp(36px,8vw,56px);line-height:1.05;
+    letter-spacing:-1.5px;margin-bottom:20px;
   }
-  .logo span { color:#4a9eff; }
-  .header-actions { display:flex; align-items:center; gap:18px; }
-  .signin { color:#4a9eff; font-size:14px; font-weight:500; }
-  .menu-btn {
-    width:38px; height:38px; border-radius:50%;
-    background:#4a9eff; color:#000; border:none;
-    font-size:18px; cursor:pointer; font-weight:700;
+  .hero p{font-size:16px;line-height:1.55;color:#a8b2c1;margin-bottom:28px;max-width:540px}
+  .cta-row{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+  .btn-primary{
+    background:#4a9eff;color:#000;
+    padding:16px 32px;border-radius:6px;
+    font-size:15px;font-weight:600;border:none;cursor:pointer;display:inline-block;
+  }
+  .btn-link{color:#4a9eff;font-size:15px;font-weight:500}
+
+  .feature-card{
+    max-width:640px;margin:20px auto;padding:0 20px;
+  }
+  .img-wrap{
+    width:100%;
+    aspect-ratio:16/10;
+    overflow:hidden;
+    border-radius:12px;
+    background:#000;
+  }
+  .img-wrap img{
+    width:100%;height:100%;
+    object-fit:cover;
+    object-position:center;
+    display:block;
   }
 
-  .hero {
-    padding:60px 24px 40px;
-    max-width:680px; margin:0 auto;
+  .card-body{padding:20px 0 8px}
+  .eyebrow{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;color:#4a9eff;margin-bottom:10px}
+  .card-body h3{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:22px;margin-bottom:12px}
+  .card-body p{font-size:14px;line-height:1.6;color:#8a94a3;margin-bottom:18px}
+  .card-cta{display:flex;gap:12px;align-items:center}
+  .btn-secondary{
+    background:#4a9eff;color:#000;
+    padding:14px 28px;border-radius:6px;
+    font-size:15px;font-weight:600;border:none;cursor:pointer;
+    flex:1;text-align:center;display:block;
   }
-  .hero h1 {
-    font-family:'Plus Jakarta Sans',sans-serif; font-weight:300;
-    font-size:clamp(42px, 7vw, 64px); line-height:1.05;
-    letter-spacing:-1.5px; margin-bottom:24px;
-  }
-  .hero p {
-    font-size:18px; line-height:1.55; color:#a8b2c1;
-    margin-bottom:36px; max-width:540px;
-  }
-  .cta-row { display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
-  .btn-primary {
-    background:#4a9eff; color:#000;
-    padding:18px 36px; border-radius:6px;
-    font-size:16px; font-weight:600; border:none; cursor:pointer;
-    transition:all .2s; display:inline-block;
-  }
-  .btn-primary:hover { background:#6db1ff; transform:translateY(-1px); }
-  .btn-link {
-    color:#4a9eff; font-size:16px; font-weight:500;
-  }
-  .btn-link:hover { text-decoration:underline; }
-
-  .feature-card {
-    max-width:680px; margin:24px auto;
-    border-radius:14px; overflow:hidden;
-    background:#0a0a0a;
-    border:1px solid rgba(255,255,255,0.06);
-  }
-  .feature-card .img-wrap { width:100%; aspect-ratio:1/1; overflow:hidden; background:#000; display:flex; align-items:center; justify-content:center; border-radius:12px; }
-    width:100%; aspect-ratio:1/1;
-    overflow:hidden; background:#000;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .feature-card .img-wrap img { width:100%; height:100%; object-fit:cover; object-position:center; display:block; transform:scale(0.55); }
-    width:100%; height:100%; object-fit:cover; display:block;
-  }
-  .feature-card.xai .img-wrap {
-    background:radial-gradient(ellipse at center, #1a1a1a 0%, #000 70%);
-  }
-  .brand-mark {
-    font-family:'Plus Jakarta Sans',sans-serif; font-weight:700;
-    font-size:clamp(60px, 14vw, 110px); letter-spacing:-2px;
-    color:#fff; font-style:italic;
-    text-shadow:0 0 40px rgba(74,158,255,0.3);
-  }
-
-  .card-body { padding:24px 24px 28px; }
-  .card-body .eyebrow {
-    font-family:'Orbitron',sans-serif; font-size:11px;
-    letter-spacing:2px; color:#4a9eff; margin-bottom:10px;
-  }
-  .card-body h3 {
-    font-family:'Plus Jakarta Sans',sans-serif; font-weight:600;
-    font-size:22px; margin-bottom:12px;
-  }
-  .card-body p {
-    font-size:14px; line-height:1.6; color:#8a94a3; margin-bottom:18px;
-  }
-  .card-cta { display:flex; gap:12px; align-items:center; }
-  .btn-secondary {
-    background:#4a9eff; color:#000;
-    padding:14px 28px; border-radius:6px;
-    font-size:15px; font-weight:600; border:none; cursor:pointer;
-    flex:1; text-align:center; display:block;
-  }
-  .icon-btn {
-    width:46px; height:46px; border-radius:50%;
+  .icon-btn{
+    width:46px;height:46px;border-radius:50%;
     border:1px solid rgba(255,255,255,0.2);
-    background:transparent; color:#fff;
-    font-size:20px; cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-    flex-shrink:0;
+    background:transparent;color:#fff;font-size:20px;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
   }
 
-  .info-section { max-width:680px; margin:40px auto; padding:0 24px; }
-  .info-section h2 {
-    font-family:'Plus Jakarta Sans',sans-serif; font-weight:300;
-    font-size:32px; letter-spacing:-0.5px; margin-bottom:18px;
-  }
-  .info-section p {
-    font-size:15px; line-height:1.7; color:#a8b2c1; margin-bottom:16px;
+  .xai-mark{
+    width:100%;aspect-ratio:16/10;
+    background:radial-gradient(ellipse at center,#1a1a1a 0%,#000 70%);
+    border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;
+    font-size:64px;letter-spacing:-2px;color:#fff;font-style:italic;
   }
 
-  .steps { max-width:680px; margin:40px auto; padding:0 24px; }
-  .step {
-    display:flex; gap:18px; padding:20px 0;
-    border-bottom:1px solid rgba(255,255,255,0.08);
-  }
-  .step-num {
-    flex-shrink:0; width:36px; height:36px; border-radius:50%;
-    background:rgba(74,158,255,0.15); color:#4a9eff;
-    display:flex; align-items:center; justify-content:center;
-    font-weight:600; font-size:15px;
-  }
-  .step-text strong { display:block; font-size:16px; margin-bottom:4px; color:#fff; }
-  .step-text span { font-size:14px; color:#8a94a3; line-height:1.5; }
+  .info-section{max-width:680px;margin:40px auto;padding:0 20px}
+  .info-section h2{font-family:'Plus Jakarta Sans',sans-serif;font-weight:300;font-size:28px;letter-spacing:-0.5px;margin-bottom:16px}
+  .info-section p{font-size:15px;line-height:1.7;color:#a8b2c1;margin-bottom:14px}
 
-  .disclosure {
-    max-width:680px; margin:40px auto 60px; padding:24px;
-    background:#0a0a0a; border:1px solid rgba(255,255,255,0.06);
-    border-radius:10px;
-  }
-  .disclosure p { font-size:12px; line-height:1.6; color:#6b7280; }
-  .disclosure a { color:#4a9eff; }
+  .steps{max-width:680px;margin:32px auto;padding:0 20px}
+  .step{display:flex;gap:16px;padding:18px 0;border-bottom:1px solid rgba(255,255,255,0.08)}
+  .step-num{flex-shrink:0;width:34px;height:34px;border-radius:50%;background:rgba(74,158,255,0.15);color:#4a9eff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px}
+  .step-text strong{display:block;font-size:15px;margin-bottom:4px;color:#fff}
+  .step-text span{font-size:13px;color:#8a94a3;line-height:1.5}
 
-  footer {
-    background:#050505; padding:40px 24px; text-align:center;
-    border-top:1px solid rgba(255,255,255,0.06);
-  }
-  footer a { color:#4a9eff; font-size:14px; margin:0 12px; }
-  footer p { color:#5a6473; font-size:12px; margin-top:18px; }
+  .disclosure{max-width:680px;margin:32px auto 50px;padding:20px;background:#0a0a0a;border:1px solid rgba(255,255,255,0.06);border-radius:10px;margin-left:20px;margin-right:20px}
+  .disclosure p{font-size:12px;line-height:1.6;color:#6b7280}
+  .disclosure a{color:#4a9eff}
 
-  @media (max-width:520px){
-    .hero { padding:40px 20px 30px; }
-    .cta-row { flex-direction:column; align-items:stretch; }
-    .btn-primary { width:100%; text-align:center; }
-    .btn-link { text-align:center; }
+  footer{background:#050505;padding:32px 20px;text-align:center;border-top:1px solid rgba(255,255,255,0.06)}
+  footer a{color:#4a9eff;font-size:13px;margin:0 10px}
+  footer p{color:#5a6473;font-size:12px;margin-top:16px}
+
+  @media(max-width:520px){
+    .cta-row{flex-direction:column;align-items:stretch;gap:14px}
+    .btn-primary{width:100%;text-align:center}
+    .btn-link{text-align:center}
+    .xai-mark{font-size:48px}
   }
 </style>
 </head>
@@ -167,7 +123,7 @@
 </header>
 
 <section class="hero">
-  <h1>Your IPO journey<br>starts here</h1>
+  <h1>Your IPO journey starts here</h1>
   <p>Set yourself up for potential access to the SpaceX and xAI IPOs and other Musk-ecosystem new-issue offerings.</p>
   <div class="cta-row">
     <a href="waitlist.html" class="btn-primary">Open an account</a>
@@ -175,7 +131,7 @@
   </div>
 </section>
 
-<div class="feature-card spacex">
+<div class="feature-card">
   <div class="img-wrap">
     <img src="assets/hero-ipos-spacex-logo.jpg" alt="SpaceX IPO">
   </div>
@@ -190,10 +146,8 @@
   </div>
 </div>
 
-<div class="feature-card xai">
-  <div class="img-wrap">
-    <div class="brand-mark">𝕏AI</div>
-  </div>
+<div class="feature-card">
+  <div class="xai-mark">𝕏AI</div>
   <div class="card-body">
     <div class="eyebrow">EARLY INDICATION</div>
     <h3>xAI IPO Access</h3>
@@ -212,27 +166,9 @@
 </section>
 
 <section class="steps">
-  <div class="step">
-    <div class="step-num">1</div>
-    <div class="step-text">
-      <strong>Open an account</strong>
-      <span>Complete the qualified-investor onboarding in under 6 minutes.</span>
-    </div>
-  </div>
-  <div class="step">
-    <div class="step-num">2</div>
-    <div class="step-text">
-      <strong>Indicate interest</strong>
-      <span>Select SpaceX, xAI, or both. Specify your target allocation size.</span>
-    </div>
-  </div>
-  <div class="step">
-    <div class="step-num">3</div>
-    <div class="step-text">
-      <strong>Receive priority notification</strong>
-      <span>When the books open, you are contacted before the public window.</span>
-    </div>
-  </div>
+  <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Open an account</strong><span>Complete the qualified-investor onboarding in under 6 minutes.</span></div></div>
+  <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Indicate interest</strong><span>Select SpaceX, xAI, or both. Specify your target allocation size.</span></div></div>
+  <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Receive priority notification</strong><span>When the books open, you are contacted before the public window.</span></div></div>
 </section>
 
 <div class="disclosure">
