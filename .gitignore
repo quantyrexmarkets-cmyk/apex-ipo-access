@@ -1,15 +1,31 @@
-.DS_Store
-*.bak
-*.log
-node_modules/
-.vercel/
-build-pages.py
-images/logos-backup/
-
 # Backups
 *.bak
+*.html.bak
 *.html.GOOD-*
 *.html.MASTERPIECE
 *.html.WORKING-*
 *.html.backup-*
 .backups/
+
+# Temp / scratch files
+*.tmp
+*.html.tmp
+fix_*.py
+clean_*.py
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# Env / secrets (just in case)
+.env
+.env.local
+*.key
+secrets.txt
+
+# Server logs
+*.log
+nohup.out

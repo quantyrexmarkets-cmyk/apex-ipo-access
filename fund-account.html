@@ -144,23 +144,6 @@
   }
 
   /* Crypto sub-options */
-  .crypto-opts{
-    display:none;gap:8px;padding:14px 0 4px;margin-top:8px;flex-wrap:wrap;
-    border-top:1px solid rgba(255,255,255,0.06);
-  }
-  .method.selected[data-method="crypto"] .crypto-opts{display:flex}
-  .crypto-chip{
-    flex:1;background:rgba(255,255,255,0.04);
-    border:1px solid rgba(255,255,255,0.1);
-    border-radius:10px;padding:8px;
-    text-align:center;cursor:pointer;
-    font-size:12px;font-weight:600;color:#cfd8e8;
-    transition:all .15s;
-  }
-  .crypto-chip:hover{border-color:rgba(74,158,255,0.4)}
-  .crypto-chip.active{
-    border-color:#4a9eff;color:#4a9eff;background:rgba(74,158,255,0.1);
-  }
 
   .err{
     text-align:center;color:#ff6a6a;font-size:13px;
@@ -190,6 +173,17 @@
   margin-top: 12px;
 }
 
+
+  /* Recommended badge */
+  .method.recommended{position:relative;border-color:rgba(62,213,152,0.4)!important;background:linear-gradient(135deg,rgba(62,213,152,0.06),rgba(62,213,152,0.01))!important;}
+  .rec-badge{
+    position:absolute;top:-9px;right:14px;
+    background:linear-gradient(135deg,#3ed598,#2eb87a);
+    color:#0a0a0a;font-size:9px;font-weight:800;
+    padding:3px 9px;border-radius:6px;
+    letter-spacing:0.8px;
+    box-shadow:0 4px 12px rgba(62,213,152,0.35);
+  }
 </style>
 </head>
 <body>
@@ -226,13 +220,28 @@
   <!-- Method -->
   <div class="section-h">Choose deposit method</div>
 
+    <div class="method selected recommended" data-method="crypto">
+      <span class="rec-badge">RECOMMENDED</span>
+      <div class="method-ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.5 8h4a2.5 2.5 0 0 1 0 5h-4M9.5 13h4.5a2.5 2.5 0 0 1 0 5H9.5M9.5 6v12"/></svg>
+      </div>
+      <div class="method-body">
+        <div class="method-name">Cryptocurrency</div>
+        <div class="method-desc">Deposit BTC, ETH, DOGE, or USDT instantly</div></div>
+      <div class="method-meta">
+        <div class="method-time">~30 minutes</div>
+        <div class="method-fee">Network fee only</div>
+      </div>
+      <div class="method-check"></div>
+    </div>
+
     <div class="method" data-method="wire">
       <div class="method-ic">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
       </div>
       <div class="method-body">
         <div class="method-name">Wire Transfer</div>
-        <div class="method-desc">Fastest settlement · Same business day</div>
+        <div class="method-desc">Bank-to-bank transfer · Same business day</div>
       </div>
       <div class="method-meta">
         <div class="method-time">Within hours</div>
@@ -240,20 +249,6 @@
       </div>
       <div class="method-check"></div>
     </div>
-
-    <div class="method" data-method="crypto">
-      <div class="method-ic">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.5 8h4a2.5 2.5 0 0 1 0 5h-4M9.5 13h4.5a2.5 2.5 0 0 1 0 5H9.5M9.5 6v12"/></svg>
-      </div>
-      <div class="method-body">
-        <div class="method-name">Cryptocurrency</div>
-        <div class="method-desc">Deposit BTC, ETH, DOGE, or USDT instantly</div>
-        <div class="crypto-opts">
-          <div class="crypto-chip active" data-asset="BTC">Bitcoin</div>
-          <div class="crypto-chip" data-asset="ETH">Ethereum</div>
-          <div class="crypto-chip" data-asset="DOGE">Dogecoin</div>
-          <div class="crypto-chip" data-asset="USDT">USDT</div>
-        </div>
       </div>
       <div class="method-meta">
         <div class="method-time">~30 minutes</div>
@@ -279,14 +274,13 @@
     document.getElementById('currentBal').textContent = '$' + Number(profile.cash_balance || 0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   }
 
-  let selectedMethod = null;
+  let selectedMethod = 'crypto';
   let cryptoAsset = 'BTC';
 
   // Method click
   document.querySelectorAll('.method').forEach(m => {
     m.addEventListener('click', (e) => {
       // Don't deselect when clicking crypto chips
-      if(e.target.classList.contains('crypto-chip')) return;
       document.querySelectorAll('.method').forEach(x => x.classList.remove('selected'));
       m.classList.add('selected');
       selectedMethod = m.dataset.method;
@@ -295,13 +289,6 @@
   });
 
   // Crypto chip click
-  document.querySelectorAll('.crypto-chip').forEach(chip => {
-    chip.addEventListener('click', (e) => {
-      e.stopPropagation();
-      document.querySelectorAll('.crypto-chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      cryptoAsset = chip.dataset.asset;
-    });
   });
 
   // Continue
@@ -412,5 +399,6 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 <!-- /deposit-nav-fix -->
 
+<script src="js/bottom-nav.js?v=1"></script>
 </body>
 </html>

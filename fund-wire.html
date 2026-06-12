@@ -27,22 +27,12 @@
     padding:16px 20px;
     display:flex;justify-content:space-between;align-items:center;
   }
-  .menu-btn{
-    width:38px;height:38px;display:flex;flex-direction:column;
-    justify-content:center;align-items:center;gap:5px;
-    background:none;border:none;cursor:pointer;
-  }
+  .menu-btn{width:38px;height:38px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;cursor:pointer}
   .menu-btn span{width:22px;height:2px;background:#4a9eff;display:block;border-radius:2px}
   .header-icons{display:flex;gap:10px;align-items:center}
-  .icon-btn{
-    width:38px;height:38px;border-radius:50%;
-    border:1px solid rgba(255,255,255,0.15);
-    display:flex;align-items:center;justify-content:center;
-    color:#4a9eff;background:none;cursor:pointer;
-  }
+  .icon-btn{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;color:#4a9eff;background:none;cursor:pointer}
   .logo{display:flex;align-items:center;gap:10px}
-  .logo-x{height:32px}
-  .logo-text-stack{display:flex;flex-direction:column;line-height:1}
+  .logo-text-stack{display:flex;flex-direction:column;line-height:1;align-items:center}
   .logo-line1{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#fff;letter-spacing:2px}
   .logo-line2{font-size:7px;color:#4a9eff;letter-spacing:3px;font-weight:600}
   .logo-tagline{font-size:5.5px;color:#6a7585;letter-spacing:2.5px;margin-top:1px}
@@ -90,23 +80,25 @@
 
   .detail-row{
     display:flex;justify-content:space-between;align-items:center;
-    padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.06);
+    padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.06);gap:12px;
   }
   .detail-row:last-child{border-bottom:none}
-  .detail-row .lbl{font-size:12px;color:#8a94a3}
+  .detail-row .lbl{font-size:12px;color:#8a94a3;flex-shrink:0}
   .detail-row .val{
     font-family:'JetBrains Mono',monospace;
     font-size:13px;color:#fff;font-weight:500;
     display:flex;align-items:center;gap:8px;
+    text-align:right;word-break:break-all;
   }
   .copy-btn{
     width:28px;height:28px;border-radius:6px;
     background:rgba(74,158,255,0.1);color:#4a9eff;
     border:none;cursor:pointer;display:flex;
     align-items:center;justify-content:center;
-    transition:all .15s;
+    transition:all .15s;flex-shrink:0;
   }
   .copy-btn:hover{background:rgba(74,158,255,0.2)}
+  .copy-btn.copied{background:rgba(62,213,152,0.2);color:#3ed598}
   .copy-btn svg{width:14px;height:14px}
 
   .warn-box{
@@ -140,6 +132,7 @@
     font-size:13px;color:#3ed598;font-weight:500;
     margin-top:8px;display:none;
   }
+  .upload-area.has-file .file-name{display:block}
 
   .submit-btn{
     width:100%;padding:16px;border:none;border-radius:12px;
@@ -154,21 +147,287 @@
   .fee-note{
     text-align:center;font-size:11px;color:#6a7585;margin-top:12px;
   }
+
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:#3ed598;color:#000;
+    padding:10px 18px;border-radius:24px;
+    font-size:13px;font-weight:600;
+    box-shadow:0 8px 24px rgba(0,0,0,0.4);
+    opacity:0;pointer-events:none;
+    transition:opacity .2s;z-index:200;
+  }
+  .toast.show{opacity:1}
 </style>
+</head>
+<body>
 
+<header class="dash-header">
+  <button class="menu-btn" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="logo">
+    <div class="logo-text-stack">
+      <span class="logo-line1">APEX</span>
+      <span class="logo-line2">IPO ACCESS</span>
+      <span class="logo-tagline">WIRE TRANSFER</span>
+    </div>
+  </div>
+  <button class="icon-btn" onclick="window.location.href='dashboard.html'" aria-label="Home">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M3 12l9-9 9 9M5 10v10h14V10"/>
+    </svg>
+  </button>
+</header>
 
+<main class="wrap">
+  <a href="fund-account.html" class="back-btn">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Back to funding options
+  </a>
 
+  <h1 class="page-h">Wire transfer instructions</h1>
+  <p class="page-sub">Send a domestic wire from your bank using the details below.</p>
 
+  <div class="amount-banner">
+    <div class="lbl">YOU'RE SENDING</div>
+    <div class="val" id="amountVal">$0.00</div>
+  </div>
 
+  <div class="warn-box">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/>
+      <line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+    <div class="txt"><strong>Include your reference code</strong> in the wire memo. Wires without a reference may be delayed by 1–3 business days.</div>
+  </div>
 
+  <div class="info-card">
+    <div class="title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      Beneficiary bank details
+    </div>
 
+    <div class="detail-row">
+      <div class="lbl">Bank name</div>
+      <div class="val">
+        <span id="bankName">Loading…</span>
+        <button class="copy-btn" data-copy="bankName" aria-label="Copy">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+    </div>
 
+    <div class="detail-row">
+      <div class="lbl">Routing (ABA)</div>
+      <div class="val">
+        <span id="routing">—</span>
+        <button class="copy-btn" data-copy="routing" aria-label="Copy">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+    </div>
 
+    <div class="detail-row">
+      <div class="lbl">Account number</div>
+      <div class="val">
+        <span id="accountNumber">—</span>
+        <button class="copy-btn" data-copy="accountNumber" aria-label="Copy">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+    </div>
 
+    <div class="detail-row">
+      <div class="lbl">SWIFT / BIC</div>
+      <div class="val">
+        <span id="swift">—</span>
+        <button class="copy-btn" data-copy="swift" aria-label="Copy">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+    </div>
 
+    <div class="detail-row">
+      <div class="lbl">Beneficiary</div>
+      <div class="val">
+        <span id="beneficiary">—</span>
+        <button class="copy-btn" data-copy="beneficiary" aria-label="Copy">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+    </div>
 
+    <div class="detail-row">
+      <div class="lbl">Bank address</div>
+      <div class="val">
+        <span id="bankAddress">—</span>
+        <button class="copy-btn" data-copy="bankAddress" aria-label="Copy">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+    </div>
 
+    <div class="detail-row">
+      <div class="lbl">Reference (memo)</div>
+      <div class="val" style="color:#4a9eff">
+        <span id="refCode">—</span>
+        <button class="copy-btn" data-copy="refCode" aria-label="Copy">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
 
+  <div class="info-card">
+    <div class="title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Delivery time
+    </div>
+    <div style="font-size:13px;color:#a8b2c1;line-height:1.6">
+      Domestic wires typically post within <strong style="color:#fff">1 business day</strong>. International wires take 2–5 business days.
+    </div>
+  </div>
 
+  <label class="upload-area" id="uploadArea" for="receiptFile">
+    <div class="ic">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+      </svg>
+    </div>
+    <div class="title">Upload wire receipt (optional)</div>
+    <div class="desc">PNG or PDF — helps us match your transfer faster</div>
+    <div class="file-name" id="fileName"></div>
+    <input type="file" id="receiptFile" accept="image/*,application/pdf" style="display:none">
+  </label>
+
+  <button class="submit-btn" id="submitBtn">I've sent the wire</button>
+  <p class="fee-note">No APEX fee. Your bank may charge a wire fee.</p>
+</main>
+
+<div class="toast" id="toast">Copied!</div>
+
+<script>
+  // Pull amount from URL or sessionStorage
+  var params = new URLSearchParams(window.location.search);
+  var amount = parseFloat(params.get('amount') || sessionStorage.getItem('fund_amount') || '0');
+  document.getElementById('amountVal').textContent = '$' + amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // Generate / restore reference code
+  var refCode = sessionStorage.getItem('fund_ref_code');
+  if(!refCode){
+    refCode = 'APX-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+    sessionStorage.setItem('fund_ref_code', refCode);
+  }
+  document.getElementById('refCode').textContent = refCode;
+
+  // Toast helper
+  var toast = document.getElementById('toast');
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(function(){ toast.classList.remove('show'); }, 1500);
+  }
+
+  // Copy buttons
+  document.querySelectorAll('.copy-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var id = btn.getAttribute('data-copy');
+      var text = document.getElementById(id).textContent.trim();
+      if(text === '—' || text === 'Loading…') return;
+      navigator.clipboard.writeText(text).then(function(){
+        btn.classList.add('copied');
+        showToast('Copied');
+        setTimeout(function(){ btn.classList.remove('copied'); }, 1500);
+      }).catch(function(){
+        // Fallback
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showToast('Copied'); } catch(e){}
+        document.body.removeChild(ta);
+      });
+    });
+  });
+
+  // File upload
+  var fileInput = document.getElementById('receiptFile');
+  var uploadArea = document.getElementById('uploadArea');
+  var fileName = document.getElementById('fileName');
+  fileInput.addEventListener('change', function(){
+    if(fileInput.files && fileInput.files[0]){
+      uploadArea.classList.add('has-file');
+      fileName.textContent = '✓ ' + fileInput.files[0].name;
+    }
+  });
+
+  // Load wire settings from Supabase
+  document.addEventListener('sb-ready', async function(){
+    try {
+      var { data, error } = await sb.from('wire_settings').select('*').limit(1).single();
+      if(data){
+        document.getElementById('bankName').textContent = data.bank_name || '—';
+        document.getElementById('routing').textContent = data.routing_number || '—';
+        document.getElementById('accountNumber').textContent = data.account_number || '—';
+        document.getElementById('swift').textContent = data.swift_code || '—';
+        document.getElementById('beneficiary').textContent = data.beneficiary_name || '—';
+        document.getElementById('bankAddress').textContent = data.bank_address || '—';
+      } else {
+        // Fallback defaults if no row exists
+        document.getElementById('bankName').textContent = 'Contact support for wire details';
+      }
+    } catch(e){
+      console.error('Wire settings load error:', e);
+      document.getElementById('bankName').textContent = 'Contact support for wire details';
+    }
+  });
+
+  // Submit — record pending deposit
+  document.getElementById('submitBtn').addEventListener('click', async function(){
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+
+    try {
+      var { data: userData } = await sb.auth.getUser();
+      var user = userData?.user;
+
+      if(user){
+        // Try to record deposit (silently continue if table missing)
+        try {
+          var insertData = {
+            user_id: user.id,
+            method: 'wire',
+            amount: amount,
+            reference_code: refCode,
+            status: 'pending'
+          };
+          await sb.from('deposits').insert(insertData);
+        } catch(e){ console.warn('deposits table:', e); }
+      }
+
+      // Persist for fund-process page
+      sessionStorage.setItem('fund_method', 'wire');
+      sessionStorage.setItem('fund_amount', String(amount));
+      sessionStorage.setItem('fund_ref_code', refCode);
+
+      window.location.href = 'fund-process.html';
+    } catch(err){
+      console.error(err);
+      btn.disabled = false;
+      btn.textContent = 'I\'ve sent the wire';
+      alert('Could not submit. Please try again or contact support.');
+    }
+  });
+</script>
+
+<script src="js/floating-widget.js" defer></script>
+
+<script src="js/bottom-nav.js?v=1"></script>
 </body>
 </html>

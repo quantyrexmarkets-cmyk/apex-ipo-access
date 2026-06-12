@@ -13,7 +13,6 @@
   html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
   a{color:inherit;text-decoration:none}
 
-  /* Header */
   .signup-header{
     position:sticky;top:0;z-index:100;
     background:rgba(0,0,0,0.92);
@@ -23,38 +22,30 @@
     padding:18px 24px;
     display:flex;justify-content:space-between;align-items:center;
   }
+  .logo-text{
+    font-family:'Orbitron',sans-serif;font-weight:600;
+    font-size:18px;color:#fff;letter-spacing:1px;
+  }
+  .logo-text .accent{color:#4a9eff}
   .progress-bar{
     position:sticky;top:72px;z-index:99;
     height:4px;background:rgba(255,255,255,0.08);width:100%;
   }
-  
-  .header-icons{display:flex;align-items:center;gap:18px}
+  .progress-fill{height:100%;background:#4a9eff;width:20%;transition:width .3s}
+  .header-icons{display:flex;align-items:center;gap:12px}
   .header-icons .icon-link{
     width:38px;height:38px;border-radius:50%;
     border:1px solid rgba(255,255,255,0.15);
     display:flex;align-items:center;justify-content:center;
-    color:#4a9eff;font-size:16px;
+    color:#4a9eff;font-size:14px;text-decoration:none;
   }
 
-  /* Progress bar */
-  
-  .progress-fill{
-    height:100%;background:#4a9eff;
-    width:20%; /* step 1 of 5 */
-    transition:width .3s;
-  }
-
-  /* Step indicator */
   .step-indicator{
-    text-align:center;
-    padding:32px 24px 8px;
-    font-size:14px;
-    color:#8a94a3;
-    letter-spacing:0.3px;
+    text-align:center;padding:32px 24px 8px;
+    font-size:14px;color:#8a94a3;letter-spacing:0.3px;
   }
 
-  /* Main content */
-  .signup-wrap{max-width:680px;margin:0 auto;padding:0 24px 120px}
+  .signup-wrap{max-width:680px;margin:0 auto;padding:0 24px 140px}
   .signup-wrap h1{
     font-family:'Plus Jakarta Sans',sans-serif;font-weight:400;
     font-size:clamp(32px,6vw,42px);line-height:1.15;
@@ -65,7 +56,6 @@
     margin-bottom:40px;line-height:1.5;
   }
 
-  /* Account type cards */
   .account-options{display:flex;flex-direction:column}
   .account-card{
     background:transparent;
@@ -75,16 +65,12 @@
     cursor:pointer;transition:all .15s;
   }
   .account-card:last-child{border-bottom:1px solid rgba(255,255,255,0.1)}
-  .account-card.selected{
-    border-color:#4a9eff;
-  }
   .account-card.selected h3{color:#4a9eff}
   .account-card .info{flex:1}
   .account-card h3{
     font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;
     font-size:20px;color:#fff;margin-bottom:10px;
-    letter-spacing:-0.3px;
-    transition:color .15s;
+    letter-spacing:-0.3px;transition:color .15s;
   }
   .account-card p{font-size:14px;color:#8a94a3;line-height:1.55}
   .account-card .checkbox{
@@ -94,19 +80,15 @@
     display:flex;align-items:center;justify-content:center;
     transition:all .15s;
   }
-  .account-card.selected .checkbox{
-    background:#4a9eff;border-color:#4a9eff;
-  }
+  .account-card.selected .checkbox{background:#4a9eff;border-color:#4a9eff}
   .account-card .checkbox::after{
-    content:"";
-    width:14px;height:8px;
+    content:"";width:14px;height:8px;
     border-left:2px solid #000;border-bottom:2px solid #000;
     transform:rotate(-45deg) translate(2px,-2px);
     opacity:0;transition:opacity .15s;
   }
   .account-card.selected .checkbox::after{opacity:1}
 
-  /* FDIC line */
   .fdic-line{
     display:flex;align-items:center;gap:12px;
     padding:20px 0;margin-top:8px;
@@ -119,11 +101,9 @@
   }
   .fdic-text{font-size:12px;color:#6b7280;line-height:1.5}
 
-  /* Sticky continue bar */
   .continue-bar{
     position:fixed;bottom:0;left:0;right:0;
-    background:#000;
-    padding:20px 24px 28px;
+    background:#000;padding:20px 24px 28px;
     border-top:1px solid rgba(255,255,255,0.08);
     z-index:50;
   }
@@ -132,33 +112,120 @@
     background:#4a9eff;color:#000;
     padding:18px;text-align:center;
     font-size:16px;font-weight:600;
-    border:none;cursor:pointer;
-    transition:all .2s;
+    border:none;cursor:pointer;transition:all .2s;
   }
   .continue-btn:hover{background:#6db1ff}
   .continue-btn:disabled{background:rgba(74,158,255,0.3);cursor:not-allowed;color:rgba(0,0,0,0.5)}
 
   .select-error{
     text-align:center;font-size:13px;color:#ff6a6a;
-    margin:12px 0 -4px;min-height:16px;letter-spacing:.2px;
-    font-weight:500;
+    margin:12px 0 -4px;min-height:16px;letter-spacing:.2px;font-weight:500;
   }
+
+  .signin-link{
+    text-align:center;margin-top:32px;
+    font-size:14px;color:#8a94a3;
+  }
+  .signin-link a{color:#4a9eff;font-weight:500}
 </style>
 <script src="js/supabase.js"></script>
+</head>
+<body>
 
+<header class="signup-header">
+  <a href="index.html" class="logo-text">APEX<span class="accent">·</span>IPO</a>
+  <div class="header-icons">
+    <a href="login.html" class="icon-link" title="Sign in">→</a>
+  </div>
+</header>
 
+<div class="progress-bar"><div class="progress-fill"></div></div>
 
+<div class="step-indicator">Step 1 of 5</div>
 
+<main class="signup-wrap">
+  <h1>What type of account do you want to open?</h1>
+  <p class="sub">Choose the account that best fits your investment goals. You can open more than one.</p>
 
+  <div class="account-options" id="acctOptions">
+    <div class="account-card" data-value="individual">
+      <div class="info">
+        <h3>Individual brokerage account</h3>
+        <p>A standard taxable account for one person to invest in stocks, ETFs, mutual funds, and pre-IPO opportunities.</p>
+      </div>
+      <div class="checkbox"></div>
+    </div>
 
+    <div class="account-card" data-value="joint">
+      <div class="info">
+        <h3>Joint brokerage account</h3>
+        <p>An account shared between two adults — ideal for couples or business partners investing together.</p>
+      </div>
+      <div class="checkbox"></div>
+    </div>
 
+    <div class="account-card" data-value="ira">
+      <div class="info">
+        <h3>Traditional or Roth IRA</h3>
+        <p>Tax-advantaged retirement account. Choose Traditional for tax-deferred growth or Roth for tax-free withdrawals.</p>
+      </div>
+      <div class="checkbox"></div>
+    </div>
 
+    <div class="account-card" data-value="trust">
+      <div class="info">
+        <h3>Trust or entity account</h3>
+        <p>For trusts, LLCs, corporations, and other legal entities investing in private markets.</p>
+      </div>
+      <div class="checkbox"></div>
+    </div>
+  </div>
 
+  <div class="fdic-line">
+    <div class="fdic-badge">SIPC</div>
+    <div class="fdic-text">Brokerage accounts are protected up to $500,000 by SIPC. APEX IPO ACCESS is a member of SIPC.</div>
+  </div>
 
+  <div class="signin-link">
+    Already have an account? <a href="login.html">Sign in</a>
+  </div>
+</main>
 
+<div class="continue-bar">
+  <div class="select-error" id="errMsg"></div>
+  <button class="continue-btn" id="continueBtn" disabled>Continue</button>
+</div>
 
+<script>
+  var selected = [];
+  var cards = document.querySelectorAll('.account-card');
+  var btn = document.getElementById('continueBtn');
+  var err = document.getElementById('errMsg');
 
+  cards.forEach(function(card){
+    card.addEventListener('click', function(){
+      var val = card.getAttribute('data-value');
+      if(card.classList.contains('selected')){
+        card.classList.remove('selected');
+        selected = selected.filter(function(v){ return v !== val; });
+      } else {
+        card.classList.add('selected');
+        selected.push(val);
+      }
+      btn.disabled = selected.length === 0;
+      err.textContent = '';
+    });
+  });
 
+  btn.addEventListener('click', function(){
+    if(selected.length === 0){
+      err.textContent = 'Please select at least one account type';
+      return;
+    }
+    sessionStorage.setItem('signup_account_types', JSON.stringify(selected));
+    window.location.href = 'signup-2.html';
+  });
+</script>
 
 </body>
 </html>

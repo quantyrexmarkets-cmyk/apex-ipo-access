@@ -1,4 +1,4 @@
-// APEX Bottom Nav — Auto-highlight active tab based on current URL
+// Auto-highlight active bottom nav tab based on current page
 (function() {
   function setActiveTab() {
     var path = window.location.pathname.split('/').pop() || 'dashboard.html';
@@ -6,14 +6,11 @@
     tabs.forEach(function(tab) {
       tab.classList.remove('active');
       var onclick = tab.getAttribute('onclick') || '';
-      // Match the page name inside location.href='xxx.html'
-      var match = onclick.match(/['"]([^'"]+\.html)['"]/);
-      if (match && match[1] === path) {
+      if (onclick.indexOf(path) !== -1) {
         tab.classList.add('active');
       }
     });
   }
-
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', setActiveTab);
   } else {

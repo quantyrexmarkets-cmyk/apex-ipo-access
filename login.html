@@ -6,7 +6,7 @@
 <title>Log on | APEX IPO ACCESS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&family=Orbitron:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
@@ -20,6 +20,11 @@
     padding:18px 24px;
     display:flex;justify-content:space-between;align-items:center;
   }
+  .logo-text{
+    font-family:'Orbitron',sans-serif;font-weight:600;
+    font-size:18px;color:#fff;letter-spacing:1px;
+  }
+  .logo-text .accent{color:#4a9eff}
   .menu-btn{
     width:38px;height:38px;
     display:flex;flex-direction:column;justify-content:center;align-items:center;
@@ -46,9 +51,7 @@
     display:flex;justify-content:space-between;align-items:center;
     margin-bottom:10px;
   }
-  .field label{
-    font-size:15px;color:#cfd8e8;font-weight:500;
-  }
+  .field label{font-size:15px;color:#cfd8e8;font-weight:500}
   .show-toggle{
     display:inline-flex;align-items:center;gap:6px;
     font-size:14px;color:#4a9eff;font-weight:500;
@@ -57,6 +60,7 @@
   .show-toggle svg{width:16px;height:16px}
 
   .field input[type="text"],
+  .field input[type="email"],
   .field input[type="password"]{
     width:100%;
     background:transparent;color:#fff;
@@ -73,7 +77,6 @@
     margin-top:6px;min-height:14px;letter-spacing:.2px;
   }
 
-  /* Custom checkboxes */
   .check-row{
     display:flex;align-items:center;gap:14px;
     margin:18px 0;cursor:pointer;user-select:none;
@@ -97,34 +100,6 @@
     font-size:16px;color:#e8eef7;
     display:inline-flex;align-items:center;gap:8px;
   }
-  .info-icon{
-    width:18px;height:18px;border-radius:50%;
-    border:1px solid #5a6473;color:#5a6473;
-    display:inline-flex;align-items:center;justify-content:center;
-    font-size:11px;font-weight:600;font-style:italic;cursor:help;
-  }
-
-  .goto-section{margin-top:28px}
-  .goto-section .label{
-    font-size:15px;color:#cfd8e8;font-weight:500;
-    margin-bottom:10px;
-  }
-  .goto-section select{
-    width:100%;
-    background:transparent;color:#fff;
-    border:1px solid rgba(255,255,255,0.25);
-    padding:18px 14px;font-size:15px;
-    font-family:inherit;border-radius:2px;
-    appearance:none;-webkit-appearance:none;
-    background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a9eff' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat:no-repeat;
-    background-position:right 14px center;
-    background-size:20px;
-    padding-right:44px;
-    cursor:pointer;
-  }
-  .goto-section select:focus{outline:none;border-color:#4a9eff}
-  .goto-section select option{background:#0a0a0a;color:#fff}
 
   .login-btn{
     display:block;width:100%;
@@ -134,8 +109,21 @@
     border:none;cursor:pointer;border-radius:2px;
     margin-top:32px;
     font-family:inherit;
+    transition:background .15s;
   }
   .login-btn:hover{background:#6db1ff}
+  .login-btn:disabled{background:rgba(74,158,255,0.3);cursor:not-allowed;color:rgba(0,0,0,0.5)}
+
+  .form-error{
+    background:rgba(255,74,74,0.1);
+    border:1px solid rgba(255,74,74,0.3);
+    color:#ff8a8a;
+    padding:14px;border-radius:4px;
+    font-size:14px;margin-bottom:20px;
+    text-align:center;
+    display:none;
+  }
+  .form-error.show{display:block}
 
   .links{margin-top:28px}
   .link-row{
@@ -159,148 +147,220 @@
   }
   .footer-row .sec-center svg{width:16px;height:16px}
   .footer-row .lang{color:#4a9eff;font-size:16px;font-weight:500}
-
 </style>
 <script src="js/supabase.js"></script>
+</head>
+<body>
+
+<header class="login-header">
+  <button class="menu-btn" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <a href="index.html" class="logo-text">APEX<span class="accent">·</span>IPO</a>
+  <div style="width:38px"></div>
+</header>
+
+<main class="login-wrap">
+  <h1 class="title">Log on</h1>
+
+  <div class="form-error" id="formError"></div>
+
+  <form id="loginForm" autocomplete="on">
+    <div class="field">
+      <div class="field-head">
+        <label for="email">Email address</label>
+      </div>
+      <input type="email" id="email" name="email" autocomplete="username" required>
+      <div class="field-error" id="emailErr"></div>
+    </div>
+
+    <div class="field">
+      <div class="field-head">
+        <label for="password">Password</label>
+        <span class="show-toggle" id="showToggle">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <span id="showText">Show</span>
+        </span>
+      </div>
+      <input type="password" id="password" name="password" autocomplete="current-password" required>
+      <div class="field-error" id="passErr"></div>
+    </div>
+
+    <div class="check-row" id="rememberRow">
+      <div class="cb"></div>
+      <div class="cb-label">Remember me</div>
+    </div>
+
+    <button type="submit" class="login-btn" id="loginBtn">Log on</button>
+  </form>
+
+  <div class="links">
+    <div class="link-row">
+      Don't have an account? <a href="signup.html">Open one now →</a>
+    </div>
+    <a href="#" class="link-block">Forgot password?</a>
+    <a href="contact.html" class="link-block">Need help signing on?</a>
+  </div>
+
+  <div class="footer-row">
+    <a href="#" class="sec-center">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      Security Center
+    </a>
+    <span class="lang">English</span>
+  </div>
+</main>
 
 <!-- 2fa-login-hook -->
 <script>
 (function() {
-  // Override the login flow to check 2FA
-  var origLogin = window.handleLogin || null;
+  function check2FA(session, email) {
+    return sb.from('profiles')
+      .select('two_factor_enabled')
+      .eq('id', session.user.id)
+      .single()
+      .then(function(res){
+        var profile = res.data;
+        if(!profile || !profile.two_factor_enabled) return false;
 
-  async function check2FA(session, email) {
-    try {
-      // Get user profile to check if 2FA is enabled
-      var { data: profile } = await sb
-        .from('profiles')
-        .select('two_factor_enabled')
-        .eq('id', session.user.id)
-        .single();
-
-      if (profile && profile.two_factor_enabled) {
-        // 2FA is enabled — generate code and redirect
-
-        // Store session temporarily (will be restored after 2FA)
         sessionStorage.setItem('pending_2fa_session', JSON.stringify({
           access_token: session.access_token,
           refresh_token: session.refresh_token
         }));
 
-        // Generate 5-digit code
-        var { data: code, error } = await sb.rpc('generate_2fa_code', {
+        return sb.rpc('generate_2fa_code', {
           p_user_id: session.user.id,
           p_email: email
-        });
+        }).then(function(r){
+          if(r.error){
+            console.error('2FA code error:', r.error);
+            return false;
+          }
+          var code = r.data;
 
-        if (error) {
-          console.error('2FA code error:', error);
-          // Fall through to dashboard if code generation fails
-          return false;
-        }
-
-        // Try to send email via Edge Function
-        try {
-          await fetch(sb.supabaseUrl + '/functions/v1/send-2fa-code', {
+          return fetch(sb.supabaseUrl + '/functions/v1/send-2fa-code', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer ' + sb.supabaseKey
             },
             body: JSON.stringify({ email: email, code: code })
+          }).catch(function(e){
+            console.warn('Edge function not set up — code stored in DB:', code);
+          }).then(function(){
+            return sb.auth.signOut();
+          }).then(function(){
+            var params = new URLSearchParams();
+            params.set('uid', session.user.id);
+            params.set('email', email);
+            window.location.href = 'verify-2fa.html?' + params.toString();
+            return true;
           });
-        } catch(e) {
-          console.warn('Edge function not set up — code stored in DB:', code);
-        }
-
-        // Sign out temporarily so the session isn't active until verified
-        await sb.auth.signOut();
-
-        // Redirect to 2FA verification page
-        var params = new URLSearchParams();
-        params.set('uid', session.user.id);
-        params.set('email', email);
-        window.location.href = 'verify-2fa.html?' + params.toString();
-        return true; // 2FA redirect happening
-      }
-
-      return false; // No 2FA, proceed normally
-    } catch(e) {
-      console.error('2FA check error:', e);
-      return false;
-    }
-  }
-
-  // Intercept all redirects to dashboard after login
-  var _origLocationSet = null;
-
-  function interceptDashboardRedirect() {
-    // Watch for any script trying to set location.href to dashboard
-    var desc = Object.getOwnPropertyDescriptor(window, 'location');
-
-    // Instead, we'll patch at the form/button level
-    document.addEventListener('submit', handleFormSubmit, true);
-
-    // Also intercept any direct login button clicks
-    setTimeout(function() {
-      var loginBtns = document.querySelectorAll('button[type="submit"], .login-btn, .cta-btn, [onclick*="login"], [onclick*="Login"]');
-      loginBtns.forEach(function(btn) {
-        var origOnclick = btn.getAttribute('onclick');
-        if (origOnclick) {
-          btn.removeAttribute('onclick');
-          btn.addEventListener('click', function(e) {
-            // Let the existing handler create the session, we'll catch the redirect
-          });
-        }
+        });
+      })
+      .catch(function(e){
+        console.error('2FA check error:', e);
+        return false;
       });
-    }, 100);
   }
 
-  // The main approach: override the point where login succeeds
-  // We'll add a MutationObserver to detect when login succeeds
-  // and intercept before dashboard redirect
-
-  // Simpler approach: patch the signInWithPassword response
-  var _origSignIn = sb.auth.signInWithPassword.bind(sb.auth);
-
-  sb.auth.signInWithPassword = async function(credentials) {
-    var result = await _origSignIn(credentials);
-
-    if (result.data && result.data.session && result.data.user) {
-      var email = credentials.email || result.data.user.email;
-      var needs2FA = await check2FA(result.data.session, email);
-
-      if (needs2FA) {
-        // Return a modified result that won't trigger dashboard redirect
-        return {
-          data: { user: null, session: null },
-          error: { message: '2FA_REDIRECT', status: 0 }
-        };
+  document.addEventListener('sb-ready', function(){
+    // Redirect already-logged-in users
+    sb.auth.getUser().then(function(r){
+      if(r.data && r.data.user){
+        window.location.href = 'dashboard.html';
       }
+    });
+
+    var form = document.getElementById('loginForm');
+    var btn = document.getElementById('loginBtn');
+    var errBox = document.getElementById('formError');
+    var emailInput = document.getElementById('email');
+    var passInput = document.getElementById('password');
+    var showToggle = document.getElementById('showToggle');
+    var showText = document.getElementById('showText');
+    var rememberRow = document.getElementById('rememberRow');
+
+    // Show/hide password
+    showToggle.addEventListener('click', function(){
+      if(passInput.type === 'password'){
+        passInput.type = 'text';
+        showText.textContent = 'Hide';
+      } else {
+        passInput.type = 'password';
+        showText.textContent = 'Show';
+      }
+    });
+
+    // Remember me toggle
+    rememberRow.addEventListener('click', function(){
+      rememberRow.classList.toggle('checked');
+    });
+
+    // Restore saved email
+    var saved = localStorage.getItem('apex_remember_email');
+    if(saved){
+      emailInput.value = saved;
+      rememberRow.classList.add('checked');
     }
 
-    return result;
-  };
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      errBox.classList.remove('show');
+      errBox.textContent = '';
 
+      var email = emailInput.value.trim();
+      var password = passInput.value;
+
+      if(!email || !password){
+        errBox.textContent = 'Please enter your email and password';
+        errBox.classList.add('show');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Signing in...';
+
+      sb.auth.signInWithPassword({ email: email, password: password })
+        .then(function(res){
+          if(res.error){
+            errBox.textContent = res.error.message || 'Invalid email or password';
+            errBox.classList.add('show');
+            btn.disabled = false;
+            btn.textContent = 'Log on';
+            return;
+          }
+
+          if(rememberRow.classList.contains('checked')){
+            localStorage.setItem('apex_remember_email', email);
+          } else {
+            localStorage.removeItem('apex_remember_email');
+          }
+
+          // Check 2FA
+          check2FA(res.data.session, email).then(function(needs2FA){
+            if(!needs2FA){
+              window.location.href = 'dashboard.html';
+            }
+            // If 2FA, redirect already happened inside check2FA
+          });
+        })
+        .catch(function(err){
+          errBox.textContent = err.message || 'Sign-in failed. Please try again.';
+          errBox.classList.add('show');
+          btn.disabled = false;
+          btn.textContent = 'Log on';
+        });
+    });
+  });
 })();
 </script>
 <!-- /2fa-login-hook -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 </body>
 </html>

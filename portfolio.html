@@ -339,23 +339,23 @@
 
 <!-- BOTTOM TAB NAV -->
 <nav class="tab-nav">
-  <div class="tab active" onclick="location.href='dashboard.html'">
+  <div onclick="location.href='dashboard.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span class="lbl">Home</span>
   </div>
-  <div class="tab">
+  <div onclick="location.href='portfolio.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
     <span class="lbl">Portfolio</span>
   </div>
-  <div class="tab" onclick="window.apexToast && window.apexToast('IPOs page coming soon')">
+  <div onclick="location.href='ipos.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
     <span class="lbl">IPOs</span>
   </div>
-  <div class="tab" onclick="location.href='docs.html'">
+  <div onclick="location.href='docs.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
     <span class="lbl">Docs</span>
   </div>
-  <div class="tab" onclick="location.href='account.html'">
+  <div onclick="location.href='account.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>
     <span class="lbl">Account</span>
   </div>
@@ -607,5 +607,6 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 <!-- /docs-quicknav-fix -->
 
+<script src="js/bottom-nav.js?v=1"></script>
 </body>
 </html>
