@@ -5,3 +5,11 @@ node_modules/
 .vercel/
 build-pages.py
 images/logos-backup/
+
+# Backups
+*.bak
+*.html.GOOD-*
+*.html.MASTERPIECE
+*.html.WORKING-*
+*.html.backup-*
+.backups/

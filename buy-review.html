@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Order | APEX IPO ACCESS</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/supabase.js?v=1781218671"></script>
+<script src="js/sidebar.js?v=1781218671"></script>
+<script>
+  document.addEventListener('sb-ready', async () => {
+    const { data } = await sb.auth.getUser();
+    if(!data.user) window.location.href = 'login.html';
+  });
+</script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+
+  .top-bar{
+    position:sticky;top:0;z-index:100;
+    background:rgba(0,0,0,0.92);backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding:16px 20px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .back-btn{
+    width:38px;height:38px;border-radius:50%;
+    border:1px solid rgba(255,255,255,0.15);
+    display:flex;align-items:center;justify-content:center;
+    color:#4a9eff;background:none;cursor:pointer;
+  }
+  .top-title{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:14px;color:#fff;letter-spacing:0.3px;
+  }
+  .top-spacer{width:38px}
+
+  .step-bar{display:flex;justify-content:center;gap:8px;padding:18px 20px 8px}
+  .step-dot{width:34px;height:3px;border-radius:3px;background:rgba(255,255,255,0.1)}
+  .step-dot.active{background:#4a9eff}
+  .step-dot.done{background:#3ed598}
+
+  .page{max-width:560px;margin:0 auto;padding:8px 20px 160px}
+
+  .lede{
+    text-align:center;color:#8a94a3;font-size:12px;letter-spacing:0.4px;
+    margin-bottom:8px;text-transform:uppercase;font-weight:600;
+  }
+  h1{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:26px;color:#fff;
+    text-align:center;letter-spacing:-0.5px;margin-bottom:22px;
+  }
+
+  /* Company header */
+  .co-hero{
+    background:linear-gradient(135deg,rgba(74,158,255,0.08),rgba(74,158,255,0.02));
+    border:1px solid rgba(74,158,255,0.2);
+    border-radius:16px;padding:20px;margin-bottom:18px;
+    display:flex;align-items:center;gap:14px;
+  }
+  .co-logo{
+    width:60px;height:60px;border-radius:14px;
+    background:#fff;flex-shrink:0;overflow:hidden;padding:7px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .co-logo img{width:100%;height:100%;object-fit:contain}
+  .co-info{flex:1;min-width:0}
+  .co-name{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:19px;color:#fff;letter-spacing:-0.3px;
+  }
+  .co-sector{font-size:12px;color:#8a94a3;margin-top:3px}
+  .co-stage{
+    display:inline-block;font-size:10px;font-weight:700;
+    color:#4a9eff;background:rgba(74,158,255,0.12);
+    padding:3px 8px;border-radius:6px;
+    text-transform:uppercase;letter-spacing:0.5px;margin-top:6px;
+  }
+
+  /* SECTION */
+  .section{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px;padding:16px 18px;margin-bottom:14px;
+  }
+  .section-h{
+    display:flex;justify-content:space-between;align-items:center;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:13px;color:#cfd8e8;
+    letter-spacing:0.3px;text-transform:uppercase;margin-bottom:12px;
+  }
+  .section-h .pill{
+    font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;
+    background:rgba(62,213,152,0.12);color:#3ed598;
+    text-transform:uppercase;letter-spacing:0.4px;
+  }
+
+  /* Order summary */
+  .row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:8px 0;font-size:13px;color:#a8b2c1;
+  }
+  .row .v{color:#fff;font-weight:500;font-feature-settings:"tnum"}
+  .row.big{
+    font-size:15px;padding-top:12px;margin-top:6px;
+    border-top:1px solid rgba(255,255,255,0.08);
+  }
+  .row.big .lbl{font-weight:600;color:#fff}
+  .row.big .v{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:700;font-size:20px;color:#4a9eff;
+  }
+
+  /* About company */
+  .about{
+    font-size:13px;color:#cfd8e8;line-height:1.55;
+    margin-bottom:12px;
+  }
+  .meta-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  }
+  .meta-tile{
+    background:rgba(255,255,255,0.03);
+    border-radius:10px;padding:10px 12px;
+  }
+  .meta-lbl{font-size:10px;color:#6a7585;letter-spacing:0.5px;text-transform:uppercase;font-weight:600;margin-bottom:4px}
+  .meta-val{font-size:13px;color:#fff;font-weight:500;line-height:1.3}
+
+  /* Success rate */
+  .stat-card{
+    display:flex;align-items:center;gap:14px;
+    padding:14px 16px;border-radius:12px;
+    background:rgba(62,213,152,0.06);
+    border:1px solid rgba(62,213,152,0.18);
+    margin-bottom:10px;
+  }
+  .stat-icon{
+    width:42px;height:42px;border-radius:50%;
+    background:rgba(62,213,152,0.15);
+    display:flex;align-items:center;justify-content:center;
+    color:#3ed598;flex-shrink:0;
+  }
+  .stat-icon svg{width:20px;height:20px}
+  .stat-body{flex:1}
+  .stat-lbl{font-size:11px;color:#8a94a3;letter-spacing:0.3px;text-transform:uppercase;font-weight:600}
+  .stat-val{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:16px;color:#fff;margin-top:2px;
+  }
+  .stat-card.blue{background:rgba(74,158,255,0.06);border-color:rgba(74,158,255,0.18)}
+  .stat-card.blue .stat-icon{background:rgba(74,158,255,0.15);color:#4a9eff}
+  .stat-card.amber{background:rgba(255,184,0,0.06);border-color:rgba(255,184,0,0.18)}
+  .stat-card.amber .stat-icon{background:rgba(255,184,0,0.15);color:#ffb800}
+
+  /* Bonus highlight */
+  .bonus-card{
+    background:linear-gradient(135deg,rgba(62,213,152,0.1),rgba(62,213,152,0.02));
+    border:1px solid rgba(62,213,152,0.25);
+    border-radius:14px;padding:16px;
+    display:flex;align-items:center;gap:12px;margin-bottom:14px;
+  }
+  .bonus-card .ic{
+    width:40px;height:40px;border-radius:50%;
+    background:rgba(62,213,152,0.18);
+    display:flex;align-items:center;justify-content:center;
+    color:#3ed598;flex-shrink:0;
+  }
+  .bonus-card .ic svg{width:18px;height:18px}
+  .bonus-card .body{flex:1}
+  .bonus-card .title{font-weight:600;color:#fff;font-size:14px}
+  .bonus-card .desc{font-size:12px;color:#a8b2c1;margin-top:2px;line-height:1.4}
+  .bonus-card .amt{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:700;font-size:16px;color:#3ed598;flex-shrink:0;
+  }
+
+  /* Terms */
+  .terms{
+    font-size:11px;color:#8a94a3;line-height:1.6;
+    background:rgba(255,255,255,0.02);
+    border-radius:10px;padding:14px;margin-top:14px;
+  }
+  .terms strong{color:#cfd8e8}
+
+  /* Checkbox */
+  .check-row{
+    display:flex;align-items:flex-start;gap:12px;
+    padding:14px 0;cursor:pointer;
+  }
+  .cb{
+    width:22px;height:22px;border-radius:5px;
+    border:1.5px solid rgba(255,255,255,0.3);
+    flex-shrink:0;margin-top:1px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .check-row.checked .cb{background:#4a9eff;border-color:#4a9eff}
+  .check-row.checked .cb::after{
+    content:"";width:11px;height:6px;
+    border-left:2px solid #000;border-bottom:2px solid #000;
+    transform:rotate(-45deg) translate(0,-1px);
+  }
+  .check-row .lbl{font-size:13px;color:#cfd8e8;line-height:1.5}
+
+  .err{
+    text-align:center;color:#ff6a6a;font-size:13px;
+    margin:14px 0 0;min-height:16px;font-weight:500;
+  }
+
+  .continue-bar{
+    position:fixed;bottom:0;left:0;right:0;
+    background:rgba(0,0,0,0.95);backdrop-filter:blur(20px);
+    padding:18px 20px 28px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    z-index:50;
+  }
+  .continue-btn{
+    display:block;width:100%;max-width:520px;margin:0 auto;
+    background:#4a9eff;color:#000;
+    padding:16px;text-align:center;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:15px;font-weight:600;
+    border:none;cursor:pointer;border-radius:12px;
+  }
+  .continue-btn:hover{background:#6db1ff}
+  .continue-btn:disabled{background:#2a2f38;color:#5a6473;cursor:not-allowed}
+  .continue-btn .spin{
+    display:inline-block;width:14px;height:14px;
+    border:2px solid rgba(0,0,0,0.3);border-top-color:#000;
+    border-radius:50%;animation:sp .8s linear infinite;
+    margin-right:8px;vertical-align:middle;
+  }
+  @keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<header class="top-bar">
+  <button class="back-btn" onclick="history.back()" aria-label="Back">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <div class="top-title">Review &amp; Confirm</div>
+  <div class="top-spacer"></div>
+</header>
+
+<div class="step-bar">
+  <div class="step-dot done"></div>
+  <div class="step-dot active"></div>
+  <div class="step-dot"></div>
+</div>
+
+<div class="page" id="page">
+  <div class="lede">Step 2 of 3 · Review your allocation</div>
+  <h1>Confirm your order</h1>
+
+  <div id="content"></div>
+</div>
+
+<div class="continue-bar">
+  <button class="continue-btn" id="confirmBtn">Confirm allocation</button>
+</div>
+
+<script>
+(async function(){
+  const order = JSON.parse(sessionStorage.getItem('apex_order') || 'null');
+  // Reject stale orders (older than 10 minutes) — forces fresh data from DB
+  if(order && order._ts && (Date.now() - order._ts) > 600000){
+    sessionStorage.removeItem('apex_order');
+    alert('Your previous order session expired. Starting fresh.');
+    window.location.href = 'dashboard.html';
+    return;
+  }
+  if(!order){
+    document.getElementById('content').innerHTML = '<p style="text-align:center;color:#8a94a3">No order data found. <a href="dashboard.html" style="color:#4a9eff">Return to dashboard</a></p>';
+    document.getElementById('confirmBtn').style.display = 'none';
+    return;
+  }
+
+  const fmt = n => '$' + Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmtInt = n => Number(n).toLocaleString('en-US');
+
+  const tierName = { 1: 'Institutional', 2: 'Priority', 3: 'Standard' }[order.tier];
+  const settlement = { 1: 'T+1', 2: 'T+3', 3: 'T+5' }[order.tier];
+
+  document.getElementById('content').innerHTML = `
+    <!-- Company hero -->
+    <div class="co-hero">
+      <div class="co-logo"><img src="${order.company_logo}" alt="${order.company_name}" onerror="this.parentElement.innerHTML='<div style=&quot;color:#000;font-weight:700;font-size:22px&quot;>${order.company_name[0]}</div>'"></div>
+      <div class="co-info">
+        <div class="co-name">${order.company_name}</div>
+        <div class="co-sector">${order.sector || ''}</div>
+        <div class="co-stage">${order.stage || 'Private'}</div>
+      </div>
+    </div>
+
+    <!-- Order summary -->
+    <div class="section">
+      <div class="section-h">Order Summary <span class="pill">${tierName} · Tier ${order.tier}</span></div>
+      <div class="row"><span>Company</span><span class="v">${order.company_name}</span></div>
+      <div class="row"><span>Shares to reserve</span><span class="v">${fmtInt(order.shares)}</span></div>
+      <div class="row"><span>Price per share</span><span class="v">${fmt(order.price_per_share)}</span></div>
+      <div class="row"><span>Settlement</span><span class="v">${settlement} after IPO</span></div>
+      <div class="row"><span>Holding period</span><span class="v">${order.hold_period_label || 'Standard'} · ${(() => { const d = order.lockup_days || 60; return d % 30 === 0 ? `${d/30} month${d/30>1?'s':''}` : `${d} days`; })()}${order.hold_perk_pct ? ' · <span style="color:#3ed598">+' + order.hold_perk_pct + '% perk</span>' : ''}</span></div>
+      <div class="row big"><span class="lbl">Total commitment</span><span class="v">${fmt(order.total_value)}</span></div>
+    </div>
+
+    ${order.bonus_eligible && order.estimated_bonus > 0 ? `
+    <!-- Bonus highlight -->
+    <div class="bonus-card">
+      <div class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="body">
+        <div class="title">Founding Investor Incentive</div>
+        <div class="desc">4% cash rebate credited on settlement</div>
+      </div>
+      <div class="amt">+${fmt(order.estimated_bonus)}</div>
+    </div>
+    ` : ''}
+
+    <!-- Performance signals -->
+    <div class="section">
+      <div class="section-h">Investment Outlook</div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="stat-body">
+          <div class="stat-lbl">Historical Success Rate</div>
+          <div class="stat-val">${order.success_rate || 'N/A'}% of allocations realized positive returns</div>
+        </div>
+      </div>
+
+      <div class="stat-card blue">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+        <div class="stat-body">
+          <div class="stat-lbl">Expected Return</div>
+          <div class="stat-val">${order.expected_return || 'Performance data pending'}</div>
+          ${(() => {
+            const m = (order.expected_return || '').match(/\+(\d+)%\s*to\s*\+(\d+)%/);
+            if(!m) return '';
+            const perk = (order.hold_perk_pct || 0) / 100;
+            const lowGain  = order.total_value * (parseInt(m[1])/100) * (1 + perk);
+            const highGain = order.total_value * (parseInt(m[2])/100) * (1 + perk);
+            const perkNote = perk > 0 ? ` (incl. +${order.hold_perk_pct}% holding-period bonus)` : '';
+            return `<div style="font-size:12px;color:#3ed598;margin-top:6px;font-weight:600">Projected profit: +${fmt(lowGain)} to +${fmt(highGain)}${perkNote}</div>`;
+          })()}
+        </div>
+      </div>
+
+      <div class="stat-card amber">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="stat-body">
+          <div class="stat-lbl">Lock-up Period</div>
+          <div class="stat-val">${(() => { const d = order.lockup_days || 60; return d % 30 === 0 ? `${d/30} month${d/30>1?'s':''} post-IPO` : `${d} days post-IPO`; })()}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- About company -->
+    <div class="section">
+      <div class="section-h">About ${order.company_name}</div>
+      <div class="about">${order.description || 'No description available.'}</div>
+      <div class="meta-grid">
+        <div class="meta-tile">
+          <div class="meta-lbl">YoY Growth</div>
+          <div class="meta-val">${order.growth_yoy || '—'}</div>
+        </div>
+        <div class="meta-tile">
+          <div class="meta-lbl">Valuation</div>
+          <div class="meta-val">${order.valuation || '—'}</div>
+        </div>
+        <div class="meta-tile">
+          <div class="meta-lbl">IPO Window</div>
+          <div class="meta-val">${order.ipo_window || 'TBD'}</div>
+        </div>
+        <div class="meta-tile">
+          <div class="meta-lbl">Founded</div>
+          <div class="meta-val">${order.founded_year || '—'} · ${order.hq || ''}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Terms -->
+    <div class="section">
+      <div class="section-h">Terms &amp; Disclosures</div>
+      <div class="terms">
+        <strong>Reservation status.</strong> Your allocation will be recorded as <em>Pending Funding</em> until your account is funded. Shares are not transferred until settlement post-IPO.<br><br>
+        <strong>Risk disclosure.</strong> Pre-IPO investments are illiquid and subject to lock-up restrictions. Past performance does not guarantee future results. You may lose part or all of your investment.<br><br>
+        <strong>Bonus terms.</strong> The 4% cash rebate applies to your first qualifying purchase only and is credited to your buying power upon settlement.<br><br>
+        <strong>Cancellation.</strong> Reservations may be cancelled at no cost up to 24 hours before the IPO subscription window closes.
+      </div>
+    </div>
+
+    <!-- Acknowledgment -->
+    <div class="check-row" id="ackCb">
+      <div class="cb"></div>
+      <div class="lbl">I have read and accept the <a href="#" style="color:#4a9eff">Terms of Service</a>, <a href="#" style="color:#4a9eff">Risk Disclosure</a>, and <a href="#" style="color:#4a9eff">Subscription Agreement</a>.</div>
+    </div>
+
+    <div class="err" id="err"></div>
+  `;
+
+  // Checkbox toggle
+  document.getElementById('ackCb').addEventListener('click', e => {
+    e.currentTarget.classList.toggle('checked');
+  });
+
+  // Confirm button — write to Supabase
+  document.getElementById('confirmBtn').addEventListener('click', async () => {
+    const err = document.getElementById('err');
+    const btn = document.getElementById('confirmBtn');
+    err.textContent = '';
+
+    if(!document.getElementById('ackCb').classList.contains('checked')){
+      err.textContent = 'Please accept the terms to continue';
+      return;
+    }
+
+    if(!window.sb){
+      await new Promise(r => document.addEventListener('sb-ready', r, { once:true }));
+    }
+    const { data: { user } } = await sb.auth.getUser();
+    if(!user){ window.location.href = 'login.html'; return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin"></span>Processing…';
+
+    // Insert allocation
+    const { data: alloc, error: allocErr } = await sb.from('allocations').insert({
+      user_id: user.id,
+      company_ticker: order.ticker,
+      company_name: order.company_name,
+      shares: order.shares,
+      price_per_share: order.price_per_share,
+      tier: order.tier,
+      status: 'pending_funding'
+    }).select().single();
+
+    if(allocErr){
+      console.error('Allocation insert error:', allocErr);
+      btn.disabled = false;
+      btn.textContent = 'Confirm allocation';
+      err.textContent = allocErr.message || 'Could not confirm allocation. Please try again.';
+      return;
+    }
+
+    // Log activity
+    await sb.from('activity_log').insert({
+      user_id: user.id,
+      event_type: 'allocation_reserved',
+      title: `${order.company_name} allocation reserved`,
+      description: `${order.shares.toLocaleString()} shares · ${fmt(order.total_value)} · ${tierName} Tier ${order.tier}`,
+      icon_color: 'green'
+    });
+
+    // Save the allocation ID for the receipt page
+    sessionStorage.setItem('apex_last_allocation', JSON.stringify({
+      ...order,
+      allocation_id: alloc.id,
+      created_at: alloc.created_at,
+      status: alloc.status
+    }));
+
+    // Bonus was triggered automatically by DB trigger — fetch updated profile
+    const profile = await window.apex.getProfile();
+    const bonus_awarded = order.bonus_eligible && profile?.welcome_bonus_claimed
+      ? order.estimated_bonus : 0;
+    if(bonus_awarded){
+      const last = JSON.parse(sessionStorage.getItem('apex_last_allocation'));
+      last.bonus_awarded = bonus_awarded;
+      sessionStorage.setItem('apex_last_allocation', JSON.stringify(last));
+    }
+
+    window.location.href = 'buy-receipt.html';
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Login | APEX IPO ACCESS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/supabase.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+
+  .signup-header{
+    position:sticky;top:0;z-index:100;
+    background:rgba(0,0,0,0.92);backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding:18px 24px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .header-icons{display:flex;align-items:center;gap:14px}
+  .header-icons .icon-link{
+    width:38px;height:38px;border-radius:50%;
+    border:1px solid rgba(255,255,255,0.15);
+    display:flex;align-items:center;justify-content:center;
+    color:#4a9eff;
+  }
+
+  .progress-bar{
+    position:sticky;top:72px;z-index:99;
+    height:4px;background:rgba(255,255,255,0.08);width:100%;
+  }
+  .progress-fill{height:100%;background:#4a9eff;width:100%}
+
+  .step-indicator{
+    text-align:center;padding:32px 24px 8px;
+    font-size:14px;color:#8a94a3;letter-spacing:0.3px;
+  }
+
+  .signup-wrap{max-width:680px;margin:0 auto;padding:0 24px 140px}
+  .signup-wrap h1{
+    font-family:'Plus Jakarta Sans',sans-serif;font-weight:400;
+    font-size:clamp(32px,6vw,42px);line-height:1.15;
+    letter-spacing:-0.8px;margin-bottom:14px;text-align:center;color:#fff;
+  }
+  .lede{
+    text-align:center;color:#a8b2c1;font-size:15px;line-height:1.55;
+    max-width:520px;margin:0 auto 36px;
+  }
+
+  .back-link{
+    display:inline-flex;align-items:center;gap:8px;
+    margin:24px 0 8px;
+    font-size:14px;color:#4a9eff;font-weight:500;
+  }
+
+  .form-grid{display:flex;flex-direction:column;gap:22px}
+  .form-group{display:flex;flex-direction:column;position:relative}
+  .form-group label{
+    font-size:13px;color:#a8b2c1;margin-bottom:8px;
+    font-weight:500;letter-spacing:0.2px;
+  }
+  .input-wrap{position:relative}
+  .form-group input{
+    width:100%;background:transparent;color:#fff;
+    border:1px solid rgba(255,255,255,0.18);
+    padding:14px 12px;font-size:14px;
+    font-family:inherit;letter-spacing:0.3px;
+    transition:border .15s;border-radius:0;
+  }
+  .form-group input:focus{outline:none;border-color:#4a9eff}
+  .form-group input::placeholder{color:#5a6473}
+  .form-group input.invalid{border-color:#ff4a4a}
+  .form-group input.valid{border-color:#3ed598}
+
+  .show-pwd{
+    position:absolute;right:12px;top:50%;
+    transform:translateY(-50%);
+    color:#4a9eff;font-size:12px;font-weight:500;
+    cursor:pointer;user-select:none;
+    background:none;border:none;padding:4px 8px;
+  }
+
+  .field-error{
+    font-size:12px;color:#ff6a6a;margin-top:6px;
+    min-height:14px;letter-spacing:.2px;
+  }
+
+  .pwd-rules{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:10px;padding:14px 16px;
+    margin-top:8px;
+  }
+  .pwd-rules .rule{
+    display:flex;align-items:center;gap:8px;
+    font-size:12px;color:#8a94a3;
+    padding:3px 0;letter-spacing:0.2px;
+  }
+  .pwd-rules .rule.ok{color:#3ed598}
+  .pwd-rules .rule .check{
+    width:14px;height:14px;border-radius:50%;
+    border:1.5px solid #5a6473;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:9px;
+  }
+  .pwd-rules .rule.ok .check{
+    background:#3ed598;border-color:#3ed598;color:#000;
+  }
+  .pwd-rules .rule.ok .check::after{content:"✓"}
+
+  .submit-error{
+    text-align:center;color:#ff6a6a;font-size:13px;
+    margin:16px 0;min-height:16px;font-weight:500;
+  }
+
+  .continue-bar{
+    position:fixed;bottom:0;left:0;right:0;
+    background:#000;padding:20px 24px 28px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    z-index:50;
+  }
+  .continue-btn{
+    display:block;width:100%;max-width:632px;margin:0 auto;
+    background:#4a9eff;color:#000;
+    padding:18px;text-align:center;
+    font-size:16px;font-weight:600;
+    border:none;cursor:pointer;font-family:inherit;
+  }
+  .continue-btn:hover{background:#6db1ff}
+  .continue-btn:disabled{background:#2a2f38;color:#5a6473;cursor:wait}
+  .continue-btn .spinner{
+    display:inline-block;width:14px;height:14px;
+    border:2px solid rgba(0,0,0,0.3);border-top-color:#000;
+    border-radius:50%;animation:spin .8s linear infinite;
+    margin-right:8px;vertical-align:middle;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<header class="signup-header">
+  <a href="index.html" class="logo">
+    <img src="assets/spacex-logo.png" class="logo-x" alt="X" />
+    <div class="logo-text-stack">
+      <span class="logo-line1">APEX</span>
+      <span class="logo-line2">IPO ACCESS</span>
+      <span class="logo-tagline">INVESTMENT INTELLIGENCE</span>
+    </div>
+  </a>
+  <div class="header-icons">
+    <a href="#" class="icon-link" title="Secure session">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </a>
+    <a href="contact.html" class="icon-link" title="Contact support">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+    </a>
+  </div>
+</header>
+
+<div class="progress-bar"><div class="progress-fill"></div></div>
+
+<div class="step-indicator">Brokerage · Account credentials</div>
+
+<div class="signup-wrap">
+  <a href="signup-6.html" class="back-link">← Back</a>
+  <h1>Create your login</h1>
+  <p class="lede">You'll use these credentials to access your APEX IPO ACCESS portal.</p>
+
+  <form id="credentialsForm" novalidate>
+    <div class="form-grid">
+
+      <div class="form-group">
+        <label for="email">Email address</label>
+        <input type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <input type="password" id="password" name="password" autocomplete="new-password" placeholder="Create a password">
+          <button type="button" class="show-pwd" id="togglePwd">Show</button>
+        </div>
+        <div class="pwd-rules">
+          <div class="rule" id="r-len"><div class="check"></div>At least 8 characters</div>
+          <div class="rule" id="r-upper"><div class="check"></div>One uppercase letter</div>
+          <div class="rule" id="r-num"><div class="check"></div>One number</div>
+          <div class="rule" id="r-special"><div class="check"></div>One special character</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password2">Confirm password</label>
+        <div class="input-wrap">
+          <input type="password" id="password2" name="password2" autocomplete="new-password" placeholder="Re-enter password">
+          <button type="button" class="show-pwd" id="togglePwd2">Show</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="submit-error" id="submitError"></div>
+  </form>
+</div>
+
+<div class="continue-bar">
+  <button class="continue-btn" id="submitBtn" form="credentialsForm" type="submit">Create account &amp; continue</button>
+</div>
+
+<script>
+(function(){
+  const form     = document.getElementById('credentialsForm');
+  const email    = document.getElementById('email');
+  const pwd      = document.getElementById('password');
+  const pwd2     = document.getElementById('password2');
+  const submitErr= document.getElementById('submitError');
+  const btn      = document.getElementById('submitBtn');
+
+  // Show/hide password toggles
+  document.getElementById('togglePwd').addEventListener('click', () => {
+    const t = pwd.type === 'password' ? 'text' : 'password';
+    pwd.type = t;
+    document.getElementById('togglePwd').textContent = t === 'password' ? 'Show' : 'Hide';
+  });
+  document.getElementById('togglePwd2').addEventListener('click', () => {
+    const t = pwd2.type === 'password' ? 'text' : 'password';
+    pwd2.type = t;
+    document.getElementById('togglePwd2').textContent = t === 'password' ? 'Show' : 'Hide';
+  });
+
+  // Password rules live check
+  function checkRules(){
+    const v = pwd.value;
+    document.getElementById('r-len').classList.toggle('ok', v.length >= 8);
+    document.getElementById('r-upper').classList.toggle('ok', /[A-Z]/.test(v));
+    document.getElementById('r-num').classList.toggle('ok', /\d/.test(v));
+    document.getElementById('r-special').classList.toggle('ok', /[^A-Za-z0-9]/.test(v));
+  }
+  pwd.addEventListener('input', checkRules);
+
+  // Validation helpers
+  function err(el, msg){
+    let e = el.parentElement.querySelector('.field-error') ||
+            el.parentElement.parentElement.querySelector('.field-error');
+    if(!e){
+      e = document.createElement('div');
+      e.className = 'field-error';
+      el.parentElement.appendChild(e);
+    }
+    if(msg){
+      el.classList.add('invalid'); el.classList.remove('valid');
+      e.textContent = msg;
+    } else {
+      el.classList.remove('invalid'); el.classList.add('valid');
+      e.textContent = '';
+    }
+  }
+
+  function validate(){
+    let ok = true;
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value.trim())){
+      err(email, 'Enter a valid email address'); ok = false;
+    } else err(email, null);
+
+    const v = pwd.value;
+    if(v.length < 8 || !/[A-Z]/.test(v) || !/\d/.test(v) || !/[^A-Za-z0-9]/.test(v)){
+      err(pwd, 'Password does not meet requirements'); ok = false;
+    } else err(pwd, null);
+
+    if(pwd2.value !== pwd.value || !pwd2.value){
+      err(pwd2, 'Passwords do not match'); ok = false;
+    } else err(pwd2, null);
+
+    return ok;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submitErr.textContent = '';
+    if(!validate()) return;
+
+    // Wait for Supabase to be ready
+    if(!window.sb){
+      submitErr.textContent = 'Connecting… please wait';
+      await new Promise(r => document.addEventListener('sb-ready', r, { once:true }));
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Creating account…';
+
+    // Save email to signup data
+    const allData = window.apex.getSignupData();
+    allData.email = email.value.trim();
+    localStorage.setItem('apex_signup', JSON.stringify(allData));
+
+    // Complete signup with Supabase
+    const result = await window.apex.completeSignup(email.value.trim(), pwd.value);
+
+    if(result.error){
+      btn.disabled = false;
+      btn.textContent = 'Create account & continue';
+      submitErr.textContent = result.error.message || 'Could not create account. Try again.';
+      return;
+    }
+
+    // Success — clear signup data and go to welcome page
+    window.apex.clearSignup();
+    window.location.href = 'signup-complete.html';
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome | APEX IPO ACCESS</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/supabase.js?v=1781218671"></script>
+<script src="js/sidebar.js?v=1781218671"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+
+  .complete-header{
+    padding:20px 24px;border-bottom:1px solid rgba(255,255,255,0.08);
+    display:flex;justify-content:center;
+  }
+
+  .complete-wrap{
+    max-width:560px;margin:0 auto;padding:60px 24px 80px;
+    display:flex;flex-direction:column;align-items:center;text-align:center;
+  }
+
+  .success-icon{
+    width:90px;height:90px;border-radius:50%;
+    background:radial-gradient(circle,rgba(62,213,152,0.2),rgba(62,213,152,0.05));
+    border:2px solid rgba(62,213,152,0.4);
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:32px;animation:pop .5s cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+  .success-icon svg{width:42px;height:42px;color:#3ed598}
+  @keyframes pop{
+    from{transform:scale(0.5);opacity:0}
+    to{transform:scale(1);opacity:1}
+  }
+
+  h1{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:400;font-size:clamp(28px,6vw,38px);
+    letter-spacing:-0.8px;line-height:1.15;
+    margin-bottom:16px;
+  }
+  h1 .name{font-weight:600}
+
+  .lede{
+    color:#a8b2c1;font-size:15px;line-height:1.6;
+    max-width:440px;margin-bottom:36px;
+  }
+
+  .checklist{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px;padding:18px 20px;
+    width:100%;max-width:440px;margin-bottom:36px;
+    text-align:left;
+  }
+  .checklist .item{
+    display:flex;align-items:center;gap:12px;
+    padding:8px 0;font-size:14px;color:#cfd8e8;
+  }
+  .checklist .item svg{
+    width:18px;height:18px;color:#3ed598;flex-shrink:0;
+  }
+
+  .cta{
+    display:block;width:100%;max-width:440px;
+    background:#4a9eff;color:#000;text-align:center;
+    padding:18px;font-size:16px;font-weight:600;
+    border:none;cursor:pointer;font-family:inherit;
+    border-radius:2px;text-decoration:none;
+  }
+  .cta:hover{background:#6db1ff}
+
+  .small{
+    color:#6a7585;font-size:12px;margin-top:20px;
+    letter-spacing:0.2px;
+  }
+</style>
+</head>
+<body>
+
+<header class="complete-header">
+  <a href="index.html" class="logo">
+    <img src="assets/spacex-logo.png" class="logo-x" alt="X" />
+    <div class="logo-text-stack">
+      <span class="logo-line1">APEX</span>
+      <span class="logo-line2">IPO ACCESS</span>
+      <span class="logo-tagline">INVESTMENT INTELLIGENCE</span>
+    </div>
+  </a>
+</header>
+
+<div class="complete-wrap">
+  <div class="success-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  </div>
+
+  <h1>Welcome, <span class="name" id="userName">Investor</span></h1>
+  <p class="lede">Your APEX IPO ACCESS account has been created successfully. You now have priority access to our curated pre-IPO opportunities.</p>
+
+  <div class="checklist">
+    <div class="item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Identity verified
+    </div>
+    <div class="item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Account activated
+    </div>
+    <div class="item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Secure portal access granted
+    </div>
+  </div>
+
+  <a href="dashboard.html" class="cta">Enter your dashboard →</a>
+  <p class="small">Redirecting in <span id="countdown">5</span>s…</p>
+</div>
+
+<script>
+  document.addEventListener('sb-ready', async () => {
+    const profile = await window.apex.getProfile();
+    if(profile && profile.first_name){
+      document.getElementById('userName').textContent = profile.first_name;
+    }
+  });
+
+  // Auto-redirect after 5 seconds
+  let n = 5;
+  const cd = document.getElementById('countdown');
+  const tmr = setInterval(() => {
+    n--;
+    if(cd) cd.textContent = n;
+    if(n <= 0){
+      clearInterval(tmr);
+      window.location.href = 'dashboard.html';
+    }
+  }, 1000);
+</script>
+
+</body>
+</html>

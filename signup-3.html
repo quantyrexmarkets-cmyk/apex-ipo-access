@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Existing Investor | APEX IPO ACCESS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&family=Inter:wght@300;400;500;600&family=Orbitron:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+
+  .signup-header{
+    position:sticky;top:0;z-index:100;
+    background:rgba(0,0,0,0.92);backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding:18px 24px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .header-icons{display:flex;align-items:center;gap:14px}
+  .header-icons .icon-link{
+    width:38px;height:38px;border-radius:50%;
+    border:1px solid rgba(255,255,255,0.15);
+    display:flex;align-items:center;justify-content:center;
+    color:#4a9eff;
+  }
+
+  .progress-bar{
+    position:sticky;top:72px;z-index:99;
+    height:4px;background:rgba(255,255,255,0.08);width:100%;
+  }
+  .progress-fill{height:100%;background:#4a9eff;width:60%}
+
+  .step-indicator{
+    text-align:center;padding:32px 24px 8px;
+    font-size:14px;color:#8a94a3;letter-spacing:0.3px;
+  }
+
+  .signup-wrap{max-width:680px;margin:0 auto;padding:0 24px 120px}
+  .signup-wrap h1{
+    font-family:'Plus Jakarta Sans',sans-serif;font-weight:400;
+    font-size:clamp(32px,6vw,42px);line-height:1.15;
+    letter-spacing:-0.8px;margin-bottom:16px;text-align:center;color:#fff;
+  }
+  .signup-wrap .sub{
+    text-align:center;font-size:15px;color:#a8b2c1;
+    margin-bottom:40px;line-height:1.55;max-width:520px;margin-left:auto;margin-right:auto;
+  }
+
+  /* Radio options — horizontal Yes/No layout */
+  .radio-group{
+    display:flex;gap:16px;justify-content:center;
+    margin:24px 0 8px;
+  }
+  .radio-option{
+    flex:1;max-width:200px;
+    display:flex;align-items:center;gap:14px;
+    padding:18px 20px;
+    border:1.5px solid rgba(255,255,255,0.18);
+    cursor:pointer;transition:all .15s;
+    background:transparent;
+  }
+  .radio-option:hover{border-color:rgba(255,255,255,0.4)}
+  .radio-option.selected{
+    border-color:#4a9eff;
+    background:rgba(74,158,255,0.08);
+  }
+  .radio-option .dot{
+    width:22px;height:22px;border-radius:50%;
+    border:2px solid rgba(255,255,255,0.3);
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .15s;
+  }
+  .radio-option.selected .dot{border-color:#4a9eff}
+  .radio-option .dot::after{
+    content:"";width:10px;height:10px;border-radius:50%;
+    background:#4a9eff;opacity:0;transition:opacity .15s;
+  }
+  .radio-option.selected .dot::after{opacity:1}
+  .radio-option .label{
+    font-size:16px;font-weight:600;color:#fff;
+    font-family:'Plus Jakarta Sans',sans-serif;
+  }
+
+  .disclosure-note{
+    margin-top:40px;padding:18px;
+    background:rgba(74,158,255,0.05);
+    border:1px solid rgba(74,158,255,0.15);
+    border-radius:10px;
+    font-size:12px;color:#8a94a3;line-height:1.6;
+  }
+  .disclosure-note strong{color:#4a9eff}
+
+  .back-link{
+    display:inline-flex;align-items:center;gap:8px;
+    margin:24px 0 8px;
+    font-size:14px;color:#4a9eff;font-weight:500;
+  }
+
+  .continue-bar{
+    position:fixed;bottom:0;left:0;right:0;
+    background:#000;padding:20px 24px 28px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    z-index:50;
+  }
+  .continue-btn{
+    display:block;width:100%;max-width:632px;margin:0 auto;
+    background:#4a9eff;color:#000;
+    padding:18px;text-align:center;
+    font-size:16px;font-weight:600;
+    border:none;cursor:pointer;
+  }
+  .continue-btn:disabled{background:rgba(74,158,255,0.3);cursor:not-allowed;color:rgba(0,0,0,0.5)}
+
+  .select-error{
+    text-align:center;font-size:13px;color:#ff6a6a;
+    margin:12px 0 -4px;min-height:16px;letter-spacing:.2px;
+    font-weight:500;
+  }
+</style>
+<script src="js/supabase.js"></script>
+</head>
+<body>
+
+<header class="signup-header">
+  <a href="index.html" class="logo">
+    <img src="assets/spacex-logo.png" class="logo-x" alt="X" />
+    <div class="logo-text-stack">
+      <span class="logo-line1">APEX</span>
+      <span class="logo-line2">IPO ACCESS</span>
+      <span class="logo-tagline">INVESTMENT INTELLIGENCE</span>
+    </div>
+  </a>
+  <div class="header-icons">
+    <a href="#" class="icon-link" title="Secure session" aria-label="Secure session">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </a>
+    <a href="contact.html" class="icon-link" title="Contact support" aria-label="Contact support">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+    </a>
+  </div>
+</header>
+
+<div class="progress-bar"><div class="progress-fill"></div></div>
+
+<div class="step-indicator">Brokerage · Personal information</div>
+
+<div class="signup-wrap">
+  <a href="signup-2.html" class="back-link">← Back</a>
+  <h1>Are you an existing APEX investor?</h1>
+  <p class="sub">If you already have an APEX IPO ACCESS account, select Yes to sign in. We'll pre-fill your information to speed up the process.</p>
+
+  <div class="radio-group">
+    <div class="radio-option" data-answer="yes">
+      <div class="dot"></div>
+      <div class="label">Yes</div>
+    </div>
+    <div class="radio-option selected" data-answer="no">
+      <div class="dot"></div>
+      <div class="label">No</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="continue-bar">
+  <div class="select-error" id="selectError"></div>
+  <button class="continue-btn" id="continueBtn" type="button">Continue</button>
+</div>
+
+<script>
+  document.querySelectorAll('.radio-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      document.getElementById('selectError').textContent = '';
+    });
+  });
+  document.getElementById('continueBtn').addEventListener('click', () => {
+    const sel = document.querySelector('.radio-option.selected');
+    if(!sel){
+      document.getElementById('selectError').textContent = 'Please select an option to continue';
+      return;
+    }
+    const hasExisting = sel.dataset.answer === 'yes';
+    window.apex.saveStep('hasExisting', hasExisting);
+    if(hasExisting){
+      window.location.href = 'login.html';
+    } else {
+      window.location.href = 'signup-4.html';
+    }
+  });
+</script>
+
+</body>
+</html>

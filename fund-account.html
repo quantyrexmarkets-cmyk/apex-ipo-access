@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fund Account | APEX IPO ACCESS</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/supabase.js?v=1781218671"></script>
+<script src="js/sidebar.js?v=1781218671"></script>
+<script>
+  document.addEventListener('sb-ready', async () => {
+    const { data } = await sb.auth.getUser();
+    if(!data.user) window.location.href = 'login.html';
+  });
+</script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+
+  .top-bar{
+    position:sticky;top:0;z-index:100;
+    background:rgba(0,0,0,0.92);backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding:16px 20px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .back-btn{
+    width:38px;height:38px;border-radius:50%;
+    border:1px solid rgba(255,255,255,0.15);
+    display:flex;align-items:center;justify-content:center;
+    color:#4a9eff;background:none;cursor:pointer;
+  }
+  .top-title{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:14px;color:#fff;letter-spacing:0.3px;
+  }
+  .top-spacer{width:38px}
+
+  .page{max-width:560px;margin:0 auto;padding:28px 20px 140px}
+
+  .lede{
+    text-align:center;color:#8a94a3;font-size:12px;letter-spacing:0.4px;
+    text-transform:uppercase;font-weight:600;margin-bottom:8px;
+  }
+  h1{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:28px;color:#fff;
+    text-align:center;letter-spacing:-0.5px;margin-bottom:8px;
+  }
+  .sub{
+    text-align:center;color:#a8b2c1;font-size:14px;
+    line-height:1.55;margin-bottom:28px;
+  }
+
+  /* Current balance */
+  .bal-card{
+    background:linear-gradient(135deg,rgba(74,158,255,0.08),rgba(74,158,255,0.02));
+    border:1px solid rgba(74,158,255,0.2);
+    border-radius:14px;padding:16px 18px;margin-bottom:24px;
+    text-align:center;
+  }
+  .bal-lbl{font-size:11px;color:#8a94a3;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:4px}
+  .bal-val{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:26px;color:#fff;
+    font-feature-settings:"tnum";letter-spacing:-0.5px;
+  }
+
+  /* Amount input */
+  .section-h{
+    font-size:13px;color:#a8b2c1;font-weight:600;
+    letter-spacing:0.3px;margin:24px 0 10px;
+  }
+  .amount-box{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:14px;padding:18px;
+  }
+  .amount-row{display:flex;align-items:center;gap:14px}
+  .amount-prefix{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:28px;color:#5a6473;flex-shrink:0;
+  }
+  .amount-input{
+    background:transparent;border:none;color:#fff;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:32px;letter-spacing:-0.5px;
+    width:100%;outline:none;
+    font-feature-settings:"tnum";
+  }
+  .amount-input::-webkit-outer-spin-button,
+  .amount-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .amount-meta{
+    font-size:12px;color:#8a94a3;margin-top:10px;
+    padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);
+  }
+
+  /* Method selector */
+  .methods{display:flex;flex-direction:column;gap:10px}
+  .method{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:14px;padding:16px;
+    cursor:pointer;transition:all .15s;
+    display:flex;align-items:center;gap:14px;
+  }
+  .method:hover{border-color:rgba(74,158,255,0.4)}
+  .method.selected{
+    border-color:#4a9eff;
+    background:linear-gradient(135deg,rgba(74,158,255,0.08),rgba(74,158,255,0.02));
+  }
+  .method-ic{
+    width:46px;height:46px;border-radius:12px;
+    background:rgba(74,158,255,0.12);
+    display:flex;align-items:center;justify-content:center;
+    color:#4a9eff;flex-shrink:0;
+  }
+  .method-ic svg{width:22px;height:22px}
+  .method-body{flex:1;min-width:0}
+  .method-name{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:15px;color:#fff;
+  }
+  .method-desc{font-size:12px;color:#8a94a3;margin-top:3px;line-height:1.4}
+  .method-meta{
+    text-align:right;flex-shrink:0;
+  }
+  .method-time{font-size:11px;color:#cfd8e8;font-weight:500}
+  .method-fee{font-size:11px;color:#3ed598;margin-top:3px;font-weight:600}
+  .method-fee.paid{color:#ffb800}
+  .method-check{
+    width:22px;height:22px;border-radius:50%;
+    border:2px solid rgba(255,255,255,0.2);
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .method.selected .method-check{background:#4a9eff;border-color:#4a9eff}
+  .method.selected .method-check::after{
+    content:"";width:8px;height:5px;
+    border-left:2px solid #000;border-bottom:2px solid #000;
+    transform:rotate(-45deg) translate(0,-1px);
+  }
+
+  /* Crypto sub-options */
+  .crypto-opts{
+    display:none;gap:8px;padding:14px 0 4px;margin-top:8px;flex-wrap:wrap;
+    border-top:1px solid rgba(255,255,255,0.06);
+  }
+  .method.selected[data-method="crypto"] .crypto-opts{display:flex}
+  .crypto-chip{
+    flex:1;background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:10px;padding:8px;
+    text-align:center;cursor:pointer;
+    font-size:12px;font-weight:600;color:#cfd8e8;
+    transition:all .15s;
+  }
+  .crypto-chip:hover{border-color:rgba(74,158,255,0.4)}
+  .crypto-chip.active{
+    border-color:#4a9eff;color:#4a9eff;background:rgba(74,158,255,0.1);
+  }
+
+  .err{
+    text-align:center;color:#ff6a6a;font-size:13px;
+    margin:14px 0 0;min-height:16px;font-weight:500;
+  }
+
+  .continue-bar{
+    position:fixed;bottom:0;left:0;right:0;
+    background:rgba(0,0,0,0.95);backdrop-filter:blur(20px);
+    padding:18px 20px 28px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    z-index:50;
+  }
+  .continue-btn{
+    display:block;width:100%;max-width:520px;margin:0 auto;
+    background:#4a9eff;color:#000;
+    padding:16px;text-align:center;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:15px;font-weight:600;
+    border:none;cursor:pointer;border-radius:12px;
+  }
+  .continue-btn:hover{background:#6db1ff}
+  .continue-btn:disabled{background:#2a2f38;color:#5a6473;cursor:not-allowed}
+
+/* Gap between deposit method cards */
+.method + .method {
+  margin-top: 12px;
+}
+
+</style>
+</head>
+<body>
+
+<header class="top-bar">
+  <button class="back-btn" onclick="history.length>1?history.back():location.href='dashboard.html'" aria-label="Back">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <div class="top-title">Fund Account</div>
+  <div class="top-spacer"></div>
+</header>
+
+<div class="page">
+  <div class="lede">Add funds to your account</div>
+  <h1>Deposit funds</h1>
+  <p class="sub">Funds are credited to your buying power and can be used to settle any pending allocations.</p>
+
+  <!-- Current balance -->
+  <div class="bal-card">
+    <div class="bal-lbl">Current cash balance</div>
+    <div class="bal-val" id="currentBal">$0.00</div>
+  </div>
+
+  <!-- Amount -->
+  <div class="section-h">Amount to deposit</div>
+  <div class="amount-box">
+    <div class="amount-row">
+      <span class="amount-prefix">$</span>
+      <input type="number" class="amount-input" id="amount" placeholder="100" min="100" step="50" inputmode="numeric">
+    </div>
+    <div class="amount-meta">Wire min $20,000 · Crypto min $100 · No maximum</div>
+  </div>
+
+  <!-- Method -->
+  <div class="section-h">Choose deposit method</div>
+
+    <div class="method" data-method="wire">
+      <div class="method-ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+      </div>
+      <div class="method-body">
+        <div class="method-name">Wire Transfer</div>
+        <div class="method-desc">Fastest settlement · Same business day</div>
+      </div>
+      <div class="method-meta">
+        <div class="method-time">Within hours</div>
+        <div class="method-fee paid">$25 fee</div>
+      </div>
+      <div class="method-check"></div>
+    </div>
+
+    <div class="method" data-method="crypto">
+      <div class="method-ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.5 8h4a2.5 2.5 0 0 1 0 5h-4M9.5 13h4.5a2.5 2.5 0 0 1 0 5H9.5M9.5 6v12"/></svg>
+      </div>
+      <div class="method-body">
+        <div class="method-name">Cryptocurrency</div>
+        <div class="method-desc">Deposit BTC, ETH, DOGE, or USDT instantly</div>
+        <div class="crypto-opts">
+          <div class="crypto-chip active" data-asset="BTC">Bitcoin</div>
+          <div class="crypto-chip" data-asset="ETH">Ethereum</div>
+          <div class="crypto-chip" data-asset="DOGE">Dogecoin</div>
+          <div class="crypto-chip" data-asset="USDT">USDT</div>
+        </div>
+      </div>
+      <div class="method-meta">
+        <div class="method-time">~30 minutes</div>
+        <div class="method-fee">Network fee only</div>
+      </div>
+      <div class="method-check"></div>
+    </div>
+
+  </div>
+
+  <div class="err" id="err"></div>
+</div>
+
+<div class="continue-bar">
+  <button class="continue-btn" id="continueBtn">Continue</button>
+</div>
+
+<script>
+(async function(){
+  if(!window.sb) await new Promise(r => document.addEventListener('sb-ready', r, { once:true }));
+  const profile = await window.apex.getProfile();
+  if(profile){
+    document.getElementById('currentBal').textContent = '$' + Number(profile.cash_balance || 0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+
+  let selectedMethod = null;
+  let cryptoAsset = 'BTC';
+
+  // Method click
+  document.querySelectorAll('.method').forEach(m => {
+    m.addEventListener('click', (e) => {
+      // Don't deselect when clicking crypto chips
+      if(e.target.classList.contains('crypto-chip')) return;
+      document.querySelectorAll('.method').forEach(x => x.classList.remove('selected'));
+      m.classList.add('selected');
+      selectedMethod = m.dataset.method;
+      document.getElementById('err').textContent = '';
+    });
+  });
+
+  // Crypto chip click
+  document.querySelectorAll('.crypto-chip').forEach(chip => {
+    chip.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.crypto-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      cryptoAsset = chip.dataset.asset;
+    });
+  });
+
+  // Continue
+  document.getElementById('continueBtn').addEventListener('click', () => {
+    const err = document.getElementById('err');
+    err.textContent = '';
+
+    const amount = parseFloat(document.getElementById('amount').value) || 0;
+    if(amount < 100){
+      err.textContent = 'Minimum deposit is $100';
+      return;
+    }
+    if(!selectedMethod){
+      err.textContent = 'Please select a deposit method';
+      return;
+    }
+
+    const deposit = {
+      amount,
+      method: selectedMethod,
+      crypto_asset: selectedMethod === 'crypto' ? cryptoAsset : null,
+      _ts: Date.now()
+    };
+    sessionStorage.setItem('apex_deposit', JSON.stringify(deposit));
+    window.location.href = 'fund-process.html';
+  });
+})();
+</script>
+
+
+<!-- deposit-nav-fix -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  // Find all method cards and the continue/submit button
+  var methods = document.querySelectorAll('.method, [data-method]');
+  var selectedMethod = '';
+
+  // Handle method selection
+  methods.forEach(function (m) {
+    m.addEventListener('click', function () {
+      methods.forEach(function (x) { x.classList.remove('selected', 'active'); });
+      m.classList.add('selected', 'active');
+      selectedMethod = m.getAttribute('data-method') || '';
+    });
+  });
+
+  // Find continue/submit button
+  var btns = document.querySelectorAll('button, .submit-btn, .continue-btn, .cta-btn, [class*="btn"]');
+  var continueBtn = null;
+
+  btns.forEach(function (b) {
+    var txt = (b.textContent || '').toLowerCase().trim();
+    if (txt.includes('continue') || txt.includes('submit') || txt.includes('proceed') || txt.includes('deposit now')) {
+      continueBtn = b;
+    }
+  });
+
+  if (continueBtn) {
+    // Remove old onclick
+    continueBtn.removeAttribute('onclick');
+
+    continueBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      var amountInput = document.getElementById('amount') || document.querySelector('.amount-input') || document.querySelector('input[type="number"]');
+      var amount = amountInput ? parseFloat(amountInput.value) : 0;
+
+      // If no method selected, try to find which one has selected/active class
+      if (!selectedMethod) {
+        var active = document.querySelector('.method.selected, .method.active, [data-method].selected, [data-method].active');
+        if (active) selectedMethod = active.getAttribute('data-method') || '';
+      }
+
+      // Validation
+      if (!selectedMethod) {
+        if (window.apexToast) window.apexToast('Please select a deposit method');
+        return;
+      }
+
+      if (!amount || isNaN(amount) || amount <= 0) {
+        if (window.apexToast) window.apexToast('Please enter a valid amount');
+        return;
+      }
+
+      if (selectedMethod === 'wire' && amount < 20000) {
+        if (window.apexToast) window.apexToast('Wire transfer minimum is $20,000');
+        return;
+      }
+
+      if (selectedMethod === 'crypto' && amount < 100) {
+        if (window.apexToast) window.apexToast('Crypto deposit minimum is $100');
+        return;
+      }
+
+      // Navigate to correct page
+      if (selectedMethod === 'wire') {
+        window.location.href = 'fund-wire.html?amount=' + amount;
+      } else if (selectedMethod === 'crypto') {
+        window.location.href = 'fund-crypto.html?amount=' + amount;
+      } else {
+        if (window.apexToast) window.apexToast('Please select Wire Transfer or Crypto');
+      }
+    });
+  }
+});
+</script>
+<!-- /deposit-nav-fix -->
+
+</body>
+</html>

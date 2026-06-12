@@ -1,0 +1,243 @@
+(function() {
+  // ── Load SmartSupp (hidden bubble) ──────────────────────────
+  if (!window._smartsupp_loaded) {
+    window._smartsupp_loaded = true;
+    var _smartsupp = window._smartsupp = window._smartsupp || {};
+    _smartsupp.key = '7d6445f6308e329b33468a584f675c298bd2c871';
+    _smartsupp.hideWidget = true; // Hide default bubble
+    (function(d) {
+      var s, c, o = window.smartsupp = function() { o._.push(arguments); };
+      o._ = [];
+      s = d.getElementsByTagName('script')[0];
+      c = d.createElement('script');
+      c.type = 'text/javascript';
+      c.charset = 'utf-8';
+      c.async = true;
+      c.src = 'https://www.smartsuppchat.com/loader.js?';
+      s.parentNode.insertBefore(c, s);
+    })(document);
+  }
+
+  // ── CSS ─────────────────────────────────────────────────────
+  var css = `
+    /* Belt-and-suspenders: hide SmartSupp default bubble */
+    #smartsupp-widget-container > *:not(#chat-application):not(.smartsupp-chat-frame),
+    .smartsupp-widget-button,
+    [class*="smartsupp-widget-button"],
+    [id^="smartsupp-launcher"] {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    body.apex-chat-open #smartsupp-widget-container,
+    body.apex-chat-open #chat-application,
+    body.apex-chat-open .smartsupp-chat-frame {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+
+    .apex-fw-trigger {
+      position: fixed; bottom: 90px; right: 16px; z-index: 99998;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: linear-gradient(135deg, #4a9eff, #357abd);
+      color: #fff; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 24px rgba(74, 158, 255, 0.4);
+      transition: all 0.2s;
+    }
+    .apex-fw-trigger:hover { transform: translateY(-2px); }
+    .apex-fw-trigger svg { width: 24px; height: 24px; }
+
+    .apex-fw-menu {
+      position: fixed; bottom: 160px; right: 16px; z-index: 99999;
+      width: 260px; max-width: calc(100vw - 40px);
+      background: rgba(20, 20, 25, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px; overflow: hidden;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      display: none; opacity: 0; transform: translateY(10px);
+      transition: opacity 0.2s, transform 0.2s;
+      font-family: 'Inter', sans-serif;
+      padding: 8px;
+    }
+    .apex-fw-menu.open { display: block; opacity: 1; transform: translateY(0); }
+
+    .apex-fw-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; border-radius: 10px;
+      cursor: pointer; transition: background 0.12s;
+    }
+    .apex-fw-item:hover { background: rgba(255, 255, 255, 0.05); }
+    .apex-fw-item .ic {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: rgba(74, 158, 255, 0.12); color: #4a9eff;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .apex-fw-item .ic svg { width: 16px; height: 16px; }
+    .apex-fw-item .ic.green { background: rgba(62, 213, 152, 0.12); color: #3ed598; }
+    .apex-fw-item .ic.amber { background: rgba(255, 184, 0, 0.12); color: #ffb800; }
+    .apex-fw-item .label {
+      font-size: 14px; color: #fff; font-weight: 500;
+    }
+
+    .apex-fw-links {
+      display: none; padding: 4px 0 8px;
+    }
+    .apex-fw-links.open { display: block; }
+    .apex-fw-sublink {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px 10px 50px;
+      cursor: pointer; transition: background 0.12s;
+      font-size: 13px; color: #ccc;
+      border-radius: 8px;
+    }
+    .apex-fw-sublink:hover { background: rgba(255, 255, 255, 0.04); color: #fff; }
+    .apex-fw-sublink svg { width: 12px; height: 12px; color: #5a6473; }
+  `;
+  var style = document.createElement('style');
+  style.textContent = css;
+  document.head.appendChild(style);
+
+  // ── HTML ────────────────────────────────────────────────────
+  var html = `
+    <button class="apex-fw-trigger" id="apexFwTrigger" aria-label="Help">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+    </button>
+
+    <div class="apex-fw-menu" id="apexFwMenu">
+      <div class="apex-fw-item" id="apexFwEmail">
+        <div class="ic">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div class="label">Email Us</div>
+      </div>
+
+      <div class="apex-fw-item" id="apexFwChat">
+        <div class="ic green">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="label">Live Chat</div>
+      </div>
+
+      <div class="apex-fw-item" id="apexFwLinksToggle">
+        <div class="ic amber">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </div>
+        <div class="label">Quick Links</div>
+      </div>
+
+      <div class="apex-fw-links" id="apexFwLinks">
+        <div class="apex-fw-sublink" data-href="dashboard.html">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          Dashboard
+        </div>
+        <div class="apex-fw-sublink" data-href="fund-account.html">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          Fund Account
+        </div>
+        <div class="apex-fw-sublink" data-href="ipos.html">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          Browse IPOs
+        </div>
+        <div class="apex-fw-sublink" data-href="portfolio.html">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          Portfolio
+        </div>
+        <div class="apex-fw-sublink" data-href="docs.html">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          Documents
+        </div>
+        <div class="apex-fw-sublink" data-href="contact.html#faqSection">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          FAQ
+        </div>
+      </div>
+    </div>
+  `;
+
+  var container = document.createElement('div');
+  container.innerHTML = html;
+  document.body.appendChild(container);
+
+  // ── Logic ───────────────────────────────────────────────────
+  var trigger = document.getElementById('apexFwTrigger');
+  var menu = document.getElementById('apexFwMenu');
+  var emailBtn = document.getElementById('apexFwEmail');
+  var chatBtn = document.getElementById('apexFwChat');
+  var linksBtn = document.getElementById('apexFwLinksToggle');
+  var linksList = document.getElementById('apexFwLinks');
+  var subLinks = container.querySelectorAll('.apex-fw-sublink');
+
+  function toggleMenu() {
+    menu.classList.toggle('open');
+    if (!menu.classList.contains('open')) {
+      linksList.classList.remove('open');
+    }
+  }
+
+  trigger.addEventListener('click', function(e) {
+    e.stopPropagation();
+    toggleMenu();
+  });
+
+  // Email Us
+  emailBtn.addEventListener('click', async function() {
+    var userInfo = '';
+    try {
+      if (window.sb) {
+        var { data } = await sb.auth.getUser();
+        if (data.user) {
+          userInfo = '\n\n---\nAccount: ' + (data.user.email || '') + '\nUser ID: ' + data.user.id + '\nPage: ' + location.pathname;
+        }
+      }
+    } catch(e) {}
+    window.location.href = 'mailto:apexipo54@zohomail.com?subject=' + encodeURIComponent('APEX Support Request') + '&body=' + encodeURIComponent(userInfo);
+    menu.classList.remove('open');
+  });
+
+  // Live Chat → SmartSupp
+  chatBtn.addEventListener('click', function() {
+    menu.classList.remove('open');
+    document.body.classList.add('apex-chat-open');
+
+    function openSS(attempt) {
+      attempt = attempt || 0;
+      if (typeof window.smartsupp === 'function') {
+        try { window.smartsupp('chat:open'); } catch(e) {}
+        return;
+      }
+      if (attempt < 20) {
+        setTimeout(function() { openSS(attempt + 1); }, 300);
+      }
+    }
+    openSS();
+  });
+
+  // Quick Links toggle
+  linksBtn.addEventListener('click', function() {
+    linksList.classList.toggle('open');
+  });
+
+  subLinks.forEach(function(link) {
+    link.addEventListener('click', function() {
+      var href = link.getAttribute('data-href');
+      if (href) window.location.href = href;
+    });
+  });
+
+  // Close on outside click
+  document.addEventListener('click', function(e) {
+    if (menu.classList.contains('open') &&
+        !menu.contains(e.target) &&
+        !trigger.contains(e.target)) {
+      menu.classList.remove('open');
+      linksList.classList.remove('open');
+    }
+  });
+})();

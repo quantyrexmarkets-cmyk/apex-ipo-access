@@ -1,134 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Contact · Apex IPO Access — Initial Public Offering Intelligence</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css"/>
-</head>
-<body>
-<header class="nav">
-  <a href="/" class="logo">
-    <img src="assets/spacex-logo.png" class="logo-x" alt="X" />
-    <div class="logo-text-stack">
-      <span class="logo-line1">APEX</span>
-      <span class="logo-line2">IPO ACCESS</span>
-      <span class="logo-tagline">INVESTMENT INTELLIGENCE</span>
-    </div>
-  </a>
-  <div class="nav-right">
-    <a href="#signin" class="btn-signin">Sign In</a>
-    <button class="hamburger" id="hamburger" aria-label="Menu" type="button">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-</header>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Help & Support | APEX IPO ACCESS</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/supabase.js?v=100"></script>
+<script src="js/sidebar.js?v=100" defer></script>
+<script>
+  document.addEventListener('sb-ready', async () => {
+    const { data } = await sb.auth.getUser();
+    if(!data.user) window.location.href = 'login.html';
+  });
+</script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+  a{color:inherit;text-decoration:none}
 
-<main class="sub-page">
-  <div class="sub-page-inner">
-    <a href="index.html" class="sub-back">&larr; Back to APEX IPO ACCESS</a>
+  .dash-header{
+    position:sticky;top:0;z-index:100;
+    background:rgba(0,0,0,0.92);backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding:16px 20px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .menu-btn{width:38px;height:38px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;cursor:pointer}
+  .menu-btn span{width:22px;height:2px;background:#4a9eff;display:block;border-radius:2px}
+  .header-icons{display:flex;gap:10px;align-items:center}
+  .icon-btn{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;color:#4a9eff;background:none;cursor:pointer}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo-x{height:32px}
+  .logo-text-stack{display:flex;flex-direction:column;line-height:1}
+  .logo-line1{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#fff;letter-spacing:2px}
+  .logo-line2{font-size:7px;color:#4a9eff;letter-spacing:3px;font-weight:600}
+  .logo-tagline{font-size:5.5px;color:#6a7585;letter-spacing:2.5px;margin-top:1px}
 
-    <header class="sub-head">
-      <span class="sub-eyebrow">GET IN TOUCH</span>
-      <h1 class="sub-headline">Speak With the Allocation Desk.</h1>
-      <p class="sub-sub">For verified investors, accreditation queries, and institutional partnerships.</p>
-    </header>
+  .wrap{max-width:680px;margin:0 auto;padding:24px 20px 120px}
+  .page-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:28px;color:#fff;letter-spacing:-0.5px;margin-bottom:6px}
+  .page-sub{font-size:13px;color:#8a94a3;margin-bottom:28px;line-height:1.5}
 
-    <div class="sub-body">
-      
-    <div class="contact-grid">
-      <div class="contact-card">
-        <h3>Allocation Desk</h3>
-        <p>For active members and allocation enquiries.</p>
-        <a href="mailto:desk@apexipoaccess.com">desk@apexipoaccess.com</a>
-      </div>
-      <div class="contact-card">
-        <h3>New Applications</h3>
-        <p>Accreditation verification and onboarding.</p>
-        <a href="mailto:apply@apexipoaccess.com">apply@apexipoaccess.com</a>
-      </div>
-      <div class="contact-card">
-        <h3>Institutional Partnerships</h3>
-        <p>Family offices, RIAs, and fund administrators.</p>
-        <a href="mailto:partners@apexipoaccess.com">partners@apexipoaccess.com</a>
-      </div>
-      <div class="contact-card">
-        <h3>Press &amp; Media</h3>
-        <p>Editorial enquiries and media requests.</p>
-        <a href="mailto:press@apexipoaccess.com">press@apexipoaccess.com</a>
-      </div>
-    </div>
-    
-    </div>
-  </div>
-</main>
+  .quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:28px}
+  .quick-tile{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .15s;text-align:left}
+  .quick-tile:hover{background:rgba(74,158,255,0.05);border-color:rgba(74,158,255,0.3);transform:translateY(-1px)}
+  .quick-tile .ic{width:40px;height:40px;border-radius:10px;background:rgba(74,158,255,0.12);color:#4a9eff;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+  .quick-tile .ic svg{width:18px;height:18px}
+  .quick-tile.green .ic{background:rgba(62,213,152,0.12);color:#3ed598}
+  .quick-tile.amber .ic{background:rgba(255,184,0,0.12);color:#ffb800}
+  .quick-tile.purple .ic{background:rgba(255,106,106,0.12);color:#ff6a6a}
+  .quick-tile .title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:14px;color:#fff;letter-spacing:-0.2px;margin-bottom:3px}
+  .quick-tile .desc{font-size:11px;color:#8a94a3;line-height:1.4}
 
-<footer class="site-footer">
-  <div class="footer-inner">
+  .sec-h{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:18px;color:#fff;letter-spacing:-0.3px;margin:24px 0 14px}
+</style>
 
-    <div class="footer-top">
 
-      <div class="footer-col footer-brand-col">
-        <div class="footer-logo">APEX <span class="accent">IPO ACCESS</span></div>
-        <p class="footer-tag">Institutional intelligence for the Musk-ecosystem IPO window.</p>
-        <p class="footer-mini">Accredited investors only.</p>
-      </div>
 
-      <div class="footer-col">
-        <h4 class="footer-heading">Platform</h4>
-        <ul class="footer-links">
-          <li><a href="#briefing">Investor Briefing</a></li>
-          <li><a href="#cta">Get Access</a></li>
-          <li><a href="how-it-works.html">How Participation Works</a></li>
-          <li><a href="#">Pricing &amp; Tiers</a></li>
-          <li><a href="#">Live IPO Stats</a></li>
-          <li><a href="#">Join Waitlist</a></li>
-          <li><a href="#">Risk Disclosure</a></li>
-        </ul>
-      </div>
 
-      <div class="footer-col">
-        <h4 class="footer-heading">Opportunities</h4>
-        <ul class="footer-links">
-          <li><a href="#">SpaceX IPO</a></li>
-          <li><a href="#">xAI Pre-IPO</a></li>
-          <li><a href="#">Neuralink Secondaries</a></li>
-          <li><a href="#">Tesla Allocations</a></li>
-        </ul>
-      </div>
 
-      <div class="footer-col">
-        <h4 class="footer-heading">Company</h4>
-        <ul class="footer-links">
-          <li><a href="#">About APEX</a></li>
-          <li><a href="#">Contact</a></li>
-          <li><a href="#">Press</a></li>
-          <li><a href="#">Careers</a></li>
-        </ul>
-      </div>
 
-      <div class="footer-col">
-        <h4 class="footer-heading">Legal</h4>
-        <ul class="footer-links">
-          <li><a href="#">Terms of Service</a></li>
-          <li><a href="#">Privacy Policy</a></li>
-          <li><a href="#">Risk Disclosure</a></li>
-          <li><a href="#">Form CRS</a></li>
-        </ul>
-      </div>
 
-    </div>
 
-    <div class="footer-bottom">
-      <p class="footer-copy">&copy; 2025 APEX IPO ACCESS, LLC. All rights reserved.</p>
-      <p class="footer-disclaimer">Securities offered through registered broker-dealers. Investing involves risk including loss of principal. Past performance does not guarantee future results. APEX IPO ACCESS does not provide investment, tax, or legal advice.</p>
-    </div>
 
-  </div>
-</footer>
+
+
+
+
+
 
 </body>
 </html>

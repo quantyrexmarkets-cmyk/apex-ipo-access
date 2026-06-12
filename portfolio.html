@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio | APEX IPO ACCESS</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/supabase.js?v=100"></script>
+<script src="js/sidebar.js?v=100" defer></script>
+<script>
+  document.addEventListener('sb-ready', async () => {
+    const { data } = await sb.auth.getUser();
+    if(!data.user) window.location.href = 'login.html';
+  });
+</script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+
+  .dash-header{
+    position:sticky;top:0;z-index:100;
+    background:rgba(0,0,0,0.92);backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding:16px 20px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .menu-btn{
+    width:38px;height:38px;
+    display:flex;flex-direction:column;justify-content:center;align-items:center;
+    gap:5px;background:none;border:none;cursor:pointer;
+  }
+  .menu-btn span{width:22px;height:2px;background:#4a9eff;display:block;border-radius:2px}
+  .header-icons{display:flex;gap:10px;align-items:center}
+  .icon-btn{
+    width:38px;height:38px;border-radius:50%;
+    border:1px solid rgba(255,255,255,0.15);
+    display:flex;align-items:center;justify-content:center;
+    color:#4a9eff;background:none;cursor:pointer;position:relative;
+  }
+
+  .page-title{padding:24px 20px 8px;text-align:center}
+  .page-title .lede{
+    font-size:11px;color:#6a7585;font-weight:600;
+    letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;
+  }
+  .page-title h1{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:400;font-size:30px;color:#fff;letter-spacing:-0.6px;
+  }
+
+  .wrap{max-width:680px;margin:0 auto;padding:8px 20px 120px}
+
+  /* PERFORMANCE HERO */
+  .perf-card{
+    background:linear-gradient(135deg,rgba(74,158,255,0.12),rgba(74,158,255,0.02));
+    border:1px solid rgba(74,158,255,0.22);
+    border-radius:18px;padding:22px;margin-bottom:14px;
+  }
+  .perf-lbl{
+    font-size:11px;color:#8a94a3;letter-spacing:0.5px;
+    text-transform:uppercase;font-weight:600;margin-bottom:6px;
+  }
+  .perf-val{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:700;font-size:36px;color:#fff;
+    letter-spacing:-0.8px;line-height:1;
+    font-feature-settings:"tnum";
+  }
+  .perf-change{
+    display:inline-flex;align-items:center;gap:6px;
+    margin-top:10px;font-size:13px;font-weight:600;
+    padding:5px 11px;border-radius:8px;
+  }
+  .perf-change.up{background:rgba(62,213,152,0.12);color:#3ed598}
+  .perf-change.flat{background:rgba(255,255,255,0.05);color:#8a94a3}
+  .perf-change.down{background:rgba(255,106,106,0.12);color:#ff6a6a}
+  .perf-change svg{width:12px;height:12px}
+
+  .perf-mini{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;
+    margin-top:20px;padding-top:18px;
+    border-top:1px solid rgba(255,255,255,0.06);
+  }
+  .perf-mini .col .lbl{font-size:11px;color:#8a94a3;margin-bottom:4px;letter-spacing:0.3px}
+  .perf-mini .col .val{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:15px;color:#fff;
+    font-feature-settings:"tnum";
+  }
+
+  /* MINI SPARKLINE */
+  .spark{
+    width:100%;height:60px;margin-top:14px;
+    display:block;
+  }
+
+  /* SECTION HEADER */
+  .sec-h{
+    display:flex;justify-content:space-between;align-items:center;
+    margin:22px 0 12px;
+  }
+  .sec-h .title{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:18px;color:#fff;letter-spacing:-0.3px;
+  }
+  .sec-h .count{
+    font-size:12px;color:#8a94a3;font-weight:500;
+    background:rgba(255,255,255,0.05);padding:3px 9px;border-radius:8px;
+  }
+
+  /* HOLDINGS LIST */
+  .holdings{display:flex;flex-direction:column;gap:10px}
+  .holding{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px;padding:14px 16px;
+    display:flex;align-items:center;gap:14px;
+    cursor:pointer;transition:all .15s;
+  }
+  .holding:hover{border-color:rgba(74,158,255,0.35)}
+  .h-logo{
+    width:46px;height:46px;border-radius:11px;
+    background:#fff;flex-shrink:0;overflow:hidden;padding:6px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .h-logo img{width:100%;height:100%;object-fit:contain}
+  .h-body{flex:1;min-width:0}
+  .h-name{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:15px;color:#fff;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .h-sub{
+    font-size:11px;color:#8a94a3;margin-top:3px;
+    display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  }
+  .h-status{
+    font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;
+    text-transform:uppercase;letter-spacing:0.4px;
+  }
+  .h-status.pending{background:rgba(255,184,0,0.12);color:#ffb800}
+  .h-status.reserved{background:rgba(74,158,255,0.12);color:#4a9eff}
+  .h-status.settled{background:rgba(62,213,152,0.12);color:#3ed598}
+  .h-status.cancelled{background:rgba(255,106,106,0.12);color:#ff6a6a}
+  .h-right{text-align:right;flex-shrink:0;min-width:90px}
+  .h-value{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:14px;color:#fff;
+    font-feature-settings:"tnum";
+  }
+  .h-pct{
+    font-size:11px;color:#3ed598;font-weight:600;margin-top:3px;
+  }
+
+  /* ALLOCATION BREAKDOWN */
+  .breakdown{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px;padding:18px;
+  }
+  .donut-wrap{
+    display:flex;align-items:center;gap:20px;margin-bottom:18px;
+  }
+  .donut{
+    width:120px;height:120px;flex-shrink:0;
+    position:relative;
+  }
+  .donut svg{width:100%;height:100%;transform:rotate(-90deg)}
+  .donut-center{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    text-align:center;
+  }
+  .donut-center .num{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:700;font-size:22px;color:#fff;
+    letter-spacing:-0.5px;line-height:1;
+  }
+  .donut-center .lbl{
+    font-size:9px;color:#8a94a3;letter-spacing:0.6px;
+    text-transform:uppercase;font-weight:600;margin-top:3px;
+  }
+  .donut-legend{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+  .legend-row{
+    display:flex;align-items:center;gap:10px;
+    font-size:12px;
+  }
+  .legend-dot{
+    width:10px;height:10px;border-radius:3px;flex-shrink:0;
+  }
+  .legend-name{
+    flex:1;color:#cfd8e8;font-weight:500;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .legend-pct{
+    color:#fff;font-weight:600;font-feature-settings:"tnum";
+  }
+
+  /* EMPTY STATE */
+  .empty{
+    background:rgba(255,255,255,0.03);
+    border:1px dashed rgba(255,255,255,0.12);
+    border-radius:16px;padding:40px 24px;text-align:center;
+  }
+  .empty-icon{
+    width:64px;height:64px;border-radius:50%;
+    background:rgba(74,158,255,0.1);
+    display:inline-flex;align-items:center;justify-content:center;
+    margin-bottom:16px;color:#4a9eff;
+  }
+  .empty-icon svg{width:30px;height:30px}
+  .empty-title{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:17px;color:#fff;margin-bottom:6px;
+  }
+  .empty-desc{
+    color:#8a94a3;font-size:13px;line-height:1.5;
+    margin-bottom:18px;max-width:320px;margin-left:auto;margin-right:auto;
+  }
+  .empty-cta{
+    display:inline-block;background:#4a9eff;color:#000;
+    padding:12px 22px;border-radius:10px;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:14px;text-decoration:none;
+  }
+  .empty-cta:hover{background:#6db1ff}
+
+  /* SKELETON */
+  .skel{
+    display:inline-block;
+    background:linear-gradient(90deg,rgba(255,255,255,0.04),rgba(255,255,255,0.1),rgba(255,255,255,0.04));
+    background-size:200% 100%;animation:sk 1.4s infinite;
+    border-radius:4px;color:transparent;min-width:80px;
+  }
+  @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+  /* BOTTOM TAB NAV */
+  .tab-nav{
+    position:fixed;bottom:0;left:0;right:0;
+    background:rgba(0,0,0,0.95);backdrop-filter:blur(20px);
+    border-top:1px solid rgba(255,255,255,0.08);
+    display:grid;grid-template-columns:repeat(5,1fr);
+    padding:8px 0 14px;z-index:50;
+  }
+  .tab{
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    padding:8px 4px;color:#5a6473;cursor:pointer;transition:color .15s;
+  }
+  .tab.active{color:#4a9eff}
+  .tab svg{width:20px;height:20px}
+  .tab .lbl{font-size:10px;font-weight:500;letter-spacing:0.3px}
+</style>
+</head>
+<body>
+
+<header class="dash-header">
+  <button class="menu-btn" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <a href="dashboard.html" class="logo">
+    <img src="assets/spacex-logo.png" class="logo-x" alt="X" />
+    <div class="logo-text-stack">
+      <span class="logo-line1">APEX</span>
+      <span class="logo-line2">IPO ACCESS</span>
+      <span class="logo-tagline">INVESTMENT INTELLIGENCE</span>
+    </div>
+  </a>
+  <div class="header-icons">
+    <button class="icon-btn" aria-label="Notifications" onclick="window.apexToast && window.apexToast('Notifications coming soon')">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<div class="page-title">
+  <div class="lede">Your Holdings</div>
+  <h1>Portfolio</h1>
+</div>
+
+<div class="wrap">
+
+  <!-- PERFORMANCE HERO -->
+  <div class="perf-card">
+    <div class="perf-lbl">Total Portfolio Value</div>
+    <div class="perf-val" id="totalVal">$0.00</div>
+    <div class="perf-change up" id="changePill">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+      <span id="changeText">+$0.00 (0%)</span>
+    </div>
+
+    <svg class="spark" id="sparkChart" viewBox="0 0 320 60" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#4a9eff" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="#4a9eff" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <path id="sparkArea" fill="url(#sparkGrad)" d=""/>
+      <path id="sparkLine" fill="none" stroke="#4a9eff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d=""/>
+    </svg>
+
+    <div class="perf-mini">
+      <div class="col"><div class="lbl">Cash</div><div class="val" id="cashVal">$0.00</div></div>
+      <div class="col"><div class="lbl">Committed</div><div class="val" id="committedVal">$0.00</div></div>
+      <div class="col"><div class="lbl">Buying Power</div><div class="val" id="buyingPower">$0.00</div></div>
+    </div>
+  </div>
+
+  <!-- HOLDINGS -->
+  <div class="sec-h">
+    <div class="title">Active Holdings</div>
+    <div class="count" id="holdCount">0</div>
+  </div>
+  <div id="holdingsContainer">
+    <div class="empty" style="opacity:0.5">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      </div>
+      <div class="empty-title">Loading holdings…</div>
+    </div>
+  </div>
+
+  <!-- ALLOCATION BREAKDOWN -->
+  <div class="sec-h" id="breakHeader" style="display:none">
+    <div class="title">Allocation Breakdown</div>
+  </div>
+  <div id="breakdownContainer"></div>
+
+</div>
+
+<!-- BOTTOM TAB NAV -->
+<nav class="tab-nav">
+  <div class="tab active" onclick="location.href='dashboard.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span class="lbl">Home</span>
+  </div>
+  <div class="tab">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span class="lbl">Portfolio</span>
+  </div>
+  <div class="tab" onclick="window.apexToast && window.apexToast('IPOs page coming soon')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+    <span class="lbl">IPOs</span>
+  </div>
+  <div class="tab" onclick="location.href='docs.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    <span class="lbl">Docs</span>
+  </div>
+  <div class="tab" onclick="location.href='account.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>
+    <span class="lbl">Account</span>
+  </div>
+</nav>
+
+<script>
+(async function(){
+  if(!window.sb) await new Promise(r => document.addEventListener('sb-ready', r, { once:true }));
+  const { data: { user } } = await sb.auth.getUser();
+  if(!user) return;
+
+  const fmt    = n => '$' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmtInt = n => Number(n||0).toLocaleString('en-US');
+
+  // Load profile + allocations + companies in parallel
+  const [profile, { data: allocs }, { data: companies }] = await Promise.all([
+    window.apex.getProfile(),
+    sb.from('allocations').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+    sb.from('companies').select('ticker,name,domain,sector,price_per_share,expected_return')
+  ]);
+
+  const companyMap = {};
+  (companies || []).forEach(c => companyMap[c.ticker] = c);
+
+  const cash       = parseFloat(profile?.cash_balance || 0);
+  const committed  = (allocs || []).reduce((s,a) => s + parseFloat(a.total_value || 0), 0);
+
+  // Estimate projected value using expected_return midpoint
+  let projectedTotal = 0;
+  (allocs || []).forEach(a => {
+    const comp = companyMap[a.company_ticker];
+    const ret = comp?.expected_return || '';
+    const m = ret.match(/\+(\d+)%\s*to\s*\+(\d+)%/);
+    const midPct = m ? (parseInt(m[1]) + parseInt(m[2])) / 200 : 0; // midpoint as decimal
+    projectedTotal += parseFloat(a.total_value || 0) * (1 + midPct);
+  });
+
+  const totalNow = cash + committed;          // current "real" value
+  const totalProjected = cash + projectedTotal;
+  const gain = totalProjected - totalNow;
+  const gainPct = totalNow > 0 ? (gain / totalNow * 100) : 0;
+
+  // ---- Render totals ----
+  document.getElementById('totalVal').textContent = fmt(totalNow);
+  document.getElementById('cashVal').textContent = fmt(cash);
+  document.getElementById('committedVal').textContent = fmt(committed);
+  document.getElementById('buyingPower').textContent = fmt(cash);
+
+  const pill = document.getElementById('changePill');
+  const changeText = document.getElementById('changeText');
+  if(totalNow === 0){
+    pill.className = 'perf-change flat';
+    changeText.textContent = 'Fund your account to begin';
+    pill.querySelector('svg').style.display = 'none';
+  } else if(gain > 0){
+    pill.className = 'perf-change up';
+    changeText.textContent = `Projected: +${fmt(gain)} (+${gainPct.toFixed(1)}%)`;
+  } else {
+    pill.className = 'perf-change flat';
+    changeText.textContent = `Holding ${fmt(totalNow)}`;
+  }
+
+  // ---- Sparkline (generate a smooth growth curve based on holdings count) ----
+  function drawSpark(){
+    const lineEl = document.getElementById('sparkLine');
+    const areaEl = document.getElementById('sparkArea');
+    if(totalNow === 0){
+      // Empty flat line
+      lineEl.setAttribute('d','M0,45 L320,45');
+      areaEl.setAttribute('d','');
+      lineEl.setAttribute('stroke','rgba(255,255,255,0.15)');
+      return;
+    }
+    // Simulate a recent upward trend
+    const pts = [];
+    const n = 30;
+    let v = 40;
+    for(let i = 0; i < n; i++){
+      const noise = (Math.sin(i*0.7) + Math.cos(i*1.3)) * 3;
+      v += (Math.random() - 0.3) * 2;
+      const y = Math.max(8, Math.min(55, v + noise - i * 0.6));
+      pts.push([i * (320 / (n-1)), y]);
+    }
+    const d = 'M' + pts.map(p => p.join(',')).join(' L');
+    lineEl.setAttribute('d', d);
+    const lastX = pts[pts.length-1][0];
+    areaEl.setAttribute('d', d + ` L${lastX},60 L0,60 Z`);
+  }
+  drawSpark();
+
+  // ---- Render holdings list ----
+  const holdContainer = document.getElementById('holdingsContainer');
+  document.getElementById('holdCount').textContent = (allocs || []).length;
+
+  if(!allocs || allocs.length === 0){
+    holdContainer.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <div class="empty-title">No holdings yet</div>
+        <div class="empty-desc">Start building your pre-IPO portfolio by reserving shares in any of our 26 curated opportunities.</div>
+        <a href="dashboard.html" class="empty-cta">Browse opportunities →</a>
+      </div>
+    `;
+  } else {
+    holdContainer.innerHTML = '<div class="holdings">' + allocs.map(a => {
+      const comp = companyMap[a.company_ticker] || {};
+      const logo = comp.domain ? `https://icons.duckduckgo.com/ip3/${comp.domain}.ico` : '';
+      const sector = comp.sector || '';
+      const tierLbl = { 1:'Institutional', 2:'Priority', 3:'Standard' }[a.tier] || `Tier ${a.tier}`;
+      const statusLbl = {
+        'pending_funding': 'Pending',
+        'reserved':        'Reserved',
+        'funded':          'Funded',
+        'settled':         'Settled',
+        'cancelled':       'Cancelled'
+      }[a.status] || a.status;
+      const statusClass = {
+        'pending_funding':'pending',
+        'reserved':'reserved',
+        'funded':'reserved',
+        'settled':'settled',
+        'cancelled':'cancelled'
+      }[a.status] || 'reserved';
+
+      // Estimated gain based on expected_return midpoint
+      const m = (comp.expected_return || '').match(/\+(\d+)%\s*to\s*\+(\d+)%/);
+      const midPct = m ? ((parseInt(m[1]) + parseInt(m[2])) / 2) : 0;
+
+      return `
+        <div class="holding" onclick="location.href='buy-shares.html?ticker=${a.company_ticker}'">
+          <div class="h-logo">
+            <img src="${logo}" alt="${a.company_name}" onerror="this.parentElement.innerHTML='<div style=&quot;color:#000;font-weight:700;font-size:18px&quot;>${(a.company_name||'?')[0]}</div>'">
+          </div>
+          <div class="h-body">
+            <div class="h-name">${a.company_name}</div>
+            <div class="h-sub">
+              <span>${fmtInt(a.shares)} sh @ ${fmt(a.price_per_share)}</span>
+              <span class="h-status ${statusClass}">${statusLbl}</span>
+              <span>· ${tierLbl}</span>
+            </div>
+          </div>
+          <div class="h-right">
+            <div class="h-value">${fmt(a.total_value)}</div>
+            ${midPct ? `<div class="h-pct">+${midPct.toFixed(0)}% proj.</div>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('') + '</div>';
+  }
+
+  // ---- Allocation breakdown donut ----
+  if(allocs && allocs.length > 0){
+    document.getElementById('breakHeader').style.display = 'flex';
+    const breakContainer = document.getElementById('breakdownContainer');
+
+    // Aggregate by ticker
+    const byTicker = {};
+    allocs.forEach(a => {
+      const t = a.company_ticker;
+      if(!byTicker[t]){
+        byTicker[t] = { name: a.company_name, value: 0, ticker: t };
+      }
+      byTicker[t].value += parseFloat(a.total_value || 0);
+    });
+    const segments = Object.values(byTicker).sort((a,b) => b.value - a.value);
+    const total = segments.reduce((s,x) => s + x.value, 0);
+
+    const COLORS = ['#4a9eff','#3ed598','#ffb800','#a259ff','#ff6a6a','#10a37f','#ff7262','#5865f2','#d97757','#1abcfe'];
+
+    // Build SVG donut
+    const cx = 60, cy = 60, r = 48, stroke = 14;
+    const circ = 2 * Math.PI * r;
+    let offset = 0;
+    let circles = '';
+    segments.forEach((seg, i) => {
+      const pct = seg.value / total;
+      const dash = pct * circ;
+      const color = COLORS[i % COLORS.length];
+      circles += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}" stroke-dasharray="${dash} ${circ}" stroke-dashoffset="${-offset}" />`;
+      offset += dash;
+      seg._color = color;
+    });
+
+    // Build legend
+    const legendRows = segments.map(seg => `
+      <div class="legend-row">
+        <div class="legend-dot" style="background:${seg._color}"></div>
+        <div class="legend-name">${seg.name}</div>
+        <div class="legend-pct">${((seg.value / total) * 100).toFixed(1)}%</div>
+      </div>
+    `).join('');
+
+    breakContainer.innerHTML = `
+      <div class="breakdown">
+        <div class="donut-wrap">
+          <div class="donut">
+            <svg viewBox="0 0 120 120">
+              <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="${stroke}"/>
+              ${circles}
+            </svg>
+            <div class="donut-center">
+              <div class="num">${segments.length}</div>
+              <div class="lbl">${segments.length === 1 ? 'Position' : 'Positions'}</div>
+            </div>
+          </div>
+          <div class="donut-legend">${legendRows}</div>
+        </div>
+      </div>
+    `;
+  }
+
+})();
+</script>
+
+
+<!-- docs-quicknav-fix -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const els = document.querySelectorAll('a, button, [onclick], .quick-nav *, .quick-actions *, .shortcut *, .action-card *, .nav-card *');
+
+  els.forEach(function (el) {
+    const text  = ((el.textContent || '') + ' ' + (el.innerText || '')).replace(/\s+/g,' ').trim().toLowerCase();
+    const aria  = (el.getAttribute('aria-label') || '').toLowerCase();
+    const title = (el.getAttribute('title') || '').toLowerCase();
+    const href  = (el.getAttribute('href') || '').trim().toLowerCase();
+    const oc    = (el.getAttribute('onclick') || '').toLowerCase();
+
+    const looksLikeDocs =
+      /\bdocs\b/.test(text) || /\bdocuments?\b/.test(text) ||
+      /\bdocs\b/.test(aria) || /\bdocuments?\b/.test(aria) ||
+      /\bdocs\b/.test(title) || /\bdocuments?\b/.test(title);
+
+    const isDead =
+      href === '' || href === '#' || href === 'javascript:void(0)' || href === 'javascript:;' ||
+      oc.includes('docs page coming soon') ||
+      oc.includes('documents page coming soon') ||
+      oc.includes('docs coming soon') ||
+      oc.includes('documents coming soon');
+
+    if (looksLikeDocs && isDead) {
+      if (el.tagName === 'A') el.setAttribute('href', 'docs.html');
+      el.setAttribute('onclick', "location.href='docs.html'");
+      el.style.cursor = 'pointer';
+    }
+  });
+});
+</script>
+<!-- /docs-quicknav-fix -->
+
+</body>
+</html>

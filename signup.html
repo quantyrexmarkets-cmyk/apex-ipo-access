@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open an Account | APEX IPO ACCESS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&family=Inter:wght@300;400;500;600&family=Orbitron:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+
+  /* Header */
+  .signup-header{
+    position:sticky;top:0;z-index:100;
+    background:rgba(0,0,0,0.92);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding:18px 24px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .progress-bar{
+    position:sticky;top:72px;z-index:99;
+    height:4px;background:rgba(255,255,255,0.08);width:100%;
+  }
+  
+  .header-icons{display:flex;align-items:center;gap:18px}
+  .header-icons .icon-link{
+    width:38px;height:38px;border-radius:50%;
+    border:1px solid rgba(255,255,255,0.15);
+    display:flex;align-items:center;justify-content:center;
+    color:#4a9eff;font-size:16px;
+  }
+
+  /* Progress bar */
+  
+  .progress-fill{
+    height:100%;background:#4a9eff;
+    width:20%; /* step 1 of 5 */
+    transition:width .3s;
+  }
+
+  /* Step indicator */
+  .step-indicator{
+    text-align:center;
+    padding:32px 24px 8px;
+    font-size:14px;
+    color:#8a94a3;
+    letter-spacing:0.3px;
+  }
+
+  /* Main content */
+  .signup-wrap{max-width:680px;margin:0 auto;padding:0 24px 120px}
+  .signup-wrap h1{
+    font-family:'Plus Jakarta Sans',sans-serif;font-weight:400;
+    font-size:clamp(32px,6vw,42px);line-height:1.15;
+    letter-spacing:-0.8px;margin-bottom:16px;text-align:center;color:#fff;
+  }
+  .signup-wrap .sub{
+    text-align:center;font-size:15px;color:#a8b2c1;
+    margin-bottom:40px;line-height:1.5;
+  }
+
+  /* Account type cards */
+  .account-options{display:flex;flex-direction:column}
+  .account-card{
+    background:transparent;
+    border-top:1px solid rgba(255,255,255,0.1);
+    padding:28px 0;
+    display:flex;justify-content:space-between;gap:20px;
+    cursor:pointer;transition:all .15s;
+  }
+  .account-card:last-child{border-bottom:1px solid rgba(255,255,255,0.1)}
+  .account-card.selected{
+    border-color:#4a9eff;
+  }
+  .account-card.selected h3{color:#4a9eff}
+  .account-card .info{flex:1}
+  .account-card h3{
+    font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;
+    font-size:20px;color:#fff;margin-bottom:10px;
+    letter-spacing:-0.3px;
+    transition:color .15s;
+  }
+  .account-card p{font-size:14px;color:#8a94a3;line-height:1.55}
+  .account-card .checkbox{
+    width:28px;height:28px;border-radius:6px;
+    border:1.5px solid rgba(255,255,255,0.25);
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .15s;
+  }
+  .account-card.selected .checkbox{
+    background:#4a9eff;border-color:#4a9eff;
+  }
+  .account-card .checkbox::after{
+    content:"";
+    width:14px;height:8px;
+    border-left:2px solid #000;border-bottom:2px solid #000;
+    transform:rotate(-45deg) translate(2px,-2px);
+    opacity:0;transition:opacity .15s;
+  }
+  .account-card.selected .checkbox::after{opacity:1}
+
+  /* FDIC line */
+  .fdic-line{
+    display:flex;align-items:center;gap:12px;
+    padding:20px 0;margin-top:8px;
+    border-top:1px solid rgba(255,255,255,0.05);
+  }
+  .fdic-badge{
+    font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;
+    font-size:12px;letter-spacing:1px;color:#4a9eff;
+    border:1px solid #4a9eff;padding:4px 8px;
+  }
+  .fdic-text{font-size:12px;color:#6b7280;line-height:1.5}
+
+  /* Sticky continue bar */
+  .continue-bar{
+    position:fixed;bottom:0;left:0;right:0;
+    background:#000;
+    padding:20px 24px 28px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    z-index:50;
+  }
+  .continue-btn{
+    display:block;width:100%;max-width:632px;margin:0 auto;
+    background:#4a9eff;color:#000;
+    padding:18px;text-align:center;
+    font-size:16px;font-weight:600;
+    border:none;cursor:pointer;
+    transition:all .2s;
+  }
+  .continue-btn:hover{background:#6db1ff}
+  .continue-btn:disabled{background:rgba(74,158,255,0.3);cursor:not-allowed;color:rgba(0,0,0,0.5)}
+
+  .select-error{
+    text-align:center;font-size:13px;color:#ff6a6a;
+    margin:12px 0 -4px;min-height:16px;letter-spacing:.2px;
+    font-weight:500;
+  }
+</style>
+<script src="js/supabase.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

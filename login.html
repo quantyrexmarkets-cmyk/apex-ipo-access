@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log on | APEX IPO ACCESS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+
+  .login-header{
+    position:sticky;top:0;z-index:100;
+    background:rgba(0,0,0,0.92);backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding:18px 24px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .menu-btn{
+    width:38px;height:38px;
+    display:flex;flex-direction:column;justify-content:center;align-items:center;
+    gap:5px;background:none;border:none;cursor:pointer;
+  }
+  .menu-btn span{
+    width:22px;height:2px;background:#4a9eff;display:block;border-radius:2px;
+  }
+
+  .login-wrap{
+    max-width:520px;margin:0 auto;
+    padding:48px 24px 80px;
+  }
+
+  h1.title{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:400;font-size:38px;
+    text-align:center;color:#fff;
+    letter-spacing:-0.8px;margin-bottom:40px;
+  }
+
+  .field{margin-bottom:24px}
+  .field-head{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:10px;
+  }
+  .field label{
+    font-size:15px;color:#cfd8e8;font-weight:500;
+  }
+  .show-toggle{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:14px;color:#4a9eff;font-weight:500;
+    cursor:pointer;user-select:none;
+  }
+  .show-toggle svg{width:16px;height:16px}
+
+  .field input[type="text"],
+  .field input[type="password"]{
+    width:100%;
+    background:transparent;color:#fff;
+    border:1px solid rgba(255,255,255,0.25);
+    padding:18px 14px;font-size:15px;
+    font-family:inherit;border-radius:2px;
+    transition:border .15s;
+  }
+  .field input:focus{outline:none;border-color:#4a9eff}
+  .field input.invalid{border-color:#ff4a4a}
+
+  .field-error{
+    font-size:12px;color:#ff6a6a;
+    margin-top:6px;min-height:14px;letter-spacing:.2px;
+  }
+
+  /* Custom checkboxes */
+  .check-row{
+    display:flex;align-items:center;gap:14px;
+    margin:18px 0;cursor:pointer;user-select:none;
+  }
+  .check-row .cb{
+    width:26px;height:26px;
+    border:1.5px solid rgba(255,255,255,0.35);
+    flex-shrink:0;border-radius:3px;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .15s;
+  }
+  .check-row.checked .cb{background:#4a9eff;border-color:#4a9eff}
+  .check-row .cb::after{
+    content:"";width:12px;height:7px;
+    border-left:2px solid #000;border-bottom:2px solid #000;
+    transform:rotate(-45deg) translate(1px,-1px);
+    opacity:0;transition:opacity .15s;
+  }
+  .check-row.checked .cb::after{opacity:1}
+  .check-row .cb-label{
+    font-size:16px;color:#e8eef7;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .info-icon{
+    width:18px;height:18px;border-radius:50%;
+    border:1px solid #5a6473;color:#5a6473;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:600;font-style:italic;cursor:help;
+  }
+
+  .goto-section{margin-top:28px}
+  .goto-section .label{
+    font-size:15px;color:#cfd8e8;font-weight:500;
+    margin-bottom:10px;
+  }
+  .goto-section select{
+    width:100%;
+    background:transparent;color:#fff;
+    border:1px solid rgba(255,255,255,0.25);
+    padding:18px 14px;font-size:15px;
+    font-family:inherit;border-radius:2px;
+    appearance:none;-webkit-appearance:none;
+    background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a9eff' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 14px center;
+    background-size:20px;
+    padding-right:44px;
+    cursor:pointer;
+  }
+  .goto-section select:focus{outline:none;border-color:#4a9eff}
+  .goto-section select option{background:#0a0a0a;color:#fff}
+
+  .login-btn{
+    display:block;width:100%;
+    background:#4a9eff;color:#000;
+    padding:20px;text-align:center;
+    font-size:18px;font-weight:600;
+    border:none;cursor:pointer;border-radius:2px;
+    margin-top:32px;
+    font-family:inherit;
+  }
+  .login-btn:hover{background:#6db1ff}
+
+  .links{margin-top:28px}
+  .link-row{
+    font-size:16px;color:#cfd8e8;
+    margin:18px 0;line-height:1.5;
+  }
+  .link-row a{color:#4a9eff;font-weight:500}
+  .link-block{
+    display:block;font-size:16px;color:#4a9eff;
+    margin:18px 0;font-weight:500;
+  }
+
+  .footer-row{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-top:36px;padding-top:24px;
+    border-top:1px solid rgba(255,255,255,0.08);
+  }
+  .footer-row .sec-center{
+    display:inline-flex;align-items:center;gap:8px;
+    color:#4a9eff;font-size:15px;font-weight:500;
+  }
+  .footer-row .sec-center svg{width:16px;height:16px}
+  .footer-row .lang{color:#4a9eff;font-size:16px;font-weight:500}
+
+</style>
+<script src="js/supabase.js"></script>
+
+<!-- 2fa-login-hook -->
+<script>
+(function() {
+  // Override the login flow to check 2FA
+  var origLogin = window.handleLogin || null;
+
+  async function check2FA(session, email) {
+    try {
+      // Get user profile to check if 2FA is enabled
+      var { data: profile } = await sb
+        .from('profiles')
+        .select('two_factor_enabled')
+        .eq('id', session.user.id)
+        .single();
+
+      if (profile && profile.two_factor_enabled) {
+        // 2FA is enabled — generate code and redirect
+
+        // Store session temporarily (will be restored after 2FA)
+        sessionStorage.setItem('pending_2fa_session', JSON.stringify({
+          access_token: session.access_token,
+          refresh_token: session.refresh_token
+        }));
+
+        // Generate 5-digit code
+        var { data: code, error } = await sb.rpc('generate_2fa_code', {
+          p_user_id: session.user.id,
+          p_email: email
+        });
+
+        if (error) {
+          console.error('2FA code error:', error);
+          // Fall through to dashboard if code generation fails
+          return false;
+        }
+
+        // Try to send email via Edge Function
+        try {
+          await fetch(sb.supabaseUrl + '/functions/v1/send-2fa-code', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + sb.supabaseKey
+            },
+            body: JSON.stringify({ email: email, code: code })
+          });
+        } catch(e) {
+          console.warn('Edge function not set up — code stored in DB:', code);
+        }
+
+        // Sign out temporarily so the session isn't active until verified
+        await sb.auth.signOut();
+
+        // Redirect to 2FA verification page
+        var params = new URLSearchParams();
+        params.set('uid', session.user.id);
+        params.set('email', email);
+        window.location.href = 'verify-2fa.html?' + params.toString();
+        return true; // 2FA redirect happening
+      }
+
+      return false; // No 2FA, proceed normally
+    } catch(e) {
+      console.error('2FA check error:', e);
+      return false;
+    }
+  }
+
+  // Intercept all redirects to dashboard after login
+  var _origLocationSet = null;
+
+  function interceptDashboardRedirect() {
+    // Watch for any script trying to set location.href to dashboard
+    var desc = Object.getOwnPropertyDescriptor(window, 'location');
+
+    // Instead, we'll patch at the form/button level
+    document.addEventListener('submit', handleFormSubmit, true);
+
+    // Also intercept any direct login button clicks
+    setTimeout(function() {
+      var loginBtns = document.querySelectorAll('button[type="submit"], .login-btn, .cta-btn, [onclick*="login"], [onclick*="Login"]');
+      loginBtns.forEach(function(btn) {
+        var origOnclick = btn.getAttribute('onclick');
+        if (origOnclick) {
+          btn.removeAttribute('onclick');
+          btn.addEventListener('click', function(e) {
+            // Let the existing handler create the session, we'll catch the redirect
+          });
+        }
+      });
+    }, 100);
+  }
+
+  // The main approach: override the point where login succeeds
+  // We'll add a MutationObserver to detect when login succeeds
+  // and intercept before dashboard redirect
+
+  // Simpler approach: patch the signInWithPassword response
+  var _origSignIn = sb.auth.signInWithPassword.bind(sb.auth);
+
+  sb.auth.signInWithPassword = async function(credentials) {
+    var result = await _origSignIn(credentials);
+
+    if (result.data && result.data.session && result.data.user) {
+      var email = credentials.email || result.data.user.email;
+      var needs2FA = await check2FA(result.data.session, email);
+
+      if (needs2FA) {
+        // Return a modified result that won't trigger dashboard redirect
+        return {
+          data: { user: null, session: null },
+          error: { message: '2FA_REDIRECT', status: 0 }
+        };
+      }
+    }
+
+    return result;
+  };
+
+})();
+</script>
+<!-- /2fa-login-hook -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
