@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script src="js/supabase.js?v=1781218671"></script>
+<script src="js/notify.js?v=1"></script>
 <script src="js/sidebar.js?v=1781218671"></script>
 <script>
   document.addEventListener('sb-ready', async () => {
@@ -244,6 +245,12 @@
   var method = sessionStorage.getItem('fund_method') || 'wire';
   var amount = parseFloat(sessionStorage.getItem('fund_amount') || '0');
   var refCode = sessionStorage.getItem('fund_ref_code') || '—';
+
+  // Safety: if user lands here with no deposit data
+  if(!amount || amount <= 0){
+    if(window.apexWarn) apexWarn('No active deposit — redirecting to dashboard');
+    setTimeout(function(){ window.location.href = 'dashboard.html'; }, 1800);
+  }
 
   var spinner = document.getElementById('spinnerWrap');
   var successIcon = document.getElementById('successIcon');

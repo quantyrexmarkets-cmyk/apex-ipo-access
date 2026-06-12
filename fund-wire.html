@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script src="js/supabase.js?v=100"></script>
+<script src="js/notify.js?v=1"></script>
 <script src="js/sidebar.js?v=100" defer></script>
 <script>
   document.addEventListener('sb-ready', async () => {
@@ -62,8 +63,9 @@
   .amount-banner .lbl{font-size:12px;color:#8a94a3;margin-bottom:4px}
   .amount-banner .val{
     font-family:'Plus Jakarta Sans',sans-serif;
-    font-size:32px;font-weight:300;color:#fff;
-    letter-spacing:-0.5px;
+    font-size:44px;font-weight:200;color:#fff;
+    letter-spacing:-1.5px;line-height:1.1;
+    font-feature-settings:"tnum";
   }
 
   .info-card{
@@ -163,21 +165,25 @@
 <body>
 
 <header class="dash-header">
-  <button class="menu-btn" aria-label="Menu">
+  <button class="menu-btn" aria-label="Menu" onclick="toggleSidebar && toggleSidebar()">
     <span></span><span></span><span></span>
   </button>
-  <div class="logo">
+  <a href="dashboard.html" class="logo">
+    <img src="assets/spacex-logo.png" class="logo-x" alt="X" />
     <div class="logo-text-stack">
       <span class="logo-line1">APEX</span>
       <span class="logo-line2">IPO ACCESS</span>
       <span class="logo-tagline">WIRE TRANSFER</span>
     </div>
+  </a>
+  <div class="header-icons">
+    <button class="icon-btn" aria-label="Notifications" onclick="window.apexToast && window.apexToast('Notifications coming soon')">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+    </button>
   </div>
-  <button class="icon-btn" onclick="window.location.href='dashboard.html'" aria-label="Home">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-      <path d="M3 12l9-9 9 9M5 10v10h14V10"/>
-    </svg>
-  </button>
 </header>
 
 <main class="wrap">
@@ -341,7 +347,7 @@
       if(text === '—' || text === 'Loading…') return;
       navigator.clipboard.writeText(text).then(function(){
         btn.classList.add('copied');
-        showToast('Copied');
+        apexSuccess('Copied');
         setTimeout(function(){ btn.classList.remove('copied'); }, 1500);
       }).catch(function(){
         // Fallback
@@ -349,7 +355,7 @@
         ta.value = text;
         document.body.appendChild(ta);
         ta.select();
-        try { document.execCommand('copy'); showToast('Copied'); } catch(e){}
+        try { document.execCommand('copy'); apexSuccess('Copied'); } catch(e){}
         document.body.removeChild(ta);
       });
     });
@@ -382,8 +388,7 @@
         document.getElementById('bankName').textContent = 'Contact support for wire details';
       }
     } catch(e){
-      console.error('Wire settings load error:', e);
-      document.getElementById('bankName').textContent = 'Contact support for wire details';
+      apexError('Could not load wire details: ' + (e.message||'unknown')); document.getElementById('bankName').textContent = 'Contact support for wire details';
     }
   });
 
@@ -408,7 +413,7 @@
             status: 'pending'
           };
           await sb.from('deposits').insert(insertData);
-        } catch(e){ console.warn('deposits table:', e); }
+        } catch(e){ apexError('Could not record deposit: ' + (e.message||'database error')); btn.disabled = false; btn.textContent = "I've sent the wire"; return; }
       }
 
       // Persist for fund-process page
@@ -421,7 +426,7 @@
       console.error(err);
       btn.disabled = false;
       btn.textContent = 'I\'ve sent the wire';
-      alert('Could not submit. Please try again or contact support.');
+      apexError('Could not submit. Please try again or contact support.');
     }
   });
 </script>

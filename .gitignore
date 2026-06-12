@@ -12,6 +12,7 @@
 *.html.tmp
 fix_*.py
 clean_*.py
+test-toasts.html
 
 # OS / editor
 .DS_Store
@@ -20,7 +21,7 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Env / secrets (just in case)
+# Env / secrets
 .env
 .env.local
 *.key
@@ -29,3 +30,8 @@ secrets.txt
 # Server logs
 *.log
 nohup.out
+
+# Disabled files
+*.disabled
+*.off
+js/_*
