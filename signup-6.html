@@ -229,8 +229,8 @@
   // ===== Hide SSN section if non-US resident =====
   try {
     var saved = JSON.parse(localStorage.getItem('apex_signup') || '{}');
-    var citizenship = saved.address && saved.address.citizenship;
-    if(citizenship && citizenship !== 'us_citizen' && citizenship !== 'us_permanent_resident' && citizenship !== 'us_visa_holder'){
+    var citizenship = saved.citizenship;
+    if(citizenship && citizenship !== "US_CITIZEN" && citizenship !== "US_RESIDENT"){
       var ssnSec = document.getElementById('ssnSection');
       var ppSec = document.getElementById('passportSection');
       if(ssnSec) ssnSec.style.display = 'none';
