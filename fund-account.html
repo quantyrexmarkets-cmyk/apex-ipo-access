@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="css/style.css">
 <script src="js/supabase.js?v=1781218671"></script>
 <script src="js/notify.js?v=1"></script>
-<script src="js/sidebar.js?v=1781218671"></script>
+<script src="js/sidebar.js?v=200"></script>
 <script>
   document.addEventListener('sb-ready', async () => {
     const { data } = await sb.auth.getUser();
@@ -62,11 +62,16 @@
     border-radius:14px;padding:16px 18px;margin-bottom:24px;
     text-align:center;
   }
-  .bal-lbl{font-size:11px;color:#8a94a3;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:4px}
+  .bal-lbl{
+    text-transform:uppercase;letter-spacing:1.5px;
+    font-size:10px;font-weight:600;color:#a8b2c1;
+    margin-bottom:8px;
+  }
   .bal-val{
     font-family:'Plus Jakarta Sans',sans-serif;
-    font-weight:600;font-size:26px;color:#fff;
-    font-feature-settings:"tnum";letter-spacing:-0.5px;
+    font-size:44px;font-weight:200;color:#fff;
+    letter-spacing:-1.5px;line-height:1.1;
+    font-feature-settings:"tnum";
   }
 
   /* Amount input */
