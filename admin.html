@@ -783,8 +783,25 @@
   <!-- TRANSACTIONS PAGE -->
   <section class="page" id="page-transactions">
     <div class="page-h">All Transactions</div>
-    <div class="page-sub">Complete activity log</div>
-    <div id="txList"><div class="empty">Coming in Phase 5</div></div>
+    <div class="page-sub">Complete activity log across the platform</div>
+
+    <div class="filter-bar">
+      <button class="filter-pill active" data-txfilter="all">All <span class="cnt" id="txcAll">0</span></button>
+      <button class="filter-pill" data-txfilter="deposit">Deposits <span class="cnt" id="txcDep">0</span></button>
+      <button class="filter-pill" data-txfilter="withdrawal">Withdrawals <span class="cnt" id="txcWd">0</span></button>
+      <button class="filter-pill" data-txfilter="adjustment">Adjustments <span class="cnt" id="txcAdj">0</span></button>
+    </div>
+
+    <div class="search-row">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" id="txSearch" placeholder="Search by user, amount, ref code...">
+      </div>
+    </div>
+
+    <div id="txList">
+      <div class="loading"><div class="spin"></div><div>Loading transactions...</div></div>
+    </div>
   </section>
 
   <!-- COMPANIES PAGE -->
@@ -1729,6 +1746,154 @@
     }
   }
 
+  // ============ TRANSACTIONS PAGE ============
+  var txFilter = 'all';
+  var allTxs = [];
+
+  document.querySelectorAll('[data-txfilter]').forEach(function(p){
+    p.addEventListener('click', function(){
+      document.querySelectorAll('[data-txfilter]').forEach(function(x){x.classList.remove('active');});
+      p.classList.add('active');
+      txFilter = p.getAttribute('data-txfilter');
+      renderTransactions();
+    });
+  });
+
+  var txSearchEl = document.getElementById('txSearch');
+  if(txSearchEl) txSearchEl.addEventListener('input', renderTransactions);
+
+  async function loadAllTransactions(){
+    try {
+      var adjRes = await sb.from('balance_adjustments').select('*').order('created_at',{ascending:false}).limit(200);
+      var adjustments = (adjRes.data || []).map(function(a){
+        return {
+          kind:'adjustment',
+          id:a.id,
+          user_id:a.user_id,
+          amount:Math.abs(a.delta),
+          delta:a.delta,
+          status:a.delta>0?'credit':'debit',
+          when:a.created_at,
+          ref:'ADJ-'+String(a.id).slice(0,8),
+          note:a.reason,
+          balance_after:a.balance_after
+        };
+      });
+
+      var deposits = (state.deposits || []).map(function(d){
+        return {
+          kind:'deposit',id:d.id,user_id:d.user_id,
+          amount:d.amount,delta:d.amount,
+          status:d.status,when:d.created_at,
+          ref:d.reference_code||('DEP-'+String(d.id).slice(0,8)),
+          method:d.method,note:d.notes
+        };
+      });
+
+      var withdrawals = (state.withdrawals || []).map(function(w){
+        return {
+          kind:'withdrawal',id:w.id,user_id:w.user_id,
+          amount:w.amount,delta:-w.amount,
+          status:w.status,when:w.created_at,
+          ref:w.reference_code||('WD-'+String(w.id).slice(0,8)),
+          method:w.method,note:w.notes
+        };
+      });
+
+      allTxs = deposits.concat(withdrawals).concat(adjustments)
+        .sort(function(a,b){return new Date(b.when)-new Date(a.when);});
+
+      renderTransactions();
+    } catch(e){
+      console.warn('Transactions load:', e);
+      document.getElementById('txList').innerHTML = '<div class="empty">Failed to load transactions</div>';
+    }
+  }
+
+  function renderTransactions(){
+    var q = (document.getElementById('txSearch').value || '').toLowerCase();
+
+    document.getElementById('txcAll').textContent = allTxs.length;
+    document.getElementById('txcDep').textContent = allTxs.filter(function(t){return t.kind==='deposit';}).length;
+    document.getElementById('txcWd').textContent = allTxs.filter(function(t){return t.kind==='withdrawal';}).length;
+    document.getElementById('txcAdj').textContent = allTxs.filter(function(t){return t.kind==='adjustment';}).length;
+
+    var filtered = allTxs.filter(function(t){
+      if(txFilter !== 'all' && t.kind !== txFilter) return false;
+      if(q){
+        var u = state.users.find(function(x){return x.id===t.user_id;});
+        var name = u ? ((u.first_name||'')+' '+(u.last_name||'')+' '+(u.email||'')).toLowerCase() : '';
+        if(!name.includes(q) && !(t.ref||'').toLowerCase().includes(q) && !String(t.amount).includes(q) && !(t.note||'').toLowerCase().includes(q)) return false;
+      }
+      return true;
+    });
+
+    var listEl = document.getElementById('txList');
+    if(!filtered.length){
+      listEl.innerHTML = '<div class="empty">No transactions found</div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(function(t){
+      var u = state.users.find(function(x){return x.id===t.user_id;});
+      var name = u ? (((u.first_name||'')+' '+(u.last_name||'')).trim() || u.email || 'Unknown') : 'Unknown user';
+      var email = u ? (u.email||'') : '';
+      var av = initial(name);
+      var when = new Date(t.when);
+      var whenStr = when.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' · ' + when.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+
+      // Kind icon + color
+      var kindIcon, kindColor, kindLabel;
+      if(t.kind==='deposit'){
+        kindIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>';
+        kindColor = '#3ed598'; kindLabel = 'DEPOSIT';
+      } else if(t.kind==='withdrawal'){
+        kindIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>';
+        kindColor = '#ff6a6a'; kindLabel = 'WITHDRAWAL';
+      } else {
+        kindIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+        kindColor = '#4a9eff'; kindLabel = 'ADJUSTMENT';
+      }
+
+      var statusPill = '';
+      var s = (t.status||'').toLowerCase();
+      if(s==='pending'||s==='awaiting_review') statusPill = '<span class="pill pending">PENDING</span>';
+      else if(s==='approved'||s==='completed'||s==='credit') statusPill = '<span class="pill ok" style="display:inline-flex;align-items:center;gap:3px;padding:3px 7px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'+s.toUpperCase()+'</span>';
+      else if(s==='rejected') statusPill = '<span class="pill banned">REJECTED</span>';
+      else if(s==='debit') statusPill = '<span class="pill" style="background:rgba(255,184,0,0.15);color:#ffb800">DEBIT</span>';
+
+      var amtColor = t.delta>0 ? '#3ed598' : '#ff6a6a';
+      var amtSign = t.delta>0 ? '+' : '−';
+
+      var html = '<div class="dep-card">' +
+        '<div class="dep-top">' +
+          '<div class="av" style="background:linear-gradient(135deg,'+kindColor+',rgba(255,255,255,0.2))">' + kindIcon + '</div>' +
+          '<div class="info">' +
+            '<div class="nm"><span style="color:'+kindColor+';font-size:10px;font-weight:700;letter-spacing:1px;margin-right:6px">'+kindLabel+'</span>' + statusPill + '</div>' +
+            '<div class="em" onclick="window._openUser(\''+(t.user_id||'')+'\')" style="cursor:pointer;color:#fff;font-weight:500">' + escapeHtml(name) + ' · ' + escapeHtml(email) + '</div>' +
+          '</div>' +
+          '<div class="amt" style="color:'+amtColor+'">' + amtSign + fmt(t.amount) + '<span class="when">' + whenStr + '</span></div>' +
+        '</div>' +
+        '<div class="dep-meta">' +
+          '<span class="chip">Ref <b>' + escapeHtml(t.ref) + '</b></span>' +
+          (t.method?'<span class="chip">Method <b>' + (t.method||'').toUpperCase() + '</b></span>':'') +
+          (t.balance_after!=null?'<span class="chip">Balance After <b>' + fmt(t.balance_after) + '</b></span>':'') +
+        '</div>';
+
+      if(t.note){
+        html += '<div class="dep-notes-inline">📝 ' + escapeHtml(t.note) + '</div>';
+      }
+
+      html += '</div>';
+      return html;
+    }).join('');
+  }
+
+  // Make av icon SVG sized correctly
+  var avStyleFix = document.createElement('style');
+  avStyleFix.textContent = '#page-transactions .dep-top .av svg{width:18px;height:18px;color:#000}';
+  document.head.appendChild(avStyleFix);
+
   // ========== AUTH GATE ==========
   document.addEventListener('sb-ready', async function(){
     var { data: userData } = await sb.auth.getUser();
@@ -1756,6 +1921,7 @@
     await loadCustomers();
     await loadDeposits();
     await loadWithdrawals();
+    await loadAllTransactions();
   });
 </script>
 
