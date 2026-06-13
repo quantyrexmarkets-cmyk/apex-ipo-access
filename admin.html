@@ -903,8 +903,60 @@
   <!-- NOTIFICATIONS PAGE -->
   <section class="page" id="page-notifications">
     <div class="page-h">Notifications</div>
-    <div class="page-sub">System alerts & broadcasts</div>
-    <div class="empty">Coming in Phase 8</div>
+    <div class="page-sub">Send messages and broadcasts to users</div>
+
+    <div class="pm-section">
+      <div class="pm-section-h">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <div><div class="ttl">Send Notification</div><div class="sub">Broadcast to all or send to specific user</div></div>
+      </div>
+
+      <div class="field-grid">
+        <div class="field-mini">
+          <label>Recipient</label>
+          <select id="ntRecipient">
+            <option value="broadcast">📢 Broadcast to All Users</option>
+            <option value="user">👤 Specific User</option>
+          </select>
+        </div>
+        <div class="field-mini">
+          <label>Type</label>
+          <select id="ntType">
+            <option value="info">ℹ️ Info</option>
+            <option value="success">✅ Success</option>
+            <option value="warning">⚠️ Warning</option>
+            <option value="alert">🚨 Alert</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-grid full" id="ntUserWrap" style="display:none">
+        <div class="field-mini">
+          <label>Select User</label>
+          <select id="ntUserId"></select>
+        </div>
+      </div>
+
+      <div class="field-grid full">
+        <div class="field-mini"><label>Title *</label><input id="ntTitle" placeholder="e.g. New IPO Listed"></div>
+      </div>
+      <div class="field-grid full">
+        <div class="field-mini"><label>Message *</label><textarea id="ntBody" rows="3" placeholder="Type your message..."></textarea></div>
+      </div>
+
+      <button class="act-btn primary" style="width:100%;margin-top:12px;padding:13px" onclick="window._sendNotif()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Send Notification
+      </button>
+    </div>
+
+    <div class="pm-section">
+      <div class="pm-section-h">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <div><div class="ttl">Recent Notifications</div><div class="sub">Last 50 sent</div></div>
+      </div>
+      <div id="notifList"><div class="empty">Loading...</div></div>
+    </div>
   </section>
 
   <!-- PAYMENT METHODS PAGE -->
@@ -1002,8 +1054,55 @@
   <!-- SETTINGS PAGE -->
   <section class="page" id="page-settings">
     <div class="page-h">Settings</div>
-    <div class="page-sub">System configuration</div>
-    <div class="empty">Coming in Phase 8</div>
+    <div class="page-sub">Platform configuration</div>
+
+    <div class="pm-section">
+      <div class="pm-section-h">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        <div><div class="ttl">Platform Settings</div><div class="sub">General configuration</div></div>
+      </div>
+
+      <div class="field-grid">
+        <div class="field-mini"><label>Platform Name</label><input id="psName" placeholder="APEX IPO ACCESS"></div>
+        <div class="field-mini"><label>Support Email</label><input id="psEmail" type="email" placeholder="support@apexipo.com"></div>
+      </div>
+      <div class="field-grid">
+        <div class="field-mini"><label>Min Deposit ($)</label><input id="psMinDep" type="number" placeholder="100"></div>
+        <div class="field-mini"><label>Max Deposit ($)</label><input id="psMaxDep" type="number" placeholder="1000000"></div>
+      </div>
+      <div class="field-grid">
+        <div class="field-mini"><label>Min Withdrawal ($)</label><input id="psMinWd" type="number" placeholder="50"></div>
+        <div class="field-mini"><label>Last Updated</label><input id="psUpdated" readonly></div>
+      </div>
+
+      <div style="margin-top:14px;padding:14px;background:rgba(255,255,255,0.03);border-radius:11px">
+        <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:13px;color:#fff;font-weight:500;margin-bottom:12px">
+          <span>Allow New Signups</span>
+          <input type="checkbox" id="psSignup" style="width:auto">
+        </label>
+        <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:13px;color:#fff;font-weight:500">
+          <span>🚧 Maintenance Mode</span>
+          <input type="checkbox" id="psMaint" style="width:auto">
+        </label>
+      </div>
+
+      <div class="field-grid full" style="margin-top:12px">
+        <div class="field-mini"><label>Maintenance Message</label><textarea id="psMaintMsg" rows="2" placeholder="We're performing scheduled maintenance..."></textarea></div>
+      </div>
+
+      <button class="act-btn primary" style="width:100%;margin-top:14px;padding:13px" onclick="window._savePlatformSettings()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Save Settings
+      </button>
+    </div>
+
+    <div class="pm-section">
+      <div class="pm-section-h">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <div><div class="ttl">Admin Activity Log</div><div class="sub">Recent admin actions</div></div>
+      </div>
+      <div id="adminLogList"><div class="empty">Loading...</div></div>
+    </div>
   </section>
 
 </main>
@@ -2155,6 +2254,9 @@
     await loadWallets();
     initCompaniesUI();
     await loadCompanies();
+    await loadNotifications();
+    await loadPlatformSettings();
+    await loadAdminLog();
   };
 
   window._toggleWallet = async function(id, currentActive){
@@ -2165,6 +2267,9 @@
     await loadWallets();
     initCompaniesUI();
     await loadCompanies();
+    await loadNotifications();
+    await loadPlatformSettings();
+    await loadAdminLog();
   };
 
   window._deleteWallet = async function(id){
@@ -2176,6 +2281,9 @@
     await loadWallets();
     initCompaniesUI();
     await loadCompanies();
+    await loadNotifications();
+    await loadPlatformSettings();
+    await loadAdminLog();
   };
 
   window._copyWallet = function(addr){
@@ -2358,6 +2466,9 @@
     window._closeCompany();
     initCompaniesUI();
     await loadCompanies();
+    await loadNotifications();
+    await loadPlatformSettings();
+    await loadAdminLog();
   };
 
   window._deleteCompany = async function(ticker){
@@ -2370,7 +2481,164 @@
     apexSuccess('Company deleted');
     initCompaniesUI();
     await loadCompanies();
+    await loadNotifications();
+    await loadPlatformSettings();
+    await loadAdminLog();
   };
+
+  // ============ NOTIFICATIONS ============
+  document.getElementById('ntRecipient').addEventListener('change', function(){
+    var wrap = document.getElementById('ntUserWrap');
+    if(this.value === 'user'){
+      wrap.style.display = 'block';
+      var sel = document.getElementById('ntUserId');
+      sel.innerHTML = '<option value="">Select a user...</option>' + state.users.map(function(u){
+        var name = ((u.first_name||'')+' '+(u.last_name||'')).trim() || u.email || u.id;
+        return '<option value="'+u.id+'">'+escapeHtml(name)+' · '+escapeHtml(u.email||'')+'</option>';
+      }).join('');
+    } else {
+      wrap.style.display = 'none';
+    }
+  });
+
+  window._sendNotif = async function(){
+    var recipient = document.getElementById('ntRecipient').value;
+    var type = document.getElementById('ntType').value;
+    var title = document.getElementById('ntTitle').value.trim();
+    var body = document.getElementById('ntBody').value.trim();
+    var userId = document.getElementById('ntUserId').value;
+
+    if(!title || !body){ apexError('Title and message required'); return; }
+    if(recipient === 'user' && !userId){ apexError('Select a user'); return; }
+
+    var payload = {
+      title: title,
+      body: body,
+      type: type,
+      created_by: state.user.id,
+      is_broadcast: recipient === 'broadcast',
+      user_id: recipient === 'user' ? userId : null
+    };
+
+    var { error } = await sb.from('notifications').insert(payload);
+    if(error){ apexError(error.message); return; }
+
+    // Log admin action
+    try {
+      await sb.from('admin_log').insert({
+        admin_id: state.user.id,
+        action: recipient === 'broadcast' ? 'broadcast_notification' : 'send_notification',
+        target_type: recipient === 'user' ? 'user' : 'all',
+        target_id: userId || null,
+        details: { title: title, type: type }
+      });
+    } catch(e){}
+
+    apexSuccess(recipient==='broadcast'?'Broadcast sent to all users':'Notification sent');
+    document.getElementById('ntTitle').value = '';
+    document.getElementById('ntBody').value = '';
+    await loadNotifications();
+  };
+
+  async function loadNotifications(){
+    try {
+      var { data } = await sb.from('notifications').select('*').order('created_at',{ascending:false}).limit(50);
+      var listEl = document.getElementById('notifList');
+      if(!data || !data.length){
+        listEl.innerHTML = '<div class="empty">No notifications sent yet</div>';
+        return;
+      }
+      listEl.innerHTML = data.map(function(n){
+        var when = new Date(n.created_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+        var color = n.type==='success'?'#3ed598':n.type==='warning'?'#ffb800':n.type==='alert'?'#ff6a6a':'#4a9eff';
+        var icon = n.type==='success'?'✓':n.type==='warning'?'⚠':n.type==='alert'?'🚨':'ℹ';
+        var who = n.is_broadcast ? 'All users' : (function(){
+          var u = state.users.find(function(x){return x.id===n.user_id;});
+          return u ? (((u.first_name||'')+' '+(u.last_name||'')).trim() || u.email || 'User') : 'User';
+        })();
+        return '<div class="dep-card">' +
+          '<div class="dep-top">' +
+            '<div class="av" style="background:'+color+'22;color:'+color+';font-size:16px">'+icon+'</div>' +
+            '<div class="info">' +
+              '<div class="nm">'+escapeHtml(n.title)+' <span class="pill" style="background:'+color+'15;color:'+color+'">'+n.type.toUpperCase()+'</span></div>' +
+              '<div class="em">To: '+escapeHtml(who)+' · '+when+'</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="dep-notes-inline">'+escapeHtml(n.body)+'</div>' +
+        '</div>';
+      }).join('');
+    } catch(e){ console.warn('Notif load:', e); }
+  }
+
+  // ============ PLATFORM SETTINGS ============
+  async function loadPlatformSettings(){
+    try {
+      var { data } = await sb.from('platform_settings').select('*').eq('id',1).single();
+      if(data){
+        document.getElementById('psName').value = data.platform_name || '';
+        document.getElementById('psEmail').value = data.support_email || '';
+        document.getElementById('psMinDep').value = data.min_deposit || '';
+        document.getElementById('psMaxDep').value = data.max_deposit || '';
+        document.getElementById('psMinWd').value = data.min_withdrawal || '';
+        document.getElementById('psSignup').checked = data.signup_enabled !== false;
+        document.getElementById('psMaint').checked = !!data.maintenance_mode;
+        document.getElementById('psMaintMsg').value = data.maintenance_message || '';
+        document.getElementById('psUpdated').value = data.updated_at ? new Date(data.updated_at).toLocaleString() : '—';
+      }
+    } catch(e){ console.warn('Settings load:', e); }
+  }
+
+  window._savePlatformSettings = async function(){
+    var updates = {
+      platform_name: document.getElementById('psName').value.trim() || 'APEX IPO ACCESS',
+      support_email: document.getElementById('psEmail').value.trim() || null,
+      min_deposit: parseFloat(document.getElementById('psMinDep').value) || 0,
+      max_deposit: parseFloat(document.getElementById('psMaxDep').value) || 1000000,
+      min_withdrawal: parseFloat(document.getElementById('psMinWd').value) || 0,
+      signup_enabled: document.getElementById('psSignup').checked,
+      maintenance_mode: document.getElementById('psMaint').checked,
+      maintenance_message: document.getElementById('psMaintMsg').value.trim() || null,
+      updated_at: new Date().toISOString()
+    };
+    var { error } = await sb.from('platform_settings').update(updates).eq('id',1);
+    if(error){ apexError(error.message); return; }
+
+    try {
+      await sb.from('admin_log').insert({
+        admin_id: state.user.id,
+        action: 'update_settings',
+        target_type: 'platform',
+        details: updates
+      });
+    } catch(e){}
+
+    apexSuccess('Settings saved');
+    document.getElementById('psUpdated').value = new Date().toLocaleString();
+    await loadAdminLog();
+  };
+
+  // ============ ADMIN ACTIVITY LOG ============
+  async function loadAdminLog(){
+    try {
+      var { data } = await sb.from('admin_log').select('*').order('created_at',{ascending:false}).limit(50);
+      var listEl = document.getElementById('adminLogList');
+      if(!data || !data.length){
+        listEl.innerHTML = '<div class="empty">No admin activity yet</div>';
+        return;
+      }
+      listEl.innerHTML = data.map(function(l){
+        var admin = state.users.find(function(x){return x.id===l.admin_id;});
+        var adminName = admin ? (((admin.first_name||'')+' '+(admin.last_name||'')).trim() || admin.email || 'Admin') : 'Admin';
+        var when = new Date(l.created_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+        var actionLabel = (l.action||'').replace(/_/g,' ').toUpperCase();
+        return '<div class="act-it" style="border-bottom:1px solid rgba(255,255,255,0.04);padding:10px 12px;display:flex;gap:10px;align-items:center">' +
+          '<div class="ico" style="width:28px;height:28px;border-radius:50%;background:rgba(74,158,255,0.1);color:#4a9eff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px">⚡</div>' +
+          '<div style="flex:1;font-size:12px;color:#a8b2c1"><b style="color:#fff">'+escapeHtml(adminName)+'</b> · '+escapeHtml(actionLabel)+(l.target_type?' · <span style="color:#6a7585">'+escapeHtml(l.target_type)+'</span>':'')+'</div>' +
+          '<div style="font-size:10px;color:#6a7585;font-family:\'Manrope\',sans-serif">'+when+'</div>' +
+        '</div>';
+      }).join('');
+    } catch(e){ console.warn('Admin log:', e); }
+  }
 
   // ========== AUTH GATE ==========
   document.addEventListener('sb-ready', async function(){
@@ -2404,6 +2672,9 @@
     await loadWallets();
     initCompaniesUI();
     await loadCompanies();
+    await loadNotifications();
+    await loadPlatformSettings();
+    await loadAdminLog();
   });
 </script>
 
