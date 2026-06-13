@@ -640,13 +640,18 @@
   // Load wallets from Supabase
   // ─────────────────────────────────────────────
   function loadWallets(){
-    sb.from('wallet_settings').select('*').then(function(res){
+    sb.from('crypto_wallets').select('*').eq('active', true).then(function(res){
       if(res.error){
-        apexError("Could not load wallet addresses: " + (res.error.message || "unknown")); renderCoin(state.selectedCoin);
+        console.warn('Crypto wallets:', res.error);
+        renderCoin(state.selectedCoin);
         return;
       }
       (res.data || []).forEach(function(w){
-        if(w.coin) state.wallets[w.coin.toUpperCase()] = w;
+        if(w.coin){
+          // Store first active wallet per coin (admin can have multiple, picks first)
+          var key = w.coin.toUpperCase();
+          if(!state.wallets[key]) state.wallets[key] = w;
+        }
       });
       renderCoin(state.selectedCoin);
     }).catch(function(e){

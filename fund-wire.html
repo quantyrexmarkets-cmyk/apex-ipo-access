@@ -53,6 +53,28 @@
   .amount-banner .lbl{text-transform:uppercase;letter-spacing:1.5px;font-size:10px;font-weight:600;color:#a8b2c1;margin-bottom:8px}
   .amount-banner .val{font-family:'Manrope',sans-serif;font-size:32px;font-weight:700;color:#4a9eff;letter-spacing:-0.5px}
 
+  .wire-preview{
+    background:linear-gradient(180deg,rgba(74,158,255,0.06),rgba(74,158,255,0.02));
+    border:1px solid rgba(74,158,255,0.2);
+    border-radius:12px;padding:14px;margin-bottom:14px;
+  }
+  .wire-preview .wp-h{
+    display:flex;align-items:center;gap:8px;
+    color:#4a9eff;font-weight:700;font-size:12px;letter-spacing:1px;
+    margin-bottom:10px;text-transform:uppercase;
+  }
+  .wire-preview .wp-h svg{width:16px;height:16px}
+  .wire-preview .wp-row{
+    display:flex;justify-content:space-between;
+    padding:8px 0;font-size:13px;color:#a8b2c1;
+    border-bottom:1px solid rgba(255,255,255,0.05);
+  }
+  .wire-preview .wp-row:last-of-type{border-bottom:none}
+  .wire-preview .wp-row b{color:#fff;font-weight:600}
+  .wire-preview .wp-note{
+    margin-top:10px;padding:10px;background:rgba(255,255,255,0.03);
+    border-radius:8px;font-size:11px;color:#a8b2c1;line-height:1.5;
+  }
   .step-card{
     background:rgba(255,255,255,0.03);
     border:1px solid rgba(255,255,255,0.08);
@@ -122,6 +144,16 @@
     <div class="val" id="amountVal">$0.00</div>
   </div>
 
+  <div class="wire-preview" id="wirePreview" style="display:none">
+    <div class="wp-h">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      <span>Bank Information</span>
+    </div>
+    <div class="wp-row"><span>Bank</span><b id="wpBank">—</b></div>
+    <div class="wp-row"><span>Beneficiary</span><b id="wpBenef">—</b></div>
+    <div class="wp-note">📞 Contact our funding team below to receive your unique account number, routing number, and reference code.</div>
+  </div>
+
   <div class="step-card">
     <div class="step-num">1</div>
     <h3>Request Wire Instructions</h3>
@@ -155,6 +187,18 @@
   var amount = parseFloat(params.get('amount') || sessionStorage.getItem('fund_amount') || '0');
 
   document.getElementById('amountVal').textContent = '$' + amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // Load wire settings from DB
+  document.addEventListener('sb-ready', async function(){
+    try {
+      var { data } = await sb.from('wire_settings').select('*').eq('id',1).single();
+      if(data && (data.bank_name || data.beneficiary_name)){
+        document.getElementById('wirePreview').style.display = 'block';
+        document.getElementById('wpBank').textContent = data.bank_name || '—';
+        document.getElementById('wpBenef').textContent = data.beneficiary_name || '—';
+      }
+    } catch(e){ console.warn(e); }
+  });
 
   // Persist for proof page
   sessionStorage.setItem('fund_method', 'wire');

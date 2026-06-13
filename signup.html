@@ -219,6 +219,16 @@
 </div>
 
 <script>
+
+  // Check if signups are enabled
+  document.addEventListener('sb-ready', async () => {
+    try {
+      const { data } = await sb.from('platform_settings').select('signup_enabled').eq('id',1).single();
+      if(data && data.signup_enabled === false){
+        document.body.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#000;color:#fff;font-family:Inter,sans-serif;padding:24px;text-align:center"><div style="max-width:400px"><div style="font-size:64px;margin-bottom:20px">🚧</div><h1 style="font-family:\'Plus Jakarta Sans\',sans-serif;font-size:24px;margin-bottom:10px">Signups Temporarily Closed</h1><p style="color:#a8b2c1;font-size:14px;line-height:1.6;margin-bottom:24px">New account registration is paused. Please check back later.</p><a href="login.html" style="display:inline-block;padding:13px 28px;background:#4a9eff;color:#000;border-radius:10px;font-weight:700;text-decoration:none;font-size:13px">Existing User? Sign In</a></div></div>';
+      }
+    } catch(e){}
+  });
   var selected = [];
   var cards = document.querySelectorAll('.account-card');
   var btn = document.getElementById('continueBtn');

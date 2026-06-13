@@ -125,3 +125,39 @@ window.apex = {
     });
   }
 };
+
+
+// ============================================
+// PLATFORM HELPERS — maintenance + signup gate
+// ============================================
+window.apex = window.apex || {};
+
+window.apex.checkMaintenance = async function(){
+  try {
+    const { data } = await sb.from('platform_settings').select('maintenance_mode,maintenance_message,signup_enabled').eq('id',1).single();
+    if(!data) return data;
+    // Show maintenance banner if enabled (skip for admins)
+    if(data.maintenance_mode){
+      const { data: userData } = await sb.auth.getUser();
+      let isAdmin = false;
+      if(userData?.user){
+        const { data: profile } = await sb.from('profiles').select('is_admin').eq('id', userData.user.id).single();
+        isAdmin = profile?.is_admin === true;
+      }
+      if(!isAdmin && !document.getElementById('maintBanner')){
+        const banner = document.createElement('div');
+        banner.id = 'maintBanner';
+        banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(90deg,#ffb800,#ff8c00);color:#000;padding:10px 16px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,0.3)';
+        banner.innerHTML = '🚧 ' + (data.maintenance_message || 'Platform under maintenance. Limited functionality.');
+        document.body.appendChild(banner);
+        document.body.style.paddingTop = (banner.offsetHeight + (parseInt(document.body.style.paddingTop||0))) + 'px';
+      }
+    }
+    return data;
+  } catch(e){ console.warn('Platform check:', e); }
+};
+
+// Auto-run on every page that loads supabase.js
+document.addEventListener('sb-ready', () => {
+  setTimeout(() => window.apex.checkMaintenance(), 500);
+});
