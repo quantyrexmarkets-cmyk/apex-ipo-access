@@ -270,11 +270,30 @@
       });
   }
 
+  // Smart redirect: pending-approval if not verified, dashboard if verified
+  async function smartRedirect(userId){
+    try {
+      var { data: prof } = await sb.from('profiles').select('kyc_status,is_admin,banned,banned_reason').eq('id', userId).single();
+      if(prof && prof.banned){
+        await sb.auth.signOut();
+        alert('Your account has been suspended.' + (prof.banned_reason ? '\n\nReason: ' + prof.banned_reason : ''));
+        return;
+      }
+      if(prof && !prof.is_admin && prof.kyc_status !== 'verified'){
+        window.location.href = 'pending-approval.html';
+      } else {
+        window.location.href = 'dashboard.html';
+      }
+    } catch(e){
+      window.location.href = 'dashboard.html';
+    }
+  }
+
   document.addEventListener('sb-ready', function(){
     // Redirect already-logged-in users
     sb.auth.getUser().then(function(r){
       if(r.data && r.data.user){
-        window.location.href = 'dashboard.html';
+        smartRedirect(r.data.user.id);
       }
     });
 
@@ -346,7 +365,7 @@
           // Check 2FA
           check2FA(res.data.session, email).then(function(needs2FA){
             if(!needs2FA){
-              window.location.href = 'dashboard.html';
+              smartRedirect(res.data.user.id);
             }
             // If 2FA, redirect already happened inside check2FA
           });

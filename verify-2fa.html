@@ -255,7 +255,18 @@
           }).then(function(){
             sessionStorage.removeItem('pending_2fa_session');
             boxes.forEach(function(b){ b.classList.add('success'); });
-            setTimeout(function(){
+            setTimeout(async function(){
+              try {
+                var u = await sb.auth.getUser();
+                if(u.data && u.data.user){
+                  var { data: prof } = await sb.from('profiles').select('kyc_status,is_admin,banned').eq('id', u.data.user.id).single();
+                  if(prof && prof.banned){ await sb.auth.signOut(); window.location.href='login.html'; return; }
+                  if(prof && !prof.is_admin && prof.kyc_status !== 'verified'){
+                    window.location.href = 'pending-approval.html';
+                    return;
+                  }
+                }
+              } catch(e){}
               window.location.href = 'dashboard.html';
             }, 400);
           }).catch(function(e){
