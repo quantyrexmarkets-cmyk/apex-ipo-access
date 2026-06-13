@@ -759,8 +759,25 @@
   <!-- WITHDRAWALS PAGE -->
   <section class="page" id="page-withdrawals">
     <div class="page-h">Withdrawals</div>
-    <div class="page-sub">Approve withdrawal requests</div>
-    <div id="wdList"><div class="empty">Coming in Phase 4</div></div>
+    <div class="page-sub">Review and process withdrawal requests</div>
+
+    <div class="filter-bar">
+      <button class="filter-pill active" data-wdfilter="all">All <span class="cnt" id="wcAll">0</span></button>
+      <button class="filter-pill" data-wdfilter="pending">Pending <span class="cnt" id="wcPend">0</span></button>
+      <button class="filter-pill" data-wdfilter="approved">Approved <span class="cnt" id="wcAppr">0</span></button>
+      <button class="filter-pill" data-wdfilter="rejected">Rejected <span class="cnt" id="wcRej">0</span></button>
+    </div>
+
+    <div class="search-row">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" id="wdSearch" placeholder="Search by user, amount, ref code, destination...">
+      </div>
+    </div>
+
+    <div id="wdList">
+      <div class="loading"><div class="spin"></div><div>Loading withdrawals...</div></div>
+    </div>
   </section>
 
   <!-- TRANSACTIONS PAGE -->
@@ -1163,8 +1180,230 @@
       var { data } = await sb.from('withdrawals').select('*').order('created_at',{ascending:false});
       state.withdrawals = data || [];
       renderStats();
-    } catch(e){ /* table may not exist yet */ }
+      renderWithdrawals();
+    } catch(e){ console.warn('Withdrawals load:', e); }
   }
+
+  // ============ WITHDRAWALS PAGE ============
+  var wdFilter = 'all';
+
+  document.querySelectorAll('[data-wdfilter]').forEach(function(p){
+    p.addEventListener('click', function(){
+      document.querySelectorAll('[data-wdfilter]').forEach(function(x){x.classList.remove('active');});
+      p.classList.add('active');
+      wdFilter = p.getAttribute('data-wdfilter');
+      renderWithdrawals();
+    });
+  });
+
+  var wdSearchEl = document.getElementById('wdSearch');
+  if(wdSearchEl) wdSearchEl.addEventListener('input', renderWithdrawals);
+
+  function renderWithdrawals(){
+    var q = (document.getElementById('wdSearch').value || '').toLowerCase();
+    var all = state.withdrawals;
+
+    document.getElementById('wcAll').textContent = all.length;
+    document.getElementById('wcPend').textContent = all.filter(function(w){return w.status==='pending';}).length;
+    document.getElementById('wcAppr').textContent = all.filter(function(w){return w.status==='approved'||w.status==='completed';}).length;
+    document.getElementById('wcRej').textContent = all.filter(function(w){return w.status==='rejected';}).length;
+
+    var filtered = all.filter(function(w){
+      if(wdFilter !== 'all'){
+        if(wdFilter === 'approved'){
+          if(w.status !== 'approved' && w.status !== 'completed') return false;
+        } else {
+          if(w.status !== wdFilter) return false;
+        }
+      }
+      if(q){
+        var u = state.users.find(function(x){return x.id===w.user_id;});
+        var name = u ? ((u.first_name||'')+' '+(u.last_name||'')+' '+(u.email||'')).toLowerCase() : '';
+        var dest = ((w.destination||'')+' '+(w.account_number||'')+' '+(w.bank_name||'')+' '+(w.beneficiary_name||'')).toLowerCase();
+        if(!name.includes(q) && !(w.reference_code||'').toLowerCase().includes(q) && !String(w.amount).includes(q) && !dest.includes(q)) return false;
+      }
+      return true;
+    });
+
+    var listEl = document.getElementById('wdList');
+    if(!filtered.length){
+      listEl.innerHTML = '<div class="empty">No withdrawals found</div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(function(w){
+      var u = state.users.find(function(x){return x.id===w.user_id;});
+      var name = u ? (((u.first_name||'')+' '+(u.last_name||'')).trim() || u.email || 'Unknown') : 'Unknown user';
+      var email = u ? (u.email||'') : '';
+      var av = initial(name);
+      var when = new Date(w.created_at);
+      var whenStr = when.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' · ' + when.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+
+      var statusPill = '';
+      if(w.status==='pending') statusPill = '<span class="pill pending">PENDING</span>';
+      else if(w.status==='approved'||w.status==='completed') statusPill = '<span class="pill ok" style="display:inline-flex;align-items:center;gap:3px;padding:3px 7px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'+w.status.toUpperCase()+'</span>';
+      else if(w.status==='rejected') statusPill = '<span class="pill banned">REJECTED</span>';
+
+      var isUrgent = w.status==='pending';
+      var method = (w.method||'').toUpperCase();
+
+      var destInfo = '';
+      if(w.method==='crypto'){
+        destInfo = '<span class="chip">Asset <b>'+(w.asset||'—')+'</b></span>' +
+                   '<span class="chip" style="word-break:break-all">Address <b>'+escapeHtml((w.destination||'').slice(0,18)+'...')+'</b></span>';
+      } else if(w.method==='bank'){
+        destInfo = '<span class="chip">Bank <b>'+escapeHtml(w.bank_name||'—')+'</b></span>' +
+                   '<span class="chip">Acct <b>'+escapeHtml((w.account_number||'').slice(-4).padStart(8,'•'))+'</b></span>';
+      } else if(w.method==='ach'){
+        destInfo = '<span class="chip">ACH <b>'+escapeHtml((w.account_number||'').slice(-4).padStart(8,'•'))+'</b></span>';
+      }
+
+      var html = '<div class="dep-card' + (isUrgent?' urgent':'') + '">' +
+        '<div class="dep-top">' +
+          '<div class="av">' + escapeHtml(av) + '</div>' +
+          '<div class="info">' +
+            '<div class="nm">' + escapeHtml(name) + ' ' + statusPill + '</div>' +
+            '<div class="em">' + escapeHtml(email) + '</div>' +
+          '</div>' +
+          '<div class="amt" style="color:#ff6a6a">−' + fmt(w.amount) + '<span class="when">' + whenStr + '</span></div>' +
+        '</div>' +
+        '<div class="dep-meta">' +
+          '<span class="chip">Method <b>' + method + '</b></span>' +
+          '<span class="chip">Ref <b>' + escapeHtml(w.reference_code||'—') + '</b></span>' +
+          destInfo +
+        '</div>';
+
+      if(w.beneficiary_name){
+        html += '<div class="dep-notes-inline">👤 Beneficiary: ' + escapeHtml(w.beneficiary_name) + (w.routing_number?' · Routing: '+escapeHtml(w.routing_number):'') + '</div>';
+      }
+      if(w.notes){
+        html += '<div class="dep-notes-inline">📝 ' + escapeHtml(w.notes) + '</div>';
+      }
+      if(w.rejection_reason){
+        html += '<div class="dep-notes-inline" style="border-left-color:#ff6a6a;color:#ff8888">❌ Rejected: ' + escapeHtml(w.rejection_reason) + '</div>';
+      }
+
+      html += '<div class="dep-actions">';
+      html += '<button class="proof" onclick="window._viewWithdrawDetails(\''+w.id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Full Details</button>';
+      if(isUrgent){
+        html += '<button class="approve" onclick="window._approveWithdraw(\''+w.id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Approve & Deduct</button>';
+        html += '<button class="reject" onclick="window._rejectWithdraw(\''+w.id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Reject</button>';
+      }
+      html += '</div></div>';
+      return html;
+    }).join('');
+  }
+
+  // ============ APPROVE WITHDRAWAL ============
+  window._approveWithdraw = async function(id){
+    var w = state.withdrawals.find(function(x){return x.id===id;});
+    if(!w){ apexError('Withdrawal not found'); return; }
+
+    // Check user balance
+    var { data: profile, error: e0 } = await sb.from('profiles').select('cash_balance').eq('id', w.user_id).single();
+    if(e0){ apexError(e0.message); return; }
+
+    var balBefore = parseFloat(profile.cash_balance || 0);
+    var amt = parseFloat(w.amount);
+
+    if(balBefore < amt){
+      var force = await apexConfirm({
+        title: 'Insufficient balance',
+        body: 'User balance is ' + fmt(balBefore) + ' but withdrawal is ' + fmt(amt) + '. Approve anyway? (Balance will go negative)',
+        okLabel: 'Force Approve'
+      });
+      if(!force) return;
+    } else {
+      var ok = await apexConfirm({
+        title: 'Approve withdrawal?',
+        body: 'This will deduct ' + fmt(amt) + ' from the user account.',
+        okLabel: 'Approve & Deduct'
+      });
+      if(!ok) return;
+    }
+
+    try {
+      // Update withdrawal
+      var { error: e1 } = await sb.from('withdrawals').update({
+        status: 'approved',
+        approved_at: new Date().toISOString()
+      }).eq('id', id);
+      if(e1) throw e1;
+
+      // Deduct balance
+      var balAfter = balBefore - amt;
+      var { error: e2 } = await sb.from('profiles').update({ cash_balance: balAfter }).eq('id', w.user_id);
+      if(e2) throw e2;
+
+      // Log adjustment
+      try {
+        await sb.from('balance_adjustments').insert({
+          user_id: w.user_id,
+          admin_id: state.user.id,
+          delta: -amt,
+          balance_before: balBefore,
+          balance_after: balAfter,
+          reason: 'Withdrawal approved: ' + (w.reference_code || w.id)
+        });
+      } catch(e){ console.warn('Audit failed', e); }
+
+      apexSuccess('Approved · ' + fmt(amt) + ' deducted');
+      await loadWithdrawals();
+      await loadCustomers();
+    } catch(e){
+      apexError('Failed: ' + e.message);
+    }
+  };
+
+  // ============ REJECT WITHDRAWAL ============
+  window._rejectWithdraw = async function(id){
+    var reason = prompt('Reason for rejection (visible to user):');
+    if(reason === null) return;
+
+    var { error } = await sb.from('withdrawals').update({
+      status: 'rejected',
+      rejection_reason: reason || 'Verification failed'
+    }).eq('id', id);
+    if(error){ apexError(error.message); return; }
+    apexSuccess('Withdrawal rejected');
+    await loadWithdrawals();
+  };
+
+  // ============ FULL DETAILS MODAL ============
+  window._viewWithdrawDetails = function(id){
+    var w = state.withdrawals.find(function(x){return x.id===id;});
+    if(!w) return;
+    var u = state.users.find(function(x){return x.id===w.user_id;});
+
+    var rows = [
+      ['Reference', w.reference_code || '—'],
+      ['User', u ? ((u.first_name||'')+' '+(u.last_name||'')).trim() + ' (' + (u.email||'') + ')' : 'Unknown'],
+      ['Method', (w.method||'').toUpperCase()],
+      ['Amount', fmt(w.amount)],
+      ['Status', (w.status||'').toUpperCase()],
+      ['Created', new Date(w.created_at).toLocaleString()]
+    ];
+    if(w.method==='crypto'){
+      rows.push(['Asset', w.asset||'—']);
+      rows.push(['Destination', w.destination||'—']);
+    } else {
+      if(w.bank_name) rows.push(['Bank', w.bank_name]);
+      if(w.beneficiary_name) rows.push(['Beneficiary', w.beneficiary_name]);
+      if(w.routing_number) rows.push(['Routing', w.routing_number]);
+      if(w.account_number) rows.push(['Account', w.account_number]);
+    }
+    if(w.notes) rows.push(['Notes', w.notes]);
+    if(w.rejection_reason) rows.push(['Rejected', w.rejection_reason]);
+    if(w.approved_at) rows.push(['Approved At', new Date(w.approved_at).toLocaleString()]);
+
+    var modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;cursor:pointer;backdrop-filter:blur(8px)';
+    modal.onclick = function(e){ if(e.target===modal) modal.remove(); };
+    modal.innerHTML = '<div style="background:#0a0e14;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:22px;max-width:480px;width:100%;max-height:80vh;overflow-y:auto"><div style="font-family:\'Plus Jakarta Sans\',sans-serif;font-weight:700;font-size:16px;margin-bottom:16px;color:#fff">Withdrawal Details</div>' +
+      rows.map(function(r){return '<div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px"><span style="color:#8b95a8">'+r[0]+'</span><span style="color:#fff;font-weight:600;text-align:right;word-break:break-all;max-width:60%;font-family:\'Manrope\',sans-serif">'+escapeHtml(r[1])+'</span></div>';}).join('') +
+      '<button style="margin-top:14px;width:100%;padding:12px;background:#4a9eff;color:#000;border:none;border-radius:9px;font-weight:700;font-size:13px;cursor:pointer" onclick="this.closest(\'div[style]\').parentElement.parentElement.remove()">Close</button></div>';
+    document.body.appendChild(modal);
+  };
 
   function renderStats(){
     var active = state.users.filter(function(u){ return u.kyc_status==='verified'; }).length;
