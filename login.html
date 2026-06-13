@@ -290,10 +290,10 @@
   }
 
   document.addEventListener('sb-ready', function(){
-    // Redirect already-logged-in users
+    // Always force fresh login — sign out any lingering session
     sb.auth.getUser().then(function(r){
       if(r.data && r.data.user){
-        smartRedirect(r.data.user.id);
+        sb.auth.signOut();
       }
     });
 
