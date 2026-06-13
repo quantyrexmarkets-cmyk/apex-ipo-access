@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Access | APEX IPO ACCESS</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="js/supabase.js?v=100"></script>
+<script src="js/notify.js?v=1"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{
+    background:#000;color:#fff;
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(74,158,255,0.10), transparent 50%),
+      radial-gradient(circle at 80% 90%, rgba(255,106,106,0.06), transparent 50%);
+  }
+
+  .wrap{
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;
+  }
+
+  .card{
+    width:100%;max-width:420px;
+    background:linear-gradient(180deg,rgba(20,24,32,0.95),rgba(10,14,20,0.95));
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:18px;
+    padding:36px 28px 30px;
+    box-shadow:0 30px 80px rgba(0,0,0,0.5);
+    backdrop-filter:blur(20px);
+  }
+
+  .brand{
+    display:flex;align-items:center;justify-content:space-between;
+    padding-bottom:20px;margin-bottom:24px;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .brand-left{display:flex;flex-direction:column;line-height:1}
+  .brand-name{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:800;font-size:18px;color:#fff;letter-spacing:2.5px;
+  }
+  .brand-tag{
+    font-size:8px;color:#4a9eff;letter-spacing:3px;
+    font-weight:600;margin-top:3px;
+  }
+  .access-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:6px 12px;border-radius:8px;
+    background:rgba(255,106,106,0.12);
+    border:1px solid rgba(255,106,106,0.3);
+    color:#ff6a6a;font-size:10px;font-weight:700;letter-spacing:1.5px;
+  }
+  .access-pill::before{
+    content:'';width:6px;height:6px;border-radius:50%;
+    background:#ff6a6a;
+    box-shadow:0 0 8px #ff6a6a;
+    animation:pulse 1.6s infinite;
+  }
+  @keyframes pulse{50%{opacity:0.4}}
+
+  h1{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:22px;letter-spacing:-0.3px;
+    margin-bottom:6px;
+  }
+  .sub{
+    color:#8b95a8;font-size:13px;margin-bottom:28px;line-height:1.5;
+  }
+
+  .field{margin-bottom:18px}
+  .field label{
+    display:flex;align-items:center;gap:5px;
+    font-size:11px;text-transform:uppercase;
+    letter-spacing:1.2px;color:#a8b2c1;font-weight:600;
+    margin-bottom:8px;
+  }
+  .field label .req{color:#ff6a6a}
+
+  .input-wrap{position:relative}
+  .input-wrap svg.lead{
+    position:absolute;left:14px;top:50%;transform:translateY(-50%);
+    width:18px;height:18px;color:#6a7585;pointer-events:none;
+  }
+  input{
+    width:100%;
+    background:#0a0e14;border:1px solid rgba(255,255,255,0.08);
+    color:#fff;font-family:'Inter',sans-serif;font-size:14px;
+    padding:14px 14px 14px 44px;border-radius:10px;
+    transition:all .15s;
+  }
+  input:focus{outline:none;border-color:rgba(74,158,255,0.5);background:#0d1218}
+  input::placeholder{color:#4a5564}
+
+  .toggle-eye{
+    position:absolute;right:10px;top:50%;transform:translateY(-50%);
+    width:34px;height:34px;border-radius:8px;
+    background:none;border:none;color:#6a7585;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .toggle-eye:hover{color:#4a9eff}
+  .toggle-eye svg{width:18px;height:18px}
+
+  .submit-btn{
+    width:100%;padding:15px;border-radius:11px;
+    background:linear-gradient(135deg,#4a9eff,#3a86d6);
+    color:#000;border:none;cursor:pointer;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:700;font-size:14px;letter-spacing:0.5px;
+    margin-top:8px;transition:all .2s;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .submit-btn:hover:not(:disabled){
+    transform:translateY(-1px);
+    box-shadow:0 10px 30px rgba(74,158,255,0.35);
+  }
+  .submit-btn:disabled{opacity:0.5;cursor:not-allowed}
+  .submit-btn svg{width:16px;height:16px}
+
+  .foot{
+    margin-top:24px;padding-top:20px;
+    border-top:1px solid rgba(255,255,255,0.06);
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:11px;color:#6a7585;
+  }
+  .foot a{color:#4a9eff;text-decoration:none;font-weight:600}
+  .foot a:hover{text-decoration:underline}
+
+  .security-note{
+    margin-top:18px;
+    background:rgba(255,184,0,0.06);
+    border:1px solid rgba(255,184,0,0.2);
+    border-radius:10px;padding:11px 14px;
+    font-size:11px;color:#ffb800;line-height:1.5;
+    display:flex;gap:9px;align-items:flex-start;
+  }
+  .security-note svg{width:14px;height:14px;flex-shrink:0;margin-top:1px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="card">
+
+    <div class="brand">
+      <div class="brand-left">
+        <div class="brand-name">APEX</div>
+        <div class="brand-tag">IPO ACCESS</div>
+      </div>
+      <div class="access-pill">ADMIN</div>
+    </div>
+
+    <h1>Admin Access</h1>
+    <div class="sub">Restricted area. Authorized personnel only.</div>
+
+    <div class="field">
+      <label>Admin Email <span class="req">*</span></label>
+      <div class="input-wrap">
+        <svg class="lead" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <input type="email" id="email" placeholder="admin@apexipo.com" autocomplete="email">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Password <span class="req">*</span></label>
+      <div class="input-wrap">
+        <svg class="lead" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input type="password" id="pwd" placeholder="••••••••" autocomplete="current-password">
+        <button type="button" class="toggle-eye" id="eyeBtn" aria-label="Show password">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="loginBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      Sign In to Admin Panel
+    </button>
+
+    <div class="security-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>All admin actions are logged. Unauthorized access attempts are blocked and reported.</span>
+    </div>
+
+    <div class="foot">
+      <a href="login.html">← User Login</a>
+      <span>v1.0</span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  var emailIn = document.getElementById('email');
+  var pwdIn = document.getElementById('pwd');
+  var btn = document.getElementById('loginBtn');
+  var eyeBtn = document.getElementById('eyeBtn');
+
+  eyeBtn.addEventListener('click', function(){
+    pwdIn.type = pwdIn.type === 'password' ? 'text' : 'password';
+  });
+
+  // Enter to submit
+  [emailIn, pwdIn].forEach(function(el){
+    el.addEventListener('keydown', function(e){
+      if(e.key === 'Enter') btn.click();
+    });
+  });
+
+  // Redirect if already logged in as admin
+  document.addEventListener('sb-ready', async function(){
+    var { data } = await sb.auth.getUser();
+    if(data && data.user){
+      var { data: profile } = await sb.from('profiles').select('is_admin').eq('id', data.user.id).single();
+      if(profile && profile.is_admin){
+        window.location.href = 'admin.html';
+      }
+    }
+  });
+
+  btn.addEventListener('click', async function(){
+    var email = emailIn.value.trim();
+    var pwd = pwdIn.value;
+
+    if(!email){ apexError('Enter admin email'); emailIn.focus(); return; }
+    if(!pwd){ apexError('Enter password'); pwdIn.focus(); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" opacity="0.3"/><path d="M22 12a10 10 0 0 1-10 10"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite"/></path></svg> Verifying...';
+
+    try {
+      var { data, error } = await sb.auth.signInWithPassword({ email: email, password: pwd });
+      if(error) throw error;
+
+      // Check admin flag
+      var { data: profile, error: profErr } = await sb.from('profiles').select('is_admin').eq('id', data.user.id).single();
+      if(profErr) throw profErr;
+
+      if(!profile || !profile.is_admin){
+        // Sign out non-admin immediately
+        await sb.auth.signOut();
+        throw new Error('Access denied. This account is not authorized for admin access.');
+      }
+
+      apexSuccess('Welcome, Admin');
+      setTimeout(function(){ window.location.href = 'admin.html'; }, 600);
+
+    } catch(e){
+      console.error(e);
+      apexError(e.message || 'Login failed');
+      btn.disabled = false;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Sign In to Admin Panel';
+    }
+  });
+</script>
+
+</body>
+</html>

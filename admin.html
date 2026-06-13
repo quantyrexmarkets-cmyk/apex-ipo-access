@@ -381,13 +381,14 @@
 
   document.addEventListener('sb-ready', async function(){
     var { data: userData } = await sb.auth.getUser();
-    if(!userData || !userData.user){ window.location.href='login.html'; return; }
+    if(!userData || !userData.user){ window.location.href='admin-login.html'; return; }
     state.user = userData.user;
 
     var { data: profile } = await sb.from('profiles').select('is_admin,email').eq('id', state.user.id).single();
     if(!profile || !profile.is_admin){
-      document.getElementById('authGate').style.display='flex';
-      setTimeout(function(){ window.location.href='dashboard.html'; }, 2000);
+      // Not an admin — sign out and redirect to admin login
+      await sb.auth.signOut();
+      window.location.href = 'admin-login.html';
       return;
     }
 
