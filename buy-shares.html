@@ -686,8 +686,8 @@
           state.valuation = company.valuation
             ? (typeof company.valuation === 'number' ? fmtCompact(company.valuation) : company.valuation)
             : state.valuation;
-          if(company.logo_url) state.logo = company.logo_url;
-          else if(company.domain) state.logo = `https://icons.duckduckgo.com/ip3/${company.domain}.ico`;
+          if(company.domain) state.logo = `https://icons.duckduckgo.com/ip3/${company.domain}.ico`;
+          else if(company.logo_url) state.logo = company.logo_url;
         }
       } catch(e){
         console.warn('Company not found in DB, using KNOWN fallback for', ticker);
