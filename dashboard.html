@@ -1559,11 +1559,21 @@ document.addEventListener('DOMContentLoaded', function () {
     try {
       var { data: userData } = await sb.auth.getUser();
       if(!userData?.user) return;
-      var { data } = await sb.from('notifications')
+      // Get user's personal notifs
+      var personal = await sb.from('notifications')
         .select('*')
-        .or('user_id.eq.'+userData.user.id+',is_broadcast.eq.true')
+        .eq('user_id', userData.user.id)
         .order('created_at',{ascending:false})
         .limit(30);
+      // Get broadcasts
+      var broadcasts = await sb.from('notifications')
+        .select('*')
+        .eq('is_broadcast', true)
+        .order('created_at',{ascending:false})
+        .limit(30);
+      var data = ((personal.data||[]).concat(broadcasts.data||[]))
+        .sort(function(a,b){ return new Date(b.created_at)-new Date(a.created_at); })
+        .slice(0,30);
       var listEl = document.getElementById('notifList');
       if(!data || !data.length){
         listEl.innerHTML = '<div style="padding:30px 20px;text-align:center;color:#6a7585;font-size:13px">No notifications yet</div>';
@@ -1599,11 +1609,9 @@ document.addEventListener('DOMContentLoaded', function () {
     try {
       var { data: userData } = await sb.auth.getUser();
       if(!userData?.user) return;
-      var { data } = await sb.from('notifications')
-        .select('id,read_at,is_broadcast,user_id')
-        .or('user_id.eq.'+userData.user.id+',is_broadcast.eq.true')
-        .is('read_at', null)
-        .limit(100);
+      var p = await sb.from('notifications').select('id').eq('user_id', userData.user.id).is('read_at', null);
+      var b = await sb.from('notifications').select('id').eq('is_broadcast', true).is('read_at', null);
+      var data = (p.data||[]).concat(b.data||[]);
       var unread = (data||[]).length;
       var badge = document.getElementById('notifBadge');
       if(badge){
