@@ -85,6 +85,14 @@
   .form-group input.invalid{border-color:#ff4a4a}
   .form-group input.valid{border-color:#3ed598}
 
+  .eye-toggle{
+    position:absolute;right:8px;top:50%;transform:translateY(-50%);
+    width:38px;height:38px;border:none;background:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    color:#8b95a8;border-radius:8px;transition:all .15s;
+  }
+  .eye-toggle:hover{color:#4a9eff;background:rgba(74,158,255,0.08)}
+  .eye-toggle svg{display:block}
   .lock-icon{
     position:absolute;right:12px;top:50%;
     transform:translateY(-50%);
@@ -158,28 +166,51 @@
         </div>
       </div>
 
-      <div class="form-group">
-        <label for="ssn">
-          Social Security number or ITIN
-          <span class="info-icon" title="Required by USA PATRIOT Act for identity verification">i</span>
-        </label>
-        <div class="input-wrap">
-          <input type="password" id="ssn" name="ssn" inputmode="numeric" maxlength="11" placeholder="•••-••-••••" autocomplete="off">
-          <svg class="lock-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-          </svg>
+      <div id="ssnSection">
+        <div class="form-group">
+          <label for="ssn">
+            Social Security number
+            <span class="info-icon" title="Required by USA PATRIOT Act for identity verification">i</span>
+          </label>
+          <div class="input-wrap">
+            <input type="password" id="ssn" name="ssn" inputmode="numeric" maxlength="11" placeholder="•••-••-••••" autocomplete="off">
+            <button type="button" class="eye-toggle" data-target="ssn" aria-label="Show SSN">
+              <svg class="eye-show" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg class="eye-hide" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="ssn2">Confirm Social Security number</label>
+          <div class="input-wrap">
+            <input type="password" id="ssn2" name="ssn2" inputmode="numeric" maxlength="11" placeholder="•••-••-••••" autocomplete="off">
+            <button type="button" class="eye-toggle" data-target="ssn2" aria-label="Show SSN">
+              <svg class="eye-show" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg class="eye-hide" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
-      <div class="form-group">
-        <label for="ssn2">Confirm Social Security number or ITIN</label>
-        <div class="input-wrap">
-          <input type="password" id="ssn2" name="ssn2" inputmode="numeric" maxlength="11" placeholder="•••-••-••••" autocomplete="off">
-          <svg class="lock-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-          </svg>
+      <!-- Non-US: passport/ID alternative -->
+      <div id="passportSection" style="display:none">
+        <div class="form-group">
+          <label for="passport">
+            Passport Number or National ID
+            <span class="info-icon" title="Required for international identity verification">i</span>
+          </label>
+          <div class="input-wrap">
+            <input type="text" id="passport" name="passport" maxlength="30" placeholder="Enter your passport or national ID number" autocomplete="off">
+          </div>
         </div>
       </div>
 
@@ -194,6 +225,39 @@
 <script>
 (function(){
   const form = document.getElementById('identityForm');
+
+  // ===== Hide SSN section if non-US resident =====
+  try {
+    var saved = JSON.parse(localStorage.getItem('apex_signup') || '{}');
+    var citizenship = saved.address && saved.address.citizenship;
+    if(citizenship && citizenship !== 'us_citizen' && citizenship !== 'us_permanent_resident' && citizenship !== 'us_visa_holder'){
+      var ssnSec = document.getElementById('ssnSection');
+      var ppSec = document.getElementById('passportSection');
+      if(ssnSec) ssnSec.style.display = 'none';
+      if(ppSec) ppSec.style.display = 'block';
+    }
+  } catch(e){ console.warn(e); }
+
+  // ===== Eye toggle for SSN =====
+  document.querySelectorAll('.eye-toggle').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var targetId = btn.getAttribute('data-target');
+      var input = document.getElementById(targetId);
+      if(!input) return;
+      var showIcon = btn.querySelector('.eye-show');
+      var hideIcon = btn.querySelector('.eye-hide');
+      if(input.type === 'password'){
+        input.type = 'text';
+        showIcon.style.display = 'none';
+        hideIcon.style.display = 'block';
+      } else {
+        input.type = 'password';
+        showIcon.style.display = 'block';
+        hideIcon.style.display = 'none';
+      }
+    });
+  });
+
   const dob  = document.getElementById('dob');
   const ssn  = document.getElementById('ssn');
   const ssn2 = document.getElementById('ssn2');
@@ -314,28 +378,3 @@
   ssn2.addEventListener('blur',  () => checkSSN2(true));
   ssn2.addEventListener('input', () => checkSSN2(false));
 
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    const a = checkDOB(true);
-    const b = checkSSN(true);
-    const c = checkSSN2(true);
-    if(a && b && c){
-      // Convert MM/DD/YYYY → YYYY-MM-DD for Postgres DATE
-      const dobRaw = document.getElementById('dob')?.value || '';
-      const m = dobRaw.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-      const dobISO = m ? `${m[3]}-${m[1]}-${m[2]}` : null;
-      window.apex.saveStep('identity', {
-        dob: dobISO,
-        ssn: document.getElementById('ssn')?.value || ''
-      });
-      window.location.href = 'signup-7.html';
-    } else {
-      const bad = form.querySelector('.invalid');
-      if(bad) bad.focus();
-    }
-  });
-})();
-</script>
-
-</body>
-</html>
