@@ -153,7 +153,7 @@
   <p class="page-sub">Get answers fast — chat with our team, browse FAQs, or send a support request.</p>
 
   <div class="quick-grid">
-    <div class="quick-tile" onclick="window.location.href='mailto:apexipo54@zohomail.com'">
+    <div class="quick-tile" onclick="window.location.href='mailto:support@apexipoaccess.com'">
       <div class="ic">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
@@ -337,13 +337,13 @@
 
       // Always open mailto as backup
       var body = 'Topic: ' + topic + '\n\n' + message + '\n\n---\nFrom: ' + userEmail + '\nUser ID: ' + userId;
-      window.location.href = 'mailto:apexipo54@zohomail.com?subject=' + encodeURIComponent('[Support] ' + topic) + '&body=' + encodeURIComponent(body);
+      window.location.href = 'mailto:support@apexipoaccess.com?subject=' + encodeURIComponent('[Support] ' + topic) + '&body=' + encodeURIComponent(body);
 
       msg.textContent = '✓ Opening your email client…';
       msg.className = 'form-msg ok';
       document.getElementById('supportForm').reset();
     } catch(err) {
-      msg.textContent = 'Could not send. Please email apexipo54@zohomail.com directly.';
+      msg.textContent = 'Could not send. Please email support@apexipoaccess.com directly.';
       msg.className = 'form-msg err';
     } finally {
       btn.disabled = false;

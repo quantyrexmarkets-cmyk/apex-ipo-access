@@ -371,7 +371,7 @@
       } catch(_) {}
       var subject = 'APEX Support Request';
       var body = 'Hi APEX team,\n\n[describe your question]' + info;
-      window.location.href = 'mailto:apexipo54@zohomail.com' +
+      window.location.href = 'mailto:support@apexipoaccess.com' +
         '?subject=' + encodeURIComponent(subject) +
         '&body=' + encodeURIComponent(body);
       // close sidebar after click
