@@ -82,6 +82,11 @@ window.apex = {
       if (profErr) console.warn('Profile update error:', profErr);
     }
 
+    // Ensure session exists so pending-approval page works
+    if (!authData.session) {
+      try { await sb.auth.signInWithPassword({ email, password }); } catch(e) { console.warn('Auto sign-in after signup failed:', e); }
+    }
+
     return { user: authData.user };
   },
 
