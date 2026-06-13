@@ -460,6 +460,9 @@
     font-size:12px;color:#8a94a3;letter-spacing:0.2px;
     font-weight:400;
   }
+
+  .qa-tile-green:hover{border-color:rgba(62,213,152,0.4) !important;background:rgba(62,213,152,0.06) !important}
+  .qa-tile-green .ic{background:rgba(62,213,152,0.12) !important;color:#3ed598 !important}
 </style>
 <script src="js/supabase.js?v=1781242485"></script>
 <script src="js/notify.js?v=1"></script>
@@ -617,9 +620,15 @@
     </div>
     <div class="qa-tile" onclick="location.href='fund-account.html'">
       <div class="ic">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
       </div>
-      <div class="lbl">Fund account</div>
+      <div class="lbl">Deposit</div>
+    </div>
+    <div class="qa-tile qa-tile-green" onclick="location.href='withdraw.html'">
+      <div class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+      </div>
+      <div class="lbl">Withdraw</div>
     </div>
     <div class="qa-tile">
       <div class="ic">

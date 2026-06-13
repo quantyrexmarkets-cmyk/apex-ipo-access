@@ -250,6 +250,10 @@
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
       Activity
     </div>
+    <div class="admin-tab" data-tab="withdrawals">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+      Withdrawals
+    </div>
     <div class="admin-tab" data-tab="settings">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       Settings
@@ -268,6 +272,11 @@
 
   <div class="panel" id="panel-transactions">
     <div class="card-list" id="txList"><div class="empty-state">Loading activity…</div></div>
+  </div>
+
+  <div class="panel" id="panel-withdrawals">
+    <div class="search-bar"><input type="text" id="wdSearch" placeholder="Search by reference or user…"></div>
+    <div class="card-list" id="wdList"><div class="empty-state">Loading withdrawals…</div></div>
   </div>
 
   <div class="panel" id="panel-settings">
@@ -348,7 +357,7 @@
 
 <script>
 (function(){
-  var state = { user:null, isAdmin:false, users:[], deposits:[], transactions:[], wireSettings:null, wallets:{} };
+  var state = { user:null, isAdmin:false, users:[], deposits:[], transactions:[], withdrawals:[], wireSettings:null, wallets:{} };
 
   function fmt(n){return '$'+(parseFloat(n)||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
   function fmtCompact(n){n=parseFloat(n)||0;if(n>=1e6)return '$'+(n/1e6).toFixed(1)+'M';if(n>=1e3)return '$'+(n/1e3).toFixed(1)+'K';return '$'+n.toFixed(0);}
@@ -387,7 +396,56 @@
     });
   }
 
-  async function loadAll(){ loadUsers(); loadDeposits(); loadTransactions(); loadSettings(); }
+  async function loadAll(){ loadUsers(); loadDeposits(); loadTransactions(); loadSettings(); loadWithdrawals(); }
+
+  async function loadWithdrawals(){
+    try {
+      var { data, error } = await sb.from('withdrawals').select('*').order('created_at',{ascending:false}).limit(100);
+      if(error) throw error;
+      state.withdrawals = data || [];
+      renderWithdrawals(state.withdrawals);
+    } catch(e){
+      document.getElementById('wdList').innerHTML='<div class="empty-state">No withdrawals yet or table missing</div>';
+    }
+  }
+
+  function renderWithdrawals(list){
+    var c = document.getElementById('wdList');
+    if(!list || !list.length){ c.innerHTML='<div class="empty-state">No withdrawals yet</div>'; return; }
+    c.innerHTML = list.map(function(w){
+      var s = w.status || 'pending';
+      var cls = s==='approved'?'ok':s==='rejected'?'rejected':s==='completed'?'ok':'pending';
+      var dest = w.method==='crypto' ? (w.asset||'')+' → '+(w.destination||'').slice(0,12)+'…' : (w.bank_name||'')+' •••'+(w.account_number||'').slice(-4);
+      return '<div class="deposit-card"><div class="card-top"><div class="name">'+fmt(w.amount)+' · '+(w.method||'').toUpperCase()+'</div><span class="pill '+cls+'">'+s.toUpperCase()+'</span></div><div class="card-meta"><span>🔖 '+escapeHtml(w.reference_code||'—')+'</span><span>📤 '+escapeHtml(dest)+'</span><span>📅 '+timeAgo(w.created_at)+'</span></div>'+(s==='pending'?'<div class="card-actions"><button class="action-btn approve" onclick="window._approveWithdraw(\''+w.id+'\')">Approve &amp; Deduct</button><button class="action-btn reject" onclick="window._rejectWithdraw(\''+w.id+'\')">Reject</button></div>':'')+'</div>';
+    }).join('');
+  }
+
+  window._approveWithdraw = async function(id){
+    var ok = await apexConfirm({ title:'Approve withdrawal?', body:'This deducts the amount from the user account and marks it approved.', okLabel:'Approve' });
+    if(!ok) return;
+    try {
+      var w = state.withdrawals.find(function(x){return x.id===id;});
+      if(!w) return;
+      await sb.from('withdrawals').update({status:'approved', approved_at:new Date().toISOString()}).eq('id',id);
+      var { data: profile } = await sb.from('profiles').select('cash_balance').eq('id',w.user_id).single();
+      var newBal = Math.max(0, parseFloat(profile.cash_balance||0) - parseFloat(w.amount));
+      await sb.from('profiles').update({cash_balance:newBal}).eq('id',w.user_id);
+      apexSuccess('Withdrawal approved and balance deducted');
+      loadWithdrawals(); loadUsers();
+    } catch(e){ apexError('Failed: '+e.message); }
+  };
+
+  window._rejectWithdraw = async function(id){
+    var ok = await apexConfirm({ title:'Reject withdrawal?', body:'User will not be charged. Are you sure?', okLabel:'Reject', danger:true });
+    if(!ok) return;
+    try { await sb.from('withdrawals').update({status:'rejected'}).eq('id',id); apexSuccess('Withdrawal rejected'); loadWithdrawals(); }
+    catch(e){ apexError('Failed: '+e.message); }
+  };
+
+  document.getElementById('wdSearch').addEventListener('input', function(e){
+    var q = e.target.value.toLowerCase();
+    renderWithdrawals(state.withdrawals.filter(function(w){return (w.reference_code||'').toLowerCase().includes(q)||(w.user_id||'').toLowerCase().includes(q);}));
+  });
 
   async function loadUsers(){
     try {
