@@ -379,6 +379,82 @@
   }
   .dep-actions .reject:hover{background:rgba(255,106,106,0.18)}
 
+  
+  /* ================= PAYMENT METHODS ================= */
+  .pm-section{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:14px;padding:18px;margin-bottom:16px;
+  }
+  .pm-section-h{
+    display:flex;align-items:center;gap:12px;margin-bottom:18px;
+    padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .pm-section-h svg{
+    width:22px;height:22px;color:#4a9eff;flex-shrink:0;
+    padding:8px;background:rgba(74,158,255,0.1);
+    border-radius:9px;box-sizing:content-box;
+  }
+  .pm-section-h .ttl{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#fff}
+  .pm-section-h .sub{font-size:11px;color:#8b95a8;margin-top:2px}
+  .field-mini.full{grid-column:1/-1}
+
+  .add-wallet{
+    margin-top:16px;padding-top:16px;
+    border-top:1px dashed rgba(255,255,255,0.08);
+  }
+
+  .wallet-item{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:11px;padding:12px;margin-bottom:8px;
+    display:flex;align-items:center;gap:12px;
+  }
+  .wallet-item.inactive{opacity:0.5}
+  .wallet-coin{
+    width:38px;height:38px;border-radius:50%;
+    background:linear-gradient(135deg,#ffb800,#ff8c00);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:10px;color:#000;flex-shrink:0;
+    font-family:'Manrope',sans-serif;letter-spacing:0;
+  }
+  .wallet-coin.eth{background:linear-gradient(135deg,#627eea,#3c5fc7)}
+  .wallet-coin.usdt{background:linear-gradient(135deg,#26a17b,#1e8862);color:#fff}
+  .wallet-coin.usdc{background:linear-gradient(135deg,#2775ca,#1e5fa8);color:#fff}
+  .wallet-coin.sol{background:linear-gradient(135deg,#9945ff,#14f195)}
+  .wallet-coin.xrp{background:linear-gradient(135deg,#23292f,#000);color:#fff}
+
+  .wallet-info{flex:1;min-width:0}
+  .wallet-top{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#fff;margin-bottom:3px}
+  .wallet-net{
+    padding:2px 7px;border-radius:5px;font-size:9px;font-weight:700;letter-spacing:0.5px;
+    background:rgba(74,158,255,0.15);color:#4a9eff;
+  }
+  .wallet-addr{
+    font-family:'Manrope',sans-serif;font-size:11px;color:#a8b2c1;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .wallet-meta{font-size:10px;color:#6a7585;margin-top:2px}
+
+  .wallet-actions{display:flex;gap:4px;flex-shrink:0}
+  .wallet-actions button{
+    width:32px;height:32px;border-radius:8px;
+    background:rgba(255,255,255,0.05);
+    color:#a8b2c1;display:flex;align-items:center;justify-content:center;
+    transition:all .15s;
+  }
+  .wallet-actions button:hover{background:rgba(255,255,255,0.1);color:#fff}
+  .wallet-actions .del:hover{background:rgba(255,106,106,0.15);color:#ff6a6a}
+  .wallet-actions svg{width:14px;height:14px}
+
+  textarea{
+    width:100%;background:#0a0e14;
+    border:1px solid rgba(255,255,255,0.08);
+    color:#fff;font-family:'Inter',sans-serif;font-size:13px;
+    padding:10px 12px;border-radius:8px;resize:vertical;
+  }
+  textarea:focus{outline:none;border-color:rgba(74,158,255,0.5)}
+
   /* ================= USER MODAL ================= */
   .modal-overlay{
     position:fixed;inset:0;background:rgba(0,0,0,0.75);
@@ -821,8 +897,93 @@
   <!-- PAYMENT METHODS PAGE -->
   <section class="page" id="page-paymethods">
     <div class="page-h">Payment Methods</div>
-    <div class="page-sub">Configure wire & crypto wallets shown to users</div>
-    <div class="empty">Coming in Phase 6</div>
+    <div class="page-sub">Configure wire instructions & crypto wallets shown to users</div>
+
+    <!-- WIRE SETTINGS -->
+    <div class="pm-section">
+      <div class="pm-section-h">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        <div><div class="ttl">Wire Transfer Details</div><div class="sub">Shown to users when funding via wire</div></div>
+      </div>
+
+      <div class="field-grid">
+        <div class="field-mini full"><label>Bank Name</label><input id="wsBank" placeholder="e.g. JPMorgan Chase"></div>
+      </div>
+      <div class="field-grid">
+        <div class="field-mini full"><label>Beneficiary Name</label><input id="wsBenef" placeholder="e.g. APEX Holdings LLC"></div>
+      </div>
+      <div class="field-grid">
+        <div class="field-mini"><label>Account Number</label><input id="wsAcct" placeholder="e.g. 1234567890"></div>
+        <div class="field-mini"><label>Routing Number</label><input id="wsRoute" placeholder="e.g. 021000021"></div>
+      </div>
+      <div class="field-grid">
+        <div class="field-mini"><label>SWIFT / BIC</label><input id="wsSwift" placeholder="e.g. CHASUS33"></div>
+        <div class="field-mini"><label>Last Updated</label><input id="wsUpdated" readonly></div>
+      </div>
+      <div class="field-grid full">
+        <div class="field-mini"><label>Bank Address</label><textarea id="wsAddr" rows="2" placeholder="270 Park Avenue, New York, NY 10017"></textarea></div>
+      </div>
+      <div class="field-grid full">
+        <div class="field-mini"><label>Reference Instructions</label><textarea id="wsRef" rows="2" placeholder="Include your APEX reference code in the wire memo"></textarea></div>
+      </div>
+
+      <button class="act-btn primary" style="width:100%;margin-top:14px;padding:13px" onclick="window._saveWireSettings()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Save Wire Settings
+      </button>
+    </div>
+
+    <!-- CRYPTO WALLETS -->
+    <div class="pm-section">
+      <div class="pm-section-h">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894m-1.216 6.894L5.86 18.047m5.908 1.042-.347 1.97m1.563-8.864c4.924.869 6.14-6.025 1.215-6.893m-1.215 6.893-3.94-.694m5.155-6.2L8.29 4.26m5.908 1.042.348-1.97M7.48 20.364l3.126-17.727"/></svg>
+        <div><div class="ttl">Crypto Wallets</div><div class="sub">Active wallets shown to users for crypto deposits</div></div>
+      </div>
+
+      <div id="walletList"><div class="empty">No wallets yet — add one below</div></div>
+
+      <div class="add-wallet">
+        <div class="field-grid">
+          <div class="field-mini">
+            <label>Coin</label>
+            <select id="walletCoin">
+              <option value="BTC">Bitcoin (BTC)</option>
+              <option value="ETH">Ethereum (ETH)</option>
+              <option value="USDT">Tether (USDT)</option>
+              <option value="USDC">USD Coin (USDC)</option>
+              <option value="SOL">Solana (SOL)</option>
+              <option value="XRP">XRP</option>
+              <option value="LTC">Litecoin (LTC)</option>
+              <option value="BNB">BNB</option>
+            </select>
+          </div>
+          <div class="field-mini">
+            <label>Network</label>
+            <select id="walletNet">
+              <option value="">Main Network</option>
+              <option value="ERC20">ERC-20 (Ethereum)</option>
+              <option value="TRC20">TRC-20 (Tron)</option>
+              <option value="BEP20">BEP-20 (BSC)</option>
+              <option value="SOL">Solana</option>
+              <option value="Polygon">Polygon</option>
+              <option value="Arbitrum">Arbitrum</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-grid full">
+          <div class="field-mini"><label>Wallet Address</label><input id="walletAddr" placeholder="Paste wallet address"></div>
+        </div>
+        <div class="field-grid">
+          <div class="field-mini"><label>Memo / Tag (Optional)</label><input id="walletMemo" placeholder="For XRP, EOS etc."></div>
+          <div class="field-mini"><label>Label (Optional)</label><input id="walletLabel" placeholder="e.g. Cold Storage"></div>
+        </div>
+
+        <button class="act-btn success" style="width:100%;margin-top:12px;padding:13px" onclick="window._addWallet()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Wallet
+        </button>
+      </div>
+    </div>
   </section>
 
   <!-- SETTINGS PAGE -->
@@ -1894,6 +2055,116 @@
   avStyleFix.textContent = '#page-transactions .dep-top .av svg{width:18px;height:18px;color:#000}';
   document.head.appendChild(avStyleFix);
 
+  // ============ PAYMENT METHODS ============
+  async function loadWireSettings(){
+    try {
+      var { data } = await sb.from('wire_settings').select('*').eq('id', 1).single();
+      if(data){
+        document.getElementById('wsBank').value = data.bank_name || '';
+        document.getElementById('wsBenef').value = data.beneficiary_name || '';
+        document.getElementById('wsAcct').value = data.account_number || '';
+        document.getElementById('wsRoute').value = data.routing_number || '';
+        document.getElementById('wsSwift').value = data.swift_code || '';
+        document.getElementById('wsAddr').value = data.bank_address || '';
+        document.getElementById('wsRef').value = data.reference_instructions || '';
+        document.getElementById('wsUpdated').value = data.updated_at ? new Date(data.updated_at).toLocaleString() : '—';
+      }
+    } catch(e){ console.warn('Wire load:', e); }
+  }
+
+  window._saveWireSettings = async function(){
+    var updates = {
+      bank_name: document.getElementById('wsBank').value.trim() || null,
+      beneficiary_name: document.getElementById('wsBenef').value.trim() || null,
+      account_number: document.getElementById('wsAcct').value.trim() || null,
+      routing_number: document.getElementById('wsRoute').value.trim() || null,
+      swift_code: document.getElementById('wsSwift').value.trim() || null,
+      bank_address: document.getElementById('wsAddr').value.trim() || null,
+      reference_instructions: document.getElementById('wsRef').value.trim() || null,
+      updated_at: new Date().toISOString()
+    };
+    var { error } = await sb.from('wire_settings').update(updates).eq('id', 1);
+    if(error){ apexError(error.message); return; }
+    apexSuccess('Wire settings saved');
+    document.getElementById('wsUpdated').value = new Date().toLocaleString();
+  };
+
+  async function loadWallets(){
+    try {
+      var { data } = await sb.from('crypto_wallets').select('*').order('created_at',{ascending:false});
+      var listEl = document.getElementById('walletList');
+      if(!data || !data.length){
+        listEl.innerHTML = '<div class="empty">No wallets yet — add one below</div>';
+        return;
+      }
+      listEl.innerHTML = data.map(function(w){
+        var coinCls = (w.coin||'').toLowerCase();
+        return '<div class="wallet-item' + (w.active?'':' inactive') + '">' +
+          '<div class="wallet-coin '+coinCls+'">'+escapeHtml(w.coin||'?')+'</div>' +
+          '<div class="wallet-info">' +
+            '<div class="wallet-top">'+escapeHtml(w.coin||'')+(w.network?' <span class="wallet-net">'+escapeHtml(w.network)+'</span>':'')+(w.label?' · '+escapeHtml(w.label):'')+'</div>' +
+            '<div class="wallet-addr">'+escapeHtml(w.address||'')+'</div>' +
+            (w.memo?'<div class="wallet-meta">Memo: '+escapeHtml(w.memo)+'</div>':'') +
+          '</div>' +
+          '<div class="wallet-actions">' +
+            '<button onclick="window._copyWallet(\''+escapeHtml(w.address)+'\')" title="Copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>' +
+            '<button onclick="window._toggleWallet(\''+w.id+'\','+w.active+')" title="'+(w.active?'Deactivate':'Activate')+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+(w.active?'<circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>':'<polyline points="20 6 9 17 4 12"/>')+'</svg></button>' +
+            '<button class="del" onclick="window._deleteWallet(\''+w.id+'\')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    } catch(e){ console.warn('Wallets load:', e); }
+  }
+
+  window._addWallet = async function(){
+    var coin = document.getElementById('walletCoin').value;
+    var network = document.getElementById('walletNet').value;
+    var address = document.getElementById('walletAddr').value.trim();
+    var memo = document.getElementById('walletMemo').value.trim();
+    var label = document.getElementById('walletLabel').value.trim();
+
+    if(!address){ apexError('Wallet address is required'); return; }
+
+    var { error } = await sb.from('crypto_wallets').insert({
+      coin: coin,
+      network: network || null,
+      address: address,
+      memo: memo || null,
+      label: label || null,
+      active: true
+    });
+    if(error){ apexError(error.message); return; }
+
+    apexSuccess('Wallet added');
+    document.getElementById('walletAddr').value = '';
+    document.getElementById('walletMemo').value = '';
+    document.getElementById('walletLabel').value = '';
+    await loadWallets();
+  };
+
+  window._toggleWallet = async function(id, currentActive){
+    var newActive = !currentActive;
+    var { error } = await sb.from('crypto_wallets').update({ active: newActive }).eq('id', id);
+    if(error){ apexError(error.message); return; }
+    apexSuccess(newActive?'Wallet activated':'Wallet deactivated');
+    await loadWallets();
+  };
+
+  window._deleteWallet = async function(id){
+    var ok = await apexConfirm({title:'Delete wallet?',body:'This cannot be undone.',okLabel:'Delete'});
+    if(!ok) return;
+    var { error } = await sb.from('crypto_wallets').delete().eq('id', id);
+    if(error){ apexError(error.message); return; }
+    apexSuccess('Wallet deleted');
+    await loadWallets();
+  };
+
+  window._copyWallet = function(addr){
+    navigator.clipboard.writeText(addr).then(function(){
+      apexSuccess('Address copied');
+    }).catch(function(){ apexError('Copy failed'); });
+  };
+
   // ========== AUTH GATE ==========
   document.addEventListener('sb-ready', async function(){
     var { data: userData } = await sb.auth.getUser();
@@ -1922,6 +2193,8 @@
     await loadDeposits();
     await loadWithdrawals();
     await loadAllTransactions();
+    await loadWireSettings();
+    await loadWallets();
   });
 </script>
 
