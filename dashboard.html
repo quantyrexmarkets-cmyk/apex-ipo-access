@@ -584,6 +584,22 @@
     const { data } = await sb.auth.getUser();
     if(!data.user){
       window.location.href = 'login.html';
+      return;
+    }
+    // Check account status — banned or pending KYC
+    const { data: profile } = await sb.from('profiles').select('kyc_status,is_admin,banned,banned_reason').eq('id', data.user.id).single();
+    if(profile){
+      if(profile.banned){
+        await sb.auth.signOut();
+        alert('Your account has been suspended.' + (profile.banned_reason ? '\n\nReason: ' + profile.banned_reason : '') + '\n\nContact support@apexipo.com');
+        window.location.href = 'login.html';
+        return;
+      }
+      // Allow admins through regardless of KYC
+      if(!profile.is_admin && profile.kyc_status !== 'verified'){
+        window.location.href = 'pending-approval.html';
+        return;
+      }
     }
   });
 </script>

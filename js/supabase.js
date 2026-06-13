@@ -73,7 +73,7 @@ window.apex = {
       ssn_last4:     data.identity?.ssn?.slice(-4),
       account_types: data.accountTypes || [],
       has_existing_account: data.hasExisting || false,
-      kyc_status:    'verified',  // demo: auto-verify
+      kyc_status:    'pending',  // requires admin approval
     };
     Object.keys(update).forEach(k => update[k] === undefined && delete update[k]);
 

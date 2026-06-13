@@ -912,7 +912,7 @@
       html = filtered.map(function(u){
         var name = ((u.first_name||'')+' '+(u.last_name||'')).trim() || u.email || 'Unnamed';
         var kyc = u.kyc_status || 'pending';
-        var kycPill = kyc==='verified' ? '<span class="pill ok">✓</span>' : '<span class="pill pending">PENDING</span>';
+        var kycPill = kyc==='verified' ? '<span class="pill ok" style="display:inline-flex;align-items:center;gap:3px;padding:3px 7px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>VERIFIED</span>' : '<span class="pill pending">PENDING</span>';
         var adminPill = u.is_admin ? '<span class="pill admin">ADMIN</span>' : '';
         return '<div class="cust-card" onclick="window._openUser(\'' + u.id + '\')">' +
           '<div class="av">' + escapeHtml(initial(name)) + '</div>' +

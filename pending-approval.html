@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account Pending | APEX IPO ACCESS</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="js/supabase.js?v=100"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{
+    background:#000;color:#fff;
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(255,184,0,0.10), transparent 50%),
+      radial-gradient(circle at 80% 90%, rgba(74,158,255,0.08), transparent 50%);
+  }
+
+  .wrap{
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;
+  }
+
+  .card{
+    width:100%;max-width:460px;
+    background:linear-gradient(180deg,rgba(20,24,32,0.95),rgba(10,14,20,0.95));
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:20px;
+    padding:36px 28px;
+    box-shadow:0 30px 80px rgba(0,0,0,0.5);
+    backdrop-filter:blur(20px);
+    text-align:center;
+  }
+
+  .brand{
+    display:flex;flex-direction:column;line-height:1;align-items:center;
+    padding-bottom:24px;margin-bottom:28px;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .brand-name{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:800;font-size:20px;color:#fff;letter-spacing:3px;
+  }
+  .brand-tag{
+    font-size:9px;color:#4a9eff;letter-spacing:3.5px;
+    font-weight:600;margin-top:4px;
+  }
+
+  .icn-wrap{
+    width:96px;height:96px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,184,0,0.18),rgba(255,184,0,0.04));
+    border:2px solid rgba(255,184,0,0.4);
+    display:inline-flex;align-items:center;justify-content:center;
+    margin-bottom:22px;
+    position:relative;
+  }
+  .icn-wrap::before{
+    content:'';position:absolute;inset:-8px;border-radius:50%;
+    border:2px solid rgba(255,184,0,0.15);
+    animation:ring 2s ease-out infinite;
+  }
+  @keyframes ring{
+    0%{transform:scale(0.9);opacity:1}
+    100%{transform:scale(1.2);opacity:0}
+  }
+  .icn-wrap svg{width:42px;height:42px;color:#ffb800}
+
+  h1{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:24px;letter-spacing:-0.3px;
+    margin-bottom:10px;
+  }
+  .status-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:5px 12px;border-radius:8px;
+    background:rgba(255,184,0,0.12);
+    border:1px solid rgba(255,184,0,0.3);
+    color:#ffb800;font-size:10px;font-weight:700;letter-spacing:1.5px;
+    margin-bottom:16px;
+  }
+  .status-pill::before{
+    content:'';width:6px;height:6px;border-radius:50%;
+    background:#ffb800;
+    box-shadow:0 0 8px #ffb800;
+    animation:pulse 1.6s infinite;
+  }
+  @keyframes pulse{50%{opacity:0.4}}
+
+  .sub{
+    color:#a8b2c1;font-size:14px;line-height:1.6;
+    margin-bottom:24px;
+  }
+  .sub b{color:#fff;font-weight:600}
+
+  .info-box{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:12px;padding:16px;margin-bottom:18px;
+    text-align:left;
+  }
+  .info-box .row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:6px 0;font-size:13px;
+  }
+  .info-box .row .l{color:#8b95a8}
+  .info-box .row .v{color:#fff;font-weight:600;font-family:'Manrope',sans-serif}
+
+  .steps{margin-bottom:24px;text-align:left}
+  .step{
+    display:flex;align-items:flex-start;gap:12px;
+    padding:10px 0;
+    font-size:13px;color:#a8b2c1;
+  }
+  .step .num{
+    width:24px;height:24px;border-radius:50%;
+    background:rgba(74,158,255,0.15);border:1px solid rgba(74,158,255,0.4);
+    color:#4a9eff;font-weight:700;font-size:11px;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    font-family:'Manrope',sans-serif;
+  }
+  .step.done .num{background:rgba(62,213,152,0.15);border-color:rgba(62,213,152,0.5);color:#3ed598}
+  .step .txt{flex:1;line-height:1.5;padding-top:2px}
+  .step .txt b{color:#fff;font-weight:600}
+
+  .btn-row{display:flex;gap:10px;margin-top:8px}
+  .btn{
+    flex:1;padding:13px;border-radius:11px;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:700;font-size:13px;letter-spacing:0.3px;
+    cursor:pointer;border:none;transition:all .2s;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+  }
+  .btn-primary{background:linear-gradient(135deg,#4a9eff,#3a86d6);color:#000}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 30px rgba(74,158,255,0.35)}
+  .btn-outline{background:rgba(255,255,255,0.05);color:#fff;border:1px solid rgba(255,255,255,0.1)}
+  .btn-outline:hover{background:rgba(255,255,255,0.08)}
+  .btn svg{width:14px;height:14px}
+
+  .foot{
+    margin-top:22px;padding-top:18px;
+    border-top:1px solid rgba(255,255,255,0.06);
+    font-size:11px;color:#6a7585;
+  }
+  .foot a{color:#4a9eff;font-weight:600;text-decoration:none}
+  .foot a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="card">
+
+    <div class="brand">
+      <div class="brand-name">APEX</div>
+      <div class="brand-tag">IPO ACCESS</div>
+    </div>
+
+    <div class="icn-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    </div>
+
+    <div class="status-pill">AWAITING APPROVAL</div>
+
+    <h1>Account Under Review</h1>
+    <div class="sub">
+      Thank you, <b id="userName">Investor</b>. Your application is being reviewed by our compliance team.
+    </div>
+
+    <div class="info-box">
+      <div class="row"><span class="l">Account Email</span><span class="v" id="userEmail">—</span></div>
+      <div class="row"><span class="l">Submitted</span><span class="v" id="submitDate">—</span></div>
+      <div class="row"><span class="l">Status</span><span class="v" style="color:#ffb800">Pending Review</span></div>
+    </div>
+
+    <div class="steps">
+      <div class="step done">
+        <div class="num">✓</div>
+        <div class="txt"><b>Registration complete</b><br><span style="font-size:12px;color:#6a7585">Your profile and KYC info submitted</span></div>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <div class="txt"><b>Compliance verification</b><br><span style="font-size:12px;color:#6a7585">Our team is reviewing your application (usually within 24 hours)</span></div>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <div class="txt"><b>Account activation</b><br><span style="font-size:12px;color:#6a7585">You'll receive an email once approved and gain full access</span></div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="window.location.reload()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg>
+        Refresh
+      </button>
+      <button class="btn btn-primary" onclick="window.location.href='mailto:apexipo54@zohomail.com?subject=Account Review Status'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Contact Support
+      </button>
+    </div>
+
+    <div class="foot">
+      <a href="#" onclick="window._logout();return false;">Sign out</a> · 
+      Need help? <a href="mailto:apexipo54@zohomail.com">apexipo54@zohomail.com</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('sb-ready', async function(){
+    var { data } = await sb.auth.getUser();
+    if(!data.user){ window.location.href='login.html'; return; }
+
+    var { data: profile } = await sb.from('profiles').select('*').eq('id', data.user.id).single();
+    if(profile){
+      // If already approved, redirect to dashboard
+      if(profile.kyc_status === 'verified' || profile.is_admin){
+        window.location.href = 'dashboard.html';
+        return;
+      }
+      // If banned
+      if(profile.banned){
+        await sb.auth.signOut();
+        alert('Your account has been suspended.\n\n' + (profile.banned_reason || ''));
+        window.location.href = 'login.html';
+        return;
+      }
+
+      var name = ((profile.first_name||'')+' '+(profile.last_name||'')).trim() || 'Investor';
+      document.getElementById('userName').textContent = name;
+      document.getElementById('userEmail').textContent = profile.email || data.user.email || '—';
+      if(profile.created_at){
+        document.getElementById('submitDate').textContent = new Date(profile.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      }
+    }
+
+    // Auto-refresh every 30s to check for approval
+    setInterval(async function(){
+      var { data: p } = await sb.from('profiles').select('kyc_status').eq('id', data.user.id).single();
+      if(p && p.kyc_status === 'verified'){
+        window.location.href = 'dashboard.html';
+      }
+    }, 30000);
+  });
+
+  window._logout = async function(){
+    await sb.auth.signOut();
+    window.location.href = 'login.html';
+  };
+</script>
+
+</body>
+</html>
