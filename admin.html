@@ -2153,6 +2153,7 @@
     document.getElementById('walletMemo').value = '';
     document.getElementById('walletLabel').value = '';
     await loadWallets();
+    initCompaniesUI();
     await loadCompanies();
   };
 
@@ -2162,6 +2163,7 @@
     if(error){ apexError(error.message); return; }
     apexSuccess(newActive?'Wallet activated':'Wallet deactivated');
     await loadWallets();
+    initCompaniesUI();
     await loadCompanies();
   };
 
@@ -2172,6 +2174,7 @@
     if(error){ apexError(error.message); return; }
     apexSuccess('Wallet deleted');
     await loadWallets();
+    initCompaniesUI();
     await loadCompanies();
   };
 
@@ -2184,18 +2187,24 @@
   // ============ COMPANIES PAGE ============
   var allCompanies = [];
   var editingCompany = null;
-  var coModal = document.getElementById('coModal');
+  var coModal = null;
 
-  document.querySelectorAll('[data-copane]').forEach(function(t){
-    t.addEventListener('click', function(){
-      var name = t.getAttribute('data-copane');
-      document.querySelectorAll('[data-copane]').forEach(function(x){x.classList.toggle('active', x===t);});
-      document.querySelectorAll('[id^=copane-]').forEach(function(p){p.classList.toggle('active', p.id==='copane-'+name);});
+  function initCompaniesUI(){
+    coModal = document.getElementById('coModal');
+    if(!coModal) return; // modal not in DOM yet
+    document.querySelectorAll('[data-copane]').forEach(function(t){
+      t.addEventListener('click', function(){
+        var name = t.getAttribute('data-copane');
+        document.querySelectorAll('[data-copane]').forEach(function(x){x.classList.toggle('active', x===t);});
+        document.querySelectorAll('[id^=copane-]').forEach(function(p){p.classList.toggle('active', p.id==='copane-'+name);});
+      });
     });
-  });
-
-  var coSearchEl = document.getElementById('coSearch');
-  if(coSearchEl) coSearchEl.addEventListener('input', renderCompanies);
+    var coSearchEl = document.getElementById('coSearch');
+    if(coSearchEl) coSearchEl.addEventListener('input', renderCompanies);
+    coModal.addEventListener('click', function(e){
+      if(e.target === coModal) window._closeCompany();
+    });
+  }
 
   async function loadCompanies(){
     try {
@@ -2309,10 +2318,6 @@
     editingCompany = null;
   };
 
-  coModal.addEventListener('click', function(e){
-    if(e.target === coModal) window._closeCompany();
-  });
-
   window._saveCompany = async function(){
     var ticker = document.getElementById('cfTicker').value.trim().toUpperCase();
     var name = document.getElementById('cfName').value.trim();
@@ -2351,6 +2356,7 @@
     if(result.error){ apexError(result.error.message); return; }
     apexSuccess(editingCompany?'Company updated':'Company added');
     window._closeCompany();
+    initCompaniesUI();
     await loadCompanies();
   };
 
@@ -2362,6 +2368,7 @@
     var { error } = await sb.from('companies').delete().eq('ticker', ticker);
     if(error){ apexError(error.message); return; }
     apexSuccess('Company deleted');
+    initCompaniesUI();
     await loadCompanies();
   };
 
@@ -2395,6 +2402,7 @@
     await loadAllTransactions();
     await loadWireSettings();
     await loadWallets();
+    initCompaniesUI();
     await loadCompanies();
   });
 </script>
