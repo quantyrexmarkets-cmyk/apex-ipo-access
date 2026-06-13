@@ -435,11 +435,12 @@
   // ─────────────────────────────────────────────
   var state = {
     company: null,           // loaded from DB
-    price: 135,              // default SpaceX price
-    name: 'SpaceX',
-    sector: 'Aerospace · Pre-IPO',
-    valuation: '$400B',
-    logo: 'assets/spacex-logo.png',
+    price: 100,              // neutral default (will be overridden by DB)
+    name: 'Company',
+    sector: 'Pre-IPO',
+    valuation: '—',
+    logo: '',                // empty — will use generated avatar if no real logo
+
     availCash: 0,
     amount: 0,
     period: '6m',
@@ -473,7 +474,20 @@
     document.getElementById('coTicker').textContent = ticker;
     document.getElementById('coPrice').textContent = fmt(state.price);
     document.getElementById('coValuation').textContent = state.valuation;
-    document.getElementById('coLogo').src = state.logo;
+    var logoEl = document.getElementById('coLogo');
+    if(state.logo){
+      logoEl.src = state.logo;
+      logoEl.style.display = 'block';
+      logoEl.onerror = function(){
+        // If logo fails to load, show initial avatar
+        logoEl.style.display = 'none';
+        logoEl.parentElement.innerHTML = '<div style="color:#000;font-weight:700;font-size:22px;font-family:\'Plus Jakarta Sans\',sans-serif">' + (state.name||'?')[0].toUpperCase() + '</div>';
+      };
+    } else {
+      // No logo URL — show initial avatar
+      logoEl.style.display = 'none';
+      logoEl.parentElement.innerHTML = '<div style="color:#000;font-weight:700;font-size:22px;font-family:\'Plus Jakarta Sans\',sans-serif">' + (state.name||'?')[0].toUpperCase() + '</div>';
+    }
     document.title = 'Reserve ' + state.name + ' Shares | APEX IPO ACCESS';
   }
 
@@ -675,21 +689,27 @@
           if(company.logo_url) state.logo = company.logo_url;
         }
       } catch(e){
-        // company not in DB — use defaults (works for SPCX)
-        console.warn('Company not found in DB, using defaults for', ticker);
+        console.warn('Company not found in DB, using KNOWN fallback for', ticker);
       }
 
-      // Special handling for known tickers (fallback if no DB entry)
-      if(!state.company){
+      // KNOWN fallback — used when DB doesn't have full info
+      var KNOWN_NEEDS_FALLBACK = !state.company || !state.logo;
+      if(KNOWN_NEEDS_FALLBACK){
         var KNOWN = {
-          'SPCX':   { name:'SpaceX',     sector:'Aerospace · Pre-IPO',   valuation:'$400B', price:135 },
-          'OAIB':   { name:'OpenAI',     sector:'AI · Pre-IPO',          valuation:'$157B', price:85  },
-          'STRP':   { name:'Stripe',     sector:'Fintech · Pre-IPO',     valuation:'$70B',  price:42  },
-          'ANTH':   { name:'Anthropic',  sector:'AI · Pre-IPO',          valuation:'$60B',  price:65  },
-          'XAI':    { name:'xAI',        sector:'AI · Pre-IPO',          valuation:'$50B',  price:38  },
-          'NLNK':   { name:'Neuralink',  sector:'Biotech · Pre-IPO',     valuation:'$8B',   price:25  },
-          'DBRX':   { name:'Databricks', sector:'Data · Pre-IPO',        valuation:'$62B',  price:73  },
-          'CNVA':   { name:'Canva',      sector:'SaaS · Pre-IPO',        valuation:'$32B',  price:48  }
+          'SPCX':   { name:'SpaceX',     sector:'Aerospace · Live IPO',  valuation:'$400B', price:135, logo:'assets/spacex-logo.png' },
+          'OAIB':   { name:'OpenAI',     sector:'AI · Pre-IPO',          valuation:'$157B', price:85,  logo:'https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg' },
+          'OPAI':   { name:'OpenAI',     sector:'AI · Pre-IPO',          valuation:'$157B', price:85,  logo:'https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg' },
+          'STRP':   { name:'Stripe',     sector:'Fintech · Pre-IPO',     valuation:'$70B',  price:42,  logo:'https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg' },
+          'ANTH':   { name:'Anthropic',  sector:'AI · Pre-IPO',          valuation:'$60B',  price:65,  logo:'https://logo.clearbit.com/anthropic.com' },
+          'XAI':    { name:'xAI',        sector:'AI · Pre-IPO',          valuation:'$50B',  price:38,  logo:'https://logo.clearbit.com/x.ai' },
+          'NLNK':   { name:'Neuralink',  sector:'Biotech · Pre-IPO',     valuation:'$8B',   price:25,  logo:'https://logo.clearbit.com/neuralink.com' },
+          'DBRX':   { name:'Databricks', sector:'Data · Pre-IPO',        valuation:'$62B',  price:73,  logo:'https://logo.clearbit.com/databricks.com' },
+          'CNVA':   { name:'Canva',      sector:'SaaS · Pre-IPO',        valuation:'$32B',  price:48,  logo:'https://logo.clearbit.com/canva.com' },
+          'STARLINK':{ name:'Starlink',  sector:'Satellite · Pre-IPO',   valuation:'$140B', price:78,  logo:'https://logo.clearbit.com/starlink.com' },
+          'BORING': { name:'The Boring Company', sector:'Infrastructure · Pre-IPO', valuation:'$5.7B', price:18, logo:'https://logo.clearbit.com/boringcompany.com' },
+          'TBC':    { name:'The Boring Company', sector:'Infrastructure · Pre-IPO', valuation:'$5.7B', price:18, logo:'https://logo.clearbit.com/boringcompany.com' },
+          'XCORP':  { name:'X Corp',     sector:'Social · Pre-IPO',      valuation:'$19B',  price:22,  logo:'https://logo.clearbit.com/x.com' },
+          'TESLA':  { name:'Tesla',      sector:'Auto · Public',         valuation:'$1.2T', price:380, logo:'https://logo.clearbit.com/tesla.com' }
         };
         var k = KNOWN[ticker];
         if(k){
@@ -697,6 +717,7 @@
           state.sector = k.sector;
           state.valuation = k.valuation;
           state.price = k.price;
+          if(k.logo) state.logo = k.logo;
         }
       }
 
