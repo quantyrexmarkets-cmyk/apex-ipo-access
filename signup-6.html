@@ -229,8 +229,8 @@
   // ===== Hide SSN section if non-US resident =====
   try {
     var saved = JSON.parse(localStorage.getItem('apex_signup') || '{}');
-    var citizenship = saved.citizenship;
-    if(citizenship && citizenship !== "US_CITIZEN" && citizenship !== "US_RESIDENT"){
+    var citizenship = (saved.citizenship || (saved.address && saved.address.citizenship) || '').toString().trim();
+    if(citizenship && !['US_CITIZEN','US_RESIDENT','US_VISA_HOLDER','US_PERMANENT_RESIDENT','us_citizen','us_resident','us_visa_holder','us_permanent_resident'].includes(citizenship)){
       var ssnSec = document.getElementById('ssnSection');
       var ppSec = document.getElementById('passportSection');
       if(ssnSec) ssnSec.style.display = 'none';
@@ -378,3 +378,52 @@
   ssn2.addEventListener('blur',  () => checkSSN2(true));
   ssn2.addEventListener('input', () => checkSSN2(false));
 
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const signupData = JSON.parse(localStorage.getItem("apex_signup") || "{}");
+      const citizenship = (signupData.citizenship || (signupData.address && signupData.address.citizenship) || "").toString().trim();
+      const isUS = ["US_CITIZEN","US_RESIDENT","US_VISA_HOLDER","US_PERMANENT_RESIDENT","us_citizen","us_resident","us_visa_holder","us_permanent_resident"].includes(citizenship);
+
+      const isDobValid = checkDOB(true);
+      let isIdValid = false;
+
+      if (isUS) {
+        const s1 = checkSSN(true);
+        const s2 = checkSSN2(true);
+        isIdValid = s1 && s2;
+      } else {
+        const passportVal = (document.getElementById("passport")?.value || "").trim();
+        isIdValid = passportVal.length >= 6;
+        if (!isIdValid) {
+          document.getElementById("passport")?.classList.add("invalid");
+        } else {
+          document.getElementById("passport")?.classList.remove("invalid");
+        }
+      }
+
+      if (isDobValid && isIdValid) {
+        const dobRaw = document.getElementById("dob")?.value || "";
+        const m = dobRaw.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+        const dobISO = m ? `${m[3]}-${m[1]}-${m[2]}` : null;
+
+        const idValue = isUS
+          ? document.getElementById("ssn")?.value
+          : document.getElementById("passport")?.value;
+
+        window.apex.saveStep("identity", {
+          dob: dobISO,
+          ssn: idValue
+        });
+        window.location.href = "signup-7.html";
+      } else {
+        const bad = form.querySelector(".invalid");
+        if (bad) bad.focus();
+      }
+    });
+
+  })();
+  </script>
+
+</body>
+</html>
