@@ -1696,8 +1696,9 @@
   };
 
   function renderStats(){
-    var active = state.users.filter(function(u){ return u.kyc_status==='verified'; }).length;
-    var pending = state.users.filter(function(u){ return u.kyc_status!=='verified'; }).length;
+    var nonAdmins = state.users.filter(function(u){ return !u.is_admin; });
+    var active = nonAdmins.filter(function(u){ return u.kyc_status==='verified'; }).length;
+    var pending = nonAdmins.filter(function(u){ return u.kyc_status!=='verified'; }).length;
     var totalDep = state.deposits.filter(function(d){ return d.status==='approved'; }).reduce(function(s,d){ return s+parseFloat(d.amount||0); },0);
     var pendDep = state.deposits.filter(function(d){ return d.status==='pending'||d.status==='awaiting_review'; }).length;
     var pendWd = state.withdrawals.filter(function(w){ return w.status==='pending'; }).length;
@@ -1723,6 +1724,7 @@
   function renderCustomers(){
     var q = (document.getElementById('custSearch').value || '').toLowerCase();
     var filtered = state.users.filter(function(u){
+      if(u.is_admin) return false; // hide admins from customer list
       if(!q) return true;
       var name = ((u.first_name||'')+' '+(u.last_name||'')).toLowerCase();
       return name.includes(q) || (u.email||'').toLowerCase().includes(q);
