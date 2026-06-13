@@ -129,6 +129,18 @@
     font-size:12px;font-weight:600;cursor:pointer;
     border:none;transition:all .12s;
   }
+  .proof-row{margin-top:10px}
+  .proof-btn{
+    width:100%;padding:10px 14px;border-radius:8px;
+    background:rgba(74,158,255,0.1);border:1px solid rgba(74,158,255,0.3);
+    color:#4a9eff;font-weight:600;font-size:12px;cursor:pointer;
+    transition:all .15s;
+  }
+  .proof-btn:hover{background:rgba(74,158,255,0.18)}
+  .dep-notes{
+    margin-top:8px;padding:8px 12px;background:rgba(255,255,255,0.03);
+    border-radius:8px;font-size:12px;color:#a8b2c1;line-height:1.4;
+  }
   .action-btn.approve{
     background:rgba(62,213,152,0.15);color:#3ed598;
   }
@@ -513,7 +525,7 @@
     c.innerHTML = list.map(function(d){
       var s = d.status || 'pending';
       var cls = s==='approved'?'ok':s==='rejected'?'rejected':'pending';
-      return '<div class="deposit-card"><div class="card-top"><div class="name">'+fmt(d.amount)+' · '+(d.method||'wire').toUpperCase()+'</div><span class="pill '+cls+'">'+s.toUpperCase()+'</span></div><div class="card-meta"><span>🔖 '+escapeHtml(d.reference_code||'—')+'</span><span>👤 '+escapeHtml((d.user_id||'').slice(0,8))+'…</span><span>📅 '+timeAgo(d.created_at)+'</span></div>'+(s==='pending'?'<div class="card-actions"><button class="action-btn approve" onclick="window._approveDeposit(\''+d.id+'\')">Approve &amp; Credit</button><button class="action-btn reject" onclick="window._rejectDeposit(\''+d.id+'\')">Reject</button></div>':'')+'</div>';
+      return '<div class="deposit-card"><div class="card-top"><div class="name">'+fmt(d.amount)+' · '+(d.method||'wire').toUpperCase()+'</div><span class="pill '+cls+'">'+s.toUpperCase()+'</span></div><div class="card-meta"><span>🔖 '+escapeHtml(d.reference_code||'—')+'</span><span>👤 '+escapeHtml((d.user_id||'').slice(0,8))+'…</span><span>📅 '+timeAgo(d.created_at)+'</span></div>'+(d.proof_url?'<div class="proof-row"><button class="proof-btn" onclick="window._viewProof(\''+d.proof_url+'\')">📎 View Payment Proof</button></div>':'')+(d.notes?'<div class="dep-notes">📝 '+escapeHtml(d.notes)+'</div>':'')+((s==='pending'||s==='awaiting_review')?'<div class="card-actions"><button class="action-btn approve" onclick="window._approveDeposit(\''+d.id+'\')">Approve &amp; Credit</button><button class="action-btn reject" onclick="window._rejectDeposit(\''+d.id+'\')">Reject</button></div>':'')+'</div>';
     }).join('');
   }
 
@@ -528,6 +540,25 @@
       await sb.from('profiles').update({cash_balance:newBal}).eq('id',dep.user_id);
       loadDeposits(); loadUsers();
     } catch(e){ alert('Failed: '+e.message); }
+  };
+
+  window._viewProof = async function(path){
+    try {
+      var { data, error } = await sb.storage.from('payment-proofs').createSignedUrl(path, 300);
+      if(error) throw error;
+      var modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;cursor:pointer';
+      modal.onclick = function(){ modal.remove(); };
+      var isPdf = path.toLowerCase().endsWith('.pdf');
+      if(isPdf){
+        modal.innerHTML = '<div style="background:#0a0e14;border-radius:14px;padding:20px;max-width:500px;text-align:center"><div style="font-size:48px;margin-bottom:14px">📄</div><div style="color:#fff;font-size:14px;margin-bottom:14px">PDF Document</div><a href="'+data.signedUrl+'" target="_blank" style="display:inline-block;padding:12px 24px;background:#4a9eff;color:#000;border-radius:8px;font-weight:700;text-decoration:none">Open PDF</a><div style="margin-top:14px;color:#6a7585;font-size:12px">Tap outside to close</div></div>';
+      } else {
+        modal.innerHTML = '<img src="'+data.signedUrl+'" style="max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,0.6)">';
+      }
+      document.body.appendChild(modal);
+    } catch(e){
+      alert('Could not load proof: '+e.message);
+    }
   };
 
   window._rejectDeposit = async function(id){

@@ -251,6 +251,7 @@
   if(!amount || amount <= 0){
     if(window.apexWarn) apexWarn('No active deposit — redirecting to dashboard');
     setTimeout(function(){ window.location.href = 'dashboard.html'; }, 1800);
+    throw new Error('no deposit');
   }
 
   var spinner = document.getElementById('spinnerWrap');
@@ -284,11 +285,11 @@
     spinner.classList.add('hide');
     successIcon.classList.add('show');
     statusLbl.className = 'status success';
-    statusLbl.textContent = 'PENDING REVIEW';
-    titleLbl.textContent = method === 'crypto' ? 'Crypto deposit recorded' : 'Wire deposit recorded';
+    statusLbl.textContent = 'AWAITING REVIEW';
+    titleLbl.textContent = method === 'crypto' ? 'Crypto deposit recorded' : 'Wire proof submitted';
     subLbl.textContent = method === 'crypto'
       ? 'We\'ll credit your account once the network confirms your transaction.'
-      : 'We\'ll credit your account as soon as the wire posts (usually within 1 business day).';
+      : 'Our compliance team is reviewing your payment proof. Funds typically credit within 1 business day.';
 
     // Fill receipt
     document.getElementById('recMethod').textContent = method === 'crypto' ? 'Crypto' : 'Wire Transfer';
