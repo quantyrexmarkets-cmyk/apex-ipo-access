@@ -614,6 +614,58 @@
   .save-bar .cancel{background:rgba(255,255,255,0.05);color:#a8b2c1}
   .save-bar .save{background:#4a9eff;color:#000}
 
+  
+  /* ================= UPGRADED CUSTOMER ROW ================= */
+  .cust-row{
+    display:flex;align-items:stretch;gap:8px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:12px;margin-bottom:8px;
+    transition:all .15s;overflow:hidden;
+  }
+  .cust-row:hover{background:rgba(74,158,255,0.04);border-color:rgba(74,158,255,0.2)}
+  .cust-main{
+    flex:1;display:flex;align-items:center;gap:12px;
+    padding:12px;cursor:pointer;min-width:0;
+  }
+  .cust-main .av{
+    width:42px;height:42px;border-radius:50%;
+    background:linear-gradient(135deg,#4a9eff,#3ed598);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;color:#000;font-size:14px;flex-shrink:0;
+  }
+  .cust-main .info{flex:1;min-width:0}
+  .cust-main .nm{font-size:13px;font-weight:600;color:#fff;margin-bottom:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .cust-main .em{font-size:11px;color:#8b95a8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:5px}
+  .cust-main .meta{display:flex;gap:6px;flex-wrap:wrap}
+  .chip-mini{
+    font-size:10px;padding:2px 7px;border-radius:5px;
+    background:rgba(255,255,255,0.04);color:#a8b2c1;
+    display:inline-flex;align-items:center;gap:3px;
+  }
+  .chip-mini b{color:#fff;font-weight:600;font-family:'Manrope',sans-serif}
+
+  .cust-actions{
+    display:flex;align-items:center;gap:4px;
+    padding:8px 10px;
+    border-left:1px solid rgba(255,255,255,0.04);
+    flex-shrink:0;
+  }
+  .qa{
+    width:34px;height:34px;border-radius:8px;
+    background:rgba(255,255,255,0.05);
+    color:#a8b2c1;border:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .15s;flex-shrink:0;
+  }
+  .qa svg{width:15px;height:15px}
+  .qa:hover{background:rgba(255,255,255,0.1);color:#fff;transform:translateY(-1px)}
+  .qa-ok{background:rgba(62,213,152,0.1);color:#3ed598}
+  .qa-ok:hover{background:rgba(62,213,152,0.2)}
+  .qa-edit:hover{background:rgba(74,158,255,0.15);color:#4a9eff}
+  .qa-msg:hover{background:rgba(255,184,0,0.15);color:#ffb800}
+  .qa-danger:hover{background:rgba(255,106,106,0.15);color:#ff6a6a}
+
   /* ================= LOADING ================= */
   .loading{
     text-align:center;padding:60px 20px;color:#6a7585;font-size:13px;
@@ -1737,13 +1789,39 @@
       html = filtered.map(function(u){
         var name = ((u.first_name||'')+' '+(u.last_name||'')).trim() || u.email || 'Unnamed';
         var kyc = u.kyc_status || 'pending';
-        var kycPill = kyc==='verified' ? '<span class="pill ok" style="display:inline-flex;align-items:center;gap:3px;padding:3px 7px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>VERIFIED</span>' : '<span class="pill pending">PENDING</span>';
-        var adminPill = u.is_admin ? '<span class="pill admin">ADMIN</span>' : '';
-        return '<div class="cust-card" onclick="window._openUser(\'' + u.id + '\')">' +
-          '<div class="av">' + escapeHtml(initial(name)) + '</div>' +
-          '<div class="info">' +
-            '<div class="nm">' + escapeHtml(name) + ' ' + adminPill + ' ' + kycPill + '</div>' +
-            '<div class="em">' + escapeHtml(u.email||'—') + '</div>' +
+        var kycPill, statusColor;
+        if(u.banned){
+          kycPill = '<span class="pill banned">BANNED</span>';
+          statusColor = '#ff6a6a';
+        } else if(kyc==='verified'){
+          kycPill = '<span class="pill ok" style="display:inline-flex;align-items:center;gap:3px;padding:3px 7px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>VERIFIED</span>';
+          statusColor = '#3ed598';
+        } else {
+          kycPill = '<span class="pill pending">PENDING</span>';
+          statusColor = '#ffb800';
+        }
+        var bal = parseFloat(u.cash_balance || 0);
+        var joined = u.created_at ? new Date(u.created_at) : null;
+        var joinedStr = joined ? joined.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+        var needsKyc = !u.is_admin && kyc !== 'verified' && !u.banned;
+
+        return '<div class="cust-row">' +
+          '<div class="cust-main" onclick="window._openUser(\'' + u.id + '\')">' +
+            '<div class="av" style="border:2px solid '+statusColor+'33">' + escapeHtml(initial(name)) + '</div>' +
+            '<div class="info">' +
+              '<div class="nm">' + escapeHtml(name) + ' ' + kycPill + '</div>' +
+              '<div class="em">' + escapeHtml(u.email||'—') + '</div>' +
+              '<div class="meta">' +
+                '<span class="chip-mini">💰 <b>' + fmt(bal) + '</b></span>' +
+                '<span class="chip-mini">📅 ' + joinedStr + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="cust-actions">' +
+            (needsKyc ? '<button class="qa qa-ok" onclick="window._quickApprove(\''+u.id+'\')" title="Approve KYC"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></button>' : '') +
+            '<button class="qa qa-edit" onclick="window._openUser(\''+u.id+'\')" title="Manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
+            '<button class="qa qa-msg" onclick="window._messageUser(\''+u.id+'\')" title="Message"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>' +
+            (u.banned ? '<button class="qa qa-ok" onclick="window._quickUnban(\''+u.id+'\')" title="Unban"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></button>' : '<button class="qa qa-danger" onclick="window._quickBan(\''+u.id+'\')" title="Ban"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></button>') +
           '</div>' +
         '</div>';
       }).join('');
@@ -2641,6 +2719,86 @@
       }).join('');
     } catch(e){ console.warn('Admin log:', e); }
   }
+
+  // ============ QUICK ACTIONS ============
+  window._quickApprove = async function(id){
+    var u = state.users.find(function(x){return x.id===id;});
+    if(!u) return;
+    var ok = await apexConfirm({title:'Approve KYC?',body:'Grant '+(u.first_name||u.email||'this user')+' full access.',okLabel:'Approve'});
+    if(!ok) return;
+    var { error } = await sb.from('profiles').update({ kyc_status: 'verified' }).eq('id', id);
+    if(error){ apexError(error.message); return; }
+    try {
+      await sb.from('admin_log').insert({
+        admin_id: state.user.id,
+        action: 'approve_kyc',
+        target_type: 'user',
+        target_id: id
+      });
+    } catch(e){}
+    apexSuccess('KYC approved');
+    await loadCustomers();
+  };
+
+  window._quickBan = async function(id){
+    var u = state.users.find(function(x){return x.id===id;});
+    if(!u) return;
+    var reason = prompt('Reason for banning '+(u.first_name||u.email||'user')+':');
+    if(reason === null) return;
+    var { error } = await sb.from('profiles').update({
+      banned: true,
+      banned_reason: reason || 'Violation of terms',
+      banned_at: new Date().toISOString()
+    }).eq('id', id);
+    if(error){ apexError(error.message); return; }
+    try {
+      await sb.from('admin_log').insert({
+        admin_id: state.user.id,
+        action: 'ban_user',
+        target_type: 'user',
+        target_id: id,
+        details: { reason: reason }
+      });
+    } catch(e){}
+    apexSuccess('User banned');
+    await loadCustomers();
+  };
+
+  window._quickUnban = async function(id){
+    var ok = await apexConfirm({title:'Unban user?',body:'Restore access to the account.',okLabel:'Unban'});
+    if(!ok) return;
+    var { error } = await sb.from('profiles').update({
+      banned: false,
+      banned_reason: null,
+      banned_at: null
+    }).eq('id', id);
+    if(error){ apexError(error.message); return; }
+    try {
+      await sb.from('admin_log').insert({
+        admin_id: state.user.id,
+        action: 'unban_user',
+        target_type: 'user',
+        target_id: id
+      });
+    } catch(e){}
+    apexSuccess('User unbanned');
+    await loadCustomers();
+  };
+
+  window._messageUser = function(id){
+    var u = state.users.find(function(x){return x.id===id;});
+    if(!u) return;
+    // Pre-fill notification form and switch to notifications page
+    window._goto('notifications');
+    setTimeout(function(){
+      document.getElementById('ntRecipient').value = 'user';
+      document.getElementById('ntRecipient').dispatchEvent(new Event('change'));
+      setTimeout(function(){
+        document.getElementById('ntUserId').value = id;
+        document.getElementById('ntTitle').focus();
+      }, 100);
+    }, 100);
+  };
 
   // ========== AUTH GATE ==========
   document.addEventListener('sb-ready', async function(){
