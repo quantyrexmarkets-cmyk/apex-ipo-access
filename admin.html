@@ -283,6 +283,166 @@
   .page{display:none}
   .page.active{display:block}
 
+  
+  /* ================= USER MODAL ================= */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,0.75);
+    z-index:300;display:none;align-items:flex-end;justify-content:center;
+    backdrop-filter:blur(8px);
+  }
+  .modal-overlay.show{display:flex}
+  .modal{
+    width:100%;max-width:560px;max-height:92vh;
+    background:#0a0e14;border:1px solid rgba(255,255,255,0.08);
+    border-radius:18px 18px 0 0;
+    display:flex;flex-direction:column;overflow:hidden;
+    animation:slideUp .3s cubic-bezier(.4,0,.2,1);
+  }
+  @keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+  @media(min-width:600px){
+    .modal-overlay{align-items:center}
+    .modal{border-radius:18px}
+  }
+
+  .m-head{
+    padding:18px 20px;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+    display:flex;align-items:center;gap:14px;
+    background:linear-gradient(180deg,rgba(74,158,255,0.06),transparent);
+  }
+  .m-head .av{
+    width:54px;height:54px;border-radius:50%;
+    background:linear-gradient(135deg,#4a9eff,#3ed598);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;color:#000;font-size:20px;flex-shrink:0;
+  }
+  .m-head .info{flex:1;min-width:0}
+  .m-head .nm{font-size:16px;font-weight:700;color:#fff;margin-bottom:2px}
+  .m-head .em{font-size:12px;color:#8b95a8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .m-head .close{
+    width:36px;height:36px;border-radius:50%;
+    background:rgba(255,255,255,0.05);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .m-head .close svg{width:16px;height:16px;color:#a8b2c1}
+
+  .m-body{flex:1;overflow-y:auto;padding:18px 20px 24px}
+
+  .m-tabs{
+    display:flex;gap:4px;padding:4px;
+    background:rgba(255,255,255,0.03);
+    border-radius:10px;margin-bottom:18px;
+  }
+  .m-tab{
+    flex:1;padding:9px 6px;text-align:center;
+    font-size:11px;font-weight:600;color:#8b95a8;
+    border-radius:7px;cursor:pointer;transition:all .15s;
+    letter-spacing:0.3px;
+  }
+  .m-tab:hover{color:#fff}
+  .m-tab.active{background:#4a9eff;color:#000}
+
+  .m-pane{display:none}
+  .m-pane.active{display:block}
+
+  .stat-row{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;
+  }
+  .stat-box{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:11px;padding:12px 14px;
+  }
+  .stat-box .l{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#6a7585;margin-bottom:4px;font-weight:600}
+  .stat-box .v{font-family:'Manrope',sans-serif;font-weight:700;font-size:18px;color:#fff;letter-spacing:-0.3px}
+  .stat-box.green .v{color:#3ed598}
+  .stat-box.amber .v{color:#ffb800}
+
+  .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+  .field-grid.full{grid-template-columns:1fr}
+  .field-mini label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#6a7585;margin-bottom:5px;font-weight:600}
+  .field-mini input,.field-mini select,.field-mini textarea{
+    width:100%;background:#0a0e14;
+    border:1px solid rgba(255,255,255,0.08);
+    color:#fff;font-family:'Inter',sans-serif;font-size:13px;
+    padding:10px 12px;border-radius:8px;
+  }
+  .field-mini input:focus,.field-mini select:focus,.field-mini textarea:focus{outline:none;border-color:rgba(74,158,255,0.5)}
+  .field-mini input:read-only{background:rgba(255,255,255,0.02);color:#a8b2c1}
+
+  .act-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .act-btn{
+    flex:1;min-width:130px;padding:11px 12px;border-radius:9px;
+    font-weight:600;font-size:12px;letter-spacing:0.3px;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    transition:all .15s;cursor:pointer;
+  }
+  .act-btn svg{width:14px;height:14px}
+  .act-btn.primary{background:#4a9eff;color:#000}
+  .act-btn.primary:hover{background:#5fb0ff}
+  .act-btn.success{background:rgba(62,213,152,0.15);color:#3ed598;border:1px solid rgba(62,213,152,0.3)}
+  .act-btn.success:hover{background:rgba(62,213,152,0.25)}
+  .act-btn.warn{background:rgba(255,184,0,0.15);color:#ffb800;border:1px solid rgba(255,184,0,0.3)}
+  .act-btn.warn:hover{background:rgba(255,184,0,0.25)}
+  .act-btn.danger{background:rgba(255,106,106,0.15);color:#ff6a6a;border:1px solid rgba(255,106,106,0.3)}
+  .act-btn.danger:hover{background:rgba(255,106,106,0.25)}
+
+  .adj-row{
+    display:flex;gap:8px;align-items:center;
+    background:rgba(74,158,255,0.06);
+    border:1px solid rgba(74,158,255,0.2);
+    border-radius:10px;padding:12px;margin-top:12px;
+  }
+  .adj-row select{
+    background:#0a0e14;border:1px solid rgba(255,255,255,0.08);
+    color:#fff;padding:9px 10px;border-radius:7px;font-size:12px;
+  }
+  .adj-row input{
+    flex:1;background:#0a0e14;border:1px solid rgba(255,255,255,0.08);
+    color:#fff;padding:9px 10px;border-radius:7px;font-size:13px;
+    font-family:'Manrope',sans-serif;font-weight:600;
+  }
+  .adj-row button{
+    padding:9px 14px;background:#4a9eff;color:#000;
+    border-radius:7px;font-weight:700;font-size:12px;
+  }
+
+  .act-list{margin-top:10px}
+  .act-it{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 12px;
+    border-bottom:1px solid rgba(255,255,255,0.04);
+    font-size:12px;
+  }
+  .act-it .ico{
+    width:30px;height:30px;border-radius:50%;
+    background:rgba(74,158,255,0.1);color:#4a9eff;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;font-size:13px;
+  }
+  .act-it .txt{flex:1;color:#a8b2c1}
+  .act-it .txt b{color:#fff;font-weight:600}
+  .act-it .when{font-size:10px;color:#6a7585;font-family:'Manrope',sans-serif}
+
+  .danger-zone{
+    margin-top:18px;padding:14px;
+    border:1px solid rgba(255,106,106,0.2);
+    border-radius:11px;background:rgba(255,106,106,0.03);
+  }
+  .danger-zone .h{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#ff6a6a;font-weight:700;margin-bottom:10px}
+
+  .save-bar{
+    padding:14px 20px;
+    border-top:1px solid rgba(255,255,255,0.06);
+    background:#0a0e14;
+    display:flex;gap:10px;
+  }
+  .save-bar button{
+    flex:1;padding:13px;border-radius:10px;font-weight:700;font-size:13px;
+  }
+  .save-bar .cancel{background:rgba(255,255,255,0.05);color:#a8b2c1}
+  .save-bar .save{background:#4a9eff;color:#000}
+
   /* ================= LOADING ================= */
   .loading{
     text-align:center;padding:60px 20px;color:#6a7585;font-size:13px;
@@ -528,6 +688,116 @@
 
 </main>
 
+<!-- USER MGMT MODAL -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal">
+    <div class="m-head">
+      <div class="av" id="mAv">?</div>
+      <div class="info">
+        <div class="nm" id="mNm">—</div>
+        <div class="em" id="mEm">—</div>
+      </div>
+      <button class="close" onclick="window._closeUser()" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="m-body">
+      <div class="m-tabs">
+        <div class="m-tab active" data-pane="overview">OVERVIEW</div>
+        <div class="m-tab" data-pane="profile">PROFILE</div>
+        <div class="m-tab" data-pane="activity">ACTIVITY</div>
+      </div>
+
+      <!-- OVERVIEW -->
+      <div class="m-pane active" id="pane-overview">
+        <div class="stat-row">
+          <div class="stat-box green"><div class="l">Cash Balance</div><div class="v" id="mBal">$0.00</div></div>
+          <div class="stat-box"><div class="l">KYC Status</div><div class="v" id="mKyc" style="font-size:14px;text-transform:uppercase">—</div></div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-box"><div class="l">Deposits</div><div class="v" id="mDepCount">0</div></div>
+          <div class="stat-box amber"><div class="l">Pending</div><div class="v" id="mPendCount">0</div></div>
+        </div>
+
+        <div class="adj-row">
+          <select id="adjType">
+            <option value="credit">Credit</option>
+            <option value="debit">Debit</option>
+          </select>
+          <input type="number" id="adjAmt" placeholder="0.00" step="0.01" min="0">
+          <button onclick="window._adjustBalance()">Apply</button>
+        </div>
+
+        <div class="act-row">
+          <button class="act-btn success" id="kycBtn" onclick="window._approveKyc()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Approve KYC
+          </button>
+          <button class="act-btn warn" id="adminBtn" onclick="window._toggleAdmin()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Toggle Admin
+          </button>
+        </div>
+
+        <div class="danger-zone">
+          <div class="h">⚠ Danger Zone</div>
+          <div class="act-row">
+            <button class="act-btn danger" id="banBtn" onclick="window._toggleBan()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+              Ban User
+            </button>
+            <button class="act-btn danger" onclick="window._resetPassword()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg>
+              Send Password Reset
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div class="m-pane" id="pane-profile">
+        <div class="field-grid">
+          <div class="field-mini"><label>First Name</label><input id="pfFirst"></div>
+          <div class="field-mini"><label>Last Name</label><input id="pfLast"></div>
+        </div>
+        <div class="field-grid full">
+          <div class="field-mini"><label>Email (read-only)</label><input id="pfEmail" readonly></div>
+        </div>
+        <div class="field-grid">
+          <div class="field-mini"><label>Phone</label><input id="pfPhone"></div>
+          <div class="field-mini"><label>DOB</label><input id="pfDob" type="date"></div>
+        </div>
+        <div class="field-grid full">
+          <div class="field-mini"><label>Address</label><input id="pfAddr"></div>
+        </div>
+        <div class="field-grid">
+          <div class="field-mini"><label>City</label><input id="pfCity"></div>
+          <div class="field-mini"><label>State</label><input id="pfState"></div>
+        </div>
+        <div class="field-grid">
+          <div class="field-mini"><label>ZIP</label><input id="pfZip"></div>
+          <div class="field-mini"><label>Citizenship</label><input id="pfCitz"></div>
+        </div>
+      </div>
+
+      <!-- ACTIVITY -->
+      <div class="m-pane" id="pane-activity">
+        <div class="act-list" id="actList">
+          <div class="empty">Loading activity...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="save-bar">
+      <button class="cancel" onclick="window._closeUser()">Close</button>
+      <button class="save" onclick="window._saveUser()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+
+
 <script>
   var state = { user:null, profile:null, users:[], deposits:[], withdrawals:[] };
 
@@ -663,9 +933,268 @@
     renderCustomers();
   });
 
-  window._openUser = function(id){
-    alert('User management modal — Phase 2');
+  // ============ USER MODAL ============
+  var currentUser = null;
+  var userModal = document.getElementById('userModal');
+
+  window._openUser = async function(id){
+    var u = state.users.find(function(x){ return x.id===id; });
+    if(!u){ apexError('User not found'); return; }
+    currentUser = u;
+    populateModal(u);
+    userModal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    // Set overview tab default
+    switchPane('overview');
+    // Load activity in background
+    loadUserActivity(u.id);
   };
+
+  window._closeUser = function(){
+    userModal.classList.remove('show');
+    document.body.style.overflow = '';
+    currentUser = null;
+  };
+
+  // Click outside to close
+  userModal.addEventListener('click', function(e){
+    if(e.target === userModal) window._closeUser();
+  });
+
+  // Tab switching
+  document.querySelectorAll('.m-tab').forEach(function(t){
+    t.addEventListener('click', function(){ switchPane(t.getAttribute('data-pane')); });
+  });
+  function switchPane(name){
+    document.querySelectorAll('.m-tab').forEach(function(t){
+      t.classList.toggle('active', t.getAttribute('data-pane')===name);
+    });
+    document.querySelectorAll('.m-pane').forEach(function(p){
+      p.classList.toggle('active', p.id==='pane-'+name);
+    });
+  }
+
+  function populateModal(u){
+    var name = ((u.first_name||'')+' '+(u.last_name||'')).trim() || u.email || 'Unnamed';
+    document.getElementById('mAv').textContent = initial(name);
+    document.getElementById('mNm').textContent = name + (u.is_admin?' • Admin':'') + (u.banned?' • Banned':'');
+    document.getElementById('mEm').textContent = u.email || '—';
+
+    document.getElementById('mBal').textContent = fmt(u.cash_balance);
+    document.getElementById('mKyc').textContent = (u.kyc_status || 'pending').toUpperCase();
+
+    var deps = state.deposits.filter(function(d){ return d.user_id===u.id; });
+    var pending = deps.filter(function(d){ return d.status==='pending'||d.status==='awaiting_review'; });
+    document.getElementById('mDepCount').textContent = deps.length;
+    document.getElementById('mPendCount').textContent = pending.length;
+
+    // Profile fields
+    document.getElementById('pfFirst').value = u.first_name || '';
+    document.getElementById('pfLast').value = u.last_name || '';
+    document.getElementById('pfEmail').value = u.email || '';
+    document.getElementById('pfPhone').value = u.phone || '';
+    document.getElementById('pfDob').value = u.dob || '';
+    document.getElementById('pfAddr').value = (u.address_line1 || '') + (u.address_line2 ? ', '+u.address_line2 : '');
+    document.getElementById('pfCity').value = u.city || '';
+    document.getElementById('pfState').value = u.state || '';
+    document.getElementById('pfZip').value = u.zip || '';
+    document.getElementById('pfCitz').value = u.citizenship || '';
+
+    // KYC button label
+    var kycBtn = document.getElementById('kycBtn');
+    if(u.kyc_status === 'verified'){
+      kycBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Revoke KYC';
+      kycBtn.className = 'act-btn warn';
+    } else {
+      kycBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Approve KYC';
+      kycBtn.className = 'act-btn success';
+    }
+
+    // Admin button label
+    var adminBtn = document.getElementById('adminBtn');
+    adminBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> ' + (u.is_admin ? 'Remove Admin' : 'Make Admin');
+
+    // Ban button label
+    var banBtn = document.getElementById('banBtn');
+    banBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> ' + (u.banned ? 'Unban User' : 'Ban User');
+  }
+
+  // ============ APPROVE / REVOKE KYC ============
+  window._approveKyc = async function(){
+    if(!currentUser) return;
+    var newStatus = currentUser.kyc_status === 'verified' ? 'pending' : 'verified';
+    var ok = await apexConfirm({
+      title: newStatus==='verified'?'Approve KYC?':'Revoke KYC?',
+      body: newStatus==='verified'?'This grants the user full access.':'This will restrict the user.',
+      okLabel: 'Confirm'
+    });
+    if(!ok) return;
+    var { error } = await sb.from('profiles').update({ kyc_status: newStatus }).eq('id', currentUser.id);
+    if(error){ apexError(error.message); return; }
+    apexSuccess('KYC ' + (newStatus==='verified'?'approved':'revoked'));
+    currentUser.kyc_status = newStatus;
+    populateModal(currentUser);
+    await loadCustomers();
+  };
+
+  // ============ TOGGLE ADMIN ============
+  window._toggleAdmin = async function(){
+    if(!currentUser) return;
+    var newVal = !currentUser.is_admin;
+    var ok = await apexConfirm({
+      title: newVal?'Make this user an admin?':'Remove admin role?',
+      body: newVal?'They will gain full admin access.':'They will lose admin access.',
+      okLabel: 'Confirm'
+    });
+    if(!ok) return;
+    var { error } = await sb.from('profiles').update({ is_admin: newVal }).eq('id', currentUser.id);
+    if(error){ apexError(error.message); return; }
+    apexSuccess('Admin role ' + (newVal?'granted':'removed'));
+    currentUser.is_admin = newVal;
+    populateModal(currentUser);
+    await loadCustomers();
+  };
+
+  // ============ TOGGLE BAN ============
+  window._toggleBan = async function(){
+    if(!currentUser) return;
+    var newVal = !currentUser.banned;
+    var reason = '';
+    if(newVal){
+      reason = prompt('Reason for ban (visible to user):');
+      if(reason === null) return;
+    }
+    var updates = { banned: newVal };
+    if(newVal){
+      updates.banned_reason = reason || 'Violation of terms';
+      updates.banned_at = new Date().toISOString();
+    } else {
+      updates.banned_reason = null;
+      updates.banned_at = null;
+    }
+    var { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
+    if(error){ apexError(error.message); return; }
+    apexSuccess(newVal ? 'User banned' : 'User unbanned');
+    currentUser.banned = newVal;
+    populateModal(currentUser);
+    await loadCustomers();
+  };
+
+  // ============ ADJUST BALANCE ============
+  window._adjustBalance = async function(){
+    if(!currentUser) return;
+    var type = document.getElementById('adjType').value;
+    var amt = parseFloat(document.getElementById('adjAmt').value || '0');
+    if(!amt || amt <= 0){ apexError('Enter a valid amount'); return; }
+
+    var reason = prompt('Reason for ' + type + ' of ' + fmt(amt) + ':');
+    if(reason === null) return;
+
+    var delta = type === 'credit' ? amt : -amt;
+    var balBefore = parseFloat(currentUser.cash_balance || 0);
+    var balAfter = balBefore + delta;
+    if(balAfter < 0){
+      apexError('Cannot debit below zero (current: ' + fmt(balBefore) + ')');
+      return;
+    }
+
+    // Update profile balance
+    var { error: e1 } = await sb.from('profiles').update({ cash_balance: balAfter }).eq('id', currentUser.id);
+    if(e1){ apexError(e1.message); return; }
+
+    // Log adjustment
+    try {
+      await sb.from('balance_adjustments').insert({
+        user_id: currentUser.id,
+        admin_id: state.user.id,
+        delta: delta,
+        balance_before: balBefore,
+        balance_after: balAfter,
+        reason: reason || null
+      });
+    } catch(e){ console.warn('Audit log failed:', e); }
+
+    apexSuccess(type==='credit'?'Credited '+fmt(amt):'Debited '+fmt(amt));
+    currentUser.cash_balance = balAfter;
+    document.getElementById('adjAmt').value = '';
+    populateModal(currentUser);
+    await loadCustomers();
+    loadUserActivity(currentUser.id);
+  };
+
+  // ============ RESET PASSWORD ============
+  window._resetPassword = async function(){
+    if(!currentUser || !currentUser.email) return;
+    var ok = await apexConfirm({
+      title: 'Send password reset?',
+      body: 'A reset link will be emailed to ' + currentUser.email,
+      okLabel: 'Send'
+    });
+    if(!ok) return;
+    var { error } = await sb.auth.resetPasswordForEmail(currentUser.email);
+    if(error){ apexError(error.message); return; }
+    apexSuccess('Reset email sent');
+  };
+
+  // ============ SAVE PROFILE EDITS ============
+  window._saveUser = async function(){
+    if(!currentUser) return;
+    var updates = {
+      first_name: document.getElementById('pfFirst').value.trim() || null,
+      last_name: document.getElementById('pfLast').value.trim() || null,
+      phone: document.getElementById('pfPhone').value.trim() || null,
+      dob: document.getElementById('pfDob').value || null,
+      address_line1: document.getElementById('pfAddr').value.trim() || null,
+      city: document.getElementById('pfCity').value.trim() || null,
+      state: document.getElementById('pfState').value.trim() || null,
+      zip: document.getElementById('pfZip').value.trim() || null,
+      citizenship: document.getElementById('pfCitz').value.trim() || null
+    };
+    var { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
+    if(error){ apexError(error.message); return; }
+    apexSuccess('Profile updated');
+    Object.assign(currentUser, updates);
+    populateModal(currentUser);
+    await loadCustomers();
+  };
+
+  // ============ LOAD ACTIVITY ============
+  async function loadUserActivity(userId){
+    var listEl = document.getElementById('actList');
+    listEl.innerHTML = '<div class="empty">Loading...</div>';
+    try {
+      // Fetch deposits, withdrawals, balance adjustments in parallel
+      var [depsRes, wdsRes, adjRes] = await Promise.all([
+        sb.from('deposits').select('*').eq('user_id', userId).order('created_at',{ascending:false}).limit(20),
+        sb.from('withdrawals').select('*').eq('user_id', userId).order('created_at',{ascending:false}).limit(20).then(function(r){return r;}).catch(function(){return {data:[]};}),
+        sb.from('balance_adjustments').select('*').eq('user_id', userId).order('created_at',{ascending:false}).limit(20)
+      ]);
+      var deps = (depsRes.data||[]).map(function(d){return {type:'deposit',amount:d.amount,status:d.status,when:d.created_at,note:d.method};});
+      var wds = (wdsRes.data||[]).map(function(w){return {type:'withdrawal',amount:w.amount,status:w.status,when:w.created_at,note:w.method};});
+      var adjs = (adjRes.data||[]).map(function(a){return {type:'adjustment',amount:a.delta,status:a.delta>0?'credit':'debit',when:a.created_at,note:a.reason};});
+      var all = deps.concat(wds).concat(adjs).sort(function(a,b){return new Date(b.when)-new Date(a.when);});
+
+      if(!all.length){
+        listEl.innerHTML = '<div class="empty">No activity yet</div>';
+        return;
+      }
+
+      listEl.innerHTML = all.map(function(it){
+        var icon = it.type==='deposit'?'↓':it.type==='withdrawal'?'↑':'⚙';
+        var color = it.type==='deposit'?'#3ed598':it.type==='withdrawal'?'#ff6a6a':'#4a9eff';
+        var amtStr = (it.amount>0?'+':'') + fmt(it.amount);
+        var label = it.type.charAt(0).toUpperCase() + it.type.slice(1);
+        return '<div class="act-it">' +
+          '<div class="ico" style="background:'+color+'22;color:'+color+'">'+icon+'</div>' +
+          '<div class="txt"><b>'+label+'</b> '+amtStr+(it.note?' · '+escapeHtml(it.note):'')+' <span style="color:#6a7585;font-size:10px">('+it.status+')</span></div>' +
+          '<div class="when">'+new Date(it.when).toLocaleDateString()+'</div>' +
+        '</div>';
+      }).join('');
+    } catch(e){
+      listEl.innerHTML = '<div class="empty">Failed to load activity</div>';
+      console.error(e);
+    }
+  }
 
   // ========== AUTH GATE ==========
   document.addEventListener('sb-ready', async function(){
