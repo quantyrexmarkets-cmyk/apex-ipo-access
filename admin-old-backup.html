@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel | APEX IPO ACCESS</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/supabase.js?v=100"></script>
+<script src="js/notify.js?v=1"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#0a0a0f;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+
+  .admin-bar{
+    position:sticky;top:0;z-index:100;
+    background:rgba(10,10,15,0.95);backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding:14px 20px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .admin-bar .brand{
+    display:flex;align-items:center;gap:10px;
+  }
+  .admin-bar .brand .badge{
+    padding:4px 10px;border-radius:6px;
+    background:rgba(255,59,48,0.15);color:#ff3b30;
+    font-size:10px;font-weight:700;letter-spacing:1px;
+  }
+  .admin-bar .title{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:700;font-size:18px;color:#fff;letter-spacing:-0.3px;
+  }
+  .admin-bar .logout{
+    padding:8px 14px;border-radius:8px;
+    background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+    color:#8a94a3;font-size:12px;font-weight:500;cursor:pointer;
+  }
+  .admin-bar .logout:hover{background:rgba(255,255,255,0.1);color:#fff}
+
+  .wrap{max-width:900px;margin:0 auto;padding:20px 16px 60px}
+
+  /* Stats row */
+  .stats{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+    margin-bottom:24px;
+  }
+  .stat{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:12px;padding:14px;
+  }
+  .stat .lbl{font-size:10px;color:#6a7585;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+  .stat .val{
+    font-family:'JetBrains Mono',monospace;
+    font-size:20px;font-weight:700;color:#fff;
+  }
+  .stat .val.green{color:#3ed598}
+  .stat .val.amber{color:#ffb800}
+  .stat .val.blue{color:#4a9eff}
+
+  /* Tabs */
+  .admin-tabs{
+    display:flex;gap:4px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:10px;padding:4px;
+    margin-bottom:20px;overflow-x:auto;
+  }
+  .admin-tab{
+    flex:1;padding:10px 8px;border-radius:8px;
+    text-align:center;font-size:12px;font-weight:500;
+    color:#6a7585;cursor:pointer;transition:all .15s;
+    white-space:nowrap;
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+  }
+  .admin-tab svg{width:18px;height:18px}
+  .admin-tab:hover{color:#fff}
+  .admin-tab.active{
+    background:rgba(74,158,255,0.15);color:#4a9eff;
+  }
+
+  /* Panel */
+  .panel{display:none}
+  .panel.active{display:block}
+
+  /* Table-like cards */
+  .card-list{display:flex;flex-direction:column;gap:8px}
+
+  .user-card,.deposit-card,.tx-card{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:12px;padding:14px 16px;
+    transition:background .12s;
+  }
+  .user-card:hover,.deposit-card:hover,.tx-card:hover{
+    background:rgba(255,255,255,0.05);
+  }
+
+  .card-top{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:8px;
+  }
+  .card-top .name{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:14px;color:#fff;
+  }
+  .card-top .pill{
+    padding:4px 10px;border-radius:20px;
+    font-size:10px;font-weight:600;letter-spacing:0.5px;
+  }
+  .pill.ok{background:rgba(62,213,152,0.12);color:#3ed598}
+  .pill.warn{background:rgba(255,184,0,0.12);color:#ffb800}
+  .pill.pending{background:rgba(74,158,255,0.12);color:#4a9eff}
+  .pill.rejected{background:rgba(255,106,106,0.12);color:#ff6a6a}
+
+  .card-meta{
+    display:flex;flex-wrap:wrap;gap:12px;
+    font-size:11px;color:#6a7585;
+  }
+  .card-meta span{display:flex;align-items:center;gap:4px}
+
+  .card-actions{
+    display:flex;gap:8px;margin-top:10px;
+  }
+  .action-btn{
+    padding:8px 12px;border-radius:8px;display:inline-flex;align-items:center;gap:5px;
+    font-size:12px;font-weight:600;cursor:pointer;
+    border:none;transition:all .12s;
+  }
+  .proof-row{margin-top:10px}
+  .proof-btn{
+    width:100%;padding:10px 14px;border-radius:8px;
+    background:rgba(74,158,255,0.1);border:1px solid rgba(74,158,255,0.3);
+    color:#4a9eff;font-weight:600;font-size:12px;cursor:pointer;
+    transition:all .15s;
+  }
+  .proof-btn:hover{background:rgba(74,158,255,0.18)}
+  .dep-notes{
+    margin-top:8px;padding:8px 12px;background:rgba(255,255,255,0.03);
+    border-radius:8px;font-size:12px;color:#a8b2c1;line-height:1.4;
+  }
+  .action-btn.approve{
+    background:rgba(62,213,152,0.15);color:#3ed598;
+  }
+  .action-btn.approve:hover{background:rgba(62,213,152,0.25)}
+  .action-btn.reject{
+    background:rgba(255,106,106,0.1);color:#ff6a6a;
+  }
+  .action-btn.reject:hover{background:rgba(255,106,106,0.2)}
+  .action-btn.edit{
+    background:rgba(74,158,255,0.1);color:#4a9eff;
+  }
+  .action-btn.edit:hover{background:rgba(74,158,255,0.2)}
+
+  .empty-state{
+    text-align:center;padding:40px 20px;color:#5a6473;font-size:14px;
+  }
+
+  /* Search */
+  .search-bar{
+    display:flex;gap:8px;margin-bottom:16px;
+  }
+  .search-bar input{
+    flex:1;padding:10px 14px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:10px;color:#fff;font-size:13px;
+    outline:none;
+  }
+  .search-bar input:focus{border-color:rgba(74,158,255,0.4)}
+  .search-bar input::placeholder{color:#5a6473}
+
+  /* Modal */
+  .modal-overlay{
+    display:none;position:fixed;inset:0;z-index:200;
+    background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);
+    padding:20px;overflow-y:auto;
+  }
+  .modal-overlay.open{display:flex;align-items:center;justify-content:center}
+  .modal-box{
+    width:100%;max-width:420px;
+    background:rgba(20,20,25,0.98);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:16px;padding:24px;
+  }
+  .modal-box h3{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:18px;font-weight:600;color:#fff;margin-bottom:16px;
+  }
+  .modal-box label{
+    display:block;font-size:12px;color:#8a94a3;margin-bottom:6px;margin-top:12px;
+  }
+  .modal-box input{
+    width:100%;padding:10px 14px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:8px;color:#fff;font-size:14px;outline:none;
+  }
+  .modal-box input:focus{border-color:rgba(74,158,255,0.4)}
+  .modal-box .btn-row{display:flex;gap:8px;margin-top:20px}
+  .modal-box .btn-row button{
+    flex:1;padding:12px;border:none;border-radius:8px;
+    font-size:14px;font-weight:600;cursor:pointer;
+  }
+  .modal-box .btn-row .save{
+    background:linear-gradient(135deg,#4a9eff,#357abd);color:#fff;
+  }
+  .modal-box .btn-row .cancel{
+    background:rgba(255,255,255,0.06);color:#8a94a3;
+  }
+
+  /* Auth gate */
+  .auth-gate{
+    display:flex;align-items:center;justify-content:center;
+    min-height:80vh;text-align:center;
+  }
+  .auth-gate .msg{
+    font-size:16px;color:#ff6a6a;
+    font-family:'Plus Jakarta Sans',sans-serif;font-weight:500;
+  }
+
+  @media(max-width:600px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+  }
+</style>
+</head>
+<body>
+
+<header class="admin-bar">
+  <div class="brand">
+    <span class="badge">ADMIN</span>
+    <span class="title">APEX Control Panel</span>
+  </div>
+  <button class="logout" id="logoutBtn">Sign out</button>
+</header>
+
+<div class="auth-gate" id="authGate" style="display:none">
+  <div class="msg">⚠️ Admin access required<br><small style="color:#8a94a3;font-weight:400">Redirecting…</small></div>
+</div>
+
+<main class="wrap" id="mainPanel" style="display:none">
+
+  <div class="stats">
+    <div class="stat"><div class="lbl">Total Users</div><div class="val blue" id="statUsers">0</div></div>
+    <div class="stat"><div class="lbl">Pending KYC</div><div class="val amber" id="statPendingKyc">0</div></div>
+    <div class="stat"><div class="lbl">Pending Deposits</div><div class="val amber" id="statPendingDep">0</div></div>
+    <div class="stat"><div class="lbl">Total Volume</div><div class="val green" id="statVolume">$0</div></div>
+  </div>
+
+  <div class="admin-tabs">
+    <div class="admin-tab active" data-tab="users">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Users
+    </div>
+    <div class="admin-tab" data-tab="deposits">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+      Deposits
+    </div>
+    <div class="admin-tab" data-tab="transactions">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      Activity
+    </div>
+    <div class="admin-tab" data-tab="withdrawals">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/><path d="M5 21h14"/></svg>
+      Withdrawals
+    </div>
+    <div class="admin-tab" data-tab="settings">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+      Settings
+    </div>
+  </div>
+
+  <div class="panel active" id="panel-users">
+    <div class="search-bar"><input type="text" id="userSearch" placeholder="Search by email or name…"></div>
+    <div class="card-list" id="usersList"><div class="empty-state">Loading users…</div></div>
+  </div>
+
+  <div class="panel" id="panel-deposits">
+    <div class="search-bar"><input type="text" id="depSearch" placeholder="Search by reference code or user id…"></div>
+    <div class="card-list" id="depositsList"><div class="empty-state">Loading deposits…</div></div>
+  </div>
+
+  <div class="panel" id="panel-transactions">
+    <div class="card-list" id="txList"><div class="empty-state">Loading activity…</div></div>
+  </div>
+
+  <div class="panel" id="panel-withdrawals">
+    <div class="search-bar"><input type="text" id="wdSearch" placeholder="Search by reference or user…"></div>
+    <div class="card-list" id="wdList"><div class="empty-state">Loading withdrawals…</div></div>
+  </div>
+
+  <div class="panel" id="panel-settings">
+    <div class="user-card" style="margin-bottom:14px">
+      <div class="card-top">
+        <div class="name">💸 Wire Transfer Details</div>
+        <button class="action-btn edit" id="editWireBtn">Edit</button>
+      </div>
+      <div id="wireDisplay" style="font-size:12px;color:#a8b2c1;line-height:1.7">Loading…</div>
+    </div>
+
+    <div class="user-card" style="margin-bottom:14px">
+      <div class="card-top"><div class="name">₿ Crypto Wallets</div></div>
+      <div id="walletsDisplay"><div style="font-size:12px;color:#8a94a3">Loading wallets…</div></div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="action-btn edit" data-wallet="BTC">Edit BTC</button>
+        <button class="action-btn edit" data-wallet="ETH">Edit ETH</button>
+        <button class="action-btn edit" data-wallet="USDT">Edit USDT</button>
+        <button class="action-btn edit" data-wallet="USDC">Edit USDC</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div class="modal-overlay" id="userModal">
+  <div class="modal-box">
+    <h3>Edit User</h3>
+    <input type="hidden" id="mUserId">
+    <label>Cash balance ($)</label>
+    <input type="number" id="mCashBalance" step="0.01">
+    <label>KYC status</label>
+    <select id="mKycStatus" style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:14px;outline:none;font-family:inherit">
+      <option value="pending">Pending</option>
+      <option value="verified">Verified</option>
+      <option value="rejected">Rejected</option>
+    </select>
+    <label>Admin role</label>
+    <select id="mIsAdmin" style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:14px;outline:none;font-family:inherit">
+      <option value="false">User</option>
+      <option value="true">Admin</option>
+    </select>
+    <div class="btn-row">
+      <button class="cancel" onclick="closeModal('userModal')">Cancel</button>
+      <button class="save" id="saveUserBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="wireModal">
+  <div class="modal-box">
+    <h3>Edit Wire Details</h3>
+    <label>Bank name</label><input type="text" id="wBankName">
+    <label>Routing (ABA)</label><input type="text" id="wRouting">
+    <label>Account number</label><input type="text" id="wAccount">
+    <label>SWIFT / BIC</label><input type="text" id="wSwift">
+    <label>Beneficiary</label><input type="text" id="wBeneficiary">
+    <label>Bank address</label><input type="text" id="wBankAddress">
+    <div class="btn-row">
+      <button class="cancel" onclick="closeModal('wireModal')">Cancel</button>
+      <button class="save" id="saveWireBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="walletModal">
+  <div class="modal-box">
+    <h3 id="walletModalTitle">Edit Wallet</h3>
+    <input type="hidden" id="mWalletCoin">
+    <label>Wallet address</label><input type="text" id="mWalletAddress">
+    <label>Network / chain</label><input type="text" id="mWalletNetwork" placeholder="e.g. ERC-20, Bitcoin, TRC-20">
+    <div class="btn-row">
+      <button class="cancel" onclick="closeModal('walletModal')">Cancel</button>
+      <button class="save" id="saveWalletBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var state = { user:null, isAdmin:false, users:[], deposits:[], transactions:[], withdrawals:[], wireSettings:null, wallets:{} };
+
+  function fmt(n){return '$'+(parseFloat(n)||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function fmtCompact(n){n=parseFloat(n)||0;if(n>=1e6)return '$'+(n/1e6).toFixed(1)+'M';if(n>=1e3)return '$'+(n/1e3).toFixed(1)+'K';return '$'+n.toFixed(0);}
+  function timeAgo(d){if(!d)return '';var s=Math.floor((Date.now()-new Date(d).getTime())/1000);if(s<60)return s+'s ago';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
+  function escapeHtml(s){if(!s)return '';return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function openModal(id){document.getElementById(id).classList.add('open');}
+  function closeModal(id){document.getElementById(id).classList.remove('open');}
+  window.closeModal=closeModal;
+
+  document.addEventListener('sb-ready', async function(){
+    var { data: userData } = await sb.auth.getUser();
+    if(!userData || !userData.user){ window.location.href='admin-login.html'; return; }
+    state.user = userData.user;
+
+    var { data: profile } = await sb.from('profiles').select('is_admin,email').eq('id', state.user.id).single();
+    if(!profile || !profile.is_admin){
+      // Not an admin — sign out and redirect to admin login
+      await sb.auth.signOut();
+      window.location.href = 'admin-login.html';
+      return;
+    }
+
+    state.isAdmin = true;
+    document.getElementById('mainPanel').style.display = 'block';
+    initTabs();
+    loadAll();
+  });
+
+  function initTabs(){
+    document.querySelectorAll('.admin-tab').forEach(function(t){
+      t.addEventListener('click', function(){
+        document.querySelectorAll('.admin-tab').forEach(function(x){x.classList.remove('active');});
+        document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('active');});
+        t.classList.add('active');
+        document.getElementById('panel-'+t.getAttribute('data-tab')).classList.add('active');
+      });
+    });
+  }
+
+  async function loadAll(){ loadUsers(); loadDeposits(); loadTransactions(); loadSettings(); loadWithdrawals(); }
+
+  async function loadWithdrawals(){
+    try {
+      var { data, error } = await sb.from('withdrawals').select('*').order('created_at',{ascending:false}).limit(100);
+      if(error) throw error;
+      state.withdrawals = data || [];
+      renderWithdrawals(state.withdrawals);
+    } catch(e){
+      document.getElementById('wdList').innerHTML='<div class="empty-state">No withdrawals yet or table missing</div>';
+    }
+  }
+
+  function renderWithdrawals(list){
+    var c = document.getElementById('wdList');
+    if(!list || !list.length){ c.innerHTML='<div class="empty-state">No withdrawals yet</div>'; return; }
+    c.innerHTML = list.map(function(w){
+      var s = w.status || 'pending';
+      var cls = s==='approved'?'ok':s==='rejected'?'rejected':s==='completed'?'ok':'pending';
+      var dest = w.method==='crypto' ? (w.asset||'')+' → '+(w.destination||'').slice(0,12)+'…' : (w.bank_name||'')+' •••'+(w.account_number||'').slice(-4);
+      return '<div class="deposit-card"><div class="card-top"><div class="name">'+fmt(w.amount)+' · '+(w.method||'').toUpperCase()+'</div><span class="pill '+cls+'">'+s.toUpperCase()+'</span></div><div class="card-meta"><span>🔖 '+escapeHtml(w.reference_code||'—')+'</span><span>📤 '+escapeHtml(dest)+'</span><span>📅 '+timeAgo(w.created_at)+'</span></div>'+(s==='pending'?'<div class="card-actions"><button class="action-btn approve" onclick="window._approveWithdraw(\''+w.id+'\')">Approve &amp; Deduct</button><button class="action-btn reject" onclick="window._rejectWithdraw(\''+w.id+'\')">Reject</button></div>':'')+'</div>';
+    }).join('');
+  }
+
+  window._approveWithdraw = async function(id){
+    var ok = await apexConfirm({ title:'Approve withdrawal?', body:'This deducts the amount from the user account and marks it approved.', okLabel:'Approve' });
+    if(!ok) return;
+    try {
+      var w = state.withdrawals.find(function(x){return x.id===id;});
+      if(!w) return;
+      await sb.from('withdrawals').update({status:'approved', approved_at:new Date().toISOString()}).eq('id',id);
+      var { data: profile } = await sb.from('profiles').select('cash_balance').eq('id',w.user_id).single();
+      var newBal = Math.max(0, parseFloat(profile.cash_balance||0) - parseFloat(w.amount));
+      await sb.from('profiles').update({cash_balance:newBal}).eq('id',w.user_id);
+      apexSuccess('Withdrawal approved and balance deducted');
+      loadWithdrawals(); loadUsers();
+    } catch(e){ apexError('Failed: '+e.message); }
+  };
+
+  window._rejectWithdraw = async function(id){
+    var ok = await apexConfirm({ title:'Reject withdrawal?', body:'User will not be charged. Are you sure?', okLabel:'Reject', danger:true });
+    if(!ok) return;
+    try { await sb.from('withdrawals').update({status:'rejected'}).eq('id',id); apexSuccess('Withdrawal rejected'); loadWithdrawals(); }
+    catch(e){ apexError('Failed: '+e.message); }
+  };
+
+  document.getElementById('wdSearch').addEventListener('input', function(e){
+    var q = e.target.value.toLowerCase();
+    renderWithdrawals(state.withdrawals.filter(function(w){return (w.reference_code||'').toLowerCase().includes(q)||(w.user_id||'').toLowerCase().includes(q);}));
+  });
+
+  async function loadUsers(){
+    try {
+      var { data, error } = await sb.from('profiles').select('*').order('created_at',{ascending:false});
+      if(error) throw error;
+      state.users = data || [];
+      renderUsers(state.users); updateStats();
+    } catch(e){ document.getElementById('usersList').innerHTML='<div class="empty-state">⚠️ '+escapeHtml(e.message||'Could not load users')+'</div>'; }
+  }
+
+  function renderUsers(list){
+    var c = document.getElementById('usersList');
+    if(!list || !list.length){ c.innerHTML='<div class="empty-state">No users yet</div>'; return; }
+    c.innerHTML = list.map(function(u){
+      var kyc = u.kyc_status || 'pending';
+      var kycCls = kyc==='verified'?'ok':kyc==='rejected'?'rejected':'warn';
+      var name = [u.first_name,u.last_name].filter(Boolean).join(' ') || u.email || 'Unknown';
+      return '<div class="user-card"><div class="card-top"><div class="name">'+escapeHtml(name)+(u.is_admin?' <span class="pill ok">ADMIN</span>':'')+'</div><span class="pill '+kycCls+'">'+kyc.toUpperCase()+'</span></div><div class="card-meta"><span>✉️ '+escapeHtml(u.email||'')+'</span><span>💰 '+fmt(u.cash_balance)+'</span><span>📅 '+timeAgo(u.created_at)+'</span></div><div class="card-actions"><button class="action-btn edit" onclick="window._editUser(\''+u.id+'\')">Edit</button>'+(kyc!=='verified'?'<button class="action-btn approve" onclick="window._approveKyc(\''+u.id+'\')">Approve KYC</button>':'')+'</div></div>';
+    }).join('');
+  }
+
+  window._editUser = function(uid){
+    var u = state.users.find(function(x){return x.id===uid;});
+    if(!u) return;
+    document.getElementById('mUserId').value = u.id;
+    document.getElementById('mCashBalance').value = u.cash_balance || 0;
+    document.getElementById('mKycStatus').value = u.kyc_status || 'pending';
+    document.getElementById('mIsAdmin').value = u.is_admin ? 'true' : 'false';
+    openModal('userModal');
+  };
+
+  window._approveKyc = async function(uid){
+    try { await sb.from('profiles').update({kyc_status:'verified'}).eq('id',uid); loadUsers(); }
+    catch(e){ alert('Failed: '+e.message); }
+  };
+
+  document.getElementById('saveUserBtn').addEventListener('click', async function(){
+    var uid = document.getElementById('mUserId').value;
+    var updates = {
+      cash_balance: parseFloat(document.getElementById('mCashBalance').value) || 0,
+      kyc_status: document.getElementById('mKycStatus').value,
+      is_admin: document.getElementById('mIsAdmin').value === 'true'
+    };
+    try { await sb.from('profiles').update(updates).eq('id',uid); closeModal('userModal'); loadUsers(); }
+    catch(e){ alert('Save failed: '+e.message); }
+  });
+
+  document.getElementById('userSearch').addEventListener('input', function(e){
+    var q = e.target.value.toLowerCase();
+    renderUsers(state.users.filter(function(u){return (u.email||'').toLowerCase().includes(q)||(u.first_name||'').toLowerCase().includes(q)||(u.last_name||'').toLowerCase().includes(q);}));
+  });
+
+  async function loadDeposits(){
+    try {
+      var { data, error } = await sb.from('deposits').select('*').order('created_at',{ascending:false}).limit(100);
+      if(error) throw error;
+      state.deposits = data || [];
+      renderDeposits(state.deposits); updateStats();
+    } catch(e){ document.getElementById('depositsList').innerHTML='<div class="empty-state">No deposits yet</div>'; }
+  }
+
+  function renderDeposits(list){
+    var c = document.getElementById('depositsList');
+    if(!list || !list.length){ c.innerHTML='<div class="empty-state">No deposits yet</div>'; return; }
+    c.innerHTML = list.map(function(d){
+      var s = d.status || 'pending';
+      var cls = s==='approved'?'ok':s==='rejected'?'rejected':'pending';
+      return '<div class="deposit-card"><div class="card-top"><div class="name">'+fmt(d.amount)+' · '+(d.method||'wire').toUpperCase()+'</div><span class="pill '+cls+'">'+s.toUpperCase()+'</span></div><div class="card-meta"><span>🔖 '+escapeHtml(d.reference_code||'—')+'</span><span>👤 '+escapeHtml((d.user_id||'').slice(0,8))+'…</span><span>📅 '+timeAgo(d.created_at)+'</span></div>'+(d.proof_url?'<div class="proof-row"><button class="proof-btn" onclick="window._viewProof(\''+d.proof_url+'\')">📎 View Payment Proof</button></div>':'')+(d.notes?'<div class="dep-notes">📝 '+escapeHtml(d.notes)+'</div>':'')+((s==='pending'||s==='awaiting_review')?'<div class="card-actions"><button class="action-btn approve" onclick="window._approveDeposit(\''+d.id+'\')">Approve &amp; Credit</button><button class="action-btn reject" onclick="window._rejectDeposit(\''+d.id+'\')">Reject</button></div>':'')+'</div>';
+    }).join('');
+  }
+
+  window._approveDeposit = async function(id){
+    if(!confirm('Approve this deposit and credit the user account?')) return;
+    try {
+      var dep = state.deposits.find(function(x){return x.id===id;});
+      if(!dep) return;
+      await sb.from('deposits').update({status:'approved', approved_at:new Date().toISOString()}).eq('id',id);
+      var { data: profile } = await sb.from('profiles').select('cash_balance').eq('id',dep.user_id).single();
+      var newBal = parseFloat(profile.cash_balance||0) + parseFloat(dep.amount);
+      await sb.from('profiles').update({cash_balance:newBal}).eq('id',dep.user_id);
+      loadDeposits(); loadUsers();
+    } catch(e){ alert('Failed: '+e.message); }
+  };
+
+  window._viewProof = async function(path){
+    try {
+      var { data, error } = await sb.storage.from('payment-proofs').createSignedUrl(path, 300);
+      if(error) throw error;
+      var modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;cursor:pointer';
+      modal.onclick = function(){ modal.remove(); };
+      var isPdf = path.toLowerCase().endsWith('.pdf');
+      if(isPdf){
+        modal.innerHTML = '<div style="background:#0a0e14;border-radius:14px;padding:20px;max-width:500px;text-align:center"><div style="font-size:48px;margin-bottom:14px">📄</div><div style="color:#fff;font-size:14px;margin-bottom:14px">PDF Document</div><a href="'+data.signedUrl+'" target="_blank" style="display:inline-block;padding:12px 24px;background:#4a9eff;color:#000;border-radius:8px;font-weight:700;text-decoration:none">Open PDF</a><div style="margin-top:14px;color:#6a7585;font-size:12px">Tap outside to close</div></div>';
+      } else {
+        modal.innerHTML = '<img src="'+data.signedUrl+'" style="max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,0.6)">';
+      }
+      document.body.appendChild(modal);
+    } catch(e){
+      alert('Could not load proof: '+e.message);
+    }
+  };
+
+  window._rejectDeposit = async function(id){
+    if(!confirm('Reject this deposit?')) return;
+    try { await sb.from('deposits').update({status:'rejected'}).eq('id',id); loadDeposits(); }
+    catch(e){ alert('Failed: '+e.message); }
+  };
+
+  document.getElementById('depSearch').addEventListener('input', function(e){
+    var q = e.target.value.toLowerCase();
+    renderDeposits(state.deposits.filter(function(d){return (d.reference_code||'').toLowerCase().includes(q)||(d.user_id||'').toLowerCase().includes(q);}));
+  });
+
+  async function loadTransactions(){
+    try {
+      var { data, error } = await sb.from('allocations').select('*').order('created_at',{ascending:false}).limit(50);
+      if(error) throw error;
+      state.transactions = data || [];
+      renderTransactions(state.transactions); updateStats();
+    } catch(e){ document.getElementById('txList').innerHTML='<div class="empty-state">No allocations yet</div>'; }
+  }
+
+  function renderTransactions(list){
+    var c = document.getElementById('txList');
+    if(!list || !list.length){ c.innerHTML='<div class="empty-state">No activity yet</div>'; return; }
+    c.innerHTML = list.map(function(t){
+      return '<div class="tx-card"><div class="card-top"><div class="name">'+escapeHtml(t.company_name||t.company||'Unknown')+' · '+(t.shares||0)+' shares</div><span class="pill ok">'+fmt(t.total_value)+'</span></div><div class="card-meta"><span>🏷 '+escapeHtml(t.tier||'standard')+'</span><span>👤 '+escapeHtml((t.user_id||'').slice(0,8))+'…</span><span>📅 '+timeAgo(t.created_at)+'</span></div></div>';
+    }).join('');
+  }
+
+  function updateStats(){
+    document.getElementById('statUsers').textContent = state.users.length;
+    document.getElementById('statPendingKyc').textContent = state.users.filter(function(u){return (u.kyc_status||'pending')==='pending';}).length;
+    document.getElementById('statPendingDep').textContent = state.deposits.filter(function(d){return (d.status||'pending')==='pending';}).length;
+    var vol = state.transactions.reduce(function(s,t){return s+parseFloat(t.total_value||0);},0);
+    document.getElementById('statVolume').textContent = fmtCompact(vol);
+  }
+
+  async function loadSettings(){
+    try { var { data } = await sb.from('wire_settings').select('*').limit(1).single(); state.wireSettings = data; renderWire(); }
+    catch(e){ document.getElementById('wireDisplay').innerHTML='<em style="color:#6a7585">Not configured yet. Click Edit.</em>'; }
+
+    try { var { data: wallets } = await sb.from('wallet_settings').select('*'); (wallets||[]).forEach(function(w){state.wallets[w.coin]=w;}); renderWallets(); }
+    catch(e){ document.getElementById('walletsDisplay').innerHTML='<em style="color:#6a7585">Not configured yet.</em>'; }
+  }
+
+  function renderWire(){
+    var w = state.wireSettings;
+    if(!w){ document.getElementById('wireDisplay').innerHTML='<em style="color:#6a7585">Not configured yet</em>'; return; }
+    document.getElementById('wireDisplay').innerHTML = '<div><strong>Bank:</strong> '+escapeHtml(w.bank_name||'—')+'</div><div><strong>Routing:</strong> '+escapeHtml(w.routing_number||'—')+'</div><div><strong>Account:</strong> '+escapeHtml(w.account_number||'—')+'</div><div><strong>SWIFT:</strong> '+escapeHtml(w.swift_code||'—')+'</div><div><strong>Beneficiary:</strong> '+escapeHtml(w.beneficiary_name||'—')+'</div><div><strong>Address:</strong> '+escapeHtml(w.bank_address||'—')+'</div>';
+  }
+
+  function renderWallets(){
+    var coins = ['BTC','ETH','USDT','USDC'];
+    document.getElementById('walletsDisplay').innerHTML = coins.map(function(c){
+      var w = state.wallets[c];
+      if(!w) return '<div style="font-size:12px;color:#6a7585"><strong>'+c+':</strong> not set</div>';
+      return '<div style="font-size:12px;color:#a8b2c1;margin-bottom:6px"><strong style="color:#fff">'+c+'</strong> ('+escapeHtml(w.network||'—')+'): <code style="color:#4a9eff;word-break:break-all">'+escapeHtml(w.address||'—')+'</code></div>';
+    }).join('');
+  }
+
+  document.getElementById('editWireBtn').addEventListener('click', function(){
+    var w = state.wireSettings || {};
+    document.getElementById('wBankName').value = w.bank_name || '';
+    document.getElementById('wRouting').value = w.routing_number || '';
+    document.getElementById('wAccount').value = w.account_number || '';
+    document.getElementById('wSwift').value = w.swift_code || '';
+    document.getElementById('wBeneficiary').value = w.beneficiary_name || '';
+    document.getElementById('wBankAddress').value = w.bank_address || '';
+    openModal('wireModal');
+  });
+
+  document.getElementById('saveWireBtn').addEventListener('click', async function(){
+    var payload = {
+      bank_name: document.getElementById('wBankName').value.trim(),
+      routing_number: document.getElementById('wRouting').value.trim(),
+      account_number: document.getElementById('wAccount').value.trim(),
+      swift_code: document.getElementById('wSwift').value.trim(),
+      beneficiary_name: document.getElementById('wBeneficiary').value.trim(),
+      bank_address: document.getElementById('wBankAddress').value.trim(),
+      updated_at: new Date().toISOString()
+    };
+    try {
+      if(state.wireSettings && state.wireSettings.id) await sb.from('wire_settings').update(payload).eq('id', state.wireSettings.id);
+      else await sb.from('wire_settings').insert(payload);
+      closeModal('wireModal'); loadSettings();
+    } catch(e){ alert('Save failed: '+e.message); }
+  });
+
+  document.querySelectorAll('[data-wallet]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var coin = b.getAttribute('data-wallet');
+      var w = state.wallets[coin] || {};
+      document.getElementById('walletModalTitle').textContent = 'Edit '+coin+' Wallet';
+      document.getElementById('mWalletCoin').value = coin;
+      document.getElementById('mWalletAddress').value = w.address || '';
+      document.getElementById('mWalletNetwork').value = w.network || '';
+      openModal('walletModal');
+    });
+  });
+
+  document.getElementById('saveWalletBtn').addEventListener('click', async function(){
+    var coin = document.getElementById('mWalletCoin').value;
+    var payload = {
+      coin: coin,
+      address: document.getElementById('mWalletAddress').value.trim(),
+      network: document.getElementById('mWalletNetwork').value.trim(),
+      updated_at: new Date().toISOString()
+    };
+    try {
+      var existing = state.wallets[coin];
+      if(existing && existing.id) await sb.from('wallet_settings').update(payload).eq('id', existing.id);
+      else await sb.from('wallet_settings').insert(payload);
+      closeModal('walletModal'); loadSettings();
+    } catch(e){ alert('Save failed: '+e.message); }
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async function(){
+    if(!confirm('Sign out of admin panel?')) return;
+    await sb.auth.signOut();
+    window.location.href = 'login.html';
+  });
+
+})();
+</script>
+
+<script src="js/floating-widget.js?v=1781343118" defer></script>
+</body>
+</html>
