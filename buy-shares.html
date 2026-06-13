@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Reserve Shares | APEX IPO ACCESS</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
-<script src="js/supabase.js?v=1781218671"></script>
+<script src="js/supabase.js?v=100"></script>
 <script src="js/notify.js?v=1"></script>
-<script src="js/sidebar.js?v=1781345031"></script>
+<script src="js/sidebar.js?v=200"></script>
 <script>
-  // Auth guard
   document.addEventListener('sb-ready', async () => {
     const { data } = await sb.auth.getUser();
     if(!data.user) window.location.href = 'login.html';
@@ -18,267 +18,704 @@
 </script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
-  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
   a{color:inherit;text-decoration:none}
 
-  /* HEADER */
-  .top-bar{
+  .dash-header{
     position:sticky;top:0;z-index:100;
     background:rgba(0,0,0,0.92);backdrop-filter:blur(20px);
     border-bottom:1px solid rgba(255,255,255,0.08);
     padding:16px 20px;
     display:flex;justify-content:space-between;align-items:center;
   }
+  .menu-btn{width:38px;height:38px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;cursor:pointer}
+  .menu-btn span{width:22px;height:2px;background:#4a9eff;display:block;border-radius:2px}
+  .header-icons{display:flex;gap:10px;align-items:center}
+  .icon-btn{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;color:#4a9eff;background:none;cursor:pointer}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo-x{height:32px}
+  .logo-text-stack{display:flex;flex-direction:column;line-height:1}
+  .logo-line1{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#fff;letter-spacing:2px}
+  .logo-line2{font-size:7px;color:#4a9eff;letter-spacing:3px;font-weight:600}
+  .logo-tagline{font-size:5.5px;color:#6a7585;letter-spacing:2.5px;margin-top:1px}
+
+  .wrap{max-width:560px;margin:0 auto;padding:18px 20px 120px}
+
   .back-btn{
-    width:38px;height:38px;border-radius:50%;
-    border:1px solid rgba(255,255,255,0.15);
-    display:flex;align-items:center;justify-content:center;
-    color:#4a9eff;background:none;cursor:pointer;
+    display:inline-flex;align-items:center;gap:6px;
+    color:#4a9eff;font-size:13px;font-weight:500;
+    margin-bottom:14px;cursor:pointer;
   }
-  .top-title{
-    font-family:'Plus Jakarta Sans',sans-serif;
-    font-weight:600;font-size:14px;color:#fff;letter-spacing:0.3px;
-  }
-  .top-spacer{width:38px}
+  .back-btn svg{width:16px;height:16px}
 
-  /* STEP INDICATOR */
-  .step-bar{
-    display:flex;justify-content:center;gap:8px;
-    padding:18px 20px 8px;
-  }
-  .step-dot{
-    width:34px;height:3px;border-radius:3px;
-    background:rgba(255,255,255,0.1);transition:background .2s;
-  }
-  .step-dot.active{background:#4a9eff}
-  .step-dot.done{background:#3ed598}
-
-  /* PAGE */
-  .page{max-width:560px;margin:0 auto;padding:8px 20px 140px}
-
-  .lede{text-align:center;color:#8a94a3;font-size:12px;letter-spacing:0.4px;margin-bottom:8px;text-transform:uppercase;font-weight:600}
-  h1{
-    font-family:'Plus Jakarta Sans',sans-serif;
-    font-weight:600;font-size:28px;color:#fff;
-    text-align:center;letter-spacing:-0.5px;margin-bottom:24px;
-  }
-
-  /* COMPANY CARD (top) */
+  /* Company header */
   .co-card{
-    display:flex;align-items:center;gap:14px;
-    background:rgba(255,255,255,0.04);
+    background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
     border:1px solid rgba(255,255,255,0.08);
-    border-radius:14px;padding:16px;margin-bottom:24px;
+    border-radius:16px; padding:18px;
+    margin-bottom:14px;
+    position:relative; overflow:hidden;
+  }
+  .co-card::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, #4a9eff, #3ed598, #4a9eff);
+    opacity:0.6;
+  }
+  .co-top{
+    display:flex; align-items:center; gap:14px; margin-bottom:14px;
   }
   .co-logo{
-    width:54px;height:54px;border-radius:12px;
-    background:#fff;flex-shrink:0;overflow:hidden;
-    display:flex;align-items:center;justify-content:center;padding:6px;
+    width:54px; height:54px; border-radius:12px;
+    background:#fff; padding:8px;
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
   }
-  .co-logo img{width:100%;height:100%;object-fit:contain}
-  .co-info{flex:1;min-width:0}
+  .co-logo img{ width:100%; height:100%; object-fit:contain; }
+  .co-info{ flex:1; min-width:0; }
   .co-name{
     font-family:'Plus Jakarta Sans',sans-serif;
-    font-weight:600;font-size:18px;color:#fff;letter-spacing:-0.2px;
+    font-weight:600; font-size:18px; color:#fff; letter-spacing:-0.3px;
   }
-  .co-sector{font-size:12px;color:#8a94a3;margin-top:2px}
-  .co-price{text-align:right;flex-shrink:0}
-  .co-price .val{
-    font-family:'Plus Jakarta Sans',sans-serif;
-    font-weight:600;font-size:18px;color:#fff;
-  }
-  .co-price .lbl{font-size:11px;color:#8a94a3;margin-top:2px}
-
-  /* TIER SELECTOR */
-  .section-h{
-    font-size:13px;color:#a8b2c1;font-weight:600;
-    letter-spacing:0.3px;margin:24px 0 10px;
-  }
-  .tier-list{display:flex;flex-direction:column;gap:10px}
-  .tier{
-    background:rgba(255,255,255,0.03);
-    border:1px solid rgba(255,255,255,0.1);
-    border-radius:12px;padding:14px 16px;
-    cursor:pointer;transition:all .15s;
-    position:relative;
-  }
-  .tier:hover{border-color:rgba(74,158,255,0.4)}
-  .tier.selected{
-    border-color:#4a9eff;
-    background:linear-gradient(135deg,rgba(74,158,255,0.1),rgba(74,158,255,0.03));
-  }
-  .tier-top{
-    display:flex;justify-content:space-between;align-items:center;gap:10px;
-  }
-  .tier-name{
-    font-family:'Plus Jakarta Sans',sans-serif;
-    font-weight:600;font-size:15px;color:#fff;
-    display:flex;align-items:center;gap:8px;
-  }
-  .tier-badge{
-    font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;
-    text-transform:uppercase;letter-spacing:0.5px;
-  }
-  .tier-badge.std  {background:rgba(255,255,255,0.08);color:#cfd8e8}
-  .tier-badge.pri  {background:rgba(74,158,255,0.15);color:#4a9eff}
-  .tier-badge.inst {background:rgba(255,184,0,0.15);color:#ffb800}
-  .tier-min{font-size:13px;color:#a8b2c1;font-weight:500}
-  .tier-desc{font-size:12px;color:#8a94a3;margin-top:6px;line-height:1.4}
-  .tier-check{
-    width:22px;height:22px;border-radius:50%;
-    border:2px solid rgba(255,255,255,0.2);
-    display:flex;align-items:center;justify-content:center;
+  .co-sector{ font-size:11px; color:#8a94a3; margin-top:2px; }
+  .co-ticker{
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(0,0,0,0.4);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:6px; padding:4px 8px;
+    font-family:'JetBrains Mono',monospace;
     flex-shrink:0;
   }
-  .tier.selected .tier-check{background:#4a9eff;border-color:#4a9eff}
-  .tier.selected .tier-check::after{
-    content:"";width:8px;height:5px;
-    border-left:2px solid #000;border-bottom:2px solid #000;
-    transform:rotate(-45deg) translate(0,-1px);
+  .co-ticker .lbl{ font-size:9px; color:#6a7585; letter-spacing:0.8px; padding-right:6px; border-right:1px solid rgba(255,255,255,0.1); }
+  .co-ticker .sym{ font-size:11px; font-weight:700; color:#4a9eff; letter-spacing:1px; }
+
+  .co-stats{
+    display:grid; grid-template-columns:repeat(3, 1fr);
+    gap:12px; padding-top:14px;
+    border-top:1px solid rgba(255,255,255,0.06);
+  }
+  .co-stat{ min-width:0; }
+  .co-stat .lbl{
+    font-size:9px; color:#6a7585; text-transform:uppercase;
+    letter-spacing:1.1px; font-weight:700; margin-bottom:4px;
+  }
+  .co-stat .val{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600; font-size:14px; color:#fff;
+    font-feature-settings:"tnum";
+  }
+  .co-stat .val.green{ color:#3ed598; }
+
+  /* Section header */
+  .section-h{
+    font-size:11px; color:#a8b2c1; font-weight:700;
+    text-transform:uppercase; letter-spacing:1.2px;
+    margin:18px 0 10px;
+    display:flex; align-items:center; gap:6px;
+  }
+  .section-h svg{ width:14px; height:14px; color:#4a9eff; }
+
+  /* Returns table */
+  .returns-table{
+    background:rgba(62,213,152,0.05);
+    border:1px solid rgba(62,213,152,0.18);
+    border-radius:12px;
+    overflow:hidden;
+    margin-bottom:14px;
+  }
+  .returns-row{
+    display:grid; grid-template-columns:repeat(3, 1fr);
+  }
+  .returns-cell{
+    padding:14px 8px; text-align:center;
+    border-right:1px solid rgba(62,213,152,0.1);
+  }
+  .returns-cell:last-child{ border-right:none; }
+  .returns-cell .period{
+    font-size:10px; color:#a8b2c1; text-transform:uppercase;
+    letter-spacing:1px; font-weight:600;
+  }
+  .returns-cell .pct{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:16px; font-weight:700; color:#3ed598;
+    margin-top:4px;
   }
 
-  /* AMOUNT INPUT */
+  /* Holding period chips */
+  .period-row{
+    display:grid; grid-template-columns:repeat(3, 1fr);
+    gap:8px; margin-bottom:16px;
+  }
+  .period-chip{
+    background:rgba(255,255,255,0.04);
+    border:1.5px solid rgba(255,255,255,0.1);
+    border-radius:11px; padding:12px 8px;
+    cursor:pointer; transition:all .15s;
+    text-align:center;
+  }
+  .period-chip:hover{ border-color:rgba(74,158,255,0.35); }
+  .period-chip.selected{
+    border-color:#4a9eff;
+    background:linear-gradient(135deg, rgba(74,158,255,0.15), rgba(74,158,255,0.04));
+  }
+  .period-chip .pc-time{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600; font-size:14px; color:#fff;
+  }
+  .period-chip .pc-return{
+    font-size:10px; color:#3ed598; font-weight:600;
+    margin-top:3px;
+  }
+
+  /* Amount input */
   .amount-box{
     background:rgba(255,255,255,0.03);
     border:1px solid rgba(255,255,255,0.1);
-    border-radius:14px;padding:18px;margin-top:8px;
+    border-radius:14px; padding:18px;
+    margin-bottom:12px;
   }
-  .amount-row{
-    display:flex;align-items:center;justify-content:space-between;gap:14px;
-  }
+  .amount-row{ display:flex; align-items:center; gap:14px; }
+  .amount-prefix{ font-size:24px; color:#8a94a3; font-weight:500; }
   .amount-input{
-    background:transparent;border:none;color:#fff;
+    flex:1; background:transparent; border:none; color:#fff;
     font-family:'Plus Jakarta Sans',sans-serif;
-    font-weight:600;font-size:32px;letter-spacing:-0.5px;
-    width:100%;outline:none;
-    font-feature-settings:"tnum";
+    font-weight:500; font-size:28px; letter-spacing:-0.5px;
+    outline:none; font-feature-settings:"tnum";
+    -moz-appearance:textfield;
   }
   .amount-input::-webkit-outer-spin-button,
   .amount-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-  .amount-suffix{
-    font-size:13px;color:#8a94a3;flex-shrink:0;letter-spacing:0.3px;
-  }
   .amount-meta{
-    display:flex;justify-content:space-between;
-    margin-top:12px;padding-top:12px;
-    border-top:1px solid rgba(255,255,255,0.06);
-    font-size:12px;color:#8a94a3;
+    display:flex; justify-content:space-between;
+    font-size:11px; color:#6a7585; margin-top:10px;
   }
-  .amount-meta .v{color:#fff;font-weight:500}
+  .amount-meta .v{ color:#a8b2c1; font-weight:500; }
 
-  /* QUICK AMOUNT BUTTONS */
   .quick-row{
-    display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
-    margin-top:12px;
+    display:grid; grid-template-columns:repeat(4, 1fr);
+    gap:8px; margin-bottom:16px;
   }
   .quick-btn{
     background:rgba(74,158,255,0.06);
     border:1px solid rgba(74,158,255,0.18);
-    color:#4a9eff;font-size:12px;font-weight:600;
-    padding:9px;border-radius:8px;cursor:pointer;font-family:inherit;
+    color:#4a9eff; font-size:12px; font-weight:600;
+    padding:9px; border-radius:8px; cursor:pointer;
+    font-family:inherit; transition:all .15s;
   }
-  .quick-btn:hover{background:rgba(74,158,255,0.12)}
+  .quick-btn:hover{ background:rgba(74,158,255,0.12); }
 
-  /* TOTAL SUMMARY */
-  .total-card{
-    background:linear-gradient(135deg,rgba(74,158,255,0.08),rgba(74,158,255,0.02));
+  /* Summary card */
+  .summary{
+    background:linear-gradient(135deg, rgba(74,158,255,0.08), rgba(74,158,255,0.02));
     border:1px solid rgba(74,158,255,0.2);
-    border-radius:14px;padding:16px 18px;margin-top:18px;
+    border-radius:14px; padding:16px 18px;
+    margin-bottom:14px;
   }
-  .total-row{
-    display:flex;justify-content:space-between;align-items:center;
-    font-size:13px;color:#a8b2c1;padding:5px 0;
+  .summary-row{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:7px 0; font-size:13px; color:#a8b2c1;
   }
-  .total-row .v{color:#fff;font-weight:500;font-feature-settings:"tnum"}
-  .total-row.big{
-    padding-top:12px;margin-top:6px;
-    border-top:1px solid rgba(255,255,255,0.06);
-    font-size:15px;
-  }
-  .total-row.big .lbl{font-weight:600;color:#fff}
-  .total-row.big .v{
-    font-family:'Plus Jakarta Sans',sans-serif;
-    font-weight:700;font-size:20px;color:#4a9eff;
-  }
-  .bonus-line{
-    display:flex;align-items:center;gap:6px;
-    font-size:11px;color:#3ed598;font-weight:600;
-    margin-top:8px;padding-top:8px;
-    border-top:1px dashed rgba(62,213,152,0.2);
-  }
-  .bonus-line svg{width:12px;height:12px}
-
-  /* ERROR */
-  .err{
-    text-align:center;color:#ff6a6a;font-size:13px;
-    margin:14px 0 0;min-height:16px;font-weight:500;
-  }
-
-  /* CONTINUE BAR */
-  .continue-bar{
-    position:fixed;bottom:0;left:0;right:0;
-    background:rgba(0,0,0,0.95);backdrop-filter:blur(20px);
-    padding:18px 20px 28px;
+  .summary-row .v{ color:#fff; font-weight:500; font-feature-settings:"tnum"; }
+  .summary-row.green .v{ color:#3ed598; font-weight:600; }
+  .summary-row.total{
+    padding-top:12px; margin-top:6px; font-size:15px;
     border-top:1px solid rgba(255,255,255,0.08);
-    z-index:50;
   }
-  .continue-btn{
-    display:block;width:100%;max-width:520px;margin:0 auto;
-    background:#4a9eff;color:#000;
-    padding:16px;text-align:center;
+  .summary-row.total .lbl{ color:#fff; font-weight:600; }
+  .summary-row.total .v{
     font-family:'Plus Jakarta Sans',sans-serif;
-    font-size:15px;font-weight:600;
-    border:none;cursor:pointer;border-radius:12px;
-    transition:background .15s;
+    font-weight:700; font-size:20px; color:#4a9eff;
   }
-  .continue-btn:hover{background:#6db1ff}
-  .continue-btn:disabled{background:#2a2f38;color:#5a6473;cursor:not-allowed}
+
+  /* CTA */
+  .cta-btn{
+    display:block; width:100%;
+    background:linear-gradient(135deg, #4a9eff, #357abd);
+    color:#fff; padding:16px;
+    border:none; border-radius:12px;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:15px; font-weight:600; cursor:pointer;
+    transition:all .15s;
+    box-shadow:0 8px 20px rgba(74,158,255,0.25);
+    margin-top:8px;
+  }
+  .cta-btn:hover{ transform:translateY(-1px); box-shadow:0 12px 28px rgba(74,158,255,0.35); }
+  .cta-btn:disabled{ opacity:0.4; cursor:not-allowed; transform:none; box-shadow:none; }
+
+  .legal-note{
+    text-align:center; font-size:11px; color:#6a7585;
+    margin-top:12px; line-height:1.4;
+  }
 
   .skel{
-    background:linear-gradient(90deg,rgba(255,255,255,0.04),rgba(255,255,255,0.08),rgba(255,255,255,0.04));
-    background-size:200% 100%;animation:sk 1.4s infinite;
-    border-radius:6px;color:transparent;
+    background:linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+    background-size:200% 100%; animation:sk 1.4s infinite;
+    border-radius:6px; color:transparent; display:inline-block; min-width:60px;
   }
-  @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
-  /* HOLDING PERIOD SELECTOR */
-  .hold-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:4px}
-  .hold-opt{
-    background:rgba(255,255,255,0.03);
-    border:1px solid rgba(255,255,255,0.1);
-    border-radius:12px;padding:12px 14px;
-    cursor:pointer;transition:all .15s;text-align:left;
-    font-family:inherit;color:#fff;
-  }
-  .hold-opt:hover{border-color:rgba(74,158,255,0.4)}
-  .hold-opt.selected{
-    border-color:#4a9eff;
-    background:linear-gradient(135deg,rgba(74,158,255,0.1),rgba(74,158,255,0.03));
-  }
-  .hold-name{
-    font-family:'Plus Jakarta Sans',sans-serif;
-    font-weight:600;font-size:14px;color:#fff;
-    display:flex;align-items:center;gap:6px;
-  }
-  .hold-perk{font-size:11px;color:#3ed598;font-weight:600;margin-top:4px}
-  .hold-period{font-size:11px;color:#8a94a3;margin-top:2px}
+  @keyframes sk{ 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 </style>
+</head>
+<body>
 
+<header class="dash-header">
+  <button class="menu-btn" aria-label="Menu" onclick="toggleSidebar && toggleSidebar()">
+    <span></span><span></span><span></span>
+  </button>
+  <a href="dashboard.html" class="logo">
+    <img src="assets/spacex-logo.png" class="logo-x" alt="X" />
+    <div class="logo-text-stack">
+      <span class="logo-line1">APEX</span>
+      <span class="logo-line2">IPO ACCESS</span>
+      <span class="logo-tagline">RESERVE SHARES</span>
+    </div>
+  </a>
+  <div class="header-icons">
+    <button class="icon-btn" aria-label="Notifications" onclick="window.apexToast && window.apexToast('Notifications coming soon')">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+    </button>
+  </div>
+</header>
 
+<div class="wrap">
 
+  <a href="ipos.html" class="back-btn">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    Back to IPOs
+  </a>
 
+  <!-- ───────── COMPANY HEADER ───────── -->
+  <div class="co-card">
+    <div class="co-top">
+      <div class="co-logo">
+        <img id="coLogo" src="assets/spacex-logo.png" alt="">
+      </div>
+      <div class="co-info">
+        <div class="co-name" id="coName"><span class="skel">Loading…</span></div>
+        <div class="co-sector" id="coSector"><span class="skel">·····</span></div>
+      </div>
+      <div class="co-ticker">
+        <span class="lbl">PRE-IPO</span>
+        <span class="sym" id="coTicker">—</span>
+      </div>
+    </div>
 
+    <div class="co-stats">
+      <div class="co-stat">
+        <div class="lbl">Share Price</div>
+        <div class="val" id="coPrice">$0.00</div>
+      </div>
+      <div class="co-stat">
+        <div class="lbl">Valuation</div>
+        <div class="val" id="coValuation">—</div>
+      </div>
+      <div class="co-stat">
+        <div class="lbl">Status</div>
+        <div class="val green" id="coStatus">Live</div>
+      </div>
+    </div>
+  </div>
 
+  <!-- ───────── PROJECTED RETURNS TABLE ───────── -->
+  <div class="section-h">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+    Projected Returns
+  </div>
 
+  <div class="returns-table">
+    <div class="returns-row">
+      <div class="returns-cell">
+        <div class="period">3 Months</div>
+        <div class="pct">35–60%</div>
+      </div>
+      <div class="returns-cell">
+        <div class="period">6 Months</div>
+        <div class="pct">40–70%</div>
+      </div>
+      <div class="returns-cell">
+        <div class="period">12 Months</div>
+        <div class="pct">50–80%</div>
+      </div>
+    </div>
+  </div>
 
+  <!-- ───────── HOLDING PERIOD ───────── -->
+  <div class="section-h">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    Select Holding Period
+  </div>
 
+  <div class="period-row">
+    <div class="period-chip" data-period="3m" data-min="35" data-max="60">
+      <div class="pc-time">3 Months</div>
+      <div class="pc-return">35–60%</div>
+    </div>
+    <div class="period-chip selected" data-period="6m" data-min="40" data-max="70">
+      <div class="pc-time">6 Months</div>
+      <div class="pc-return">40–70%</div>
+    </div>
+    <div class="period-chip" data-period="12m" data-min="50" data-max="80">
+      <div class="pc-time">12 Months</div>
+      <div class="pc-return">50–80%</div>
+    </div>
+  </div>
 
+  <!-- ───────── AMOUNT ───────── -->
+  <div class="section-h">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    Amount to Invest
+  </div>
 
+  <div class="amount-box">
+    <div class="amount-row">
+      <span class="amount-prefix">$</span>
+      <input type="number" class="amount-input" id="amount" placeholder="500" min="500" step="100" inputmode="decimal">
+    </div>
+    <div class="amount-meta">
+      <span>Minimum: <span class="v">$500</span></span>
+      <span>Available: <span class="v" id="availBal">$0.00</span></span>
+    </div>
+  </div>
 
+  <div class="quick-row">
+    <button class="quick-btn" data-amount="500">$500</button>
+    <button class="quick-btn" data-amount="1000">$1K</button>
+    <button class="quick-btn" data-amount="5000">$5K</button>
+    <button class="quick-btn" data-pct="100">Max</button>
+  </div>
 
+  <!-- ───────── ORDER SUMMARY ───────── -->
+  <div class="section-h">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
+    Order Summary
+  </div>
 
+  <div class="summary">
+    <div class="summary-row">
+      <span>Shares</span>
+      <span class="v" id="sumShares">0 SPCX</span>
+    </div>
+    <div class="summary-row">
+      <span>Price per share</span>
+      <span class="v" id="sumPrice">$0.00</span>
+    </div>
+    <div class="summary-row">
+      <span>Holding period</span>
+      <span class="v" id="sumPeriod">6 Months</span>
+    </div>
+    <div class="summary-row green">
+      <span>Projected return</span>
+      <span class="v" id="sumReturn">$0.00 – $0.00</span>
+    </div>
+    <div class="summary-row total">
+      <span class="lbl">Total cost</span>
+      <span class="v" id="sumTotal">$0.00</span>
+    </div>
+  </div>
 
+  <button class="cta-btn" id="ctaBtn" disabled>Reserve Shares</button>
+  <p class="legal-note">Pre-IPO securities held via SPV · Subject to compliance review · Liquidity at IPO event</p>
+
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar && toggleSidebar()"></div>
+<div class="sidebar" id="sidebar"></div>
+
+<script>
+(function(){
+  // ─────────────────────────────────────────────
+  // URL params
+  // ─────────────────────────────────────────────
+  var params = new URLSearchParams(window.location.search);
+  var ticker = (params.get('ticker') || params.get('id') || 'SPCX').toUpperCase();
+
+  // ─────────────────────────────────────────────
+  // State
+  // ─────────────────────────────────────────────
+  var state = {
+    company: null,           // loaded from DB
+    price: 135,              // default SpaceX price
+    name: 'SpaceX',
+    sector: 'Aerospace · Pre-IPO',
+    valuation: '$400B',
+    logo: 'assets/spacex-logo.png',
+    availCash: 0,
+    amount: 0,
+    period: '6m',
+    returnMin: 40,
+    returnMax: 70,
+    periodLabel: '6 Months'
+  };
+
+  // ─────────────────────────────────────────────
+  // Helpers
+  // ─────────────────────────────────────────────
+  function fmt(n){
+    return '$' + (parseFloat(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function fmtCompact(n){
+    n = parseFloat(n) || 0;
+    if(n >= 1e9) return '$' + (n/1e9).toFixed(1) + 'B';
+    if(n >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M';
+    if(n >= 1e3) return '$' + (n/1e3).toFixed(1) + 'K';
+    return '$' + n.toFixed(0);
+  }
+
+  // ─────────────────────────────────────────────
+  // Render company info
+  // ─────────────────────────────────────────────
+  function renderCompany(){
+    document.getElementById('coName').textContent = state.name;
+    document.getElementById('coName').classList.remove('skel');
+    document.getElementById('coSector').textContent = state.sector;
+    document.getElementById('coSector').innerHTML = state.sector;
+    document.getElementById('coTicker').textContent = ticker;
+    document.getElementById('coPrice').textContent = fmt(state.price);
+    document.getElementById('coValuation').textContent = state.valuation;
+    document.getElementById('coLogo').src = state.logo;
+    document.title = 'Reserve ' + state.name + ' Shares | APEX IPO ACCESS';
+  }
+
+  // ─────────────────────────────────────────────
+  // Render summary
+  // ─────────────────────────────────────────────
+  function renderSummary(){
+    var amt = state.amount;
+    var shares = state.price > 0 ? (amt / state.price) : 0;
+    var minGain = amt * (state.returnMin / 100);
+    var maxGain = amt * (state.returnMax / 100);
+
+    document.getElementById('sumShares').textContent = shares.toFixed(2) + ' ' + ticker;
+    document.getElementById('sumPrice').textContent = fmt(state.price);
+    document.getElementById('sumPeriod').textContent = state.periodLabel;
+    document.getElementById('sumReturn').textContent = fmt(minGain) + ' – ' + fmt(maxGain);
+    document.getElementById('sumTotal').textContent = fmt(amt);
+
+    // Validate
+    var btn = document.getElementById('ctaBtn');
+    if(amt < 500){
+      btn.disabled = true;
+      btn.textContent = amt > 0 ? 'Minimum $500' : 'Enter an amount';
+    } else if(amt > state.availCash){
+      btn.disabled = true;
+      btn.textContent = 'Insufficient balance — Fund Account';
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Reserve Shares';
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // Period selection
+  // ─────────────────────────────────────────────
+  document.querySelectorAll('.period-chip').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      document.querySelectorAll('.period-chip').forEach(function(c){ c.classList.remove('selected'); });
+      chip.classList.add('selected');
+      state.period = chip.getAttribute('data-period');
+      state.returnMin = parseFloat(chip.getAttribute('data-min'));
+      state.returnMax = parseFloat(chip.getAttribute('data-max'));
+      state.periodLabel = chip.querySelector('.pc-time').textContent;
+      renderSummary();
+    });
+  });
+
+  // ─────────────────────────────────────────────
+  // Quick amount buttons
+  // ─────────────────────────────────────────────
+  document.querySelectorAll('.quick-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var amt;
+      if(b.getAttribute('data-pct')){
+        amt = Math.floor(state.availCash);
+      } else {
+        amt = parseFloat(b.getAttribute('data-amount'));
+      }
+      document.getElementById('amount').value = amt > 0 ? amt : '';
+      state.amount = amt > 0 ? amt : 0;
+      renderSummary();
+    });
+  });
+
+  // Amount input
+  document.getElementById('amount').addEventListener('input', function(e){
+    state.amount = parseFloat(e.target.value) || 0;
+    renderSummary();
+  });
+
+  // ─────────────────────────────────────────────
+  // CTA — Reserve Shares
+  // ─────────────────────────────────────────────
+  document.getElementById('ctaBtn').addEventListener('click', async function(){
+    var btn = this;
+    if(state.amount < 500){
+      apexError('Minimum investment is $500');
+      return;
+    }
+    if(state.amount > state.availCash){
+      apexError('Insufficient cash balance. Please fund your account first.');
+      setTimeout(function(){ window.location.href = 'fund-account.html'; }, 1500);
+      return;
+    }
+
+    var shares = state.amount / state.price;
+    var minGain = state.amount * (state.returnMin / 100);
+    var maxGain = state.amount * (state.returnMax / 100);
+
+    var ok = await apexConfirm({
+      title: 'Confirm reservation',
+      body: 'Reserve ' + shares.toFixed(2) + ' ' + ticker + ' shares for ' + fmt(state.amount) +
+            '\n\nHolding period: ' + state.periodLabel +
+            '\nProjected return: ' + fmt(minGain) + ' – ' + fmt(maxGain),
+      okLabel: 'Confirm Purchase'
+    });
+    if(!ok) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Processing…';
+
+    try {
+      var { data: userData } = await sb.auth.getUser();
+      if(!userData || !userData.user){ window.location.href = 'login.html'; return; }
+      var uid = userData.user.id;
+
+      // Calculate maturity date
+      var months = state.period === '3m' ? 3 : state.period === '6m' ? 6 : 12;
+      var maturesAt = new Date();
+      maturesAt.setMonth(maturesAt.getMonth() + months);
+
+      // Insert allocation
+      var { error: insErr } = await sb.from('allocations').insert({
+        user_id: uid,
+        company_ticker: ticker,
+        company_name: state.name,
+        shares: shares,
+        price_per_share: state.price,
+        total_value: state.amount,
+        holding_period: state.period,
+        projected_return_min: state.returnMin,
+        projected_return_max: state.returnMax,
+        status: 'active',
+        matures_at: maturesAt.toISOString()
+      });
+
+      if(insErr){
+        apexError('Could not reserve: ' + insErr.message);
+        btn.disabled = false;
+        btn.textContent = 'Reserve Shares';
+        return;
+      }
+
+      // Deduct from cash balance
+      var newBal = Math.max(0, state.availCash - state.amount);
+      var { error: balErr } = await sb.from('profiles')
+        .update({ cash_balance: newBal })
+        .eq('id', uid);
+
+      if(balErr){
+        apexWarn('Reserved but could not update balance — contact support');
+      }
+
+      // Save to session for receipt page
+      sessionStorage.setItem('order_company', state.name);
+      sessionStorage.setItem('order_ticker', ticker);
+      sessionStorage.setItem('order_shares', shares.toFixed(4));
+      sessionStorage.setItem('order_price', String(state.price));
+      sessionStorage.setItem('order_total', String(state.amount));
+      sessionStorage.setItem('order_period', state.periodLabel);
+      sessionStorage.setItem('order_return_min', String(minGain));
+      sessionStorage.setItem('order_return_max', String(maxGain));
+
+      apexSuccess('Reservation confirmed!');
+      setTimeout(function(){
+        window.location.href = 'buy-receipt.html';
+      }, 600);
+
+    } catch(e){
+      apexError('Reservation failed: ' + (e.message || 'unknown error'));
+      btn.disabled = false;
+      btn.textContent = 'Reserve Shares';
+    }
+  });
+
+  // ─────────────────────────────────────────────
+  // Load company data + user balance
+  // ─────────────────────────────────────────────
+  async function loadData(){
+    try {
+      // Load user balance
+      var { data: userData } = await sb.auth.getUser();
+      if(userData && userData.user){
+        var { data: profile } = await sb.from('profiles')
+          .select('cash_balance')
+          .eq('id', userData.user.id)
+          .single();
+        if(profile){
+          state.availCash = parseFloat(profile.cash_balance || 0);
+          document.getElementById('availBal').textContent = fmt(state.availCash);
+        }
+      }
+
+      // Load company from DB (by ticker)
+      try {
+        var { data: company } = await sb.from('companies')
+          .select('*')
+          .eq('ticker', ticker)
+          .single();
+
+        if(company){
+          state.company = company;
+          state.name = company.name || state.name;
+          state.price = parseFloat(company.share_price || company.price || state.price);
+          state.sector = (company.sector || 'Pre-IPO') + ' · ' + (company.stage || 'Pre-IPO');
+          state.valuation = company.valuation
+            ? (typeof company.valuation === 'number' ? fmtCompact(company.valuation) : company.valuation)
+            : state.valuation;
+          if(company.logo_url) state.logo = company.logo_url;
+        }
+      } catch(e){
+        // company not in DB — use defaults (works for SPCX)
+        console.warn('Company not found in DB, using defaults for', ticker);
+      }
+
+      // Special handling for known tickers (fallback if no DB entry)
+      if(!state.company){
+        var KNOWN = {
+          'SPCX':   { name:'SpaceX',     sector:'Aerospace · Pre-IPO',   valuation:'$400B', price:135 },
+          'OAIB':   { name:'OpenAI',     sector:'AI · Pre-IPO',          valuation:'$157B', price:85  },
+          'STRP':   { name:'Stripe',     sector:'Fintech · Pre-IPO',     valuation:'$70B',  price:42  },
+          'ANTH':   { name:'Anthropic',  sector:'AI · Pre-IPO',          valuation:'$60B',  price:65  },
+          'XAI':    { name:'xAI',        sector:'AI · Pre-IPO',          valuation:'$50B',  price:38  },
+          'NLNK':   { name:'Neuralink',  sector:'Biotech · Pre-IPO',     valuation:'$8B',   price:25  },
+          'DBRX':   { name:'Databricks', sector:'Data · Pre-IPO',        valuation:'$62B',  price:73  },
+          'CNVA':   { name:'Canva',      sector:'SaaS · Pre-IPO',        valuation:'$32B',  price:48  }
+        };
+        var k = KNOWN[ticker];
+        if(k){
+          state.name = k.name;
+          state.sector = k.sector;
+          state.valuation = k.valuation;
+          state.price = k.price;
+        }
+      }
+
+      renderCompany();
+      renderSummary();
+    } catch(e){
+      apexError('Failed to load: ' + e.message);
+    }
+  }
+
+  if(window.sb) loadData();
+  else document.addEventListener('sb-ready', loadData, { once: true });
+
+  renderSummary();
+})();
+</script>
+
+<script src="js/floating-widget.js?v=3" defer></script>
 <script src="js/bottom-nav.js?v=1"></script>
-<script src="js/floating-widget.js?v=1781343118" defer></script>
+
 </body>
 </html>
