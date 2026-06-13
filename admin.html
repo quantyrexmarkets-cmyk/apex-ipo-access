@@ -284,6 +284,101 @@
   .page.active{display:block}
 
   
+  
+  /* ================= DEPOSITS ================= */
+  .filter-bar{
+    display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;
+    padding-bottom:4px;-webkit-overflow-scrolling:touch;
+  }
+  .filter-bar::-webkit-scrollbar{display:none}
+  .filter-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:8px 14px;border-radius:9px;flex-shrink:0;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.06);
+    color:#a8b2c1;font-size:12px;font-weight:600;
+    cursor:pointer;transition:all .15s;white-space:nowrap;
+  }
+  .filter-pill:hover{color:#fff;border-color:rgba(255,255,255,0.15)}
+  .filter-pill.active{
+    background:#4a9eff;color:#000;border-color:#4a9eff;
+  }
+  .filter-pill .cnt{
+    background:rgba(0,0,0,0.2);padding:1px 6px;border-radius:6px;
+    font-size:10px;font-weight:700;
+  }
+  .filter-pill.active .cnt{background:rgba(0,0,0,0.25)}
+
+  .dep-card{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:14px;padding:14px;margin-bottom:10px;
+    transition:all .15s;
+  }
+  .dep-card.urgent{
+    border-color:rgba(255,184,0,0.3);
+    background:rgba(255,184,0,0.04);
+  }
+  .dep-top{
+    display:flex;align-items:center;gap:12px;margin-bottom:10px;
+  }
+  .dep-top .av{
+    width:36px;height:36px;border-radius:50%;
+    background:linear-gradient(135deg,#4a9eff,#3ed598);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;color:#000;font-size:13px;flex-shrink:0;
+  }
+  .dep-top .info{flex:1;min-width:0}
+  .dep-top .nm{font-size:13px;font-weight:600;color:#fff;display:flex;align-items:center;gap:6px;margin-bottom:2px}
+  .dep-top .em{font-size:11px;color:#8b95a8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dep-top .amt{
+    font-family:'Manrope',sans-serif;font-weight:700;font-size:18px;
+    color:#3ed598;letter-spacing:-0.3px;text-align:right;
+  }
+  .dep-top .amt .when{
+    display:block;font-size:10px;color:#6a7585;font-weight:500;
+    margin-top:2px;letter-spacing:0;
+  }
+
+  .dep-meta{
+    display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;
+    font-size:11px;
+  }
+  .dep-meta .chip{
+    padding:4px 10px;border-radius:7px;
+    background:rgba(255,255,255,0.04);color:#a8b2c1;
+    display:inline-flex;align-items:center;gap:5px;
+  }
+  .dep-meta .chip b{color:#fff;font-weight:600;font-family:'Manrope',sans-serif}
+
+  .dep-notes-inline{
+    margin-top:8px;padding:9px 12px;
+    background:rgba(255,255,255,0.02);
+    border-radius:8px;font-size:12px;color:#a8b2c1;line-height:1.4;
+    border-left:2px solid rgba(74,158,255,0.3);
+  }
+
+  .dep-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .dep-actions button{
+    flex:1;min-width:100px;padding:10px;border-radius:8px;
+    font-weight:600;font-size:12px;letter-spacing:0.3px;
+    display:flex;align-items:center;justify-content:center;gap:5px;
+    transition:all .15s;cursor:pointer;border:1px solid transparent;
+  }
+  .dep-actions button svg{width:13px;height:13px}
+  .dep-actions .proof{
+    background:rgba(74,158,255,0.1);color:#4a9eff;
+    border-color:rgba(74,158,255,0.3);
+  }
+  .dep-actions .proof:hover{background:rgba(74,158,255,0.18)}
+  .dep-actions .approve{background:#3ed598;color:#000}
+  .dep-actions .approve:hover{background:#5ce0a8}
+  .dep-actions .reject{
+    background:rgba(255,106,106,0.1);color:#ff6a6a;
+    border-color:rgba(255,106,106,0.3);
+  }
+  .dep-actions .reject:hover{background:rgba(255,106,106,0.18)}
+
   /* ================= USER MODAL ================= */
   .modal-overlay{
     position:fixed;inset:0;background:rgba(0,0,0,0.75);
@@ -641,7 +736,24 @@
   <section class="page" id="page-deposits">
     <div class="page-h">Customer Deposits</div>
     <div class="page-sub">Review and approve pending deposits</div>
-    <div id="depList"><div class="empty">Coming in Phase 3</div></div>
+
+    <div class="filter-bar">
+      <button class="filter-pill active" data-filter="all">All <span class="cnt" id="cntAll">0</span></button>
+      <button class="filter-pill" data-filter="awaiting_review">Pending Review <span class="cnt" id="cntPend">0</span></button>
+      <button class="filter-pill" data-filter="approved">Approved <span class="cnt" id="cntAppr">0</span></button>
+      <button class="filter-pill" data-filter="rejected">Rejected <span class="cnt" id="cntRej">0</span></button>
+    </div>
+
+    <div class="search-row">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" id="depSearch" placeholder="Search by user, amount, ref code...">
+      </div>
+    </div>
+
+    <div id="depList">
+      <div class="loading"><div class="spin"></div><div>Loading deposits...</div></div>
+    </div>
   </section>
 
   <!-- WITHDRAWALS PAGE -->
@@ -862,7 +974,189 @@
     var { data } = await sb.from('deposits').select('*').order('created_at',{ascending:false});
     state.deposits = data || [];
     renderStats();
+    renderDeposits();
   }
+
+  // ============ DEPOSITS PAGE ============
+  var depFilter = 'all';
+
+  document.querySelectorAll('.filter-pill').forEach(function(p){
+    p.addEventListener('click', function(){
+      document.querySelectorAll('.filter-pill').forEach(function(x){x.classList.remove('active');});
+      p.classList.add('active');
+      depFilter = p.getAttribute('data-filter');
+      renderDeposits();
+    });
+  });
+
+  var depSearchEl = document.getElementById('depSearch');
+  if(depSearchEl) depSearchEl.addEventListener('input', renderDeposits);
+
+  function renderDeposits(){
+    var q = (document.getElementById('depSearch').value || '').toLowerCase();
+    var all = state.deposits;
+
+    // Counts
+    document.getElementById('cntAll').textContent = all.length;
+    document.getElementById('cntPend').textContent = all.filter(function(d){return d.status==='pending'||d.status==='awaiting_review';}).length;
+    document.getElementById('cntAppr').textContent = all.filter(function(d){return d.status==='approved';}).length;
+    document.getElementById('cntRej').textContent = all.filter(function(d){return d.status==='rejected';}).length;
+
+    var filtered = all.filter(function(d){
+      if(depFilter !== 'all'){
+        if(depFilter === 'awaiting_review'){
+          if(d.status !== 'pending' && d.status !== 'awaiting_review') return false;
+        } else {
+          if(d.status !== depFilter) return false;
+        }
+      }
+      if(q){
+        var u = state.users.find(function(x){return x.id===d.user_id;});
+        var name = u ? ((u.first_name||'')+' '+(u.last_name||'')+' '+(u.email||'')).toLowerCase() : '';
+        if(!name.includes(q) && !(d.reference_code||'').toLowerCase().includes(q) && !String(d.amount).includes(q)) return false;
+      }
+      return true;
+    });
+
+    var listEl = document.getElementById('depList');
+    if(!filtered.length){
+      listEl.innerHTML = '<div class="empty">No deposits found</div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(function(d){
+      var u = state.users.find(function(x){return x.id===d.user_id;});
+      var name = u ? (((u.first_name||'')+' '+(u.last_name||'')).trim() || u.email || 'Unknown') : 'Unknown user';
+      var email = u ? (u.email||'') : '';
+      var av = initial(name);
+      var when = new Date(d.created_at);
+      var whenStr = when.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' · ' + when.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+      var statusPill = '';
+      if(d.status==='pending'||d.status==='awaiting_review') statusPill = '<span class="pill pending">PENDING REVIEW</span>';
+      else if(d.status==='approved') statusPill = '<span class="pill ok" style="display:inline-flex;align-items:center;gap:3px;padding:3px 7px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>APPROVED</span>';
+      else if(d.status==='rejected') statusPill = '<span class="pill banned">REJECTED</span>';
+
+      var isUrgent = (d.status==='pending'||d.status==='awaiting_review');
+
+      var html = '<div class="dep-card' + (isUrgent?' urgent':'') + '">' +
+        '<div class="dep-top">' +
+          '<div class="av">' + escapeHtml(av) + '</div>' +
+          '<div class="info">' +
+            '<div class="nm">' + escapeHtml(name) + ' ' + statusPill + '</div>' +
+            '<div class="em">' + escapeHtml(email) + '</div>' +
+          '</div>' +
+          '<div class="amt">' + fmt(d.amount) + '<span class="when">' + whenStr + '</span></div>' +
+        '</div>' +
+        '<div class="dep-meta">' +
+          '<span class="chip">Method <b>' + (d.method||'wire').toUpperCase() + '</b></span>' +
+          '<span class="chip">Ref <b>' + escapeHtml(d.reference_code||'—') + '</b></span>' +
+        '</div>';
+
+      if(d.notes){
+        html += '<div class="dep-notes-inline">📝 ' + escapeHtml(d.notes) + '</div>';
+      }
+
+      html += '<div class="dep-actions">';
+      if(d.proof_url){
+        html += '<button class="proof" onclick="window._viewProof(\''+d.proof_url+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>View Proof</button>';
+      }
+      if(isUrgent){
+        html += '<button class="approve" onclick="window._approveDeposit(\''+d.id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Approve & Credit</button>';
+        html += '<button class="reject" onclick="window._rejectDeposit(\''+d.id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Reject</button>';
+      }
+      html += '</div></div>';
+      return html;
+    }).join('');
+  }
+
+  // ============ APPROVE DEPOSIT ============
+  window._approveDeposit = async function(id){
+    var d = state.deposits.find(function(x){return x.id===id;});
+    if(!d){ apexError('Deposit not found'); return; }
+
+    var ok = await apexConfirm({
+      title: 'Approve deposit?',
+      body: 'This will credit ' + fmt(d.amount) + ' to the user account.',
+      okLabel: 'Approve & Credit'
+    });
+    if(!ok) return;
+
+    try {
+      // Update deposit status
+      var { error: e1 } = await sb.from('deposits').update({
+        status: 'approved',
+        approved_at: new Date().toISOString(),
+        reviewed_at: new Date().toISOString(),
+        reviewed_by: state.user.id
+      }).eq('id', id);
+      if(e1) throw e1;
+
+      // Get user balance
+      var { data: profile, error: e2 } = await sb.from('profiles').select('cash_balance').eq('id', d.user_id).single();
+      if(e2) throw e2;
+
+      var balBefore = parseFloat(profile.cash_balance || 0);
+      var balAfter = balBefore + parseFloat(d.amount);
+
+      // Credit user
+      var { error: e3 } = await sb.from('profiles').update({ cash_balance: balAfter }).eq('id', d.user_id);
+      if(e3) throw e3;
+
+      // Log adjustment
+      try {
+        await sb.from('balance_adjustments').insert({
+          user_id: d.user_id,
+          admin_id: state.user.id,
+          delta: parseFloat(d.amount),
+          balance_before: balBefore,
+          balance_after: balAfter,
+          reason: 'Deposit approved: ' + (d.reference_code || d.id)
+        });
+      } catch(e){ console.warn('Audit failed', e); }
+
+      apexSuccess('Approved · ' + fmt(d.amount) + ' credited');
+      await loadDeposits();
+      await loadCustomers();
+    } catch(e){
+      apexError('Failed: ' + e.message);
+    }
+  };
+
+  // ============ REJECT DEPOSIT ============
+  window._rejectDeposit = async function(id){
+    var reason = prompt('Reason for rejection (visible to user):');
+    if(reason === null) return;
+
+    var { error } = await sb.from('deposits').update({
+      status: 'rejected',
+      reviewed_at: new Date().toISOString(),
+      reviewed_by: state.user.id,
+      rejection_reason: reason || 'Verification failed'
+    }).eq('id', id);
+    if(error){ apexError(error.message); return; }
+    apexSuccess('Deposit rejected');
+    await loadDeposits();
+  };
+
+  // ============ VIEW PROOF ============
+  window._viewProof = async function(path){
+    try {
+      var { data, error } = await sb.storage.from('payment-proofs').createSignedUrl(path, 300);
+      if(error) throw error;
+      var modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;cursor:pointer';
+      modal.onclick = function(){ modal.remove(); };
+      var isPdf = path.toLowerCase().endsWith('.pdf');
+      if(isPdf){
+        modal.innerHTML = '<div style="background:#0a0e14;border-radius:14px;padding:24px;max-width:420px;text-align:center;border:1px solid rgba(255,255,255,0.08)"><div style="font-size:54px;margin-bottom:14px">📄</div><div style="color:#fff;font-size:14px;font-weight:600;margin-bottom:16px">PDF Document</div><a href="'+data.signedUrl+'" target="_blank" style="display:inline-block;padding:12px 28px;background:#4a9eff;color:#000;border-radius:9px;font-weight:700;text-decoration:none;font-size:13px">Open PDF</a><div style="margin-top:16px;color:#6a7585;font-size:11px">Tap outside to close</div></div>';
+      } else {
+        modal.innerHTML = '<img src="'+data.signedUrl+'" style="max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,0.6)">';
+      }
+      document.body.appendChild(modal);
+    } catch(e){
+      apexError('Could not load proof: '+e.message);
+    }
+  };
 
   async function loadWithdrawals(){
     try {
