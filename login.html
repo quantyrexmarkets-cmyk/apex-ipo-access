@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Log on | APEX IPO ACCESS</title>
+<title>Log in | APEX IPO ACCESS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&family=Orbitron:wght@400;500;600&display=swap" rel="stylesheet">
@@ -150,19 +150,43 @@
 </style>
 <script src="js/supabase.js"></script>
 <script src="js/notify.js?v=1"></script>
+<script src="js/script.js" defer></script>
 </head>
 <body>
 
-<header class="login-header">
-  <button class="menu-btn" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
-  <a href="index.html" class="logo-text">APEX<span class="accent">·</span>IPO</a>
-  <div style="width:38px"></div>
+<header class="nav">
+  <a href="/" class="logo">
+    <img src="assets/spacex-logo.png" class="logo-x" alt="X" />
+    <div class="logo-text-stack">
+      <span class="logo-line1">APEX</span>
+      <span class="logo-line2">IPO ACCESS</span>
+      <span class="logo-tagline">INVESTMENT INTELLIGENCE</span>
+    </div>
+  </a>
+  <div class="nav-right">
+    <a href="signup.html" class="btn-signin">Sign Up</a>
+    <button class="hamburger" id="hamburger" aria-label="Menu" type="button">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
 </header>
 
+<nav class="side-menu" id="sideMenu">
+  <button class="menu-close" id="menuClose" aria-label="Close" type="button">✕</button>
+  <div class="menu-items">
+    <a href="trading.html" class="menu-item">Trading & Investing<svg class="chev-svg" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#7A8699" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
+    <a href="research.html" class="menu-item">Research<svg class="chev-svg" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#7A8699" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
+    <a href="ipo-opportunity.html" class="menu-item">SpaceX IPO &amp; xAI IPO Opportunity<svg class="chev-svg" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#7A8699" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
+    <a href="private-markets.html" class="menu-item">Private Markets<svg class="chev-svg" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#7A8699" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
+    <a href="pricing.html" class="menu-item">Pricing</a>
+    <a href="support.html" class="menu-item-sub">Customer Service &amp; Support<svg class="chev-svg sm" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke="#7A8699" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
+  </div>
+  <a href="signup.html" class="menu-cta">Open an Account</a>
+</nav>
+<div class="menu-backdrop" id="menuBackdrop"></div>
+
 <main class="login-wrap">
-  <h1 class="title">Log on</h1>
+  <h1 class="title">Log in</h1>
 
   <div class="form-error" id="formError"></div>
 
@@ -195,15 +219,15 @@
       <div class="cb-label">Remember me</div>
     </div>
 
-    <button type="submit" class="login-btn" id="loginBtn">Log on</button>
+    <button type="submit" class="login-btn" id="loginBtn">Log in</button>
   </form>
 
   <div class="links">
     <div class="link-row">
       Don't have an account? <a href="signup.html">Open one now →</a>
     </div>
-    <a href="#" class="link-block">Forgot password?</a>
-    <a href="contact.html" class="link-block">Need help signing on?</a>
+    <a href="forgot-password.html" class="link-block">Forgot password?</a>
+    <a href="support.html" class="link-block">Need help signing in?</a>
   </div>
 
   <div class="footer-row">
@@ -352,7 +376,7 @@
             errBox.textContent = res.error.message || 'Invalid email or password';
             errBox.classList.add('show');
             btn.disabled = false;
-            btn.textContent = 'Log on';
+            btn.textContent = 'Log in';
             return;
           }
 
@@ -374,7 +398,7 @@
           errBox.textContent = err.message || 'Sign-in failed. Please try again.';
           errBox.classList.add('show');
           btn.disabled = false;
-          btn.textContent = 'Log on';
+          btn.textContent = 'Log in';
         });
     });
   });
