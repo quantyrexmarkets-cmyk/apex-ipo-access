@@ -882,9 +882,22 @@
 
   <!-- COMPANIES PAGE -->
   <section class="page" id="page-companies">
-    <div class="page-h">Companies</div>
-    <div class="page-sub">Manage IPO listings</div>
-    <div class="empty">Coming in Phase 7</div>
+    <div class="page-h">Companies (IPOs)</div>
+    <div class="page-sub">Manage IPO listings shown to investors</div>
+
+    <div class="search-row">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" id="coSearch" placeholder="Search companies...">
+      </div>
+      <button class="add-btn" onclick="window._newCompany()" aria-label="Add">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
+
+    <div id="coList">
+      <div class="loading"><div class="spin"></div><div>Loading companies...</div></div>
+    </div>
   </section>
 
   <!-- NOTIFICATIONS PAGE -->
@@ -2140,6 +2153,7 @@
     document.getElementById('walletMemo').value = '';
     document.getElementById('walletLabel').value = '';
     await loadWallets();
+    await loadCompanies();
   };
 
   window._toggleWallet = async function(id, currentActive){
@@ -2148,6 +2162,7 @@
     if(error){ apexError(error.message); return; }
     apexSuccess(newActive?'Wallet activated':'Wallet deactivated');
     await loadWallets();
+    await loadCompanies();
   };
 
   window._deleteWallet = async function(id){
@@ -2157,12 +2172,197 @@
     if(error){ apexError(error.message); return; }
     apexSuccess('Wallet deleted');
     await loadWallets();
+    await loadCompanies();
   };
 
   window._copyWallet = function(addr){
     navigator.clipboard.writeText(addr).then(function(){
       apexSuccess('Address copied');
     }).catch(function(){ apexError('Copy failed'); });
+  };
+
+  // ============ COMPANIES PAGE ============
+  var allCompanies = [];
+  var editingCompany = null;
+  var coModal = document.getElementById('coModal');
+
+  document.querySelectorAll('[data-copane]').forEach(function(t){
+    t.addEventListener('click', function(){
+      var name = t.getAttribute('data-copane');
+      document.querySelectorAll('[data-copane]').forEach(function(x){x.classList.toggle('active', x===t);});
+      document.querySelectorAll('[id^=copane-]').forEach(function(p){p.classList.toggle('active', p.id==='copane-'+name);});
+    });
+  });
+
+  var coSearchEl = document.getElementById('coSearch');
+  if(coSearchEl) coSearchEl.addEventListener('input', renderCompanies);
+
+  async function loadCompanies(){
+    try {
+      var { data } = await sb.from('companies').select('*').order('name',{ascending:true});
+      allCompanies = data || [];
+      renderCompanies();
+    } catch(e){
+      console.warn('Companies load:', e);
+      document.getElementById('coList').innerHTML = '<div class="empty">Failed to load</div>';
+    }
+  }
+
+  function renderCompanies(){
+    var q = (document.getElementById('coSearch').value || '').toLowerCase();
+    var filtered = allCompanies.filter(function(c){
+      if(!q) return true;
+      return (c.name||'').toLowerCase().includes(q) ||
+             (c.ticker||'').toLowerCase().includes(q) ||
+             (c.sector||'').toLowerCase().includes(q);
+    });
+
+    var listEl = document.getElementById('coList');
+    if(!filtered.length){
+      listEl.innerHTML = '<div class="empty">No companies found</div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(function(c){
+      var logo = c.domain ? 'https://icons.duckduckgo.com/ip3/'+c.domain+'.ico' : '';
+      var price = c.share_price || c.price_per_share || 0;
+      var flags = '';
+      if(c.stage) flags += '<span class="flg stage">'+escapeHtml(c.stage)+'</span>';
+      if(c.is_musk) flags += '<span class="flg musk">MUSK</span>';
+      if(c.is_featured) flags += '<span class="flg featured">FEATURED</span>';
+
+      return '<div class="co-card">' +
+        '<div class="co-logo">' + (logo?'<img src="'+logo+'" onerror="this.parentElement.innerHTML=\'<div style=&quot;color:#000;font-weight:700;font-size:16px&quot;>'+escapeHtml((c.name||'?').charAt(0))+'</div>\'">':'<div style="color:#000;font-weight:700;font-size:16px">'+escapeHtml((c.name||'?').charAt(0))+'</div>') + '</div>' +
+        '<div class="co-info" onclick="window._editCompany(\''+c.ticker+'\')">' +
+          '<div class="co-name">'+escapeHtml(c.name||'')+' <span class="tk">'+escapeHtml(c.ticker||'')+'</span></div>' +
+          '<div class="co-meta">'+
+            (c.sector?'<span>📊 <b>'+escapeHtml(c.sector)+'</b></span>':'')+
+            (c.valuation?'<span>💎 <b>'+escapeHtml(c.valuation)+'</b></span>':'')+
+            (c.growth_yoy?'<span>📈 <b>'+escapeHtml(c.growth_yoy)+'</b></span>':'')+
+          '</div>' +
+        '</div>' +
+        '<div>' +
+          '<div class="co-price">'+fmt(price)+'</div>' +
+          '<div class="co-flags">'+flags+'</div>' +
+        '</div>' +
+        '<div class="co-row-actions">' +
+          '<button onclick="window._editCompany(\''+c.ticker+'\')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
+          '<button class="del" onclick="event.stopPropagation();window._deleteCompany(\''+c.ticker+'\')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  window._newCompany = function(){
+    editingCompany = null;
+    document.getElementById('cmTitle').textContent = 'New Company';
+    document.getElementById('cmDomain').textContent = 'Fill in details below';
+    document.getElementById('cmAv').textContent = '+';
+    // Clear all fields
+    ['cfTicker','cfName','cfDomain','cfSector','cfCeo','cfHq','cfFounded','cfLogo','cfDesc','cfPrice','cfValuation','cfGrowth','cfSuccess','cfReturn','cfWindow','cfLockup'].forEach(function(id){
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('cfStage').value = 'Pre-IPO';
+    document.getElementById('cfMusk').checked = false;
+    document.getElementById('cfFeatured').checked = false;
+    document.querySelectorAll('[data-copane]').forEach(function(t){t.classList.toggle('active', t.getAttribute('data-copane')==='basic');});
+    document.querySelectorAll('[id^=copane-]').forEach(function(p){p.classList.toggle('active', p.id==='copane-basic');});
+    coModal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window._editCompany = function(ticker){
+    var c = allCompanies.find(function(x){return x.ticker===ticker;});
+    if(!c) return;
+    editingCompany = c;
+    document.getElementById('cmTitle').textContent = c.name || c.ticker;
+    document.getElementById('cmDomain').textContent = c.domain || c.ticker;
+    document.getElementById('cmAv').textContent = (c.name||'?').charAt(0).toUpperCase();
+    document.getElementById('cfTicker').value = c.ticker || '';
+    document.getElementById('cfName').value = c.name || '';
+    document.getElementById('cfDomain').value = c.domain || '';
+    document.getElementById('cfSector').value = c.sector || '';
+    document.getElementById('cfCeo').value = c.ceo || '';
+    document.getElementById('cfHq').value = c.hq || '';
+    document.getElementById('cfFounded').value = c.founded_year || '';
+    document.getElementById('cfLogo').value = c.logo_url || '';
+    document.getElementById('cfDesc').value = c.description || '';
+    document.getElementById('cfPrice').value = c.share_price || c.price_per_share || '';
+    document.getElementById('cfValuation').value = c.valuation || '';
+    document.getElementById('cfGrowth').value = c.growth_yoy || '';
+    document.getElementById('cfSuccess').value = c.success_rate || '';
+    document.getElementById('cfReturn').value = c.expected_return || '';
+    document.getElementById('cfStage').value = c.stage || 'Pre-IPO';
+    document.getElementById('cfWindow').value = c.ipo_window || '';
+    document.getElementById('cfLockup').value = c.lockup_days || '';
+    document.getElementById('cfMusk').checked = !!c.is_musk;
+    document.getElementById('cfFeatured').checked = !!c.is_featured;
+    document.querySelectorAll('[data-copane]').forEach(function(t){t.classList.toggle('active', t.getAttribute('data-copane')==='basic');});
+    document.querySelectorAll('[id^=copane-]').forEach(function(p){p.classList.toggle('active', p.id==='copane-basic');});
+    coModal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window._closeCompany = function(){
+    coModal.classList.remove('show');
+    document.body.style.overflow = '';
+    editingCompany = null;
+  };
+
+  coModal.addEventListener('click', function(e){
+    if(e.target === coModal) window._closeCompany();
+  });
+
+  window._saveCompany = async function(){
+    var ticker = document.getElementById('cfTicker').value.trim().toUpperCase();
+    var name = document.getElementById('cfName').value.trim();
+    if(!ticker || !name){ apexError('Ticker and Name are required'); return; }
+
+    var price = parseFloat(document.getElementById('cfPrice').value || 0);
+    var payload = {
+      ticker: ticker,
+      name: name,
+      domain: document.getElementById('cfDomain').value.trim() || null,
+      sector: document.getElementById('cfSector').value.trim() || null,
+      ceo: document.getElementById('cfCeo').value.trim() || null,
+      hq: document.getElementById('cfHq').value.trim() || null,
+      founded_year: parseInt(document.getElementById('cfFounded').value) || null,
+      logo_url: document.getElementById('cfLogo').value.trim() || null,
+      description: document.getElementById('cfDesc').value.trim() || null,
+      share_price: price || null,
+      price_per_share: price || null,
+      valuation: document.getElementById('cfValuation').value.trim() || null,
+      growth_yoy: document.getElementById('cfGrowth').value.trim() || null,
+      success_rate: parseInt(document.getElementById('cfSuccess').value) || null,
+      expected_return: document.getElementById('cfReturn').value.trim() || null,
+      stage: document.getElementById('cfStage').value,
+      ipo_window: document.getElementById('cfWindow').value.trim() || null,
+      lockup_days: parseInt(document.getElementById('cfLockup').value) || null,
+      is_musk: document.getElementById('cfMusk').checked,
+      is_featured: document.getElementById('cfFeatured').checked
+    };
+
+    var result;
+    if(editingCompany){
+      result = await sb.from('companies').update(payload).eq('ticker', editingCompany.ticker);
+    } else {
+      result = await sb.from('companies').insert(payload);
+    }
+    if(result.error){ apexError(result.error.message); return; }
+    apexSuccess(editingCompany?'Company updated':'Company added');
+    window._closeCompany();
+    await loadCompanies();
+  };
+
+  window._deleteCompany = async function(ticker){
+    var c = allCompanies.find(function(x){return x.ticker===ticker;});
+    if(!c) return;
+    var ok = await apexConfirm({title:'Delete '+c.name+'?',body:'This removes the company from all IPO listings.',okLabel:'Delete'});
+    if(!ok) return;
+    var { error } = await sb.from('companies').delete().eq('ticker', ticker);
+    if(error){ apexError(error.message); return; }
+    apexSuccess('Company deleted');
+    await loadCompanies();
   };
 
   // ========== AUTH GATE ==========
@@ -2195,8 +2395,153 @@
     await loadAllTransactions();
     await loadWireSettings();
     await loadWallets();
+    await loadCompanies();
   });
 </script>
+
+
+<!-- COMPANY EDIT MODAL -->
+<div class="modal-overlay" id="coModal">
+  <div class="modal">
+    <div class="m-head">
+      <div class="av" id="cmAv" style="background:#ffb800">?</div>
+      <div class="info">
+        <div class="nm" id="cmTitle">New Company</div>
+        <div class="em" id="cmDomain">—</div>
+      </div>
+      <button class="close" onclick="window._closeCompany()" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="m-body">
+      <div class="m-tabs">
+        <div class="m-tab active" data-copane="basic">BASIC</div>
+        <div class="m-tab" data-copane="financial">FINANCIAL</div>
+        <div class="m-tab" data-copane="ipo">IPO INFO</div>
+      </div>
+
+      <!-- BASIC -->
+      <div class="m-pane active" id="copane-basic">
+        <div class="field-grid">
+          <div class="field-mini"><label>Ticker *</label><input id="cfTicker" placeholder="SPCX" style="text-transform:uppercase"></div>
+          <div class="field-mini"><label>Name *</label><input id="cfName" placeholder="SpaceX"></div>
+        </div>
+        <div class="field-grid">
+          <div class="field-mini"><label>Domain (for logo)</label><input id="cfDomain" placeholder="spacex.com"></div>
+          <div class="field-mini"><label>Sector</label><input id="cfSector" placeholder="Aerospace"></div>
+        </div>
+        <div class="field-grid">
+          <div class="field-mini"><label>CEO</label><input id="cfCeo" placeholder="Elon Musk"></div>
+          <div class="field-mini"><label>HQ</label><input id="cfHq" placeholder="Hawthorne, CA"></div>
+        </div>
+        <div class="field-grid">
+          <div class="field-mini"><label>Founded Year</label><input id="cfFounded" type="number" placeholder="2002"></div>
+          <div class="field-mini"><label>Custom Logo URL (optional)</label><input id="cfLogo" placeholder="leave blank for auto"></div>
+        </div>
+        <div class="field-grid full">
+          <div class="field-mini"><label>Description</label><textarea id="cfDesc" rows="3" placeholder="Brief company description..."></textarea></div>
+        </div>
+      </div>
+
+      <!-- FINANCIAL -->
+      <div class="m-pane" id="copane-financial">
+        <div class="field-grid">
+          <div class="field-mini"><label>Share Price ($)</label><input id="cfPrice" type="number" step="0.01" placeholder="135"></div>
+          <div class="field-mini"><label>Valuation</label><input id="cfValuation" placeholder="$400B"></div>
+        </div>
+        <div class="field-grid">
+          <div class="field-mini"><label>YoY Growth</label><input id="cfGrowth" placeholder="+42%"></div>
+          <div class="field-mini"><label>Success Rate (%)</label><input id="cfSuccess" type="number" min="0" max="100" placeholder="92"></div>
+        </div>
+        <div class="field-grid full">
+          <div class="field-mini"><label>Expected Return</label><input id="cfReturn" placeholder="+30% to +60% within 3 months"></div>
+        </div>
+      </div>
+
+      <!-- IPO INFO -->
+      <div class="m-pane" id="copane-ipo">
+        <div class="field-grid">
+          <div class="field-mini">
+            <label>Stage</label>
+            <select id="cfStage">
+              <option value="Pre-IPO">Pre-IPO</option>
+              <option value="Live IPO">Live IPO</option>
+              <option value="Public">Public</option>
+              <option value="Coming Soon">Coming Soon</option>
+            </select>
+          </div>
+          <div class="field-mini"><label>IPO Window</label><input id="cfWindow" placeholder="Q2 2026"></div>
+        </div>
+        <div class="field-grid">
+          <div class="field-mini"><label>Lockup Period (days)</label><input id="cfLockup" type="number" placeholder="180"></div>
+          <div class="field-mini">
+            <label>Flags</label>
+            <div style="display:flex;gap:8px;margin-top:4px">
+              <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:#a8b2c1;cursor:pointer;text-transform:none;letter-spacing:0">
+                <input type="checkbox" id="cfMusk" style="width:auto;margin:0"> 🛡 Musk
+              </label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:#a8b2c1;cursor:pointer;text-transform:none;letter-spacing:0">
+                <input type="checkbox" id="cfFeatured" style="width:auto;margin:0"> ⭐ Featured
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="save-bar">
+      <button class="cancel" onclick="window._closeCompany()">Cancel</button>
+      <button class="save" onclick="window._saveCompany()">Save Company</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMPANY ROW STYLES -->
+<style>
+  .co-card{
+    display:flex;align-items:center;gap:12px;
+    padding:12px;background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:12px;margin-bottom:8px;cursor:pointer;
+    transition:all .15s;
+  }
+  .co-card:hover{background:rgba(74,158,255,0.04);border-color:rgba(74,158,255,0.2)}
+  .co-logo{
+    width:42px;height:42px;border-radius:10px;
+    background:#fff;display:flex;align-items:center;justify-content:center;
+    overflow:hidden;flex-shrink:0;
+  }
+  .co-logo img{width:100%;height:100%;object-fit:contain}
+  .co-info{flex:1;min-width:0}
+  .co-name{font-size:14px;font-weight:600;color:#fff;margin-bottom:2px;display:flex;align-items:center;gap:6px}
+  .co-name .tk{font-family:'Manrope',sans-serif;color:#4a9eff;font-size:11px;font-weight:700;padding:2px 6px;background:rgba(74,158,255,0.1);border-radius:5px}
+  .co-meta{font-size:11px;color:#8b95a8;display:flex;gap:10px;flex-wrap:wrap}
+  .co-meta span{display:inline-flex;align-items:center;gap:3px}
+  .co-meta b{color:#fff;font-weight:600;font-family:'Manrope',sans-serif}
+  .co-price{
+    font-family:'Manrope',sans-serif;font-weight:700;font-size:16px;
+    color:#3ed598;letter-spacing:-0.3px;text-align:right;flex-shrink:0;
+  }
+  .co-flags{display:flex;gap:4px;margin-top:3px;justify-content:flex-end}
+  .co-flags .flg{
+    font-size:9px;padding:2px 6px;border-radius:5px;font-weight:700;letter-spacing:0.5px;
+  }
+  .co-flags .musk{background:rgba(74,158,255,0.15);color:#4a9eff}
+  .co-flags .featured{background:rgba(255,184,0,0.15);color:#ffb800}
+  .co-flags .stage{background:rgba(62,213,152,0.15);color:#3ed598}
+
+  .co-row-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
+  .co-row-actions button{
+    width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.05);
+    color:#a8b2c1;display:flex;align-items:center;justify-content:center;transition:all .15s;
+  }
+  .co-row-actions button:hover{background:rgba(255,255,255,0.1);color:#fff}
+  .co-row-actions .del:hover{background:rgba(255,106,106,0.15);color:#ff6a6a}
+  .co-row-actions svg{width:14px;height:14px}
+
+  input[type="checkbox"]{accent-color:#4a9eff}
+</style>
 
 </body>
 </html>
