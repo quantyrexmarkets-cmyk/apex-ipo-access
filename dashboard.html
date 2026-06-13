@@ -50,97 +50,32 @@
   .greeting .hi .name{font-weight:600;color:#fff}
   .greeting .sub{font-size:13px;color:#8a94a3;margin-top:4px}
 
-  .hero-card{
-    margin:20px;border-radius:18px;overflow:hidden;
-    background:linear-gradient(135deg,#0a1628 0%,#001a3d 50%,#0a0a0a 100%);
-    border:1px solid rgba(74,158,255,0.25);
-    position:relative;
-  }
+  
   .hero-card::before{
     content:"";position:absolute;inset:0;
     background:radial-gradient(circle at top right,rgba(74,158,255,0.18),transparent 60%);
     pointer-events:none;
   }
-  .hero-top{
-    padding:22px 22px 14px;
-    display:flex;justify-content:space-between;align-items:center;
-    position:relative;z-index:1;
-  }
-  .hero-tag{
-    display:inline-flex;align-items:center;gap:6px;
-    padding:5px 11px;border-radius:20px;
-    background:rgba(255,184,0,0.12);
-    border:1px solid rgba(255,184,0,0.35);
-    color:#ffb800;font-size:11px;font-weight:600;
-    letter-spacing:0.5px;text-transform:uppercase;
-  }
+  
+  
   .hero-tag .dot{width:6px;height:6px;background:#ffb800;border-radius:50%;animation:pulse 2s infinite}
   @keyframes pulse{50%{opacity:0.4}}
-  .hero-ticker{
-    font-family:'Orbitron',sans-serif;font-weight:500;
-    font-size:13px;color:#4a9eff;letter-spacing:1px;
-  }
-  .hero-title{
-    padding:0 22px;position:relative;z-index:1;
-    font-family:'Plus Jakarta Sans',sans-serif;
-    font-weight:300;font-size:14px;color:#a8b2c1;
-    letter-spacing:0.3px;
-  }
-  .hero-company{
-    padding:4px 22px 0;position:relative;z-index:1;
-    font-family:'Plus Jakarta Sans',sans-serif;
-    font-weight:600;font-size:24px;color:#fff;
-    letter-spacing:-0.4px;
-  }
-  .hero-stats{
-    display:grid;grid-template-columns:1fr 1fr;
-    gap:14px;padding:22px;position:relative;z-index:1;
-  }
-  .stat-box{
-    background:rgba(0,0,0,0.35);
-    border:1px solid rgba(255,255,255,0.06);
-    border-radius:12px;padding:14px;
-  }
-  .stat-box .lbl{
-    font-size:11px;color:#8a94a3;letter-spacing:0.5px;
-    text-transform:uppercase;margin-bottom:6px;
-  }
-  .stat-box .val{
-    font-family:'Plus Jakarta Sans',sans-serif;
-    font-weight:600;font-size:22px;color:#fff;letter-spacing:-0.3px;
-  }
-  .stat-box .delta{font-size:12px;color:#3ed598;margin-top:4px;font-weight:500}
+  
+  
+  
+  
+  
+  
+  
+  
 
-  .countdown-row{padding:0 22px 22px;position:relative;z-index:1}
-  .countdown-lbl{
-    font-size:11px;color:#8a94a3;letter-spacing:0.5px;
-    text-transform:uppercase;margin-bottom:10px;
-  }
-  .countdown-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-  .cd-cell{
-    background:rgba(74,158,255,0.08);
-    border:1px solid rgba(74,158,255,0.2);
-    border-radius:10px;padding:10px 6px;text-align:center;
-  }
-  .cd-num{
-    font-family:'JetBrains Mono',ui-monospace,monospace;
-    font-weight:600;font-size:26px;color:#fff;
-    letter-spacing:0;line-height:1;
-    font-feature-settings:"tnum";
-  }
-  .cd-unit{
-    font-family:'Inter',sans-serif;
-    font-size:10px;color:#6a7585;
-    text-transform:uppercase;letter-spacing:1.2px;
-    font-weight:600;margin-top:6px;
-  }
-  .hero-cta{
-    display:block;width:calc(100% - 44px);margin:0 22px 22px;
-    background:#4a9eff;color:#000;text-align:center;
-    padding:14px;font-weight:600;font-size:14px;
-    border:none;border-radius:10px;cursor:pointer;
-    font-family:inherit;position:relative;z-index:1;
-  }
+  
+  
+  
+  
+  
+  
+  
 
   .section{padding:8px 20px 0}
   .section-h{
@@ -238,7 +173,7 @@
 
   @media (max-width:380px){
     .quick-grid{grid-template-columns:repeat(2,1fr)}
-    .hero-stats{grid-template-columns:1fr}
+    
   }
 
   
@@ -363,106 +298,283 @@
   @keyframes livepulse{50%{opacity:0.4}}
 
   /* HERO card upgrade */
-  .hero-card{
-    margin:24px 20px;border-radius:20px;
-    background:
-      radial-gradient(circle at top right, rgba(74,158,255,0.22), transparent 55%),
-      linear-gradient(160deg, #0a1a2f 0%, #061226 45%, #0a0a0a 100%);
-    border:1px solid rgba(74,158,255,0.18);
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.05) inset,
-      0 20px 60px -20px rgba(74,158,255,0.15),
-      0 8px 24px -8px rgba(0,0,0,0.6);
-  }
+  
   .hero-card::before{display:none}
 
-  .hero-top{padding:20px 22px 12px}
-  .hero-tag{
-    padding:5px 10px;border-radius:6px;
-    background:rgba(255,184,0,0.1);
-    border:1px solid rgba(255,184,0,0.3);
-    font-size:10px;letter-spacing:0.8px;
-    text-transform:uppercase;font-weight:700;
+  
+  
+  
+  
+  
+
+  
+  
+  
+  
+
+  
+  
+  
+  
+
+  
+  
+
+  
+
+  .qa-tile-green:hover{border-color:rgba(62,213,152,0.4) !important;background:rgba(62,213,152,0.06) !important}
+  .qa-tile-green .ic{background:rgba(62,213,152,0.12) !important;color:#3ed598 !important}
+
+  /* ════════ BROKER-GRADE HERO CARD ════════ */
+  .hero-card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:16px;
+    padding:20px;
+    margin-bottom:18px;
+    position:relative;
+    overflow:hidden;
   }
-  .hero-ticker{
-    font-size:11px;letter-spacing:1.5px;color:#6a7585;
-    font-family:'Orbitron',sans-serif;
-  }
-  .hero-title{
-    font-size:12px;color:#8a94a3;letter-spacing:0.4px;
-    text-transform:uppercase;font-weight:500;
-  }
-  .hero-company{
-    font-size:26px;letter-spacing:-0.6px;color:#fff;
-    font-weight:600;padding-top:6px;
+  .hero-card::before{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, #4a9eff, #357abd, #4a9eff);
+    opacity:0.6;
   }
 
-  .stat-box{
-    background:rgba(255,255,255,0.03);
-    border:1px solid rgba(255,255,255,0.07);
-    border-radius:14px;padding:14px 16px;
-    backdrop-filter:blur(10px);
+  /* Header — status + ticker */
+  .hero-header{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:18px;
   }
-  .stat-box .lbl{
-    font-size:10px;color:#6a7585;letter-spacing:0.6px;
-    font-weight:600;margin-bottom:8px;
+  .status-pill{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:4px 10px;
+    background:rgba(255,184,0,0.1);
+    border:1px solid rgba(255,184,0,0.2);
+    border-radius:6px;
+    font-size:10px; font-weight:700;
+    color:#ffb800;
+    letter-spacing:0.5px; text-transform:uppercase;
   }
-  .stat-box .val{
-    font-size:24px;letter-spacing:-0.5px;font-weight:600;
+  .status-pill.active{
+    background:rgba(62,213,152,0.1);
+    border-color:rgba(62,213,152,0.25);
+    color:#3ed598;
+  }
+  .status-dot{
+    width:6px; height:6px; border-radius:50%;
+    background:currentColor;
+    animation:axDotPulse 2s ease-in-out infinite;
+  }
+  .ticker-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(0,0,0,0.4);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:6px;
+    padding:4px 8px;
+    font-family:'JetBrains Mono', monospace;
+  }
+  .ticker-label{
+    font-size:9px; color:#6a7585;
+    letter-spacing:0.8px;
+    padding-right:6px;
+    border-right:1px solid rgba(255,255,255,0.1);
+  }
+  .ticker-sym{
+    font-size:11px; font-weight:700; color:#4a9eff;
+    letter-spacing:1px;
+  }
+
+  /* Company row */
+  .company-row{
+    display:flex; align-items:center; gap:14px;
+    margin-bottom:22px;
+  }
+  .company-logo{
+    width:48px; height:48px; border-radius:10px;
+    background:#fff; padding:8px;
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .company-logo img{
+    width:100%; height:100%; object-fit:contain;
+  }
+  .company-info{ flex:1; min-width:0; }
+  .company-name{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600; font-size:18px; color:#fff;
+    letter-spacing:-0.3px; line-height:1.2;
+  }
+  .company-fullname{
+    font-size:11px; color:#8a94a3;
+    margin-top:2px; line-height:1.3;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+
+  /* Market Value block */
+  .value-block{ margin-bottom:18px; }
+  .value-label{
+    text-transform:uppercase;
+    font-size:9px; font-weight:700;
+    color:#6a7585; letter-spacing:1.2px;
+    margin-bottom:6px;
+  }
+  .value-row{
+    display:flex; align-items:baseline; justify-content:space-between;
+    gap:12px; flex-wrap:wrap;
+  }
+  .value-amount{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:36px; font-weight:200; color:#fff;
+    letter-spacing:-1.2px; line-height:1.1;
     font-feature-settings:"tnum";
   }
-  .stat-box .delta{
-    font-size:11px;font-weight:600;margin-top:6px;
-    display:inline-flex;align-items:center;gap:4px;
+  .value-change{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:11px; font-weight:600;
+    color:#8a94a3;
+    padding:4px 9px; border-radius:6px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+  }
+  .value-change.up{ color:#3ed598; background:rgba(62,213,152,0.06); border-color:rgba(62,213,152,0.15); }
+  .value-change.down{ color:#ff6a6a; background:rgba(255,106,106,0.06); border-color:rgba(255,106,106,0.15); }
+  .change-dot{
+    width:5px; height:5px; border-radius:50%;
+    background:currentColor;
   }
 
-  .countdown-lbl{
-    font-size:10px;letter-spacing:0.8px;font-weight:600;color:#6a7585;
+  .divider{
+    height:1px;
+    background:rgba(255,255,255,0.06);
+    margin:16px 0;
+  }
+
+  /* Metrics grid */
+  .metrics-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr);
+    gap:14px;
+  }
+  .metric{ min-width:0; }
+  .metric-label{
+    font-size:9px; color:#6a7585;
+    text-transform:uppercase; letter-spacing:1.2px;
+    font-weight:700; margin-bottom:5px;
+  }
+  .metric-value{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:14px; font-weight:600; color:#fff;
+    font-feature-settings:"tnum";
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .metric-value span{
+    font-size:10px; font-weight:500; color:#8a94a3;
+    margin-left:2px;
+  }
+
+  /* Countdown section */
+  .countdown-section{ margin-bottom:18px; }
+  .countdown-header{
+    display:flex; align-items:center; gap:7px;
+    font-size:11px; color:#a8b2c1; font-weight:600;
+    margin-bottom:10px;
+  }
+  .countdown-header svg{ width:13px; height:13px; color:#4a9eff; }
+  .countdown-grid{
+    display:grid; grid-template-columns:repeat(4, 1fr);
+    gap:8px;
   }
   .cd-cell{
     background:rgba(74,158,255,0.06);
     border:1px solid rgba(74,158,255,0.15);
-    border-radius:10px;padding:12px 6px;
-    box-shadow:0 1px 0 rgba(255,255,255,0.04) inset;
+    border-radius:10px;
+    padding:10px 6px;
+    text-align:center;
   }
   .cd-num{
-    font-family:'JetBrains Mono',ui-monospace,monospace;
-    font-weight:600;font-size:26px;color:#fff;
-    letter-spacing:0;line-height:1;
-    font-feature-settings:"tnum";
+    font-family:'JetBrains Mono', monospace;
+    font-size:20px; font-weight:700; color:#fff;
+    line-height:1;
   }
   .cd-unit{
-    font-family:'Inter',sans-serif;
-    font-size:10px;color:#6a7585;
-    text-transform:uppercase;letter-spacing:1.2px;
-    font-weight:600;margin-top:6px;
+    font-size:9px; color:#8a94a3;
+    text-transform:uppercase; letter-spacing:1px;
+    margin-top:4px; font-weight:600;
   }
 
+  /* Primary CTA */
   .hero-cta{
-    background:#4a9eff;color:#000;
-    border-radius:12px;font-size:14px;font-weight:600;
-    padding:15px;letter-spacing:0.2px;
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,0.1) inset,
-      0 10px 30px -10px rgba(74,158,255,0.5);
-    transition:all .2s;
+    display:block; width:100%;
+    background:linear-gradient(135deg, #4a9eff, #357abd);
+    color:#fff;
+    padding:15px;
+    border:none; border-radius:12px;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:15px; font-weight:600;
+    cursor:pointer;
+    transition:all .15s;
+    box-shadow:0 8px 20px rgba(74,158,255,0.25);
+    letter-spacing:0.3px;
   }
   .hero-cta:hover{
-    background:#5ea8ff;
     transform:translateY(-1px);
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,0.15) inset,
-      0 14px 40px -10px rgba(74,158,255,0.65);
+    box-shadow:0 12px 28px rgba(74,158,255,0.35);
+  }
+  .hero-link{
+    display:block; text-align:center;
+    font-size:12px; color:#4a9eff; font-weight:500;
+    margin-top:12px;
+    text-decoration:none;
+  }
+  .hero-link:hover{ color:#6db1ff; }
+
+
+  /* Live status variant */
+  .status-pill.live{
+    background:rgba(62,213,152,0.12);
+    border-color:rgba(62,213,152,0.3);
+    color:#3ed598;
   }
 
-  .hero-sector{
-    padding:6px 22px 0;position:relative;z-index:1;
-    font-size:12px;color:#8a94a3;letter-spacing:0.2px;
-    font-weight:400;
+  /* Live Price Strip */
+  .live-price-strip{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:12px 14px; margin-bottom:14px;
+    background:linear-gradient(135deg, rgba(62,213,152,0.08), rgba(62,213,152,0.02));
+    border:1px solid rgba(62,213,152,0.2);
+    border-radius:11px;
   }
+  .lp-left{ display:flex; align-items:center; gap:8px; }
+  .lp-pulse{
+    width:8px; height:8px; border-radius:50%;
+    background:#3ed598;
+    box-shadow:0 0 10px rgba(62,213,152,0.6);
+    animation:lpPulse 1.6s ease-in-out infinite;
+  }
+  @keyframes lpPulse{
+    0%,100%{ opacity:1; transform:scale(1) }
+    50%{ opacity:0.5; transform:scale(0.85) }
+  }
+  .lp-label{
+    font-size:10px; font-weight:700; color:#3ed598;
+    text-transform:uppercase; letter-spacing:1.2px;
+  }
+  .lp-right{
+    display:flex; align-items:center; gap:10px;
+    font-family:'JetBrains Mono', monospace;
+  }
+  .lp-value{
+    font-size:15px; font-weight:700; color:#fff;
+    font-feature-settings:"tnum";
+  }
+  .lp-change{
+    font-size:11px; font-weight:600;
+    padding:3px 7px; border-radius:5px;
+  }
+  .lp-change.up{ color:#3ed598; background:rgba(62,213,152,0.1); }
+  .lp-change.down{ color:#ff6a6a; background:rgba(255,106,106,0.1); }
 
-  .qa-tile-green:hover{border-color:rgba(62,213,152,0.4) !important;background:rgba(62,213,152,0.06) !important}
-  .qa-tile-green .ic{background:rgba(62,213,152,0.12) !important;color:#3ed598 !important}
 </style>
 <script src="js/supabase.js?v=1781242485"></script>
 <script src="js/notify.js?v=1"></script>
@@ -475,7 +587,7 @@
     }
   });
 </script>
-<script src="js/sidebar.js?v=200" defer></script>
+<script src="js/sidebar.js?v=1781345031" defer></script>
 </head>
 <body>
 
@@ -508,38 +620,74 @@
 </div>
 
 <div class="hero-card">
-  <div class="hero-top">
-    <span class="hero-tag" id="heroTag"><span class="dot"></span>No Active Allocation</span>
-    <span class="hero-ticker">PRE-IPO · SPCX</span>
-  </div>
-  <div class="hero-title">Your active allocation</div>
-  <div class="hero-company">APEX Private Markets</div>
-  <div class="hero-sector">Curated access to late-stage private companies</div>
-
-  <div class="hero-stats">
-    <div class="stat-box">
-      <div class="lbl">Reserved shares</div>
-      <div class="val" id="heroShares">0</div>
-      <div class="delta" id="heroTier">No allocation yet</div>
-    </div>
-    <div class="stat-box">
-      <div class="lbl">Est. value</div>
-      <div class="val" id="heroValue">$0.00</div>
-      <div class="delta" id="heroChange">Reserve to get started</div>
-    </div>
+  <!-- HEADER: Status pill + ticker badge -->
+  <div class="hero-header">
+    <span class="status-pill live" id="heroTag">
+      <span class="status-dot"></span>LIVE · TRADING
+    </span>
+    <span class="ticker-badge">
+      <span class="ticker-label">PRE-IPO</span>
+      <span class="ticker-sym">SPCX</span>
+    </span>
   </div>
 
-  <div class="countdown-row">
-    <div class="countdown-lbl">SpaceX IPO window opens in</div>
-    <div class="countdown-grid">
-      <div class="cd-cell"><div class="cd-num" id="cd-d">--</div><div class="cd-unit">Days</div></div>
-      <div class="cd-cell"><div class="cd-num" id="cd-h">--</div><div class="cd-unit">Hours</div></div>
-      <div class="cd-cell"><div class="cd-num" id="cd-m">--</div><div class="cd-unit">Mins</div></div>
-      <div class="cd-cell"><div class="cd-num" id="cd-s">--</div><div class="cd-unit">Secs</div></div>
+  <!-- COMPANY IDENTITY -->
+  <div class="company-row">
+    <div class="company-logo">
+      <img src="assets/spacex-logo.png" alt="SpaceX">
+    </div>
+    <div class="company-info">
+      <div class="company-name">SpaceX</div>
+      <div class="company-fullname">Space Exploration Technologies Corp.</div>
     </div>
   </div>
 
-  <button class="hero-cta" onclick="location.href='buy-shares.html?ticker=SPCX'">Buy SpaceX Shares Now →</button>
+  <!-- MARKET VALUE -->
+  <div class="value-block">
+    <div class="value-label">Market Value</div>
+    <div class="value-row">
+      <div class="value-amount" id="heroValue">$0.00</div>
+      <div class="value-change" id="heroChange">
+        <span class="change-dot"></span>No position
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- METRICS GRID -->
+  <div class="metrics-grid">
+    <div class="metric">
+      <div class="metric-label">Reserved</div>
+      <div class="metric-value" id="heroShares">0 <span>shares</span></div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Avg Price</div>
+      <div class="metric-value" id="heroAvgPrice">$135.00</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Status</div>
+      <div class="metric-value" id="heroTier" style="color:#3ed598">Trading</div>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <!-- LIVE PRICE STRIP -->
+  <div class="live-price-strip">
+    <div class="lp-left">
+      <span class="lp-pulse"></span>
+      <span class="lp-label">Live Price</span>
+    </div>
+    <div class="lp-right">
+      <span class="lp-value">$135.00</span>
+      <span class="lp-change up">▲ $0.00 (0.00%)</span>
+    </div>
+  </div>
+
+  <button class="hero-cta" onclick="location.href='buy-shares.html?ticker=SPCX'">
+    Buy SpaceX Shares
+  </button>
+  <a href="ipo-opportunity.html" class="hero-link">View opportunity details →</a>
 </div>
 
 
@@ -1357,5 +1505,6 @@ document.addEventListener('DOMContentLoaded', function () {
 <!-- /docs-quicknav-fix -->
 
 <script src="js/bottom-nav.js?v=1"></script>
+<script src="js/floating-widget.js?v=1781343118" defer></script>
 </body>
 </html>

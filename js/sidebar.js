@@ -30,33 +30,12 @@
     }
     .ax-sidebar.open{transform:translateX(0)}
 
-    .ax-sb-head{
-      padding:24px 22px 20px;
-      border-bottom:1px solid rgba(255,255,255,0.06);
-      background:linear-gradient(135deg,rgba(74,158,255,0.08),transparent 60%);
-    }
-    .ax-sb-avatar{
-      width:54px;height:54px;border-radius:50%;
-      background:linear-gradient(135deg,#4a9eff,#1a5bbf);
-      display:flex;align-items:center;justify-content:center;
-      font-family:'Plus Jakarta Sans',sans-serif;
-      font-weight:700;font-size:22px;color:#fff;
-      margin-bottom:12px;letter-spacing:-0.5px;
-    }
-    .ax-sb-name{
-      font-family:'Plus Jakarta Sans',sans-serif;
-      font-weight:600;font-size:17px;letter-spacing:-0.3px;color:#fff;
-    }
-    .ax-sb-email{font-size:12px;color:#8a94a3;margin-top:2px}
-    .ax-sb-status{
-      display:inline-flex;align-items:center;gap:6px;
-      margin-top:10px;font-size:11px;font-weight:600;
-      color:#3ed598;
-    }
-    .ax-sb-status .dot{
-      width:6px;height:6px;border-radius:50%;background:#3ed598;
-      box-shadow:0 0 8px rgba(62,213,152,0.5);
-    }
+    
+    
+    
+    
+    
+    
 
     .ax-sb-nav{
       flex:1;overflow-y:auto;padding:10px 0;
@@ -103,6 +82,69 @@
     }
     .ax-sb-close:hover{color:#fff}
     .ax-sb-close svg{width:14px;height:14px}
+
+    .ax-sb-head{
+      padding:20px 20px 16px;
+      border-bottom:1px solid rgba(255,255,255,0.06);
+    }
+    .ax-sb-head-top{
+      display:flex; align-items:center;
+      gap:12px; margin-bottom:14px;
+    }
+    .ax-sb-avatar{
+      width:48px; height:48px; border-radius:50%;
+      background:rgba(74,158,255,0.12);
+      border:1.5px solid rgba(74,158,255,0.3);
+      display:flex; align-items:center; justify-content:center;
+      color:#4a9eff;
+      flex-shrink:0;
+    }
+    .ax-sb-avatar svg{ width:24px; height:24px; }
+    .ax-sb-identity{ flex:1; min-width:0; text-align:left; }
+    .ax-sb-name{
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-weight:600; font-size:15px; color:#fff;
+      letter-spacing:-0.2px; line-height:1.2;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .ax-sb-email{
+      font-size:12px; color:#8a94a3; margin-top:2px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .ax-sb-badges{
+      display:flex; flex-direction:column;
+      gap:6px; align-items:flex-start;
+    }
+    .ax-sb-badges::-webkit-scrollbar{display:none}
+    .ax-sb-badges::-webkit-scrollbar{display:none}
+    .ax-sb-badge{
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:11px; font-weight:600;
+      padding:0; background:none !important;
+      border:none !important; border-radius:0;
+      letter-spacing:0.3px; text-transform:none;
+    }
+    .ax-sb-badge svg{ width:13px; height:13px; flex-shrink:0; }
+    .ax-sb-badge.verified{ color:#3ed598; }
+    .ax-sb-badge.tier{ color:#ffb800; }
+    .ax-sb-badge.secure{ color:#4a9eff; }
+    .ax-sb-dot{
+      width:13px; height:13px;
+      display:inline-flex; align-items:center; justify-content:center;
+      flex-shrink:0;
+    }
+    .ax-sb-dot::before{
+      content:""; width:7px; height:7px;
+      border-radius:50%;
+      background:#3ed598;
+      box-shadow:0 0 6px rgba(62,213,152,0.6);
+      animation:axDotPulse 2s ease-in-out infinite;
+    }
+    @keyframes axDotPulse{
+      0%,100%{opacity:1}
+      50%{opacity:0.4}
+    }
+
   `;
   const styleEl = document.createElement('style');
   styleEl.textContent = css;
@@ -120,11 +162,33 @@
     </button>
 
     <div class="ax-sb-head">
-      <div class="ax-sb-avatar" id="axSbAvatar">·</div>
-      <div class="ax-sb-name" id="axSbName">Loading…</div>
-      <div class="ax-sb-email" id="axSbEmail">·</div>
-      <div class="ax-sb-status"><span class="dot"></span>Verified · Secure session</div>
-    </div>
+        <div class="ax-sb-head-top">
+          <div class="ax-sb-avatar" id="axSbAvatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <div class="ax-sb-identity">
+            <div class="ax-sb-name" id="axSbName">Loading…</div>
+            <div class="ax-sb-email" id="axSbEmail">·</div>
+          </div>
+        </div>
+        <div class="ax-sb-badges">
+          <span class="ax-sb-badge verified" id="axSbBadgeKyc">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Verified
+          </span>
+          <span class="ax-sb-badge tier" id="axSbBadgeTier">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Founding
+          </span>
+          <span class="ax-sb-badge secure">
+            <span class="ax-sb-dot"></span>
+            Secure
+          </span>
+        </div>
+      </div>
 
     <nav class="ax-sb-nav">
       <div class="ax-sb-group-label">Main</div>
@@ -162,8 +226,8 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         Security
       </a>
-      <a class="ax-sb-item" data-page="contact.html" href="contact.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <a class="ax-sb-item" id="axHelpSupport" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         Help &amp; Support
       </a>
 
@@ -235,7 +299,7 @@
       const initial = (p.first_name || p.email || 'A').charAt(0).toUpperCase();
       document.getElementById('axSbName').textContent = name;
       document.getElementById('axSbEmail').textContent = p.email || '';
-      document.getElementById('axSbAvatar').textContent = initial;
+      // avatar uses SVG, no text needed
     });
   }
   if(window.sb) fillProfile();
@@ -287,5 +351,73 @@
     }, 2200);
   }
   window.apexToast = showToast;
+
+
+  // ── Help & Support → mailto with user info ──
+  var helpBtn = sidebar.querySelector('#axHelpSupport');
+  if (helpBtn) {
+    helpBtn.addEventListener('click', async function(e){
+      e.preventDefault();
+      var info = '';
+      try {
+        if (window.sb) {
+          var { data } = await sb.auth.getUser();
+          if (data && data.user) {
+            info = '\n\n---\nAccount: ' + (data.user.email || '') +
+                   '\nUser ID: ' + data.user.id +
+                   '\nPage: ' + location.pathname;
+          }
+        }
+      } catch(_) {}
+      var subject = 'APEX Support Request';
+      var body = 'Hi APEX team,\n\n[describe your question]' + info;
+      window.location.href = 'mailto:apexipo54@zohomail.com' +
+        '?subject=' + encodeURIComponent(subject) +
+        '&body=' + encodeURIComponent(body);
+      // close sidebar after click
+      if (typeof closeSidebar === 'function') closeSidebar();
+      else if (overlay) overlay.classList.remove('open');
+      if (sidebar) sidebar.classList.remove('open');
+    });
+  }
+
+
+  // Enhanced profile populate (badges)
+  async function axPopulateBadges(){
+    if(!window.sb) return;
+    try {
+      var { data: { user } } = await sb.auth.getUser();
+      if(!user) return;
+      var { data: profile } = await sb.from('profiles').select('kyc_status, account_tier, first_name, last_name').eq('id', user.id).single();
+      if(!profile) return;
+
+      var kycBadge = document.getElementById('axSbBadgeKyc');
+      var tierBadge = document.getElementById('axSbBadgeTier');
+
+      if(kycBadge){
+        var kyc = (profile.kyc_status || 'pending').toLowerCase();
+        if(kyc === 'verified'){
+          kycBadge.className = 'ax-sb-badge verified';
+          kycBadge.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Verified';
+        } else if(kyc === 'pending'){
+          kycBadge.className = 'ax-sb-badge';
+          kycBadge.style.background = 'rgba(255,184,0,0.12)';
+          kycBadge.style.color = '#ffb800';
+          kycBadge.style.border = '1px solid rgba(255,184,0,0.2)';
+          kycBadge.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> KYC Pending';
+        } else {
+          kycBadge.style.display = 'none';
+        }
+      }
+
+      if(tierBadge){
+        var tier = profile.account_tier || 'Founding';
+        tierBadge.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> ' + tier;
+      }
+    } catch(e){ /* silent */ }
+  }
+
+  if(window.sb) axPopulateBadges();
+  else document.addEventListener('sb-ready', axPopulateBadges, { once: true });
 
 })();
