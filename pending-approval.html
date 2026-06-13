@@ -124,6 +124,7 @@
 
     <div class="brand">APEX <span>·</span> IPO ACCESS</div>
 
+    <div id="pendingState">
     <div class="icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/>
@@ -166,6 +167,33 @@
       <span class="sep">·</span>
       <a href="mailto:support@apexipoaccess.com">support@apexipoaccess.com</a>
     </div>
+    </div>
+
+    <div id="approvedState" style="display:none">
+      <div class="icon" style="background:rgba(62,213,152,0.08);border-color:rgba(62,213,152,0.3)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#3ed598" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+
+      <h1>Account approved</h1>
+      <div class="sub">
+        Welcome aboard, <b id="userName2">Investor</b>. Your account has been verified by our compliance team and is now active.
+      </div>
+
+      <div class="notice" style="background:rgba(62,213,152,0.06);border-color:rgba(62,213,152,0.18)">
+        <b style="color:#3ed598">✓ Verification complete</b>
+        You now have full access to APEX IPO ACCESS — including pre-IPO opportunities, deposits, and your investor dashboard.
+      </div>
+
+      <div class="btn-row">
+        <a class="btn btn-primary" href="#" onclick="window._goToLogin();return false;" style="flex:1">Login to dashboard →</a>
+      </div>
+
+      <div class="foot">
+        Need help? <a href="mailto:support@apexipoaccess.com">support@apexipoaccess.com</a>
+      </div>
+    </div>
 
   </div>
 </div>
@@ -182,10 +210,6 @@
 
     var { data: profile } = await sb.from('profiles').select('*').eq('id', data.user.id).single();
     if(profile){
-      if(profile.kyc_status === 'verified' || profile.is_admin){
-        window.location.href = 'dashboard.html';
-        return;
-      }
       if(profile.banned){
         await sb.auth.signOut();
         alert('Your account has been suspended.\n\n' + (profile.banned_reason || ''));
@@ -195,12 +219,28 @@
 
       var name = ((profile.first_name||'') + ' ' + (profile.last_name||'')).trim() || 'Investor';
       document.getElementById('userName').textContent = name;
+      var un2 = document.getElementById('userName2'); if(un2) un2.textContent = name;
       document.getElementById('userEmail').textContent = profile.email || data.user.email || '—';
       if(profile.created_at){
         document.getElementById('submitDate').textContent = new Date(profile.created_at).toLocaleDateString('en-US',{month:'short', day:'numeric', year:'numeric'});
       }
+
+      // ✅ Approved — switch to success state
+      if(profile.kyc_status === 'verified' || profile.is_admin){
+        showApprovedState();
+      }
     }
   });
+
+  function showApprovedState(){
+    document.getElementById('pendingState').style.display = 'none';
+    document.getElementById('approvedState').style.display = 'block';
+  }
+
+  window._goToLogin = async function(){
+    try { await sb.auth.signOut(); } catch(e){}
+    window.location.href = 'login.html';
+  };
 </script>
 
 </body>
