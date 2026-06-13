@@ -687,6 +687,7 @@
             ? (typeof company.valuation === 'number' ? fmtCompact(company.valuation) : company.valuation)
             : state.valuation;
           if(company.logo_url) state.logo = company.logo_url;
+          else if(company.domain) state.logo = `https://icons.duckduckgo.com/ip3/${company.domain}.ico`;
         }
       } catch(e){
         console.warn('Company not found in DB, using KNOWN fallback for', ticker);
@@ -696,20 +697,20 @@
       var KNOWN_NEEDS_FALLBACK = !state.company || !state.logo;
       if(KNOWN_NEEDS_FALLBACK){
         var KNOWN = {
-          'SPCX':   { name:'SpaceX',     sector:'Aerospace · Live IPO',  valuation:'$400B', price:135, logo:'assets/spacex-logo.png' },
-          'OAIB':   { name:'OpenAI',     sector:'AI · Pre-IPO',          valuation:'$157B', price:85,  logo:'https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg' },
-          'OPAI':   { name:'OpenAI',     sector:'AI · Pre-IPO',          valuation:'$157B', price:85,  logo:'https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg' },
-          'STRP':   { name:'Stripe',     sector:'Fintech · Pre-IPO',     valuation:'$70B',  price:42,  logo:'https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg' },
-          'ANTH':   { name:'Anthropic',  sector:'AI · Pre-IPO',          valuation:'$60B',  price:65,  logo:'https://logo.clearbit.com/anthropic.com' },
-          'XAI':    { name:'xAI',        sector:'AI · Pre-IPO',          valuation:'$50B',  price:38,  logo:'https://logo.clearbit.com/x.ai' },
-          'NLNK':   { name:'Neuralink',  sector:'Biotech · Pre-IPO',     valuation:'$8B',   price:25,  logo:'https://logo.clearbit.com/neuralink.com' },
-          'DBRX':   { name:'Databricks', sector:'Data · Pre-IPO',        valuation:'$62B',  price:73,  logo:'https://logo.clearbit.com/databricks.com' },
-          'CNVA':   { name:'Canva',      sector:'SaaS · Pre-IPO',        valuation:'$32B',  price:48,  logo:'https://logo.clearbit.com/canva.com' },
-          'STARLINK':{ name:'Starlink',  sector:'Satellite · Pre-IPO',   valuation:'$140B', price:78,  logo:'https://logo.clearbit.com/starlink.com' },
-          'BORING': { name:'The Boring Company', sector:'Infrastructure · Pre-IPO', valuation:'$5.7B', price:18, logo:'https://logo.clearbit.com/boringcompany.com' },
-          'TBC':    { name:'The Boring Company', sector:'Infrastructure · Pre-IPO', valuation:'$5.7B', price:18, logo:'https://logo.clearbit.com/boringcompany.com' },
-          'XCORP':  { name:'X Corp',     sector:'Social · Pre-IPO',      valuation:'$19B',  price:22,  logo:'https://logo.clearbit.com/x.com' },
-          'TESLA':  { name:'Tesla',      sector:'Auto · Public',         valuation:'$1.2T', price:380, logo:'https://logo.clearbit.com/tesla.com' }
+          'SPCX':   { name:'SpaceX',     sector:'Aerospace · Live IPO',  valuation:'$400B', price:135, logo:'https://icons.duckduckgo.com/ip3/spacex.com.ico' },
+          'OAIB':   { name:'OpenAI',     sector:'AI · Pre-IPO',          valuation:'$157B', price:85,  logo:'https://icons.duckduckgo.com/ip3/openai.com.ico' },
+          'OPAI':   { name:'OpenAI',     sector:'AI · Pre-IPO',          valuation:'$157B', price:85,  logo:'https://icons.duckduckgo.com/ip3/openai.com.ico' },
+          'STRP':   { name:'Stripe',     sector:'Fintech · Pre-IPO',     valuation:'$70B',  price:42,  logo:'https://icons.duckduckgo.com/ip3/stripe.com.ico' },
+          'ANTH':   { name:'Anthropic',  sector:'AI · Pre-IPO',          valuation:'$60B',  price:65,  logo:'https://icons.duckduckgo.com/ip3/anthropic.com.ico' },
+          'XAI':    { name:'xAI',        sector:'AI · Pre-IPO',          valuation:'$50B',  price:38,  logo:'https://icons.duckduckgo.com/ip3/x.ai.ico' },
+          'NLNK':   { name:'Neuralink',  sector:'Biotech · Pre-IPO',     valuation:'$8B',   price:25,  logo:'https://icons.duckduckgo.com/ip3/neuralink.com.ico' },
+          'DBRX':   { name:'Databricks', sector:'Data · Pre-IPO',        valuation:'$62B',  price:73,  logo:'https://icons.duckduckgo.com/ip3/databricks.com.ico' },
+          'CNVA':   { name:'Canva',      sector:'SaaS · Pre-IPO',        valuation:'$32B',  price:48,  logo:'https://icons.duckduckgo.com/ip3/canva.com.ico' },
+          'STARLINK':{ name:'Starlink',  sector:'Satellite · Pre-IPO',   valuation:'$140B', price:78,  logo:'https://icons.duckduckgo.com/ip3/starlink.com.ico' },
+          'BORING': { name:'The Boring Company', sector:'Infrastructure · Pre-IPO', valuation:'$5.7B', price:18, logo:'https://icons.duckduckgo.com/ip3/boringcompany.com.ico' },
+          'TBC':    { name:'The Boring Company', sector:'Infrastructure · Pre-IPO', valuation:'$5.7B', price:18, logo:'https://icons.duckduckgo.com/ip3/boringcompany.com.ico' },
+          'XCORP':  { name:'X Corp',     sector:'Social · Pre-IPO',      valuation:'$19B',  price:22,  logo:'https://icons.duckduckgo.com/ip3/x.com.ico' },
+          'TESLA':  { name:'Tesla',      sector:'Auto · Public',         valuation:'$1.2T', price:380, logo:'https://icons.duckduckgo.com/ip3/tesla.com.ico' }
         };
         var k = KNOWN[ticker];
         if(k){
