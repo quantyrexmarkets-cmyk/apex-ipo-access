@@ -256,7 +256,7 @@ function shell(opts: {
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px">
 
       <!-- Main card -->
-      <tr><td class="card" style="border-radius:20px;padding:0;border:1px solid #3c3f43">
+      <tr><td class="card" style="border-radius:20px;padding:0">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 
           <!-- Brand logo (dark version - white text works on dark card) -->
@@ -265,11 +265,15 @@ function shell(opts: {
                  width="220" style="display:block;margin:0 auto;width:220px;max-width:70%;height:auto">
           </td></tr>
 
-          <!-- Big headline (Google style: lighter weight, more spacing) -->
-          <tr><td class="headline" style="padding:24px 32px 28px;font-family:'Google Sans',Inter,Arial,sans-serif;font-size:32px;font-weight:400;line-height:1.35;letter-spacing:-0.3px;text-align:center">${opts.headline.split('\n').map(l => escape(l)).join('<br style="line-height:1.55">')}</td></tr>
+          <!-- Bordered inner content block -->
+          <tr><td style="padding:24px 20px 8px">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #3c3f43;border-radius:16px">
+              <tr><td class="headline" style="padding:32px 24px 20px;font-family:'Google Sans',Inter,Arial,sans-serif;font-size:32px;font-weight:400;line-height:1.35;letter-spacing:-0.3px;text-align:center">${opts.headline.split('\n').map(l => escape(l)).join('<br style="line-height:1.55">')}</td></tr>
+              ${subtitle}
+              ${cta}
+            </table>
+          </td></tr>
 
-          ${subtitle}
-          ${cta}
           ${details}
 
         </table>
