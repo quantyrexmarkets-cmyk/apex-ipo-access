@@ -3328,6 +3328,7 @@
   function closeBellDropdown(){
     var dd = document.getElementById('bellDropdown');
     if(dd) dd.classList.remove('open');
+    document.body.style.overflow = '';
   }
 
   function initBell(){
@@ -3337,11 +3338,24 @@
     btn.addEventListener('click', function(e){
       e.stopPropagation();
       dd.classList.toggle('open');
-      if(dd.classList.contains('open')) loadAdminNotifications();
+      if(dd.classList.contains('open')){
+        loadAdminNotifications();
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
     });
-    document.addEventListener('click', function(e){
-      if(!dd.contains(e.target) && e.target !== btn) closeBellDropdown();
-    });
+    // Close button (×)
+    var fsClose = document.getElementById('bellFsClose');
+    if(fsClose){
+      fsClose.addEventListener('click', function(e){
+        e.stopPropagation();
+        closeBellDropdown();
+        document.body.style.overflow = '';
+      });
+    }
+    // Don't close on outside click when fullscreen — only via × button
+    // (commented out the outside-click handler)
     // Fullscreen close button
     var fsClose = document.getElementById('bellFsClose');
     if(fsClose){
