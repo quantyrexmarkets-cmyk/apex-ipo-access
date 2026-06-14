@@ -11,7 +11,7 @@ function wrap(opts: {
   noticeBody?: string;
   iconType?: 'success' | 'info' | 'warn' | 'error';
 }) {
-  const icons = {
+  const ICONS = {
     success: '<svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#3ed598" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
     info: '<svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#5fb0ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
     warn: '<svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#ffb800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
@@ -30,7 +30,7 @@ function wrap(opts: {
     error: 'rgba(255,106,106,0.3)',
   };
   const ic = opts.iconType || 'info';
-  const iconHtml = `<table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 20px"><tr><td align="center" valign="middle" width="64" height="64" style="background:${iconBgs[ic]};border:1px solid ${iconBorders[ic]};border-radius:50%">${icons[ic]}</td></tr></table>`;
+  const iconHtml = `<table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 20px"><tr><td align="center" valign="middle" width="64" height="64" style="background:${iconBgs[ic]};border:1px solid ${iconBorders[ic]};border-radius:50%">${ICONS[ic]}</td></tr></table>`;
   const ctaHtml = opts.ctaText && opts.ctaUrl ? `<table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:28px auto"><tr><td align="center" class="cta-btn" style="border-radius:8px"><a href="${opts.ctaUrl}" target="_blank" class="cta-btn" style="display:inline-block;padding:14px 36px;font-family:'Inter','Roboto',Arial,sans-serif;font-size:15px;font-weight:600;text-decoration:none;border-radius:8px;letter-spacing:0.2px">${opts.ctaText}</a></td></tr></table>` : '';
   const noticeHtml = opts.noticeTitle ? `<p class="security" style="margin:32px 0 0;padding:14px 16px;border-radius:8px;font-size:12px;line-height:1.6"><strong>${opts.noticeTitle}</strong> ${opts.noticeBody || ''}</p>` : '';
   const preheader = opts.preheader || opts.heading;
