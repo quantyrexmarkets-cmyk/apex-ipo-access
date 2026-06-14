@@ -203,8 +203,8 @@ function shell(opts: {
   :root { color-scheme: light dark; supported-color-schemes: light dark; }
   body, .bg { background:#ffffff !important; }
   .card { background:#f8f9fa !important; }
-  .brand { color:#202124 !important; }
-  .brand-sub { color:#5f6368 !important; }
+  .brand-apex { color:#1a73e8 !important; }
+  .brand-rest { color:#202124 !important; }
   .headline { color:#202124 !important; }
   .subtitle { color:#5f6368 !important; }
   .details { color:#5f6368 !important; }
@@ -216,8 +216,8 @@ function shell(opts: {
   @media (prefers-color-scheme: dark) {
     body, .bg { background:#1f2123 !important; }
     .card { background:#28292c !important; }
-    .brand { color:#ffffff !important; }
-    .brand-sub { color:#a0a4a8 !important; }
+    .brand-apex { color:#5fb0ff !important; }
+    .brand-rest { color:#ffffff !important; }
     .headline { color:#ffffff !important; }
     .subtitle { color:#c8ccd0 !important; }
     .details { color:#a0a4a8 !important; }
@@ -229,6 +229,7 @@ function shell(opts: {
   }
   @media only screen and (max-width:600px) {
     .headline { font-size:23px !important; line-height:1.45 !important; padding:8px 28px 20px !important; }
+    .brand-apex, .brand-rest { font-size:28px !important; }
     .card { border-radius:16px !important; }
   }
 </style>
@@ -245,19 +246,11 @@ function shell(opts: {
       <tr><td class="card" style="border-radius:20px;padding:0">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 
-          <!-- Brand mark (centered) -->
-          <tr><td align="center" style="padding:48px 32px 36px">
-            <table role="presentation" cellpadding="0" cellspacing="0">
-              <tr>
-                <td style="padding-right:12px;vertical-align:middle">
-                  <img src="https://apexipoaccess.com/assets/spacex-logo.png" alt="" width="40" height="40" style="display:block;width:40px;height:40px">
-                </td>
-                <td style="vertical-align:middle">
-                  <span class="brand" style="font-family:Oswald,Impact,'Helvetica Neue',Arial,sans-serif;font-size:22px;font-weight:600;letter-spacing:2px;text-transform:uppercase">APEX</span>
-                  <span class="brand-sub" style="font-family:Oswald,Impact,'Helvetica Neue',Arial,sans-serif;font-size:22px;font-weight:300;letter-spacing:2px;text-transform:uppercase;margin-left:6px">IPO Access</span>
-                </td>
-              </tr>
-            </table>
+          <!-- Brand wordmark (Google-style centered) -->
+          <tr><td align="center" style="padding:52px 32px 40px">
+            <div style="font-family:'Google Sans','Product Sans',Inter,Roboto,Arial,sans-serif;font-size:34px;font-weight:500;letter-spacing:-0.5px;line-height:1">
+              <span class="brand-apex" style="color:#1a73e8">APEX</span><span class="brand-rest" style="color:#202124;margin-left:10px;font-weight:400">IPO Access</span>
+            </div>
           </td></tr>
 
           <!-- Big headline (Google style: weight 400, generous line-height) -->
