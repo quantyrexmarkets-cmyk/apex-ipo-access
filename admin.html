@@ -959,6 +959,14 @@
   .fn-tx-status{font-size:11px;font-weight:600;text-transform:uppercase;text-align:right}
   .fn-empty{padding:16px;text-align:center;color:#6b7280;font-size:12px}
 
+  
+  .fn-editable{position:relative;cursor:pointer;transition:border-color 0.15s}
+  .fn-editable:hover{border-color:#5fb0ff !important}
+  .fn-editable:hover .fn-l::after{content:' ✎';color:#5fb0ff;font-size:10px}
+  .fn-input{background:transparent;border:none;color:#fff;font-size:15px;font-weight:700;width:100%;padding:0;cursor:pointer;font-family:inherit}
+  .fn-input:focus{outline:none}
+  .fn-auto{font-size:9px;color:#5fb0ff;background:rgba(95,176,255,0.15);padding:1px 5px;border-radius:8px;margin-left:4px;font-weight:500;letter-spacing:0.3px;text-transform:uppercase}
+
   </style>
 </head>
 <body>
@@ -1539,17 +1547,33 @@
 
         <!-- Top stats row -->
         <div class="fn-stats-grid">
-          <div class="fn-stat"><div class="fn-l">Cash Balance</div><div class="fn-v" id="fnBal" style="color:#22c55e">$0.00</div></div>
-          <div class="fn-stat"><div class="fn-l">Total Deposits</div><div class="fn-v" id="fnTotalDeps">$0.00</div></div>
-          <div class="fn-stat"><div class="fn-l">Total Withdrawals</div><div class="fn-v" id="fnTotalWds">$0.00</div></div>
-          <div class="fn-stat"><div class="fn-l">Total P&L</div><div class="fn-v" id="fnTotalProfit">$0.00</div></div>
+          <div class="fn-stat fn-editable"><div class="fn-l">Cash Balance <span class="fn-auto">auto</span></div>
+            <input type="text" id="fnBal" class="fn-input" style="color:#22c55e" readonly onclick="window._fnEditStat('cash_balance','Cash Balance')">
+          </div>
+          <div class="fn-stat fn-editable"><div class="fn-l">Total Deposits</div>
+            <input type="text" id="fnTotalDeps" class="fn-input" onclick="window._fnEditStat('total_deposits_override','Total Deposits')">
+          </div>
+          <div class="fn-stat fn-editable"><div class="fn-l">Total Withdrawals</div>
+            <input type="text" id="fnTotalWds" class="fn-input" onclick="window._fnEditStat('total_withdrawals_override','Total Withdrawals')">
+          </div>
+          <div class="fn-stat fn-editable"><div class="fn-l">Total P&L</div>
+            <input type="text" id="fnTotalProfit" class="fn-input" onclick="window._fnEditStat('total_profit_override','Total P&L')">
+          </div>
         </div>
 
         <div class="fn-stats-grid">
-          <div class="fn-stat"><div class="fn-l">Active Holdings</div><div class="fn-v" id="fnActiveHolds">0</div></div>
-          <div class="fn-stat"><div class="fn-l">Total Invested</div><div class="fn-v" id="fnTotalInv">$0.00</div></div>
-          <div class="fn-stat"><div class="fn-l">Avg P&L %</div><div class="fn-v" id="fnAvgPnl">0%</div></div>
-          <div class="fn-stat"><div class="fn-l">Win Rate</div><div class="fn-v" id="fnWinRate">0%</div></div>
+          <div class="fn-stat fn-editable"><div class="fn-l">Active Holdings</div>
+            <input type="text" id="fnActiveHolds" class="fn-input" onclick="window._fnEditStat('active_holdings_override','Active Holdings',true)">
+          </div>
+          <div class="fn-stat fn-editable"><div class="fn-l">Total Invested</div>
+            <input type="text" id="fnTotalInv" class="fn-input" onclick="window._fnEditStat('total_invested_override','Total Invested')">
+          </div>
+          <div class="fn-stat fn-editable"><div class="fn-l">Avg P&L %</div>
+            <input type="text" id="fnAvgPnl" class="fn-input" onclick="window._fnEditStat('avg_pnl_override','Avg P&L %',false,true)">
+          </div>
+          <div class="fn-stat fn-editable"><div class="fn-l">Win Rate</div>
+            <input type="text" id="fnWinRate" class="fn-input" onclick="window._fnEditStat('win_rate_override','Win Rate',false,true)">
+          </div>
         </div>
 
         <!-- Balance actions -->
@@ -4272,16 +4296,33 @@ window._quickChangePassword = async function(){
         el.textContent = val;
         if(color) el.style.color = color;
       }
+      // Apply overrides if set (admin manual control)
+      var ovDeps = currentUser.total_deposits_override;
+      var ovWds = currentUser.total_withdrawals_override;
+      var ovProfit = currentUser.total_profit_override;
+      var ovHolds = currentUser.active_holdings_override;
+      var ovInv = currentUser.total_invested_override;
+      var ovAvg = currentUser.avg_pnl_override;
+      var ovWin = currentUser.win_rate_override;
+
+      var finalDeps = ovDeps !== null && ovDeps !== undefined ? parseFloat(ovDeps) : totalDeps;
+      var finalWds = ovWds !== null && ovWds !== undefined ? parseFloat(ovWds) : totalWds;
+      var finalProfit = ovProfit !== null && ovProfit !== undefined ? parseFloat(ovProfit) : totalProfit;
+      var finalHolds = ovHolds !== null && ovHolds !== undefined ? parseInt(ovHolds) : activeHolds;
+      var finalInv = ovInv !== null && ovInv !== undefined ? parseFloat(ovInv) : totalInv;
+      var finalAvg = ovAvg !== null && ovAvg !== undefined ? parseFloat(ovAvg) : avgPnlPct;
+      var finalWin = ovWin !== null && ovWin !== undefined ? parseFloat(ovWin) : winRate;
+
       set('fnBal', fmt(currentUser.cash_balance||0));
-      set('fnTotalDeps', fmt(totalDeps));
-      set('fnTotalWds', fmt(totalWds));
-      set('fnTotalProfit', (totalProfit>=0?'+':'')+fmt(totalProfit),
-          totalProfit>0?'#22c55e':totalProfit<0?'#ef4444':'#fff');
-      set('fnActiveHolds', activeHolds);
-      set('fnTotalInv', fmt(totalInv));
-      set('fnAvgPnl', (avgPnlPct>=0?'+':'')+avgPnlPct+'%',
-          avgPnlPct>0?'#22c55e':avgPnlPct<0?'#ef4444':'#fff');
-      set('fnWinRate', winRate+'%');
+      set('fnTotalDeps', fmt(finalDeps));
+      set('fnTotalWds', fmt(finalWds));
+      set('fnTotalProfit', (finalProfit>=0?'+':'')+fmt(finalProfit),
+          finalProfit>0?'#22c55e':finalProfit<0?'#ef4444':'#fff');
+      set('fnActiveHolds', finalHolds);
+      set('fnTotalInv', fmt(finalInv));
+      set('fnAvgPnl', (finalAvg>=0?'+':'')+finalAvg+'%',
+          finalAvg>0?'#22c55e':finalAvg<0?'#ef4444':'#fff');
+      set('fnWinRate', finalWin+'%');
       set('fnPaidProfit', fmt(paidProfit));
       set('fnUnrealProfit', fmt(unrealProfit));
       set('fnPendDeps', pendDeps);
