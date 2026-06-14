@@ -3998,5 +3998,117 @@
   </div>
 </div>
 
+
+<!-- ADMIN PROFILE MODAL JS (force-injected) -->
+<script>
+(function(){
+  window._openAdminProfile = async function(){
+    var modal = document.getElementById('adminProfileModal');
+    if(!modal){ alert('Profile modal HTML missing'); return; }
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    var acctMenu = document.getElementById('acctMenu');
+    if(acctMenu) acctMenu.classList.remove('show');
+    try {
+      var ures = await sb.auth.getUser();
+      var user = ures.data && ures.data.user;
+      if(!user) return;
+      var pres = await sb.from('profiles').select('*').eq('id', user.id).single();
+      var profile = pres.data || {};
+      document.getElementById('apFirst').value = profile.first_name || '';
+      document.getElementById('apLast').value = profile.last_name || '';
+      document.getElementById('apEmail').value = profile.email || user.email || '';
+      document.getElementById('apPhone').value = profile.phone || '';
+      document.getElementById('apEmailNew').value = '';
+      document.getElementById('apPwdCur').value = '';
+      document.getElementById('apPwdNew').value = '';
+      document.getElementById('apPwdConf').value = '';
+      var idEl = document.getElementById('apIdLbl'); if(idEl) idEl.textContent = user.id;
+      var crEl = document.getElementById('apCreatedLbl'); if(crEl) crEl.textContent = profile.created_at ? new Date(profile.created_at).toLocaleString() : '—';
+      var llEl = document.getElementById('apLastLoginLbl'); if(llEl) llEl.textContent = user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : '—';
+      try {
+        var ar = await sb.from('admin_log').select('*').order('created_at',{ascending:false}).limit(15);
+        var list = document.getElementById('apActList');
+        if(list){
+          if(!ar.data || !ar.data.length){
+            list.innerHTML = '<div class="empty" style="padding:20px;text-align:center;color:#6b7280">No activity yet</div>';
+          } else {
+            list.innerHTML = ar.data.map(function(a){
+              var when = new Date(a.created_at).toLocaleString();
+              return '<div class="ap-act-item"><div class="ap-act-act">'+(a.action||'action')+'</div>'+
+                '<div class="ap-act-meta">'+(a.target_email || a.target_id || '')+'  ·  '+when+'</div></div>';
+            }).join('');
+          }
+        }
+      } catch(e){}
+    } catch(e){ console.error('admin profile load', e); }
+  };
+
+  window._closeAdminProfile = function(){
+    var m = document.getElementById('adminProfileModal');
+    if(m) m.classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  window._apTab = function(name){
+    document.querySelectorAll('.ap-tab').forEach(function(t){
+      t.classList.toggle('active', t.dataset.tab === name);
+    });
+    document.querySelectorAll('.ap-pane').forEach(function(p){
+      p.classList.toggle('active', p.id === 'apPane-'+name);
+    });
+  };
+
+  window._apSaveProfile = async function(){
+    var ures = await sb.auth.getUser();
+    var user = ures.data && ures.data.user;
+    if(!user) return alert('Not signed in');
+    var updates = {
+      first_name: document.getElementById('apFirst').value.trim(),
+      last_name: document.getElementById('apLast').value.trim(),
+      phone: document.getElementById('apPhone').value.trim() || null
+    };
+    var r = await sb.from('profiles').update(updates).eq('id', user.id);
+    if(r.error) return alert('Save failed: '+r.error.message);
+    alert('Profile updated');
+    var nm = (updates.first_name + ' ' + updates.last_name).trim() || 'Admin';
+    var av = (nm.charAt(0) || 'A').toUpperCase();
+    var aAv = document.getElementById('acctAv'); if(aAv) aAv.textContent = av;
+    var aNm = document.getElementById('acctNm'); if(aNm) aNm.textContent = nm.split(' ')[0];
+    var aMn = document.getElementById('acctMenuName'); if(aMn) aMn.textContent = nm;
+  };
+
+  window._apChangeEmail = async function(){
+    var newEmail = document.getElementById('apEmailNew').value.trim().toLowerCase();
+    if(!newEmail || newEmail.indexOf('@')<0) return alert('Enter a valid email');
+    if(!confirm('Change your login email to '+newEmail+'?')) return;
+    var r = await sb.auth.updateUser({ email: newEmail });
+    if(r.error) return alert('Email change failed: '+r.error.message);
+    alert('Verification link sent to '+newEmail);
+    document.getElementById('apEmailNew').value = '';
+  };
+
+  window._apChangePassword = async function(){
+    var cur = document.getElementById('apPwdCur').value;
+    var neu = document.getElementById('apPwdNew').value;
+    var conf = document.getElementById('apPwdConf').value;
+    if(!cur || !neu) return alert('Fill all password fields');
+    if(neu.length < 8) return alert('New password must be at least 8 characters');
+    if(neu !== conf) return alert('New passwords do not match');
+    var ures = await sb.auth.getUser();
+    var user = ures.data && ures.data.user;
+    if(!user) return alert('Not signed in');
+    var ar = await sb.auth.signInWithPassword({ email: user.email, password: cur });
+    if(ar.error) return alert('Current password is incorrect');
+    var r = await sb.auth.updateUser({ password: neu });
+    if(r.error) return alert('Password change failed: '+r.error.message);
+    alert('Password updated successfully');
+    document.getElementById('apPwdCur').value = '';
+    document.getElementById('apPwdNew').value = '';
+    document.getElementById('apPwdConf').value = '';
+  };
+})();
+</script>
+
 </body>
 </html>
