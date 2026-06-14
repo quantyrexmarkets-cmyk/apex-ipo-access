@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
           <table role="presentation" cellpadding="0" cellspacing="0">
             <tr>
               <td style="padding-right:14px;vertical-align:middle">
-                <img src="https://apexipoaccess.com/assets/spacex-x-blue.png" alt="APEX" width="48" height="48" style="display:block;width:48px;height:48px">
+                <img src="https://apexipoaccess.com/assets/spacex-logo.png" alt="APEX" width="48" height="48" style="display:block;width:48px;height:48px">
               </td>
               <td style="vertical-align:middle">
                 <div style="font-family:'Manrope','Helvetica Neue',Arial,sans-serif;font-size:20px;font-weight:300;letter-spacing:3px;color:#ffffff;line-height:1.1">APEX IPO ACCESS</div>
