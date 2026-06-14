@@ -692,7 +692,60 @@
     margin-bottom:10px;
   }
   @keyframes spin{to{transform:rotate(360deg)}}
-</style>
+
+  /* Notification Bell Dropdown */
+  .bell-dropdown{
+    position:absolute; top:48px; right:0; width:360px; max-width:calc(100vw - 32px);
+    background:#1a1d21; border:1px solid #2a2d31; border-radius:12px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.5); z-index:1000;
+    display:none; overflow:hidden;
+  }
+  .bell-dropdown.open{display:block}
+  .bell-dd-head{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 16px; border-bottom:1px solid #2a2d31;
+    font-weight:600; color:#fff; font-size:14px;
+  }
+  .bell-dd-clear{
+    background:none; border:none; color:#5fb0ff; font-size:12px;
+    cursor:pointer; padding:4px 8px; border-radius:6px;
+  }
+  .bell-dd-clear:hover{background:rgba(95,176,255,0.1)}
+  .bell-dd-list{max-height:420px; overflow-y:auto}
+  .bell-dd-empty{padding:32px 16px; text-align:center; color:#6b7280; font-size:13px}
+  .bell-item{
+    display:flex; gap:12px; padding:12px 16px; border-bottom:1px solid #22252a;
+    cursor:pointer; transition:background 0.15s;
+  }
+  .bell-item:hover{background:#22252a}
+  .bell-item.unread{background:rgba(95,176,255,0.06)}
+  .bell-item.unread::before{
+    content:''; width:6px; height:6px; border-radius:50%;
+    background:#5fb0ff; flex-shrink:0; margin-top:6px;
+  }
+  .bell-item.read::before{
+    content:''; width:6px; flex-shrink:0;
+  }
+  .bell-item-icon{
+    width:32px; height:32px; border-radius:8px; display:flex;
+    align-items:center; justify-content:center; font-size:16px;
+    background:#2a2d31; flex-shrink:0;
+  }
+  .bell-item-body{flex:1; min-width:0}
+  .bell-item-title{color:#fff; font-size:13px; font-weight:500; margin-bottom:2px}
+  .bell-item-msg{color:#a8b2c1; font-size:12px; line-height:1.4;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .bell-item-time{color:#6b7280; font-size:11px; margin-top:4px}
+  .bell-dd-foot{
+    padding:10px; border-top:1px solid #2a2d31; text-align:center;
+  }
+  .bell-dd-foot button{
+    background:none; border:none; color:#5fb0ff; font-size:13px;
+    cursor:pointer; padding:6px 12px; border-radius:6px; width:100%;
+  }
+  .bell-dd-foot button:hover{background:rgba(95,176,255,0.1)}
+
+  </style>
 </head>
 <body>
 
@@ -703,10 +756,24 @@
   </button>
 
   <div class="topbar-right">
+    <div class="bell-wrap" style="position:relative">
     <button class="bell-btn" id="bellBtn" aria-label="Notifications">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <span class="bell-badge" id="bellBadge" style="display:none">0</span>
     </button>
+    <div class="bell-dropdown" id="bellDropdown">
+      <div class="bell-dd-head">
+        <span>Notifications</span>
+        <button class="bell-dd-clear" id="bellMarkAll">Mark all read</button>
+      </div>
+      <div class="bell-dd-list" id="bellList">
+        <div class="bell-dd-empty">No notifications yet</div>
+      </div>
+      <div class="bell-dd-foot">
+        <button onclick="window._goto && window._goto('notifications')">View all</button>
+      </div>
+    </div>
+  </div>
 
     <div class="acct-wrap">
       <button class="acct-btn" id="acctBtn">
@@ -2919,6 +2986,153 @@
     await loadPlatformSettings();
     await loadAdminLog();
   });
+
+  // ═══════════════════════════════════════════════════════════
+  // ADMIN NOTIFICATION BELL — realtime
+  // ═══════════════════════════════════════════════════════════
+  var adminNotifs = [];
+  var bellRealtimeSub = null;
+
+  function bellTimeAgo(iso){
+    var d = new Date(iso); var sec = Math.floor((Date.now()-d)/1000);
+    if(sec<60) return 'just now';
+    if(sec<3600) return Math.floor(sec/60)+'m ago';
+    if(sec<86400) return Math.floor(sec/3600)+'h ago';
+    if(sec<604800) return Math.floor(sec/86400)+'d ago';
+    return d.toLocaleDateString();
+  }
+
+  function bellIconFor(type){
+    var map = {signup:'🆕', deposit:'💰', withdrawal:'💸', kyc:'🪪',
+               purchase:'📈', allocation:'🎟️', login:'🔐'};
+    return map[type] || '🔔';
+  }
+
+  async function loadAdminNotifications(){
+    try {
+      var { data, error } = await sb.from('admin_notifications')
+        .select('*').order('created_at',{ascending:false}).limit(20);
+      if(error) { console.warn('bell load error', error); return; }
+      adminNotifs = data || [];
+      renderBellDropdown();
+      updateBellBadge();
+    } catch(e){ console.warn('bell err', e); }
+  }
+
+  function renderBellDropdown(){
+    var list = document.getElementById('bellList');
+    if(!list) return;
+    if(!adminNotifs.length){
+      list.innerHTML = '<div class="bell-dd-empty">No notifications yet</div>';
+      return;
+    }
+    list.innerHTML = adminNotifs.map(function(n){
+      var cls = n.is_read ? 'read' : 'unread';
+      return '<div class="bell-item '+cls+'" data-id="'+n.id+'" data-uid="'+(n.user_id||'')+'" data-type="'+(n.related_type||'')+'">' +
+        '<div class="bell-item-icon">'+bellIconFor(n.type)+'</div>' +
+        '<div class="bell-item-body">' +
+          '<div class="bell-item-title">'+(n.title||'Notification')+'</div>' +
+          '<div class="bell-item-msg">'+(n.message||'')+'</div>' +
+          '<div class="bell-item-time">'+bellTimeAgo(n.created_at)+'</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    // Click handlers
+    list.querySelectorAll('.bell-item').forEach(function(el){
+      el.addEventListener('click', async function(){
+        var id = el.dataset.id;
+        var uid = el.dataset.uid;
+        var type = el.dataset.type;
+        // Mark read
+        await sb.from('admin_notifications').update({is_read:true}).eq('id',id);
+        var n = adminNotifs.find(function(x){return x.id===id});
+        if(n) n.is_read = true;
+        el.classList.remove('unread'); el.classList.add('read');
+        updateBellBadge();
+        // Navigate
+        closeBellDropdown();
+        if(type==='deposit') window._goto && window._goto('deposits');
+        else if(type==='withdrawal') window._goto && window._goto('withdrawals');
+        else if(type==='profile' || type==='kyc') window._goto && window._goto('customers');
+        else window._goto && window._goto('notifications');
+      });
+    });
+  }
+
+  function updateBellBadge(){
+    var unread = adminNotifs.filter(function(n){return !n.is_read}).length;
+    var bb = document.getElementById('bellBadge');
+    if(!bb) return;
+    if(unread>0){
+      bb.textContent = unread>9 ? '9+' : unread;
+      bb.style.display = 'flex';
+    } else {
+      bb.style.display = 'none';
+    }
+  }
+
+  function openBellDropdown(){
+    var dd = document.getElementById('bellDropdown');
+    if(dd) dd.classList.add('open');
+  }
+  function closeBellDropdown(){
+    var dd = document.getElementById('bellDropdown');
+    if(dd) dd.classList.remove('open');
+  }
+
+  function initBell(){
+    var btn = document.getElementById('bellBtn');
+    var dd = document.getElementById('bellDropdown');
+    if(!btn || !dd) return;
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      dd.classList.toggle('open');
+      if(dd.classList.contains('open')) loadAdminNotifications();
+    });
+    document.addEventListener('click', function(e){
+      if(!dd.contains(e.target) && e.target !== btn) closeBellDropdown();
+    });
+    // Mark all read
+    var clearBtn = document.getElementById('bellMarkAll');
+    if(clearBtn){
+      clearBtn.addEventListener('click', async function(e){
+        e.stopPropagation();
+        var unreadIds = adminNotifs.filter(function(n){return !n.is_read}).map(function(n){return n.id});
+        if(!unreadIds.length) return;
+        await sb.from('admin_notifications').update({is_read:true}).in('id',unreadIds);
+        adminNotifs.forEach(function(n){n.is_read=true});
+        renderBellDropdown(); updateBellBadge();
+      });
+    }
+    // Initial load
+    loadAdminNotifications();
+    // Realtime subscription
+    try {
+      bellRealtimeSub = sb.channel('admin_notif_rt')
+        .on('postgres_changes', {event:'INSERT', schema:'public', table:'admin_notifications'},
+          function(payload){
+            adminNotifs.unshift(payload.new);
+            if(adminNotifs.length>20) adminNotifs.pop();
+            renderBellDropdown(); updateBellBadge();
+            // Toast-ish: subtle browser notify if permitted
+            try{ if('Notification' in window && Notification.permission==='granted'){
+              new Notification(payload.new.title||'New event',{body:payload.new.message||''});
+            }}catch(_){}
+          })
+        .subscribe();
+    } catch(e){ console.warn('realtime bell sub failed', e); }
+    // Refresh time labels every 60s
+    setInterval(function(){ if(dd.classList.contains('open')) renderBellDropdown(); }, 60000);
+  }
+
+  // Boot bell after DOM ready (and after sb client exists)
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(initBell, 500); });
+  } else {
+    setTimeout(initBell, 500);
+  }
+
 </script>
 
 
