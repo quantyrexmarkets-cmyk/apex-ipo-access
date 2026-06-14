@@ -745,6 +745,53 @@
   }
   .bell-dd-foot button:hover{background:rgba(95,176,255,0.1)}
 
+  
+  /* Holdings tab */
+  .holdings-head{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+  .hh-stat{background:#1a1d21;border:1px solid #2a2d31;border-radius:10px;padding:12px}
+  .hh-stat .l{font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+  .hh-stat .v{font-size:18px;font-weight:600;color:#fff}
+  .holdings-list{display:flex;flex-direction:column;gap:10px}
+  .holding-card{background:#1a1d21;border:1px solid #2a2d31;border-radius:12px;padding:14px}
+  .holding-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .holding-title{font-size:14px;font-weight:600;color:#fff}
+  .holding-tag{font-size:10px;padding:3px 8px;border-radius:12px;text-transform:uppercase;letter-spacing:0.5px}
+  .holding-tag.pending{background:rgba(251,191,36,0.15);color:#fbbf24}
+  .holding-tag.active{background:rgba(95,176,255,0.15);color:#5fb0ff}
+  .holding-tag.win{background:rgba(34,197,94,0.15);color:#22c55e}
+  .holding-tag.loss{background:rgba(239,68,68,0.15);color:#ef4444}
+  .holding-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:12px;color:#a8b2c1;margin-bottom:12px}
+  .holding-grid .k{color:#6b7280;font-size:10px;text-transform:uppercase;letter-spacing:0.5px}
+  .holding-grid .v{color:#fff;font-weight:500;margin-top:2px}
+  .holding-pnl-form{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #2a2d31}
+  .holding-pnl-form input,.holding-pnl-form select{background:#0f1114;border:1px solid #2a2d31;border-radius:8px;padding:8px 10px;color:#fff;font-size:13px}
+  .holding-pnl-form button{background:#5fb0ff;border:none;border-radius:8px;color:#fff;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer}
+  .holding-pnl-form button:hover{background:#4a9eed}
+
+  /* KYC tab */
+  .kyc-status-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .kyc-st-lbl{color:#a8b2c1;font-size:13px}
+  .kyc-st-val{font-size:13px;font-weight:600;padding:4px 10px;border-radius:12px;text-transform:uppercase;letter-spacing:0.5px;background:rgba(251,191,36,0.15);color:#fbbf24}
+  .kyc-st-val.verified{background:rgba(34,197,94,0.15);color:#22c55e}
+  .kyc-st-val.rejected{background:rgba(239,68,68,0.15);color:#ef4444}
+  .kyc-meta{font-size:11px;color:#6b7280;margin-bottom:14px}
+  .kyc-docs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .kyc-doc{background:#1a1d21;border:1px solid #2a2d31;border-radius:10px;overflow:hidden;cursor:pointer}
+  .kyc-doc img{width:100%;height:120px;object-fit:cover;display:block}
+  .kyc-doc-lbl{padding:8px 10px;font-size:11px;color:#a8b2c1;text-transform:uppercase;letter-spacing:0.5px}
+  .kyc-doc-empty{padding:24px;text-align:center;color:#6b7280;font-size:12px;border:1px dashed #2a2d31;border-radius:10px;grid-column:1/-1}
+
+  /* Restrictions tab */
+  .restrict-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #2a2d31}
+  .rr-info .rr-title{font-size:14px;font-weight:500;color:#fff;margin-bottom:2px}
+  .rr-info .rr-desc{font-size:12px;color:#6b7280}
+  .toggle{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0}
+  .toggle input{opacity:0;width:0;height:0}
+  .toggle span{position:absolute;cursor:pointer;inset:0;background:#2a2d31;border-radius:12px;transition:0.2s}
+  .toggle span:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:0.2s}
+  .toggle input:checked + span{background:#22c55e}
+  .toggle input:checked + span:before{transform:translateX(20px)}
+
   </style>
 </head>
 <body>
@@ -1259,7 +1306,10 @@
       <div class="m-tabs">
         <div class="m-tab active" data-pane="overview">OVERVIEW</div>
         <div class="m-tab" data-pane="profile">PROFILE</div>
+        <div class="m-tab" data-pane="holdings">HOLDINGS</div>
         <div class="m-tab" data-pane="activity">ACTIVITY</div>
+        <div class="m-tab" data-pane="kyc">KYC DOCS</div>
+        <div class="m-tab" data-pane="restrict">RESTRICTIONS</div>
       </div>
 
       <!-- OVERVIEW -->
@@ -1342,6 +1392,71 @@
       <div class="m-pane" id="pane-activity">
         <div class="act-list" id="actList">
           <div class="empty">Loading activity...</div>
+        </div>
+      </div>
+
+      <!-- HOLDINGS -->
+      <div class="m-pane" id="pane-holdings">
+        <div class="holdings-head">
+          <div class="hh-stat"><div class="l">Total Invested</div><div class="v" id="hTotalInv">$0.00</div></div>
+          <div class="hh-stat"><div class="l">Current Value</div><div class="v" id="hCurVal">$0.00</div></div>
+          <div class="hh-stat"><div class="l">Total P&L</div><div class="v" id="hPnl">$0.00</div></div>
+        </div>
+        <div class="holdings-list" id="holdingsList">
+          <div class="empty">Loading holdings...</div>
+        </div>
+      </div>
+
+      <!-- KYC DOCS -->
+      <div class="m-pane" id="pane-kyc">
+        <div class="kyc-status-row">
+          <div class="kyc-st-lbl">Current Status:</div>
+          <div class="kyc-st-val" id="kycStVal">—</div>
+        </div>
+        <div class="kyc-meta" id="kycMeta">Submitted: —</div>
+        <div class="kyc-docs-grid" id="kycDocsGrid">
+          <div class="empty">No documents uploaded</div>
+        </div>
+        <div class="act-row" style="margin-top:16px">
+          <button class="act-btn success" onclick="window._kycApproveWithEmail()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Approve & Send Welcome Email
+          </button>
+          <button class="act-btn danger" onclick="window._kycRejectWithReason()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            Reject with Reason
+          </button>
+        </div>
+      </div>
+
+      <!-- RESTRICTIONS -->
+      <div class="m-pane" id="pane-restrict">
+        <div class="restrict-row">
+          <div class="rr-info">
+            <div class="rr-title">Allow Deposits</div>
+            <div class="rr-desc">User can submit new deposits</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="rCanDeposit" onchange="window._toggleRestriction('can_deposit', this.checked)"><span></span></label>
+        </div>
+        <div class="restrict-row">
+          <div class="rr-info">
+            <div class="rr-title">Allow Withdrawals</div>
+            <div class="rr-desc">User can request withdrawals</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="rCanWithdraw" onchange="window._toggleRestriction('can_withdraw', this.checked)"><span></span></label>
+        </div>
+        <div class="restrict-row">
+          <div class="rr-info">
+            <div class="rr-title">Account Suspended</div>
+            <div class="rr-desc">Block all access to the platform</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="rIsSuspended" onchange="window._toggleSuspend(this.checked)"><span></span></label>
+        </div>
+        <div class="field-grid full" style="margin-top:16px">
+          <div class="field-mini">
+            <label>Suspension Reason (visible in audit log)</label>
+            <input id="rSuspReason" placeholder="e.g. Suspicious activity detected">
+          </div>
         </div>
       </div>
     </div>
@@ -2018,6 +2133,39 @@
     // Ban button label
     var banBtn = document.getElementById('banBtn');
     banBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> ' + (u.banned ? 'Unban User' : 'Ban User');
+
+    // Restrictions tab toggles
+    var rcd = document.getElementById('rCanDeposit'); if(rcd) rcd.checked = u.can_deposit !== false;
+    var rcw = document.getElementById('rCanWithdraw'); if(rcw) rcw.checked = u.can_withdraw !== false;
+    var ris = document.getElementById('rIsSuspended'); if(ris) ris.checked = !!u.is_suspended;
+    var rsr = document.getElementById('rSuspReason'); if(rsr) rsr.value = u.suspension_reason || '';
+
+    // KYC tab
+    var ksv = document.getElementById('kycStVal');
+    if(ksv){
+      var st = (u.kyc_status || 'pending').toLowerCase();
+      ksv.textContent = st.toUpperCase();
+      ksv.className = 'kyc-st-val ' + (st==='verified'?'verified':st==='rejected'?'rejected':'');
+    }
+    var km = document.getElementById('kycMeta');
+    if(km) km.textContent = 'Submitted: ' + (u.kyc_submitted_at ? new Date(u.kyc_submitted_at).toLocaleString() : 'Not submitted');
+    var kdg = document.getElementById('kycDocsGrid');
+    if(kdg){
+      var docs = [];
+      if(u.kyc_id_front_url) docs.push({lbl:'ID Front', url:u.kyc_id_front_url});
+      if(u.kyc_id_back_url) docs.push({lbl:'ID Back', url:u.kyc_id_back_url});
+      if(u.kyc_selfie_url) docs.push({lbl:'Selfie', url:u.kyc_selfie_url});
+      if(!docs.length){
+        kdg.innerHTML = '<div class="kyc-doc-empty">No documents uploaded yet</div>';
+      } else {
+        kdg.innerHTML = docs.map(function(d){
+          return '<div class="kyc-doc" onclick="window.open(\''+d.url+'\',\'_blank\')"><img src="'+d.url+'" alt="'+d.lbl+'" onerror="this.style.display=\'none\'"><div class="kyc-doc-lbl">'+d.lbl+'</div></div>';
+        }).join('');
+      }
+    }
+
+    // Holdings tab — load async
+    loadUserHoldings(u.id);
   }
 
   // ============ APPROVE / REVOKE KYC ============
