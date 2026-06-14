@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify Email | APEX IPO ACCESS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="js/supabase.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+  .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .card{width:100%;max-width:440px;background:#0a0d12;border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:40px 32px;text-align:center}
+  .brand{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;letter-spacing:3px;color:#fff;margin-bottom:32px}
+  .brand span{color:#4a9eff}
+  .icon{width:64px;height:64px;border-radius:50%;background:rgba(74,158,255,0.08);border:1px solid rgba(74,158,255,0.25);display:inline-flex;align-items:center;justify-content:center;margin-bottom:20px}
+  .icon svg{width:28px;height:28px;color:#4a9eff}
+  h1{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:22px;margin-bottom:10px;color:#fff}
+  .sub{color:#8b95a8;font-size:14px;line-height:1.6;margin-bottom:28px}
+  .sub b{color:#fff;font-weight:600}
+  .code-row{display:flex;gap:8px;justify-content:center;margin-bottom:20px}
+  .code-box{width:44px;height:54px;background:#000;border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#fff;font-size:22px;font-weight:600;text-align:center;font-family:'Manrope',sans-serif}
+  .code-box:focus{outline:none;border-color:#4a9eff;box-shadow:0 0 0 3px rgba(74,158,255,0.15)}
+  .code-box.success{border-color:#3ed598;color:#3ed598}
+  .code-box.error{border-color:#ff6a6a;color:#ff8a8a;animation:shake .3s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  .msg{font-size:13px;margin-bottom:20px;min-height:18px}
+  .msg.error{color:#ff8a8a}
+  .msg.success{color:#3ed598}
+  .btn{width:100%;padding:14px;background:#4a9eff;color:#000;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:14px}
+  .btn:hover{background:#5cacff}
+  .btn:disabled{opacity:0.5;cursor:not-allowed}
+  .resend{font-size:13px;color:#8b95a8}
+  .resend a{color:#4a9eff;font-weight:500;cursor:pointer;text-decoration:none}
+  .resend a:hover{text-decoration:underline}
+  .resend a.disabled{color:#3a4250;cursor:not-allowed;text-decoration:none}
+  .foot{margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.05);font-size:12px;color:#6a7585}
+  .foot a{color:#4a9eff;text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="card">
+    <div class="brand">APEX <span>·</span> IPO ACCESS</div>
+
+    <div class="icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+    </div>
+
+    <h1>Verify your email</h1>
+    <div class="sub">
+      We've sent a 6-digit code to <b id="userEmail">your email</b>. Enter it below to confirm your account.
+    </div>
+
+    <div class="code-row">
+      <input type="text" class="code-box" maxlength="1" inputmode="numeric" autocomplete="one-time-code">
+      <input type="text" class="code-box" maxlength="1" inputmode="numeric">
+      <input type="text" class="code-box" maxlength="1" inputmode="numeric">
+      <input type="text" class="code-box" maxlength="1" inputmode="numeric">
+      <input type="text" class="code-box" maxlength="1" inputmode="numeric">
+      <input type="text" class="code-box" maxlength="1" inputmode="numeric">
+    </div>
+
+    <div class="msg" id="msg"></div>
+
+    <button class="btn" id="verifyBtn" disabled>Verify email</button>
+
+    <div class="resend">
+      Didn't receive the code? <a id="resendLink">Resend</a> <span id="resendTimer"></span>
+    </div>
+
+    <div class="foot">
+      Wrong email? <a href="#" onclick="window._logout();return false;">Sign out</a>
+      &nbsp;·&nbsp;
+      <a href="mailto:support@apexipoaccess.com">Contact support</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  var SUPABASE_URL = '';
+  var currentUser = null;
+  var currentProfile = null;
+
+  window._logout = async function(){
+    try { await sb.auth.signOut(); } catch(e){}
+    window.location.href = 'login.html';
+  };
+
+  function genCode(){
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
+  async function sendCode(){
+    var code = genCode();
+    // Save code in DB
+    await sb.from('email_verification_codes').insert({
+      user_id: currentUser.id,
+      code: code,
+      expires_at: new Date(Date.now() + 10*60*1000).toISOString()
+    });
+
+    // Call edge function
+    var url = SUPABASE_URL + '/functions/v1/send-email-verification';
+    var { data: session } = await sb.auth.getSession();
+    var res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + session.session.access_token
+      },
+      body: JSON.stringify({
+        email: currentUser.email,
+        code: code,
+        firstName: currentProfile?.first_name || ''
+      })
+    });
+    return res.ok;
+  }
+
+  function startResendCooldown(seconds){
+    var link = document.getElementById('resendLink');
+    var timer = document.getElementById('resendTimer');
+    link.classList.add('disabled');
+    var s = seconds;
+    timer.textContent = '(' + s + 's)';
+    var iv = setInterval(function(){
+      s--;
+      if(s <= 0){
+        clearInterval(iv);
+        link.classList.remove('disabled');
+        timer.textContent = '';
+      } else {
+        timer.textContent = '(' + s + 's)';
+      }
+    }, 1000);
+  }
+
+  async function verifyCode(code){
+    var msg = document.getElementById('msg');
+    var btn = document.getElementById('verifyBtn');
+    msg.className = 'msg';
+    msg.textContent = '';
+    btn.disabled = true;
+    btn.textContent = 'Verifying...';
+
+    var { data: codes } = await sb.from('email_verification_codes')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .eq('code', code)
+      .is('used_at', null)
+      .gt('expires_at', new Date().toISOString())
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if(!codes || codes.length === 0){
+      msg.className = 'msg error';
+      msg.textContent = 'Invalid or expired code. Try again.';
+      document.querySelectorAll('.code-box').forEach(function(b){ b.classList.add('error'); });
+      setTimeout(function(){ document.querySelectorAll('.code-box').forEach(function(b){ b.classList.remove('error'); }); }, 600);
+      btn.disabled = false;
+      btn.textContent = 'Verify email';
+      return;
+    }
+
+    // Mark code used + flag profile verified
+    await sb.from('email_verification_codes').update({ used_at: new Date().toISOString() }).eq('id', codes[0].id);
+    await sb.from('profiles').update({ email_verified_at: new Date().toISOString() }).eq('id', currentUser.id);
+
+    msg.className = 'msg success';
+    msg.textContent = '✓ Email verified! Redirecting...';
+    document.querySelectorAll('.code-box').forEach(function(b){ b.classList.add('success'); });
+    setTimeout(function(){ window.location.href = 'dashboard.html'; }, 800);
+  }
+
+  document.addEventListener('sb-ready', async function(){
+    SUPABASE_URL = sb.supabaseUrl;
+    var { data } = await sb.auth.getUser();
+    if(!data.user){ window.location.href = 'login.html'; return; }
+    currentUser = data.user;
+
+    var { data: profile } = await sb.from('profiles').select('*').eq('id', data.user.id).single();
+    currentProfile = profile;
+
+    if(!profile || profile.kyc_status !== 'verified'){
+      window.location.href = 'pending-approval.html';
+      return;
+    }
+    if(profile.email_verified_at){
+      window.location.href = 'dashboard.html';
+      return;
+    }
+
+    document.getElementById('userEmail').textContent = currentUser.email;
+
+    // Auto-send first code
+    await sendCode();
+    startResendCooldown(60);
+
+    // Wire up code inputs
+    var boxes = document.querySelectorAll('.code-box');
+    var btn = document.getElementById('verifyBtn');
+
+    function getCode(){
+      return Array.from(boxes).map(function(b){ return b.value; }).join('');
+    }
+
+    boxes.forEach(function(box, i){
+      box.addEventListener('input', function(){
+        box.value = box.value.replace(/\D/g, '').slice(0,1);
+        if(box.value && i < boxes.length - 1) boxes[i+1].focus();
+        var code = getCode();
+        btn.disabled = code.length !== 6;
+        if(code.length === 6) verifyCode(code);
+      });
+      box.addEventListener('keydown', function(e){
+        if(e.key === 'Backspace' && !box.value && i > 0) boxes[i-1].focus();
+      });
+      box.addEventListener('paste', function(e){
+        e.preventDefault();
+        var paste = (e.clipboardData.getData('text') || '').replace(/\D/g,'').slice(0,6);
+        for(var j = 0; j < paste.length && j < boxes.length; j++){
+          boxes[j].value = paste[j];
+        }
+        boxes[Math.min(paste.length, boxes.length-1)].focus();
+        if(paste.length === 6){ btn.disabled = false; verifyCode(paste); }
+      });
+    });
+
+    boxes[0].focus();
+
+    btn.addEventListener('click', function(){
+      var code = getCode();
+      if(code.length === 6) verifyCode(code);
+    });
+
+    document.getElementById('resendLink').addEventListener('click', async function(){
+      if(this.classList.contains('disabled')) return;
+      var msg = document.getElementById('msg');
+      msg.className = 'msg';
+      msg.textContent = 'Sending new code...';
+      var ok = await sendCode();
+      msg.className = 'msg success';
+      msg.textContent = ok ? '✓ New code sent.' : 'Failed to send. Try again.';
+      startResendCooldown(60);
+    });
+  });
+</script>
+
+</body>
+</html>

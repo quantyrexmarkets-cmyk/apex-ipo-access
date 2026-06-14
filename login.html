@@ -294,10 +294,10 @@
       });
   }
 
-  // Smart redirect: pending-approval if not verified, dashboard if verified
+  // Smart redirect: pending-approval → verify-email → dashboard
   async function smartRedirect(userId){
     try {
-      var { data: prof } = await sb.from('profiles').select('kyc_status,is_admin,banned,banned_reason').eq('id', userId).single();
+      var { data: prof } = await sb.from('profiles').select('kyc_status,is_admin,banned,banned_reason,email_verified_at').eq('id', userId).single();
       if(prof && prof.banned){
         await sb.auth.signOut();
         alert('Your account has been suspended.' + (prof.banned_reason ? '\n\nReason: ' + prof.banned_reason : ''));
@@ -305,9 +305,13 @@
       }
       if(prof && !prof.is_admin && prof.kyc_status !== 'verified'){
         window.location.href = 'pending-approval.html';
-      } else {
-        window.location.href = 'dashboard.html';
+        return;
       }
+      if(prof && !prof.is_admin && !prof.email_verified_at){
+        window.location.href = 'verify-email.html';
+        return;
+      }
+      window.location.href = 'dashboard.html';
     } catch(e){
       window.location.href = 'dashboard.html';
     }

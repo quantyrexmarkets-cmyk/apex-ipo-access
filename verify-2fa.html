@@ -265,6 +265,10 @@
                     window.location.href = 'pending-approval.html';
                     return;
                   }
+                  if(prof && !prof.is_admin && !prof.email_verified_at){
+                    window.location.href = 'verify-email.html';
+                    return;
+                  }
                 }
               } catch(e){}
               window.location.href = 'dashboard.html';
