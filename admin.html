@@ -844,7 +844,7 @@
     background:#0a0b0d !important;
     z-index:9998;
   }
-  .bell-dropdown.fullscreen.open{display:flex !important}
+  .bell-dropdown.fullscreen.open{display:flex !important; position:fixed !important; inset:0 !important}
   .bell-dropdown.fullscreen .bell-dd-head{
     padding:18px 20px !important; font-size:18px !important;
     border-bottom:1px solid #1f2227 !important;
@@ -885,7 +885,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <span class="bell-badge" id="bellBadge" style="display:none">0</span>
     </button>
-    <div class="bell-dropdown fullscreen" id="bellDropdown">
+    <div class="bell-dropdown fullscreen" id="bellDropdown" style="display:none">
       <div class="bell-dd-head">
         <span>Notifications</span>
         <div style="display:flex;align-items:center;gap:8px">
@@ -3327,7 +3327,7 @@
   }
   function closeBellDropdown(){
     var dd = document.getElementById('bellDropdown');
-    if(dd) dd.classList.remove('open');
+    if(dd){ dd.classList.remove('open'); dd.style.display = 'none'; }
     document.body.style.overflow = '';
   }
 
@@ -3337,12 +3337,16 @@
     if(!btn || !dd) return;
     btn.addEventListener('click', function(e){
       e.stopPropagation();
-      dd.classList.toggle('open');
-      if(dd.classList.contains('open')){
-        loadAdminNotifications();
-        document.body.style.overflow = 'hidden';
-      } else {
+      var isOpen = dd.classList.contains('open');
+      if(isOpen){
+        dd.classList.remove('open');
+        dd.style.display = 'none';
         document.body.style.overflow = '';
+      } else {
+        dd.classList.add('open');
+        dd.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        loadAdminNotifications();
       }
     });
     // Close button (×)
