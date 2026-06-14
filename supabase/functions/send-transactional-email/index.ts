@@ -246,17 +246,10 @@ function shell(opts: {
       <tr><td class="card" style="border-radius:20px;padding:0">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 
-          <!-- Brand wordmark (logo + text on same baseline) -->
-          <tr><td align="center" style="padding:44px 32px 32px">
-            <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;border-collapse:collapse">
-              <tr>
-                <td style="padding:0;line-height:0;font-size:0">
-                  <img src="https://apexipoaccess.com/assets/spacex-logo-blue.png" alt="" width="48" height="48" style="display:inline-block;width:48px;height:48px;vertical-align:middle;margin-right:12px">
-                  <span class="brand-apex" style="font-family:'Google Sans','Product Sans',Inter,Roboto,Arial,sans-serif;font-size:30px;font-weight:500;letter-spacing:-0.3px;line-height:48px;color:#1a73e8;vertical-align:middle">Apex</span>
-                  <span class="brand-rest" style="font-family:'Google Sans','Product Sans',Inter,Roboto,Arial,sans-serif;font-size:30px;font-weight:400;letter-spacing:-0.3px;line-height:48px;color:#202124;vertical-align:middle;margin-left:8px">Ipo Access</span>
-                </td>
-              </tr>
-            </table>
+          <!-- Full brand logo (single image, centered) -->
+          <tr><td align="center" style="padding:44px 32px 36px">
+            <img src="https://apexipoaccess.com/assets/apex-logo-full.png" alt="Apex IPO Access"
+                 width="280" style="display:block;margin:0 auto;width:280px;max-width:80%;height:auto">
           </td></tr>
 
           <!-- Big headline (Google style: weight 400, generous line-height) -->
