@@ -262,13 +262,13 @@ function shell(opts: {
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 
           <!-- Brand logo (dark version - white text works on dark card) -->
-          <tr><td align="center" style="padding:36px 32px 8px">
+          <tr><td align="center" style="padding:16px 32px 4px">
             <img src="https://apexipoaccess.com/assets/apex-logo-dark.png?v=2" alt="Apex IPO Access"
                  width="220" style="display:block;margin:0 auto;width:220px;max-width:70%;height:auto">
           </td></tr>
 
           <!-- Bordered inner content block -->
-          <tr><td style="padding:24px 20px 8px">
+          <tr><td style="padding:8px 20px 8px">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="inner-box" style="border:1px solid #5f6368;border-radius:16px">
               <tr><td class="headline" style="padding:32px 24px 20px;font-family:'Google Sans',Inter,Arial,sans-serif;font-size:32px;font-weight:400;line-height:1.35;letter-spacing:-0.3px;text-align:center">${opts.headline.split('\n').map(l => escape(l)).join('<br style="line-height:1.55">')}</td></tr>
               ${subtitle}
@@ -308,7 +308,7 @@ function detailLine(label: string, value: string): string {
 // ─── Reusable detail block (boxed, slightly highlighted) ────────────────────
 function detailBlock(rows: Array<{ label: string; value: string }>): string {
   const inner = rows.map(r => detailLine(r.label, r.value)).join('');
-  return `<div style="display:inline-block;text-align:left;padding:18px 24px;border-radius:12px;background:rgba(0,0,0,0.03);font-size:13.5px;line-height:1.8">${inner}</div>`;
+  return `<div style="display:inline-block;text-align:center;padding:18px 24px;font-size:13.5px;line-height:1.9;color:#ffffff">${inner}</div>`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -328,7 +328,7 @@ function tplWelcome(user: UserProfile): string {
   return shell({
     preheader: 'Your account is verified and ready. Start exploring launched IPO opportunities.',
     headline: `Hi ${user.first_name},\nWelcome to Apex Ipo Access`,
-    subtitle: `Your identity has been verified. Your account is now fully activated and ready to access curated pre-IPO opportunities.`,
+    subtitle: `Your account has been verified.`,
     ctaLabel: 'Go to Dashboard',
     ctaUrl: 'https://apexipoaccess.com/dashboard.html',
     detailsHtml: details,
