@@ -193,7 +193,7 @@ function tplWelcome(p: { name: string; email: string }) {
   return getEmailShell({
     title: 'Account Activated — APEX IPO Access',
     preview: 'Your account is verified and ready to invest.',
-    icon: ICONS.success,
+    icon: icons.success,
     heading: 'Account Activated',
     body,
   });
@@ -226,7 +226,7 @@ function tplKycRejected(p: { name: string; reason: string }) {
   return getEmailShell({
     title: 'KYC Application Declined — APEX IPO Access',
     preview: 'Your identity verification was not approved.',
-    icon: ICONS.error,
+    icon: icons.error,
     heading: 'Identity Verification Declined',
     body,
   });
@@ -266,7 +266,7 @@ function tplDepositPending(p: {
   return getEmailShell({
     title: 'Deposit Submitted — APEX IPO Access',
     preview: 'Your deposit is pending review.',
-    icon: ICONS.info,
+    icon: icons.info,
     heading: 'Deposit Pending Review',
     body,
   });
@@ -308,7 +308,7 @@ function tplDepositApproved(p: {
   return getEmailShell({
     title: 'Deposit Approved — APEX IPO Access',
     preview: 'Your deposit has been credited to your account.',
-    icon: ICONS.success,
+    icon: icons.success,
     heading: 'Deposit Approved',
     body,
   });
@@ -348,7 +348,7 @@ function tplDepositRejected(p: {
   return getEmailShell({
     title: 'Deposit Rejected — APEX IPO Access',
     preview: 'Your deposit submission was not approved.',
-    icon: ICONS.warn,
+    icon: icons.warn,
     heading: 'Deposit Rejected',
     body,
   });
@@ -390,7 +390,7 @@ function tplWithdrawalPending(p: {
   return getEmailShell({
     title: 'Withdrawal Submitted — APEX IPO Access',
     preview: 'Your withdrawal request is pending review.',
-    icon: ICONS.info,
+    icon: icons.info,
     heading: 'Withdrawal Pending Review',
     body,
   });
@@ -436,7 +436,7 @@ function tplWithdrawalApproved(p: {
   return getEmailShell({
     title: 'Withdrawal Approved — APEX IPO Access',
     preview: 'Your withdrawal request has been approved.',
-    icon: ICONS.success,
+    icon: icons.success,
     heading: 'Withdrawal Approved',
     body,
   });
@@ -478,7 +478,7 @@ function tplWithdrawalRejected(p: {
   return getEmailShell({
     title: 'Withdrawal Rejected — APEX IPO Access',
     preview: 'Your withdrawal request was not approved.',
-    icon: ICONS.warn,
+    icon: icons.warn,
     heading: 'Withdrawal Rejected',
     body,
   });
@@ -519,7 +519,7 @@ function tplPasswordReset(p: {
   return getEmailShell({
     title: 'Password Reset — APEX IPO Access',
     preview: 'Reset your APEX IPO Access account password.',
-    icon: ICONS.warn,
+    icon: icons.warn,
     heading: 'Password Reset Request',
     body,
   });
@@ -565,7 +565,7 @@ function tplLoginAlert(p: {
   return getEmailShell({
     title: 'New Sign-In Detected — APEX IPO Access',
     preview: 'A new sign-in was detected on your account.',
-    icon: ICONS.warn,
+    icon: icons.warn,
     heading: 'New Sign-In Detected',
     body,
   });
