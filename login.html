@@ -318,12 +318,10 @@
   }
 
   document.addEventListener('sb-ready', function(){
-    // Always force fresh login — sign out any lingering session
-    sb.auth.getUser().then(function(r){
-      if(r.data && r.data.user){
-        sb.auth.signOut();
-      }
-    });
+    // Don't auto-redirect logged-in users to dashboard;
+    // just let them re-enter credentials if they want.
+    // Do NOT call signOut() here — it creates a race condition with sign-in
+    // that can wipe the new session before smartRedirect runs.
 
     var form = document.getElementById('loginForm');
     var btn = document.getElementById('loginBtn');
