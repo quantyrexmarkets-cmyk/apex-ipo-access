@@ -179,7 +179,7 @@ function shell(opts: {
     </td></tr>` : '';
 
   const subtitle = opts.subtitle ? `
-    <tr><td style="padding:0 32px 36px;font-family:'Google Sans',Inter,Arial,sans-serif;font-size:16px;line-height:1.55;color:#5f6368;text-align:center" class="subtitle">
+    <tr><td style="padding:0 32px 36px;font-family:'Google Sans',Inter,Arial,sans-serif;font-size:15px;line-height:1.6;color:#5f6368;text-align:center" class="subtitle">
       ${escape(opts.subtitle)}
     </td></tr>` : '';
 
@@ -228,7 +228,7 @@ function shell(opts: {
     .cta { background:#1a73e8 !important; color:#ffffff !important; }
   }
   @media only screen and (max-width:600px) {
-    .headline { font-size:28px !important; line-height:1.25 !important; }
+    .headline { font-size:22px !important; line-height:1.4 !important; padding:8px 24px 18px !important; }
     .card { border-radius:16px !important; }
   }
 </style>
@@ -261,9 +261,7 @@ function shell(opts: {
           </td></tr>
 
           <!-- Big headline -->
-          <tr><td class="headline" style="padding:0 32px 24px;font-family:'Google Sans',Inter,Arial,sans-serif;font-size:30px;font-weight:600;line-height:1.25;letter-spacing:-0.5px;text-align:center">
-            ${escape(opts.headline)}
-          </td></tr>
+          <tr><td class="headline" style="padding:8px 40px 20px;font-family:'Google Sans',Inter,Arial,sans-serif;font-size:24px;font-weight:500;line-height:1.4;letter-spacing:-0.3px;text-align:center;white-space:pre-line">${escape(opts.headline)}</td></tr>
 
           ${subtitle}
           ${cta}
@@ -319,7 +317,7 @@ function tplWelcome(user: UserProfile): string {
   return shell({
     preheader: 'Your account is verified and ready. Start exploring launched IPO opportunities.',
     headline: `Hi ${user.first_name},\nWelcome to APEX IPO Access`,
-    subtitle: 'Your identity has been verified and your account is now fully activated. You now have access to our curated selection of launched pre-IPO opportunities and institutional allocations.',
+    subtitle: `Hi ${user.first_name}, your identity has been verified and your APEX IPO Access account is now fully activated. You now have access to our curated selection of launched pre-IPO opportunities and institutional allocations.`,
     ctaLabel: 'Go to Dashboard',
     ctaUrl: 'https://apexipoaccess.com/dashboard.html',
     detailsHtml: details,
