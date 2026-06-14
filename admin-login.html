@@ -254,8 +254,17 @@
         throw new Error('Access denied. This account is not authorized for admin access.');
       }
 
-      apexSuccess('Welcome, Admin');
-      setTimeout(function(){ window.location.href = 'admin.html'; }, 600);
+      // Fetch admin's name for personalized welcome
+      var nameRes = await sb.from('profiles').select('first_name,last_name,email').eq('id', data.user.id).single();
+      var adminName = 'Admin';
+      if(nameRes && nameRes.data){
+        var fn = (nameRes.data.first_name || '').trim();
+        var ln = (nameRes.data.last_name || '').trim();
+        if(fn || ln) adminName = (fn + ' ' + ln).trim();
+        else if(nameRes.data.email) adminName = nameRes.data.email.split('@')[0];
+      }
+      apexSuccess('Welcome back ' + adminName);
+      setTimeout(function(){ window.location.href = 'admin.html'; }, 1400);
 
     } catch(e){
       console.error(e);
