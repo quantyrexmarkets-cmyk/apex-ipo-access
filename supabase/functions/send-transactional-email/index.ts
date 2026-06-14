@@ -246,17 +246,14 @@ function shell(opts: {
       <tr><td class="card" style="border-radius:20px;padding:0">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 
-          <!-- Brand wordmark (logo + Title Case Google-style) -->
+          <!-- Brand wordmark (logo + text on same baseline) -->
           <tr><td align="center" style="padding:44px 32px 32px">
             <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;border-collapse:collapse">
               <tr>
-                <td style="padding:0 12px 0 0;vertical-align:middle;line-height:0">
-                  <img src="https://apexipoaccess.com/assets/spacex-logo.png" alt="" width="38" height="38" style="display:block;width:38px;height:38px;vertical-align:middle">
-                </td>
-                <td style="vertical-align:middle;line-height:1;padding:0;height:38px">
-                  <span style="display:inline-block;vertical-align:middle;font-family:'Google Sans','Product Sans',Inter,Roboto,Arial,sans-serif;font-size:28px;font-weight:500;letter-spacing:-0.3px;line-height:1">
-                    <span class="brand-apex" style="color:#1a73e8">Apex</span><span class="brand-rest" style="color:#202124;margin-left:7px;font-weight:400">Ipo Access</span>
-                  </span>
+                <td style="padding:0;line-height:0;font-size:0">
+                  <img src="https://apexipoaccess.com/assets/spacex-logo.png" alt="" width="48" height="48" style="display:inline-block;width:48px;height:48px;vertical-align:middle;margin-right:12px">
+                  <span class="brand-apex" style="font-family:'Google Sans','Product Sans',Inter,Roboto,Arial,sans-serif;font-size:30px;font-weight:500;letter-spacing:-0.3px;line-height:48px;color:#1a73e8;vertical-align:middle">Apex</span>
+                  <span class="brand-rest" style="font-family:'Google Sans','Product Sans',Inter,Roboto,Arial,sans-serif;font-size:30px;font-weight:400;letter-spacing:-0.3px;line-height:48px;color:#202124;vertical-align:middle;margin-left:8px">Ipo Access</span>
                 </td>
               </tr>
             </table>
