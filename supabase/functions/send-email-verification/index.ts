@@ -23,9 +23,13 @@ Deno.serve(async (req) => {
 
     const html = `<!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><title>Verification code</title></head>
-<body style="margin:0;padding:0;background:#0a0d12;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#e8eef7">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0a0d12;padding:32px 16px">
+<head><meta charset="UTF-8"><title>Verification code</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body style="margin:0;padding:0;background:#0d1117;font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#e8eef7">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0d1117;padding:40px 16px;background-image:radial-gradient(ellipse at top, rgba(74,158,255,0.06), transparent 60%)">
     <tr><td align="center">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px">
 
@@ -37,18 +41,18 @@ Deno.serve(async (req) => {
                 <img src="https://apexipoaccess.com/assets/spacex-logo.png" alt="APEX" width="48" height="48" style="display:block;width:48px;height:48px">
               </td>
               <td style="vertical-align:middle">
-                <div style="font-family:'Manrope','Helvetica Neue',Arial,sans-serif;font-size:20px;font-weight:300;letter-spacing:3px;color:#ffffff;line-height:1.1">APEX IPO ACCESS</div>
-                <div style="font-family:'Manrope','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:300;letter-spacing:2px;color:#4a9eff;line-height:1.1;margin-top:6px">INVESTMENT INTELLIGENCE</div>
+                <div style="font-family:'Montserrat','Helvetica Neue',Arial,sans-serif;font-size:21px;font-weight:300;letter-spacing:4px;color:#ffffff;line-height:1.1">APEX IPO ACCESS</div>
+                <div style="font-family:'Montserrat','Helvetica Neue',Arial,sans-serif;font-size:10px;font-weight:400;letter-spacing:3px;color:#5fb0ff;line-height:1.1;margin-top:7px;text-transform:uppercase">Investment Intelligence</div>
               </td>
             </tr>
           </table>
         </td></tr>
 
         <!-- Card -->
-        <tr><td style="background:#141a24;border:1px solid #1f2630;border-radius:10px;padding:40px 36px">
+        <tr><td style="background:linear-gradient(180deg,#161c28 0%,#13182238 100%);border:1px solid #232a38;border-radius:12px;padding:44px 36px;box-shadow:0 1px 0 rgba(255,255,255,0.03) inset">
 
           <!-- Eyebrow -->
-          <p style="margin:0 0 10px;font-size:11px;font-weight:600;letter-spacing:1.2px;color:#4a9eff;text-transform:uppercase">Security · Verification Code</p>
+          <p style="margin:0 0 10px;font-size:11px;font-weight:600;letter-spacing:1.2px;color:#5fb0ff;text-transform:uppercase">Security · Verification Code</p>
 
           <!-- Heading -->
           <h1 style="margin:0 0 22px;font-family:Georgia,'Times New Roman',serif;font-size:24px;font-weight:400;color:#ffffff;letter-spacing:-0.3px;line-height:1.3">Confirm your email address</h1>
@@ -60,7 +64,7 @@ Deno.serve(async (req) => {
 
           <!-- Code -->
           <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:0 0 28px;border-collapse:collapse">
-            <tr><td align="center" style="background:#0a0d12;border:1px solid #1f2630;border-radius:8px;padding:28px 16px">
+            <tr><td align="center" style="background:#0a0e15;border:1px solid #2a3242;border-radius:10px;padding:30px 16px">
               <div style="font-family:'SF Mono','Courier New',monospace;font-size:32px;font-weight:600;color:#ffffff;letter-spacing:10px;line-height:1">${code}</div>
               <div style="margin-top:12px;font-size:11px;color:#8b95a8;letter-spacing:0.5px">Expires in 10 minutes</div>
             </td></tr>
@@ -112,7 +116,7 @@ Deno.serve(async (req) => {
               </td>
               <td style="padding:0 5px">
                 <a href="mailto:support@apexipoaccess.com" style="text-decoration:none">
-                  <table role="presentation" cellpadding="0" cellspacing="0"><tr><td align="center" valign="middle" width="32" height="32" style="background:#141a24;border:1px solid #2a3242;border-radius:50%;font-family:Arial,sans-serif;font-size:14px;color:#4a9eff">✉</td></tr></table>
+                  <table role="presentation" cellpadding="0" cellspacing="0"><tr><td align="center" valign="middle" width="32" height="32" style="background:#141a24;border:1px solid #2a3242;border-radius:50%;font-family:Arial,sans-serif;font-size:14px;color:#5fb0ff">✉</td></tr></table>
                 </a>
               </td>
             </tr>
@@ -120,7 +124,7 @@ Deno.serve(async (req) => {
 
           <p style="margin:0 0 4px;font-size:12px;font-weight:600;color:#ffffff;letter-spacing:0.4px">APEX IPO Access</p>
           <p style="margin:0 0 10px;color:#8b95a8;font-size:11px">Investment Intelligence Platform</p>
-          <p style="margin:0 0 4px"><a href="mailto:support@apexipoaccess.com" style="color:#4a9eff;text-decoration:none">support@apexipoaccess.com</a></p>
+          <p style="margin:0 0 4px"><a href="mailto:support@apexipoaccess.com" style="color:#5fb0ff;text-decoration:none">support@apexipoaccess.com</a></p>
           <p style="margin:0 0 14px"><a href="https://apexipoaccess.com" style="color:#7a8699;text-decoration:none">apexipoaccess.com</a></p>
           <p style="margin:0;font-size:10px;color:#6a7585;line-height:1.6">This is a transactional message from APEX IPO Access.<br>© ${new Date().getFullYear()} APEX IPO Access. All rights reserved.</p>
         </td></tr>
