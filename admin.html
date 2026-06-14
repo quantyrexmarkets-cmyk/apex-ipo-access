@@ -4110,5 +4110,33 @@
 })();
 </script>
 
+
+<!-- Quick Change Password Popup -->
+<script>
+window._quickChangePassword = async function(){
+  var menu = document.getElementById('acctMenu');
+  if(menu) menu.classList.remove('show');
+  var cur = prompt('Enter your CURRENT password:');
+  if(!cur) return;
+  var neu = prompt('Enter your NEW password (min 8 chars):');
+  if(!neu) return;
+  if(neu.length < 8){ alert('Password must be at least 8 characters'); return; }
+  var conf = prompt('Confirm your NEW password:');
+  if(neu !== conf){ alert('Passwords do not match'); return; }
+  try {
+    var ures = await sb.auth.getUser();
+    var user = ures.data && ures.data.user;
+    if(!user){ alert('Not signed in'); return; }
+    var ar = await sb.auth.signInWithPassword({ email: user.email, password: cur });
+    if(ar.error){ alert('Current password is incorrect'); return; }
+    var r = await sb.auth.updateUser({ password: neu });
+    if(r.error){ alert('Failed: ' + r.error.message); return; }
+    alert('Password updated successfully');
+  } catch(e){
+    alert('Error: ' + e.message);
+  }
+};
+</script>
+
 </body>
 </html>
