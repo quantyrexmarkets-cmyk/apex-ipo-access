@@ -933,6 +933,32 @@
   .ap-act-act{font-size:13px;color:#fff;font-weight:500}
   .ap-act-meta{font-size:11px;color:#6b7280;margin-top:3px}
 
+  
+  /* Finances tab */
+  .fn-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+  @media(max-width:700px){.fn-stats-grid{grid-template-columns:repeat(2,1fr)}}
+  .fn-stat{background:#1a1d21;border:1px solid #2a2d31;border-radius:10px;padding:10px}
+  .fn-stat .fn-l{font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+  .fn-stat .fn-v{font-size:15px;font-weight:700;color:#fff}
+  .fn-section{background:#1a1d21;border:1px solid #2a2d31;border-radius:12px;padding:14px;margin-bottom:12px}
+  .fn-section-title{font-size:11px;color:#a8b2c1;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:12px}
+  .fn-action-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media(min-width:600px){.fn-action-grid{grid-template-columns:repeat(4,1fr)}}
+  .fn-btn{padding:11px 8px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;color:#fff}
+  .fn-btn.success{background:#22c55e}
+  .fn-btn.danger{background:#ef4444}
+  .fn-btn.warn{background:#f59e0b}
+  .fn-btn.primary{background:#5fb0ff}
+  .fn-btn.dark{background:#374151}
+  .fn-profit-split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid #2a2d31}
+  .fn-profit-split .fn-l{font-size:10px;color:#6b7280;text-transform:uppercase}
+  .fn-tx-list{display:flex;flex-direction:column;gap:6px}
+  .fn-tx-row{display:flex;justify-content:space-between;align-items:center;background:#0f1114;padding:10px 12px;border-radius:8px;gap:10px}
+  .fn-tx-amt{font-size:14px;font-weight:600;color:#fff}
+  .fn-tx-meta{font-size:11px;color:#6b7280;margin-top:2px}
+  .fn-tx-status{font-size:11px;font-weight:600;text-transform:uppercase;text-align:right}
+  .fn-empty{padding:16px;text-align:center;color:#6b7280;font-size:12px}
+
   </style>
 </head>
 <body>
@@ -1449,6 +1475,7 @@
     <div class="m-body">
       <div class="m-tabs">
         <div class="m-tab active" data-pane="overview">OVERVIEW</div>
+        <div class="m-tab" data-pane="finances">FINANCES</div>
         <div class="m-tab" data-pane="profile">PROFILE</div>
         <div class="m-tab" data-pane="holdings">HOLDINGS</div>
         <div class="m-tab" data-pane="activity">ACTIVITY</div>
@@ -1504,6 +1531,69 @@
             </button>
           </div>
         </div>
+      </div>
+
+      
+      <!-- FINANCES -->
+      <div class="m-pane" id="pane-finances">
+
+        <!-- Top stats row -->
+        <div class="fn-stats-grid">
+          <div class="fn-stat"><div class="fn-l">Cash Balance</div><div class="fn-v" id="fnBal" style="color:#22c55e">$0.00</div></div>
+          <div class="fn-stat"><div class="fn-l">Total Deposits</div><div class="fn-v" id="fnTotalDeps">$0.00</div></div>
+          <div class="fn-stat"><div class="fn-l">Total Withdrawals</div><div class="fn-v" id="fnTotalWds">$0.00</div></div>
+          <div class="fn-stat"><div class="fn-l">Total P&L</div><div class="fn-v" id="fnTotalProfit">$0.00</div></div>
+        </div>
+
+        <div class="fn-stats-grid">
+          <div class="fn-stat"><div class="fn-l">Active Holdings</div><div class="fn-v" id="fnActiveHolds">0</div></div>
+          <div class="fn-stat"><div class="fn-l">Total Invested</div><div class="fn-v" id="fnTotalInv">$0.00</div></div>
+          <div class="fn-stat"><div class="fn-l">Avg P&L %</div><div class="fn-v" id="fnAvgPnl">0%</div></div>
+          <div class="fn-stat"><div class="fn-l">Win Rate</div><div class="fn-v" id="fnWinRate">0%</div></div>
+        </div>
+
+        <!-- Balance actions -->
+        <div class="fn-section">
+          <div class="fn-section-title">💵 BALANCE OPERATIONS</div>
+          <div class="fn-action-grid">
+            <button class="fn-btn success" onclick="window._fnCredit()">+ Credit</button>
+            <button class="fn-btn danger" onclick="window._fnDebit()">− Debit</button>
+            <button class="fn-btn warn" onclick="window._fnBonus()">🎁 Bonus</button>
+            <button class="fn-btn dark" onclick="window._fnSetBalance()">⚡ Set Exact</button>
+          </div>
+        </div>
+
+        <!-- Profit actions -->
+        <div class="fn-section">
+          <div class="fn-section-title">📈 PROFIT OPERATIONS</div>
+          <div class="fn-action-grid">
+            <button class="fn-btn primary" onclick="window._fnDistributeProfit()">📊 Distribute % to Holdings</button>
+            <button class="fn-btn success" onclick="window._fnLumpProfit()">💰 Lump Sum Credit</button>
+          </div>
+          <div class="fn-profit-split">
+            <div><div class="fn-l">Paid Out</div><div class="fn-v" id="fnPaidProfit" style="font-size:14px;color:#22c55e">$0.00</div></div>
+            <div><div class="fn-l">Unrealized</div><div class="fn-v" id="fnUnrealProfit" style="font-size:14px;color:#5fb0ff">$0.00</div></div>
+          </div>
+        </div>
+
+        <!-- Recent deposits -->
+        <div class="fn-section">
+          <div class="fn-section-title">⬇️ RECENT DEPOSITS <span id="fnPendDepsLbl" style="float:right;font-size:11px;color:#fbbf24"><span id="fnPendDeps">0</span> pending</span></div>
+          <div class="fn-tx-list" id="fnDepList"><div class="fn-empty">Loading...</div></div>
+        </div>
+
+        <!-- Recent withdrawals -->
+        <div class="fn-section">
+          <div class="fn-section-title">⬆️ RECENT WITHDRAWALS <span id="fnPendWdsLbl" style="float:right;font-size:11px;color:#fbbf24"><span id="fnPendWds">0</span> pending</span></div>
+          <div class="fn-tx-list" id="fnWdList"><div class="fn-empty">Loading...</div></div>
+        </div>
+
+        <!-- Adjustment audit -->
+        <div class="fn-section">
+          <div class="fn-section-title">📜 BALANCE ADJUSTMENT HISTORY</div>
+          <div class="fn-tx-list" id="fnAdjList"><div class="fn-empty">Loading...</div></div>
+        </div>
+
       </div>
 
       <!-- PROFILE -->
@@ -2228,6 +2318,9 @@
     t.addEventListener('click', function(){ switchPane(t.getAttribute('data-pane')); });
   });
   function switchPane(name){
+    if(name==='finances' && currentUser && typeof window.loadUserFinances==='function'){
+      window.loadUserFinances(currentUser.id);
+    }
     document.querySelectorAll('.m-tab').forEach(function(t){
       t.classList.toggle('active', t.getAttribute('data-pane')===name);
     });
@@ -4136,6 +4229,247 @@ window._quickChangePassword = async function(){
     alert('Error: ' + e.message);
   }
 };
+</script>
+
+<!-- FINANCES TAB JS -->
+<script>
+(function(){
+  window.loadUserFinances = async function(userId){
+    if(!userId) return;
+    try {
+      // Parallel fetch
+      var [depRes, wdRes, allRes, adjRes] = await Promise.all([
+        sb.from('deposits').select('*').eq('user_id', userId),
+        sb.from('withdrawals').select('*').eq('user_id', userId),
+        sb.from('allocations').select('*').eq('user_id', userId),
+        sb.from('balance_adjustments').select('*').eq('user_id', userId).order('created_at',{ascending:false}).limit(20)
+      ]);
+
+      var deposits = depRes.data || [];
+      var withdrawals = wdRes.data || [];
+      var allocations = allRes.data || [];
+      var adjustments = adjRes.data || [];
+
+      // Compute stats
+      var totalDeps = deposits.filter(d=>d.status==='approved'||d.status==='completed').reduce((a,d)=>a+parseFloat(d.amount||0),0);
+      var totalWds = withdrawals.filter(w=>w.status==='approved'||w.status==='completed').reduce((a,w)=>a+parseFloat(w.amount||0),0);
+      var totalInv = allocations.reduce((a,h)=>a+parseFloat(h.amount_invested||h.total_value||0),0);
+      var totalProfit = allocations.reduce((a,h)=>a+parseFloat(h.profit_loss||0),0);
+      var activeHolds = allocations.filter(h=>h.outcome==='active'||h.outcome==='pending').length;
+      var wins = allocations.filter(h=>h.outcome==='win').length;
+      var losses = allocations.filter(h=>h.outcome==='loss').length;
+      var winRate = (wins+losses)>0 ? Math.round(wins/(wins+losses)*100) : 0;
+      var avgPnlPct = totalInv>0 ? ((totalProfit/totalInv)*100).toFixed(1) : 0;
+      var pendDeps = deposits.filter(d=>d.status==='pending'||d.status==='awaiting_review').length;
+      var pendWds = withdrawals.filter(w=>w.status==='pending'||w.status==='awaiting_review').length;
+      var paidProfit = allocations.filter(h=>h.payout_credited).reduce((a,h)=>a+parseFloat(h.profit_loss||0),0);
+      var unrealProfit = allocations.filter(h=>!h.payout_credited).reduce((a,h)=>a+parseFloat(h.profit_loss||0),0);
+
+      // Update DOM
+      function set(id, val, color){
+        var el = document.getElementById(id);
+        if(!el) return;
+        el.textContent = val;
+        if(color) el.style.color = color;
+      }
+      set('fnBal', fmt(currentUser.cash_balance||0));
+      set('fnTotalDeps', fmt(totalDeps));
+      set('fnTotalWds', fmt(totalWds));
+      set('fnTotalProfit', (totalProfit>=0?'+':'')+fmt(totalProfit),
+          totalProfit>0?'#22c55e':totalProfit<0?'#ef4444':'#fff');
+      set('fnActiveHolds', activeHolds);
+      set('fnTotalInv', fmt(totalInv));
+      set('fnAvgPnl', (avgPnlPct>=0?'+':'')+avgPnlPct+'%',
+          avgPnlPct>0?'#22c55e':avgPnlPct<0?'#ef4444':'#fff');
+      set('fnWinRate', winRate+'%');
+      set('fnPaidProfit', fmt(paidProfit));
+      set('fnUnrealProfit', fmt(unrealProfit));
+      set('fnPendDeps', pendDeps);
+      set('fnPendWds', pendWds);
+
+      // Recent deposits
+      var depList = document.getElementById('fnDepList');
+      if(depList){
+        var rdeps = deposits.slice().sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,5);
+        if(!rdeps.length){
+          depList.innerHTML = '<div class="fn-empty">No deposits</div>';
+        } else {
+          depList.innerHTML = rdeps.map(function(d){
+            var st = (d.status||'pending').toLowerCase();
+            var color = st==='approved'||st==='completed'?'#22c55e':st==='rejected'?'#ef4444':'#fbbf24';
+            return '<div class="fn-tx-row"><div><div class="fn-tx-amt">'+fmt(d.amount)+'</div>'+
+              '<div class="fn-tx-meta">'+(d.method||'—')+' · '+new Date(d.created_at).toLocaleDateString()+'</div></div>'+
+              '<div class="fn-tx-status" style="color:'+color+'">'+st+'</div></div>';
+          }).join('');
+        }
+      }
+
+      // Recent withdrawals
+      var wdList = document.getElementById('fnWdList');
+      if(wdList){
+        var rwds = withdrawals.slice().sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,5);
+        if(!rwds.length){
+          wdList.innerHTML = '<div class="fn-empty">No withdrawals</div>';
+        } else {
+          wdList.innerHTML = rwds.map(function(w){
+            var st = (w.status||'pending').toLowerCase();
+            var color = st==='approved'||st==='completed'?'#22c55e':st==='rejected'?'#ef4444':'#fbbf24';
+            return '<div class="fn-tx-row"><div><div class="fn-tx-amt">'+fmt(w.amount)+'</div>'+
+              '<div class="fn-tx-meta">'+(w.method||'—')+' · '+new Date(w.created_at).toLocaleDateString()+'</div></div>'+
+              '<div class="fn-tx-status" style="color:'+color+'">'+st+'</div></div>';
+          }).join('');
+        }
+      }
+
+      // Adjustment history
+      var adjList = document.getElementById('fnAdjList');
+      if(adjList){
+        if(!adjustments.length){
+          adjList.innerHTML = '<div class="fn-empty">No adjustments yet</div>';
+        } else {
+          adjList.innerHTML = adjustments.slice(0,10).map(function(a){
+            var sign = a.type==='credit' ? '+' : '−';
+            var color = a.type==='credit' ? '#22c55e' : '#ef4444';
+            return '<div class="fn-tx-row"><div><div class="fn-tx-amt" style="color:'+color+'">'+sign+fmt(a.amount)+'</div>'+
+              '<div class="fn-tx-meta">'+(a.reason||'—')+'</div>'+
+              '<div class="fn-tx-meta" style="font-size:10px">'+new Date(a.created_at).toLocaleString()+'</div></div>'+
+              '<div class="fn-tx-status">'+fmt(a.balance_after||0)+'</div></div>';
+          }).join('');
+        }
+      }
+    } catch(e){ console.error('finances load', e); }
+  };
+
+  // ── BALANCE OPERATIONS ─────────────────────────────────
+  window._fnCredit = async function(){
+    if(!currentUser) return;
+    var amt = parseFloat(prompt('Credit amount ($):','0')||'0');
+    if(amt<=0){ alert('Invalid amount'); return; }
+    var reason = prompt('Reason for credit:','Admin credit') || 'Admin credit';
+    if(!confirm('Credit '+fmt(amt)+' to user balance?\nReason: '+reason)) return;
+    var newBal = parseFloat(currentUser.cash_balance||0) + amt;
+    var r = await sb.from('profiles').update({cash_balance:newBal}).eq('id', currentUser.id);
+    if(r.error){ alert('Failed: '+r.error.message); return; }
+    currentUser.cash_balance = newBal;
+    await sb.from('balance_adjustments').insert({
+      user_id: currentUser.id, amount: amt, type: 'credit',
+      reason: reason, balance_after: newBal
+    });
+    alert('Credited '+fmt(amt));
+    window.loadUserFinances(currentUser.id);
+    if(typeof populateModal==='function') populateModal(currentUser);
+  };
+
+  window._fnDebit = async function(){
+    if(!currentUser) return;
+    var amt = parseFloat(prompt('Debit amount ($):','0')||'0');
+    if(amt<=0){ alert('Invalid amount'); return; }
+    var reason = prompt('Reason for debit:','Admin debit') || 'Admin debit';
+    var curBal = parseFloat(currentUser.cash_balance||0);
+    if(amt > curBal){
+      if(!confirm('Debit exceeds balance ('+fmt(curBal)+'). Continue and go negative?')) return;
+    }
+    if(!confirm('Debit '+fmt(amt)+' from user balance?\nReason: '+reason)) return;
+    var newBal = curBal - amt;
+    var r = await sb.from('profiles').update({cash_balance:newBal}).eq('id', currentUser.id);
+    if(r.error){ alert('Failed: '+r.error.message); return; }
+    currentUser.cash_balance = newBal;
+    await sb.from('balance_adjustments').insert({
+      user_id: currentUser.id, amount: amt, type: 'debit',
+      reason: reason, balance_after: newBal
+    });
+    alert('Debited '+fmt(amt));
+    window.loadUserFinances(currentUser.id);
+    if(typeof populateModal==='function') populateModal(currentUser);
+  };
+
+  window._fnBonus = async function(){
+    if(!currentUser) return;
+    var amt = parseFloat(prompt('Bonus amount ($):','0')||'0');
+    if(amt<=0){ alert('Invalid amount'); return; }
+    var reason = prompt('Bonus reason:','Welcome bonus') || 'Bonus';
+    if(!confirm('Award '+fmt(amt)+' bonus?\nReason: '+reason)) return;
+    var newBal = parseFloat(currentUser.cash_balance||0) + amt;
+    var r = await sb.from('profiles').update({cash_balance:newBal}).eq('id', currentUser.id);
+    if(r.error){ alert('Failed: '+r.error.message); return; }
+    currentUser.cash_balance = newBal;
+    await sb.from('balance_adjustments').insert({
+      user_id: currentUser.id, amount: amt, type: 'credit',
+      reason: '🎁 BONUS: '+reason, balance_after: newBal
+    });
+    alert('Bonus '+fmt(amt)+' awarded');
+    window.loadUserFinances(currentUser.id);
+    if(typeof populateModal==='function') populateModal(currentUser);
+  };
+
+  window._fnSetBalance = async function(){
+    if(!currentUser) return;
+    if(!confirm('⚠️ DANGER: This overrides the user balance to an exact amount. Continue?')) return;
+    var newBalStr = prompt('Set balance to exactly ($):', String(currentUser.cash_balance||0));
+    if(newBalStr === null) return;
+    var newBal = parseFloat(newBalStr);
+    if(isNaN(newBal)){ alert('Invalid amount'); return; }
+    var reason = prompt('Reason for override:','Manual balance correction') || 'Balance override';
+    var diff = newBal - parseFloat(currentUser.cash_balance||0);
+    var r = await sb.from('profiles').update({cash_balance:newBal}).eq('id', currentUser.id);
+    if(r.error){ alert('Failed: '+r.error.message); return; }
+    currentUser.cash_balance = newBal;
+    await sb.from('balance_adjustments').insert({
+      user_id: currentUser.id, amount: Math.abs(diff), type: diff>=0?'credit':'debit',
+      reason: '⚡ OVERRIDE: '+reason, balance_after: newBal
+    });
+    alert('Balance set to '+fmt(newBal));
+    window.loadUserFinances(currentUser.id);
+    if(typeof populateModal==='function') populateModal(currentUser);
+  };
+
+  // ── PROFIT OPERATIONS ──────────────────────────────────
+  window._fnDistributeProfit = async function(){
+    if(!currentUser) return;
+    var pct = parseFloat(prompt('Profit % to add to each active holding (e.g. 5 for +5%):','0')||'0');
+    if(pct===0){ alert('Invalid %'); return; }
+    var ar = await sb.from('allocations').select('*').eq('user_id', currentUser.id).in('outcome',['active','pending']);
+    var holds = ar.data || [];
+    if(!holds.length){ alert('No active holdings'); return; }
+    if(!confirm('Apply '+pct+'% profit to '+holds.length+' holding(s)?')) return;
+    var totalAdded = 0;
+    for(var i=0;i<holds.length;i++){
+      var h = holds[i];
+      var invested = parseFloat(h.amount_invested||h.total_value||0);
+      var addProfit = invested * (pct/100);
+      var newProfit = parseFloat(h.profit_loss||0) + addProfit;
+      var newPct = invested>0 ? (newProfit/invested*100) : 0;
+      await sb.from('allocations').update({
+        profit_loss: newProfit,
+        profit_loss_percent: newPct,
+        outcome: 'active',
+        updated_at: new Date().toISOString()
+      }).eq('id', h.id);
+      totalAdded += addProfit;
+    }
+    alert('Distributed '+fmt(totalAdded)+' across '+holds.length+' holdings');
+    window.loadUserFinances(currentUser.id);
+  };
+
+  window._fnLumpProfit = async function(){
+    if(!currentUser) return;
+    var amt = parseFloat(prompt('Lump-sum profit to credit directly ($):','0')||'0');
+    if(amt<=0){ alert('Invalid amount'); return; }
+    var reason = prompt('Reason:','Promotional profit credit') || 'Profit credit';
+    if(!confirm('Credit '+fmt(amt)+' as lump-sum profit?')) return;
+    var newBal = parseFloat(currentUser.cash_balance||0) + amt;
+    var r = await sb.from('profiles').update({cash_balance:newBal}).eq('id', currentUser.id);
+    if(r.error){ alert('Failed: '+r.error.message); return; }
+    currentUser.cash_balance = newBal;
+    await sb.from('balance_adjustments').insert({
+      user_id: currentUser.id, amount: amt, type: 'credit',
+      reason: '💰 PROFIT: '+reason, balance_after: newBal
+    });
+    alert('Profit '+fmt(amt)+' credited');
+    window.loadUserFinances(currentUser.id);
+    if(typeof populateModal==='function') populateModal(currentUser);
+  };
+})();
 </script>
 
 </body>
