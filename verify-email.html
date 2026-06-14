@@ -90,7 +90,12 @@ let profile = null;
 let cooldownTimer = null;
 
 function setMsg(text, type){
-  msg.textContent = text;
+  var cleanText = String(text).replace(/^✓\s*/, '');
+  if(type === 'ok'){
+    msg.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><polyline points="20 6 9 17 4 12"/></svg>' + cleanText;
+  } else {
+    msg.textContent = cleanText;
+  }
   msg.className = 'msg' + (type ? ' ' + type : '');
 }
 
@@ -132,7 +137,7 @@ async function sendCode(){
       setMsg('Send failed: ' + t.slice(0,100), 'err');
       return false;
     }
-    setMsg('✓ Code sent to ' + user.email, 'ok');
+    setMsg('Code sent to ' + user.email, 'ok');
     return true;
   } catch(e){
     setMsg('Network error: ' + e.message, 'err');
@@ -178,7 +183,7 @@ async function verifyCode(code){
   await sb.from('email_verification_codes').update({ used_at: new Date().toISOString() }).eq('id', codes[0].id);
   await sb.from('profiles').update({ email_verified_at: new Date().toISOString() }).eq('id', user.id);
 
-  setMsg('✓ Verified! Redirecting...', 'ok');
+  setMsg('Verified! Redirecting...', 'ok');
   boxes.forEach(b => b.classList.add('success'));
   setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
 }
