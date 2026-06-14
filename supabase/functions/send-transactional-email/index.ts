@@ -227,7 +227,9 @@ function shell(opts: {
   .footer-link { color:#1a73e8 !important; }
   .divider { border-color:#e8eaed !important; }
   .cta { background:#1a73e8 !important; color:#ffffff !important; }
+  .inner-box { border-color:#5f6368 !important; }
   @media (prefers-color-scheme: dark) {
+    .inner-box { border-color:#5f6368 !important; }
     body, .bg { background:#1f2123 !important; }
     .card { background:#28292c !important; }
     .brand-apex { color:#5fb0ff !important; }
@@ -267,7 +269,7 @@ function shell(opts: {
 
           <!-- Bordered inner content block -->
           <tr><td style="padding:24px 20px 8px">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #3c3f43;border-radius:16px">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="inner-box" style="border:1px solid #5f6368;border-radius:16px">
               <tr><td class="headline" style="padding:32px 24px 20px;font-family:'Google Sans',Inter,Arial,sans-serif;font-size:32px;font-weight:400;line-height:1.35;letter-spacing:-0.3px;text-align:center">${opts.headline.split('\n').map(l => escape(l)).join('<br style="line-height:1.55">')}</td></tr>
               ${subtitle}
               ${cta}
