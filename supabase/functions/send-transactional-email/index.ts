@@ -228,8 +228,7 @@ function shell(opts: {
     .cta { background:#1a73e8 !important; color:#ffffff !important; }
   }
   @media only screen and (max-width:600px) {
-    .headline { font-size:23px !important; line-height:1.45 !important; padding:8px 28px 20px !important; }
-    .brand-apex, .brand-rest { font-size:24px !important; }
+    .headline { font-size:22px !important; line-height:1.4 !important; padding:4px 24px 14px !important; }
     .card { border-radius:16px !important; }
   }
 </style>
@@ -247,13 +246,13 @@ function shell(opts: {
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 
           <!-- Full brand logo (single image, centered) -->
-          <tr><td align="center" style="padding:44px 32px 36px">
+          <tr><td align="center" style="padding:32px 32px 0">
             <img src="https://apexipoaccess.com/assets/apex-logo-full.png" alt="Apex IPO Access"
-                 width="280" style="display:block;margin:0 auto;width:280px;max-width:80%;height:auto">
+                 width="220" style="display:block;margin:0 auto;width:220px;max-width:70%;height:auto">
           </td></tr>
 
           <!-- Big headline (Google style: weight 400, generous line-height) -->
-          <tr><td class="headline" style="padding:8px 40px 24px;font-family:'Google Sans',Inter,Arial,sans-serif;font-size:26px;font-weight:400;line-height:1.45;letter-spacing:-0.2px;text-align:center;white-space:pre-line">${opts.headline.split('\n').map(l => escape(l)).join('<br>')}</td></tr>
+          <tr><td class="headline" style="padding:4px 40px 16px;font-family:'Google Sans',Inter,Arial,sans-serif;font-size:26px;font-weight:400;line-height:1.4;letter-spacing:-0.2px;text-align:center;white-space:pre-line">${opts.headline.split('\n').map(l => escape(l)).join('<br>')}</td></tr>
 
           ${subtitle}
           ${cta}
