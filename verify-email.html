@@ -197,7 +197,11 @@
     else { document.addEventListener('sb-ready', fn, { once: true }); }
   }
   __runWhenReady(async function(){
+    var dbg = document.getElementById('debugStatus');
+    if(dbg) dbg.textContent = 'Step 1: sb ready';
+    try {
     SUPABASE_URL = sb.supabaseUrl;
+    if(dbg) dbg.textContent = 'Step 2: got URL';
     var { data } = await sb.auth.getUser();
     if(!data.user){
       var dbg = document.getElementById('debugStatus');
@@ -274,6 +278,11 @@
       msg.textContent = ok ? '✓ New code sent.' : 'Failed to send. Try again.';
       startResendCooldown(60);
     });
+    } catch(err){
+      var dbg = document.getElementById('debugStatus');
+      if(dbg) dbg.textContent = 'ERROR: ' + (err.message || err);
+      console.error('[verify-email] error:', err);
+    }
   });
 </script>
 
