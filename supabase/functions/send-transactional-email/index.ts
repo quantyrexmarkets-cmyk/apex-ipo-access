@@ -246,15 +246,17 @@ function shell(opts: {
       <tr><td class="card" style="border-radius:20px;padding:0">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 
-          <!-- Brand wordmark (logo + lowercase Google-style) -->
-          <tr><td align="center" style="padding:48px 32px 36px">
-            <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto">
+          <!-- Brand wordmark (logo + Title Case Google-style) -->
+          <tr><td align="center" style="padding:44px 32px 32px">
+            <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;border-collapse:collapse">
               <tr>
-                <td style="padding-right:14px;vertical-align:middle">
-                  <img src="https://apexipoaccess.com/assets/spacex-logo.png" alt="" width="42" height="42" style="display:block;width:42px;height:42px">
+                <td style="padding:0 12px 0 0;vertical-align:middle;line-height:0">
+                  <img src="https://apexipoaccess.com/assets/spacex-logo.png" alt="" width="38" height="38" style="display:block;width:38px;height:38px;vertical-align:middle">
                 </td>
-                <td style="vertical-align:middle;font-family:'Google Sans','Product Sans',Inter,Roboto,Arial,sans-serif;font-size:30px;font-weight:500;letter-spacing:-0.4px;line-height:1">
-                  <span class="brand-apex" style="color:#1a73e8">apex</span><span class="brand-rest" style="color:#202124;margin-left:8px;font-weight:400">ipo access</span>
+                <td style="vertical-align:middle;line-height:1;padding:0;height:38px">
+                  <span style="display:inline-block;vertical-align:middle;font-family:'Google Sans','Product Sans',Inter,Roboto,Arial,sans-serif;font-size:28px;font-weight:500;letter-spacing:-0.3px;line-height:1">
+                    <span class="brand-apex" style="color:#1a73e8">Apex</span><span class="brand-rest" style="color:#202124;margin-left:7px;font-weight:400">Ipo Access</span>
+                  </span>
                 </td>
               </tr>
             </table>
@@ -316,12 +318,12 @@ function tplWelcome(user: UserProfile): string {
   `;
   return shell({
     preheader: 'Your account is verified and ready. Start exploring launched IPO opportunities.',
-    headline: `Hi ${user.first_name},\nWelcome to APEX IPO Access`,
-    subtitle: `Hi ${user.first_name}, your identity has been verified and your APEX IPO Access account is now fully activated. You now have access to our curated selection of launched pre-IPO opportunities and institutional allocations.`,
+    headline: `Hi ${user.first_name},\nWelcome to Apex Ipo Access`,
+    subtitle: `Hi ${user.first_name}, your identity has been verified and your Apex Ipo Access account is now fully activated. You now have access to our curated selection of launched pre-IPO opportunities and institutional allocations.`,
     ctaLabel: 'Go to Dashboard',
     ctaUrl: 'https://apexipoaccess.com/dashboard.html',
     detailsHtml: details,
-    footerNote: 'This email confirms that your APEX IPO Access account has been activated following successful identity verification.',
+    footerNote: 'This email confirms that your Apex Ipo Access account has been activated following successful identity verification.',
     recipientEmail: user.email,
   });
 }
@@ -377,7 +379,7 @@ function tplDepositPending(user: UserProfile, params: {
     ctaLabel: 'View Account',
     ctaUrl: 'https://apexipoaccess.com/dashboard.html',
     detailsHtml: details,
-    footerNote: 'You are receiving this email because a deposit was submitted to your APEX IPO Access account.',
+    footerNote: 'You are receiving this email because a deposit was submitted to your Apex Ipo Access account.',
     recipientEmail: user.email,
   });
 }
@@ -406,7 +408,7 @@ function tplDepositApproved(user: UserProfile, params: {
   return shell({
     preheader: `Your deposit of ${fmtMoney(params.amount)} has been credited. New balance: ${fmtMoney(newBal)}.`,
     headline: `Hi ${user.first_name},\nYour deposit has been credited`,
-    subtitle: `${fmtMoney(params.amount)} has been added to your APEX IPO Access account and is now available to invest.`,
+    subtitle: `${fmtMoney(params.amount)} has been added to your Apex Ipo Access account and is now available to invest.`,
     ctaLabel: 'Browse Available IPOs',
     ctaUrl: 'https://apexipoaccess.com/dashboard.html',
     detailsHtml: details,
@@ -475,7 +477,7 @@ function tplWithdrawalPending(user: UserProfile, params: {
     ctaLabel: 'View Status',
     ctaUrl: 'https://apexipoaccess.com/dashboard.html',
     detailsHtml: details,
-    footerNote: 'You are receiving this email because a withdrawal was requested from your APEX IPO Access account. If this was not you, contact support immediately.',
+    footerNote: 'You are receiving this email because a withdrawal was requested from your Apex Ipo Access account. If this was not you, contact support immediately.',
     recipientEmail: user.email,
   });
 }
@@ -537,7 +539,7 @@ function tplWithdrawalRejected(user: UserProfile, params: {
       { label: 'Status', value: 'Rejected — Funds Returned to Balance' },
       { label: 'Reviewed', value: fmtDateTime(params.reviewedAt) },
     ])}
-    <p style="margin:18px 0 0;font-size:13px;line-height:1.65;opacity:0.75">Your funds remain safely in your APEX IPO Access account and are reflected in your available balance.</p>
+    <p style="margin:18px 0 0;font-size:13px;line-height:1.65;opacity:0.75">Your funds remain safely in your Apex Ipo Access account and are reflected in your available balance.</p>
   `;
   return shell({
     preheader: `Your withdrawal of ${fmtMoney(params.amount)} could not be processed. Funds returned to your balance.`,
@@ -603,9 +605,9 @@ function tplLoginAlert(user: UserProfile, params: {
     <p style="margin:18px 0 0;font-size:13px;line-height:1.65;opacity:0.75">If this was not you, change your password immediately and enable two-factor authentication.</p>
   `;
   return shell({
-    preheader: 'A new sign-in was detected on your APEX IPO Access account.',
+    preheader: 'A new sign-in was detected on your Apex Ipo Access account.',
     headline: `Hi ${user.first_name},\nNew sign-in to your account`,
-    subtitle: 'We detected a new sign-in to your APEX IPO Access account. If this was you, no action is needed.',
+    subtitle: 'We detected a new sign-in to your Apex Ipo Access account. If this was you, no action is needed.',
     ctaLabel: 'Secure My Account',
     ctaUrl: 'https://apexipoaccess.com/account.html',
     detailsHtml: details,
@@ -723,9 +725,9 @@ function tplAccountBanned(user: UserProfile, params: {
   `;
 
   return shell({
-    preheader: 'Your APEX IPO Access account has been suspended. Review the reason and appeal process inside.',
+    preheader: 'Your Apex Ipo Access account has been suspended. Review the reason and appeal process inside.',
     headline: `Hi ${user.first_name},\nYour account has been suspended`,
-    subtitle: 'Following review by our compliance and risk-management team, your APEX IPO Access account has been suspended and access has been revoked.',
+    subtitle: 'Following review by our compliance and risk-management team, your Apex Ipo Access account has been suspended and access has been revoked.',
     ctaLabel: 'File an Appeal',
     ctaUrl: 'mailto:compliance@apexipoaccess.com?subject=Account%20Suspension%20Appeal',
     detailsHtml: details,
@@ -758,7 +760,7 @@ const TEMPLATES: Record<string, (user: UserProfile, params: any) => string> = {
 // SUBJECT LINE DEFAULTS (if caller doesn't provide one)
 // ═══════════════════════════════════════════════════════════════════════════
 const DEFAULT_SUBJECTS: Record<string, string> = {
-  'welcome':             'Welcome to APEX IPO Access',
+  'welcome':             'Welcome to Apex Ipo Access',
   'kyc-rejected':        'Identity Verification Update',
   'deposit-pending':     'We received your deposit',
   'deposit-approved':    'Your deposit has been credited',
