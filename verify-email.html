@@ -2,40 +2,38 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Verify Email | APEX IPO ACCESS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
-<script src="js/supabase.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Inter:wght@400;500;600&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
-  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;min-height:100vh}
   .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
   .card{width:100%;max-width:440px;background:#0a0d12;border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:40px 32px;text-align:center}
-  .brand{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;letter-spacing:3px;color:#fff;margin-bottom:32px}
+  .brand{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;letter-spacing:3px;color:#fff;margin-bottom:24px}
   .brand span{color:#4a9eff}
   .icon{width:64px;height:64px;border-radius:50%;background:rgba(74,158,255,0.08);border:1px solid rgba(74,158,255,0.25);display:inline-flex;align-items:center;justify-content:center;margin-bottom:20px}
   .icon svg{width:28px;height:28px;color:#4a9eff}
-  h1{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:22px;margin-bottom:10px;color:#fff}
-  .sub{color:#8b95a8;font-size:14px;line-height:1.6;margin-bottom:28px}
-  .sub b{color:#fff;font-weight:600}
-  .code-row{display:flex;gap:8px;justify-content:center;margin-bottom:20px}
-  .code-box{width:44px;height:54px;background:#000;border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#fff;font-size:22px;font-weight:600;text-align:center;font-family:'Manrope',sans-serif}
-  .code-box:focus{outline:none;border-color:#4a9eff;box-shadow:0 0 0 3px rgba(74,158,255,0.15)}
-  .code-box.success{border-color:#3ed598;color:#3ed598}
-  .code-box.error{border-color:#ff6a6a;color:#ff8a8a;animation:shake .3s}
-  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-  .msg{font-size:13px;margin-bottom:20px;min-height:18px}
-  .msg.error{color:#ff8a8a}
-  .msg.success{color:#3ed598}
+  h1{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:22px;margin-bottom:10px}
+  .sub{color:#8b95a8;font-size:14px;line-height:1.6;margin-bottom:24px}
+  .sub b{color:#fff;font-weight:600;word-break:break-all}
+  .codes{display:flex;gap:8px;justify-content:center;margin-bottom:20px}
+  .codes input{width:44px;height:54px;background:#000;border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#fff;font-size:22px;font-weight:600;text-align:center;font-family:'Manrope',sans-serif}
+  .codes input:focus{outline:none;border-color:#4a9eff;box-shadow:0 0 0 3px rgba(74,158,255,0.15)}
+  .codes input.success{border-color:#3ed598;color:#3ed598}
+  .codes input.error{border-color:#ff6a6a;color:#ff8a8a}
+  .msg{font-size:13px;min-height:18px;margin-bottom:18px;color:#8b95a8}
+  .msg.err{color:#ff8a8a}
+  .msg.ok{color:#3ed598}
   .btn{width:100%;padding:14px;background:#4a9eff;color:#000;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:14px}
-  .btn:hover{background:#5cacff}
   .btn:disabled{opacity:0.5;cursor:not-allowed}
-  .resend{font-size:13px;color:#8b95a8}
-  .resend a{color:#4a9eff;font-weight:500;cursor:pointer;text-decoration:none}
-  .resend a:hover{text-decoration:underline}
-  .resend a.disabled{color:#3a4250;cursor:not-allowed;text-decoration:none}
-  .foot{margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.05);font-size:12px;color:#6a7585}
+  .resend-row{font-size:13px;color:#8b95a8;margin-bottom:24px}
+  .resend-row button{background:none;border:none;color:#4a9eff;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px;padding:4px 8px}
+  .resend-row button:disabled{color:#3a4250;cursor:not-allowed}
+  .foot{font-size:12px;color:#6a7585;padding-top:20px;border-top:1px solid rgba(255,255,255,0.05)}
   .foot a{color:#4a9eff;text-decoration:none}
 </style>
 </head>
@@ -44,258 +42,215 @@
 <div class="wrap">
   <div class="card">
     <div class="brand">APEX <span>·</span> IPO ACCESS</div>
-    <div id="debugStatus" style="background:#1a1f2e;color:#ffb800;font-size:11px;padding:8px;border-radius:6px;margin-bottom:16px;font-family:monospace">Loading...</div>
-
     <div class="icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
         <polyline points="22,6 12,13 2,6"/>
       </svg>
     </div>
-
     <h1>Verify your email</h1>
-    <div class="sub">
-      We've sent a 6-digit code to <b id="userEmail">your email</b>. Enter it below to confirm your account.
+    <div class="sub">We've sent a 6-digit code to <b id="userEmail">loading...</b></div>
+
+    <div class="codes">
+      <input type="text" maxlength="1" inputmode="numeric" autocomplete="one-time-code">
+      <input type="text" maxlength="1" inputmode="numeric">
+      <input type="text" maxlength="1" inputmode="numeric">
+      <input type="text" maxlength="1" inputmode="numeric">
+      <input type="text" maxlength="1" inputmode="numeric">
+      <input type="text" maxlength="1" inputmode="numeric">
     </div>
 
-    <div class="code-row">
-      <input type="text" class="code-box" maxlength="1" inputmode="numeric" autocomplete="one-time-code">
-      <input type="text" class="code-box" maxlength="1" inputmode="numeric">
-      <input type="text" class="code-box" maxlength="1" inputmode="numeric">
-      <input type="text" class="code-box" maxlength="1" inputmode="numeric">
-      <input type="text" class="code-box" maxlength="1" inputmode="numeric">
-      <input type="text" class="code-box" maxlength="1" inputmode="numeric">
-    </div>
-
-    <div class="msg" id="msg"></div>
+    <div class="msg" id="msg">Loading...</div>
 
     <button class="btn" id="verifyBtn" disabled>Verify email</button>
 
-    <div class="resend">
-      Didn't receive the code? <button type="button" id="resendLink" style="background:none;border:none;color:#4a9eff;font-weight:500;cursor:pointer;padding:4px 8px;font-family:inherit;font-size:13px">Resend</button> <span id="resendTimer"></span>
+    <div class="resend-row">
+      Didn't receive the code? <button type="button" id="resendBtn" disabled>Resend</button> <span id="cooldown"></span>
     </div>
 
     <div class="foot">
-      Wrong email? <a href="#" onclick="window._logout();return false;">Sign out</a>
-      &nbsp;·&nbsp;
-      <a href="mailto:support@apexipoaccess.com">Contact support</a>
+      <a href="#" id="signoutLink">Sign out</a> · <a href="mailto:support@apexipoaccess.com">Contact support</a>
     </div>
   </div>
 </div>
 
 <script>
-  var SUPABASE_URL = '';
-  var currentUser = null;
-  var currentProfile = null;
+const SUPABASE_URL = 'https://tbivhlxkwtklhvsaggwg.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiaXZobHhrd3RrbGh2c2FnZ3dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0Mjc1MTksImV4cCI6MjA2ODAwMzUxOX0.rw-LXJTPzYJu5TdEP0pgqUguviMJNwzJkpI5uGtR6XY';
 
-  window._logout = async function(){
-    try { await sb.auth.signOut(); } catch(e){}
-    window.location.href = 'login.html';
-  };
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-  function genCode(){
-    return Math.floor(100000 + Math.random() * 900000).toString();
-  }
+const boxes = document.querySelectorAll('.codes input');
+const msg = document.getElementById('msg');
+const verifyBtn = document.getElementById('verifyBtn');
+const resendBtn = document.getElementById('resendBtn');
+const cooldownEl = document.getElementById('cooldown');
 
-  async function sendCode(){
-    console.log('[verify-email] sendCode called');
-    if(!currentUser){
-      console.error('[verify-email] currentUser is null!');
-      alert('Error: not logged in. Please sign in again.');
-      return false;
-    }
-    var code = genCode();
-    // Save code in DB
-    await sb.from('email_verification_codes').insert({
-      user_id: currentUser.id,
-      code: code,
-      expires_at: new Date(Date.now() + 10*60*1000).toISOString()
-    });
+let user = null;
+let profile = null;
+let cooldownTimer = null;
 
-    // Call edge function
-    var url = SUPABASE_URL + '/functions/v1/send-email-verification';
-    var { data: session } = await sb.auth.getSession();
-    var res = await fetch(url, {
+function setMsg(text, type){
+  msg.textContent = text;
+  msg.className = 'msg' + (type ? ' ' + type : '');
+}
+
+function genCode(){
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+async function sendCode(){
+  if(!user){ setMsg('Not signed in.', 'err'); return false; }
+  setMsg('Sending code...');
+
+  const code = genCode();
+
+  // Save to DB
+  const { error: dbErr } = await sb.from('email_verification_codes').insert({
+    user_id: user.id,
+    code: code,
+    expires_at: new Date(Date.now() + 10*60*1000).toISOString()
+  });
+  if(dbErr){ setMsg('DB error: ' + dbErr.message, 'err'); return false; }
+
+  // Call edge function
+  try {
+    const { data: sessionData } = await sb.auth.getSession();
+    const res = await fetch(SUPABASE_URL + '/functions/v1/send-email-verification', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + session.session.access_token
+        'Authorization': 'Bearer ' + sessionData.session.access_token
       },
       body: JSON.stringify({
-        email: currentUser.email,
+        email: user.email,
         code: code,
-        firstName: currentProfile?.first_name || ''
+        firstName: profile?.first_name || ''
       })
     });
     if(!res.ok){
-      var errText = await res.text();
-      console.error('[verify-email] Edge function error:', res.status, errText);
-      alert('Email send failed: ' + res.status + '\n' + errText);
-    } else {
-      console.log('[verify-email] Email sent successfully');
+      const t = await res.text();
+      setMsg('Send failed: ' + t.slice(0,100), 'err');
+      return false;
     }
-    return res.ok;
+    setMsg('✓ Code sent to ' + user.email, 'ok');
+    return true;
+  } catch(e){
+    setMsg('Network error: ' + e.message, 'err');
+    return false;
   }
+}
 
-  function startResendCooldown(seconds){
-    var link = document.getElementById('resendLink');
-    var timer = document.getElementById('resendTimer');
-    link.classList.add('disabled');
-    var s = seconds;
-    timer.textContent = '(' + s + 's)';
-    var iv = setInterval(function(){
-      s--;
-      if(s <= 0){
-        clearInterval(iv);
-        link.classList.remove('disabled');
-        timer.textContent = '';
-      } else {
-        timer.textContent = '(' + s + 's)';
-      }
-    }, 1000);
-  }
+function startCooldown(seconds){
+  if(cooldownTimer) clearInterval(cooldownTimer);
+  let s = seconds;
+  resendBtn.disabled = true;
+  cooldownEl.textContent = '(' + s + 's)';
+  cooldownTimer = setInterval(() => {
+    s--;
+    cooldownEl.textContent = s > 0 ? '(' + s + 's)' : '';
+    if(s <= 0){ clearInterval(cooldownTimer); resendBtn.disabled = false; }
+  }, 1000);
+}
 
-  async function verifyCode(code){
-    var msg = document.getElementById('msg');
-    var btn = document.getElementById('verifyBtn');
-    msg.className = 'msg';
-    msg.textContent = '';
-    btn.disabled = true;
-    btn.textContent = 'Verifying...';
+async function verifyCode(code){
+  verifyBtn.disabled = true;
+  setMsg('Verifying...');
 
-    var { data: codes } = await sb.from('email_verification_codes')
-      .select('*')
-      .eq('user_id', currentUser.id)
-      .eq('code', code)
-      .is('used_at', null)
-      .gt('expires_at', new Date().toISOString())
-      .order('created_at', { ascending: false })
-      .limit(1);
+  const { data: codes, error } = await sb.from('email_verification_codes')
+    .select('*')
+    .eq('user_id', user.id)
+    .eq('code', code)
+    .is('used_at', null)
+    .gt('expires_at', new Date().toISOString())
+    .order('created_at', { ascending: false })
+    .limit(1);
 
-    if(!codes || codes.length === 0){
-      msg.className = 'msg error';
-      msg.textContent = 'Invalid or expired code. Try again.';
-      document.querySelectorAll('.code-box').forEach(function(b){ b.classList.add('error'); });
-      setTimeout(function(){ document.querySelectorAll('.code-box').forEach(function(b){ b.classList.remove('error'); }); }, 600);
-      btn.disabled = false;
-      btn.textContent = 'Verify email';
-      return;
-    }
-
-    // Mark code used + flag profile verified
-    await sb.from('email_verification_codes').update({ used_at: new Date().toISOString() }).eq('id', codes[0].id);
-    await sb.from('profiles').update({ email_verified_at: new Date().toISOString() }).eq('id', currentUser.id);
-
-    msg.className = 'msg success';
-    msg.textContent = '✓ Email verified! Redirecting...';
-    document.querySelectorAll('.code-box').forEach(function(b){ b.classList.add('success'); });
-    setTimeout(function(){ window.location.href = 'dashboard.html'; }, 800);
-  }
-
-  function __runWhenReady(fn){
-    var dbg = document.getElementById('debugStatus');
-    if(dbg) dbg.textContent = '__runWhenReady called, sb=' + (typeof window.sb) + ' ready=' + window.__sbReady;
-    if(window.sb) {
-      setTimeout(fn, 0);
-    } else {
-      document.addEventListener('sb-ready', function(){ fn(); }, { once: true });
-      // Fallback: poll for sb in case event was missed
-      var tries = 0;
-      var iv = setInterval(function(){
-        tries++;
-        if(window.sb){ clearInterval(iv); fn(); }
-        if(tries > 50){ clearInterval(iv); if(dbg) dbg.textContent = 'TIMEOUT: sb never loaded'; }
-      }, 100);
-    }
-  }
-  __runWhenReady(async function(){
-    var dbg = document.getElementById('debugStatus');
-    if(dbg) dbg.textContent = 'Step 1: sb ready';
-    try {
-    SUPABASE_URL = sb.supabaseUrl;
-    if(dbg) dbg.textContent = 'Step 2: got URL';
-    var { data } = await sb.auth.getUser();
-    if(!data.user){
-      var dbg = document.getElementById('debugStatus');
-      if(dbg) dbg.textContent = 'ERROR: Not logged in. Redirecting...';
-      setTimeout(function(){ window.location.href = 'login.html'; }, 2000);
-      return;
-    }
-    currentUser = data.user;
-    var dbg = document.getElementById('debugStatus');
-    if(dbg) dbg.textContent = 'User: ' + (currentUser.email || 'NONE');
-
-    var { data: profile } = await sb.from('profiles').select('*').eq('id', data.user.id).single();
-    currentProfile = profile;
-
-    if(!profile || profile.kyc_status !== 'verified'){
-      window.location.href = 'pending-approval.html';
-      return;
-    }
-    if(profile.email_verified_at){
-      window.location.href = 'dashboard.html';
-      return;
-    }
-
-    document.getElementById('userEmail').textContent = currentUser.email;
-
-    // Auto-send first code
-    await sendCode();
-    startResendCooldown(60);
-
-    // Wire up code inputs
-    var boxes = document.querySelectorAll('.code-box');
-    var btn = document.getElementById('verifyBtn');
-
-    function getCode(){
-      return Array.from(boxes).map(function(b){ return b.value; }).join('');
-    }
-
-    boxes.forEach(function(box, i){
-      box.addEventListener('input', function(){
-        box.value = box.value.replace(/\D/g, '').slice(0,1);
-        if(box.value && i < boxes.length - 1) boxes[i+1].focus();
-        var code = getCode();
-        btn.disabled = code.length !== 6;
-        if(code.length === 6) verifyCode(code);
-      });
-      box.addEventListener('keydown', function(e){
-        if(e.key === 'Backspace' && !box.value && i > 0) boxes[i-1].focus();
-      });
-      box.addEventListener('paste', function(e){
-        e.preventDefault();
-        var paste = (e.clipboardData.getData('text') || '').replace(/\D/g,'').slice(0,6);
-        for(var j = 0; j < paste.length && j < boxes.length; j++){
-          boxes[j].value = paste[j];
-        }
-        boxes[Math.min(paste.length, boxes.length-1)].focus();
-        if(paste.length === 6){ btn.disabled = false; verifyCode(paste); }
-      });
-    });
-
+  if(error){ setMsg('Error: ' + error.message, 'err'); verifyBtn.disabled = false; return; }
+  if(!codes || codes.length === 0){
+    setMsg('Invalid or expired code.', 'err');
+    boxes.forEach(b => b.classList.add('error'));
+    setTimeout(() => boxes.forEach(b => { b.classList.remove('error'); b.value = ''; }), 700);
     boxes[0].focus();
+    verifyBtn.disabled = false;
+    return;
+  }
 
-    btn.addEventListener('click', function(){
-      var code = getCode();
-      if(code.length === 6) verifyCode(code);
-    });
+  await sb.from('email_verification_codes').update({ used_at: new Date().toISOString() }).eq('id', codes[0].id);
+  await sb.from('profiles').update({ email_verified_at: new Date().toISOString() }).eq('id', user.id);
 
-    document.getElementById('resendLink').addEventListener('click', async function(){
-      if(this.classList.contains('disabled')) return;
-      var msg = document.getElementById('msg');
-      msg.className = 'msg';
-      msg.textContent = 'Sending new code...';
-      var ok = await sendCode();
-      msg.className = 'msg success';
-      msg.textContent = ok ? '✓ New code sent.' : 'Failed to send. Try again.';
-      startResendCooldown(60);
-    });
-    } catch(err){
-      var dbg = document.getElementById('debugStatus');
-      if(dbg) dbg.textContent = 'ERROR: ' + (err.message || err);
-      console.error('[verify-email] error:', err);
-    }
+  setMsg('✓ Verified! Redirecting...', 'ok');
+  boxes.forEach(b => b.classList.add('success'));
+  setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+}
+
+// Wire up code inputs
+boxes.forEach((box, i) => {
+  box.addEventListener('input', () => {
+    box.value = box.value.replace(/\D/g, '').slice(0,1);
+    if(box.value && i < boxes.length - 1) boxes[i+1].focus();
+    const code = Array.from(boxes).map(b => b.value).join('');
+    verifyBtn.disabled = code.length !== 6;
+    if(code.length === 6) verifyCode(code);
   });
+  box.addEventListener('keydown', e => {
+    if(e.key === 'Backspace' && !box.value && i > 0) boxes[i-1].focus();
+  });
+  box.addEventListener('paste', e => {
+    e.preventDefault();
+    const paste = (e.clipboardData.getData('text') || '').replace(/\D/g,'').slice(0,6);
+    paste.split('').forEach((d, j) => { if(boxes[j]) boxes[j].value = d; });
+    boxes[Math.min(paste.length, boxes.length-1)].focus();
+    if(paste.length === 6) verifyCode(paste);
+  });
+});
+
+verifyBtn.addEventListener('click', () => {
+  const code = Array.from(boxes).map(b => b.value).join('');
+  if(code.length === 6) verifyCode(code);
+});
+
+resendBtn.addEventListener('click', async () => {
+  const ok = await sendCode();
+  if(ok) startCooldown(60);
+});
+
+document.getElementById('signoutLink').addEventListener('click', async e => {
+  e.preventDefault();
+  await sb.auth.signOut();
+  window.location.href = 'login.html';
+});
+
+// Bootstrap
+(async function init(){
+  const { data: u } = await sb.auth.getUser();
+  if(!u.user){ setMsg('Not signed in. Redirecting...', 'err'); setTimeout(() => location.href='login.html', 1500); return; }
+  user = u.user;
+
+  const { data: p } = await sb.from('profiles').select('*').eq('id', user.id).single();
+  profile = p;
+
+  if(!p || (p.kyc_status !== 'verified' && !p.is_admin)){
+    setMsg('Account pending review. Redirecting...', 'err');
+    setTimeout(() => location.href='pending-approval.html', 1500);
+    return;
+  }
+
+  if(p.email_verified_at){
+    setMsg('Already verified. Redirecting...', 'ok');
+    setTimeout(() => location.href='dashboard.html', 1000);
+    return;
+  }
+
+  document.getElementById('userEmail').textContent = user.email;
+  setMsg('');
+
+  // Auto-send first code
+  const sent = await sendCode();
+  if(sent) startCooldown(60);
+
+  boxes[0].focus();
+})();
 </script>
 
 </body>
