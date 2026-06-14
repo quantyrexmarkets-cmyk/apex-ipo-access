@@ -23,110 +23,88 @@ Deno.serve(async (req) => {
 
     const html = `<!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><title>Verification code</title>
+<head>
+<meta charset="UTF-8">
+<title>Verification code</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body style="margin:0;padding:0;background:#0d1117;font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#e8eef7">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0d1117;padding:40px 16px;background-image:radial-gradient(ellipse at top, rgba(74,158,255,0.06), transparent 60%)">
+<body style="margin:0;padding:0;background:#1f2123;font-family:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#e3e3e3">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#1f2123;padding:32px 16px">
     <tr><td align="center">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:580px">
 
-        <!-- Brand Header -->
-        <tr><td align="left" style="padding:0 4px 24px">
+        <!-- Brand Header (text only, no card) -->
+        <tr><td style="padding:0 8px 28px">
           <table role="presentation" cellpadding="0" cellspacing="0">
             <tr>
-              <td style="padding-right:14px;vertical-align:middle">
-                <img src="https://apexipoaccess.com/assets/spacex-logo.png" alt="APEX" width="48" height="48" style="display:block;width:48px;height:48px">
+              <td style="padding-right:12px;vertical-align:middle">
+                <img src="https://apexipoaccess.com/assets/spacex-logo.png" alt="" width="32" height="32" style="display:block;width:32px;height:32px">
               </td>
               <td style="vertical-align:middle">
-                <div style="font-family:'Montserrat','Helvetica Neue',Arial,sans-serif;font-size:21px;font-weight:300;letter-spacing:4px;color:#ffffff;line-height:1.1">APEX IPO ACCESS</div>
-                <div style="font-family:'Montserrat','Helvetica Neue',Arial,sans-serif;font-size:10px;font-weight:400;letter-spacing:3px;color:#5fb0ff;line-height:1.1;margin-top:7px;text-transform:uppercase">Investment Intelligence</div>
+                <div style="font-family:'Montserrat',sans-serif;font-size:18px;font-weight:400;color:#e3e3e3;letter-spacing:0.3px">
+                  <span style="font-weight:700;color:#ffffff">APEX</span> <span style="color:#a0a4a8">IPO Access</span>
+                </div>
               </td>
             </tr>
           </table>
         </td></tr>
 
-        <!-- Card -->
-        <tr><td style="background:linear-gradient(180deg,#161c28 0%,#13182238 100%);border:1px solid #232a38;border-radius:12px;padding:44px 36px;box-shadow:0 1px 0 rgba(255,255,255,0.03) inset">
+        <!-- Card (subtle border, dark gray bg matching Google style) -->
+        <tr><td style="background:#28292c;border:1px solid #3c3f43;border-radius:12px;padding:32px 28px">
 
-          <!-- Eyebrow -->
-          <p style="margin:0 0 10px;font-size:11px;font-weight:600;letter-spacing:1.2px;color:#5fb0ff;text-transform:uppercase">Security · Verification Code</p>
+          <h1 style="margin:0 0 24px;font-family:'Montserrat',sans-serif;font-size:22px;font-weight:500;color:#ffffff;letter-spacing:-0.2px;line-height:1.3">Confirm your email for APEX IPO Access</h1>
 
-          <!-- Heading -->
-          <h1 style="margin:0 0 22px;font-family:Georgia,'Times New Roman',serif;font-size:24px;font-weight:400;color:#ffffff;letter-spacing:-0.3px;line-height:1.3">Confirm your email address</h1>
+          <p style="margin:0 0 16px;font-size:14px;line-height:1.65;color:#c8ccd0"><span style="color:#a0a4a8">To:</span> ${email}</p>
 
-          <!-- Body -->
-          <p style="margin:0 0 14px;font-size:14px;line-height:1.65;color:#cfd8e8">Dear ${name},</p>
+          <p style="margin:0 0 20px;font-size:14px;line-height:1.65;color:#c8ccd0">Hi ${name}, you recently signed up for APEX IPO Access. Use the verification code below to confirm your email and finish setting up your account.</p>
 
-          <p style="margin:0 0 24px;font-size:14px;line-height:1.65;color:#cfd8e8">To complete your account verification with APEX IPO Access, please enter the one-time verification code below in your active browser session.</p>
+          <!-- Section heading -->
+          <h2 style="margin:28px 0 16px;font-size:15px;font-weight:600;color:#ffffff;letter-spacing:0.2px">Your verification code</h2>
 
-          <!-- Code -->
-          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:0 0 28px;border-collapse:collapse">
-            <tr><td align="center" style="background:#0a0e15;border:1px solid #2a3242;border-radius:10px;padding:30px 16px">
-              <div style="font-family:'SF Mono','Courier New',monospace;font-size:32px;font-weight:600;color:#ffffff;letter-spacing:10px;line-height:1">${code}</div>
-              <div style="margin-top:12px;font-size:11px;color:#8b95a8;letter-spacing:0.5px">Expires in 10 minutes</div>
-            </td></tr>
-          </table>
-
-          <p style="margin:0 0 18px;font-size:13px;line-height:1.65;color:#a8b2c1">If you did not request this code, please disregard this email. Your account remains secure.</p>
-
-          <p style="margin:0 0 4px;font-size:13px;line-height:1.65;color:#a8b2c1">Kind regards,</p>
-          <p style="margin:0;font-size:13px;font-weight:600;color:#ffffff">The APEX IPO Access Team</p>
-
-        </td></tr>
-
-        <!-- Security Notice -->
-        <tr><td style="padding:20px 4px 0">
-          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:rgba(255,184,0,0.06);border:1px solid rgba(255,184,0,0.25);border-radius:8px;padding:14px 16px">
-            <tr><td style="font-size:12px;line-height:1.6;color:#e8d59a">
-              <strong style="color:#ffb800">Security Notice:</strong> APEX IPO Access will never ask you to share this code by phone, email, or chat. Never disclose this code to anyone, including APEX staff.
-            </td></tr>
-          </table>
-        </td></tr>
-
-        <!-- Gradient Divider -->
-        <tr><td style="padding:32px 4px 20px">
-          <div style="height:2px;background:linear-gradient(90deg,#3ed598 0%,#4a9eff 50%,#ffb800 100%);border-radius:2px"></div>
-        </td></tr>
-
-        <!-- Footer -->
-        <tr><td align="center" style="padding:0 4px 16px;font-size:11px;line-height:1.7;color:#7a8699">
-
-          <!-- Social icons -->
-          <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 18px">
+          <!-- Code with numbered marker like Google's "1" circle -->
+          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:0 0 8px">
             <tr>
-              <td style="padding:0 5px">
-                <a href="https://apexipoaccess.com" style="text-decoration:none">
-                  <table role="presentation" cellpadding="0" cellspacing="0"><tr><td align="center" valign="middle" width="32" height="32" style="background:#141a24;border:1px solid #2a3242;border-radius:50%">
-                    <img src="https://apexipoaccess.com/assets/spacex-x.png" alt="Web" width="16" height="16" style="display:block;width:16px;height:16px">
-                  </td></tr></table>
-                </a>
+              <td valign="top" width="36" style="padding-top:2px">
+                <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+                  <td align="center" valign="middle" width="26" height="26" style="background:#5fb0ff;border-radius:50%;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;color:#0d1117">1</td>
+                </tr></table>
               </td>
-              <td style="padding:0 5px">
-                <a href="https://twitter.com/apexipoaccess" style="text-decoration:none">
-                  <table role="presentation" cellpadding="0" cellspacing="0"><tr><td align="center" valign="middle" width="32" height="32" style="background:#141a24;border:1px solid #2a3242;border-radius:50%;font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:#ffffff">𝕏</td></tr></table>
-                </a>
-              </td>
-              <td style="padding:0 5px">
-                <a href="https://linkedin.com/company/apexipoaccess" style="text-decoration:none">
-                  <table role="presentation" cellpadding="0" cellspacing="0"><tr><td align="center" valign="middle" width="32" height="32" style="background:#141a24;border:1px solid #2a3242;border-radius:50%;font-family:Arial,sans-serif;font-size:11px;font-weight:700;color:#ffffff">in</td></tr></table>
-                </a>
-              </td>
-              <td style="padding:0 5px">
-                <a href="mailto:support@apexipoaccess.com" style="text-decoration:none">
-                  <table role="presentation" cellpadding="0" cellspacing="0"><tr><td align="center" valign="middle" width="32" height="32" style="background:#141a24;border:1px solid #2a3242;border-radius:50%;font-family:Arial,sans-serif;font-size:14px;color:#5fb0ff">✉</td></tr></table>
-                </a>
+              <td style="padding-left:4px">
+                <div style="font-family:'SF Mono','Courier New',monospace;font-size:26px;font-weight:600;color:#ffffff;letter-spacing:8px;line-height:1.3">${code}</div>
+                <div style="margin-top:6px;font-size:12px;color:#8b9097;line-height:1.5">Code expires in 10 minutes. You can copy and paste it.</div>
               </td>
             </tr>
           </table>
 
-          <p style="margin:0 0 4px;font-size:12px;font-weight:600;color:#ffffff;letter-spacing:0.4px">APEX IPO Access</p>
-          <p style="margin:0 0 10px;color:#8b95a8;font-size:11px">Investment Intelligence Platform</p>
-          <p style="margin:0 0 4px"><a href="mailto:support@apexipoaccess.com" style="color:#5fb0ff;text-decoration:none">support@apexipoaccess.com</a></p>
-          <p style="margin:0 0 14px"><a href="https://apexipoaccess.com" style="color:#7a8699;text-decoration:none">apexipoaccess.com</a></p>
-          <p style="margin:0;font-size:10px;color:#6a7585;line-height:1.6">This is a transactional message from APEX IPO Access.<br>© ${new Date().getFullYear()} APEX IPO Access. All rights reserved.</p>
+          <!-- Step 2 -->
+          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:20px 0 0">
+            <tr>
+              <td valign="top" width="36" style="padding-top:2px">
+                <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+                  <td align="center" valign="middle" width="26" height="26" style="background:#5fb0ff;border-radius:50%;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;color:#0d1117">2</td>
+                </tr></table>
+              </td>
+              <td style="padding-left:4px">
+                <div style="font-size:14px;font-weight:600;color:#ffffff;line-height:1.4">Enter the code in your browser</div>
+                <div style="margin-top:4px;font-size:13px;color:#a0a4a8;line-height:1.55">Return to the verification page and paste the 6-digit code to activate your account.</div>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Security note -->
+          <p style="margin:32px 0 0;padding:14px 16px;background:#1f2123;border-radius:8px;font-size:12px;line-height:1.6;color:#a0a4a8">
+            <strong style="color:#e3e3e3">Security tip:</strong> APEX IPO Access will never ask you to share this code. If you didn't request it, you can safely ignore this email.
+          </p>
+
+        </td></tr>
+
+        <!-- Footer (outside card, minimal like Google) -->
+        <tr><td align="center" style="padding:24px 8px 8px">
+          <p style="margin:0 0 6px;font-size:11px;color:#8b9097;line-height:1.6">You received this email because you signed up at <a href="https://apexipoaccess.com" style="color:#5fb0ff;text-decoration:none">apexipoaccess.com</a></p>
+          <p style="margin:0 0 6px;font-size:11px;color:#8b9097;line-height:1.6">Need help? Contact <a href="mailto:support@apexipoaccess.com" style="color:#5fb0ff;text-decoration:none">support@apexipoaccess.com</a></p>
+          <p style="margin:14px 0 0;font-size:10px;color:#6b6f74;line-height:1.6">© ${new Date().getFullYear()} APEX IPO Access · Investment Intelligence Platform</p>
         </td></tr>
 
       </table>
@@ -144,7 +122,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from: "APEX IPO Access <noreply@apexipoaccess.com>",
         to: [email],
-        subject: `Your APEX IPO Access verification code`,
+        subject: `Confirm your email for APEX IPO Access`,
         html,
       }),
     });
