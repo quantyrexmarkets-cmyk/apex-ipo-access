@@ -97,6 +97,12 @@
   }
 
   async function sendCode(){
+    console.log('[verify-email] sendCode called');
+    if(!currentUser){
+      console.error('[verify-email] currentUser is null!');
+      alert('Error: not logged in. Please sign in again.');
+      return false;
+    }
     var code = genCode();
     // Save code in DB
     await sb.from('email_verification_codes').insert({
@@ -120,6 +126,13 @@
         firstName: currentProfile?.first_name || ''
       })
     });
+    if(!res.ok){
+      var errText = await res.text();
+      console.error('[verify-email] Edge function error:', res.status, errText);
+      alert('Email send failed: ' + res.status + '\n' + errText);
+    } else {
+      console.log('[verify-email] Email sent successfully');
+    }
     return res.ok;
   }
 
