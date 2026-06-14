@@ -33,24 +33,24 @@ Deno.serve(async (req) => {
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root { color-scheme: light dark; supported-color-schemes: light dark; }
-  body, .bg { background:#ffffff !important; color:#1a1f2e !important; }
-  .card { background:#fafbfc !important; border-color:#e5e8ee !important; }
-  .brand-text { color:#1a1f2e !important; }
-  .brand-sub { color:#5f6368 !important; }
-  .eyebrow { color:#5f6368 !important; }
-  .heading { color:#1a1f2e !important; }
-  .body-text { color:#3a4250 !important; }
-  .label { color:#5f6368 !important; }
-  .code-box { background:#ffffff !important; border:1px solid #dadce0 !important; }
-  .code-digits { color:#1a1f2e !important; }
-  .section-title { color:#1a1f2e !important; }
-  .list-text { color:#3a4250 !important; }
-  .notice-box { background:#fef9e7 !important; border:1px solid #f5e6a8 !important; color:#5c4a14 !important; }
-  .notice-box strong { color:#3d3208 !important; }
-  .divider { border-top:1px solid #e5e8ee !important; }
-  .footer { color:#5f6368 !important; }
-  .footer-small { color:#80868b !important; }
-  a.link { color:#1a73e8 !important; }
+  body, .bg { background:#1f2123 !important; color:#ffffff !important; }
+  .card { background:#28292c !important; border-color:#3c3f43 !important; }
+  .brand-text { color:#ffffff !important; }
+  .brand-sub { color:#ffffff !important; }
+  .eyebrow { color:#ffffff !important; }
+  .heading { color:#ffffff !important; }
+  .body-text { color:#ffffff !important; }
+  .label { color:#ffffff !important; }
+  .code-box { background:#1f2123 !important; border:1px solid #3c3f43 !important; }
+  .code-digits { color:#ffffff !important; }
+  .section-title { color:#ffffff !important; }
+  .list-text { color:#ffffff !important; }
+  .notice-box { background:rgba(255,184,0,0.06) !important; border:1px solid rgba(255,184,0,0.25) !important; color:#ffffff !important; }
+  .notice-box strong { color:#ffb800 !important; }
+  .divider { border-top:1px solid #3c3f43 !important; }
+  .footer { color:#ffffff !important; }
+  .footer-small { color:#ffffff !important; }
+  a.link { color:#5fb0ff !important; }
 
   @media (prefers-color-scheme: dark) {
     body, .bg { background:#1f2123 !important; color:#e3e3e3 !important; }
