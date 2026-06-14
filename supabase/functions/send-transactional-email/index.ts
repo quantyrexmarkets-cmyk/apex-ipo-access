@@ -76,6 +76,19 @@ function firstName(fullName: string): string {
   return fullName.trim().split(/\s+/)[0];
 }
 
+// Beautify an email username like "kelvinpaid21" → "Kelvinpaid 21"
+function beautifyHandle(handle: string): string {
+  if (!handle) return 'Investor';
+  let s = handle.trim();
+  // Replace dots, dashes, underscores with spaces
+  s = s.replace(/[._-]+/g, ' ');
+  // Insert space before any digit group: "kelvinpaid21" → "kelvinpaid 21"
+  s = s.replace(/([a-zA-Z])(\d)/g, '$1 $2');
+  // Capitalize each word
+  s = s.split(/\s+/).map(w => w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : '').join(' ').trim();
+  return s || 'Investor';
+}
+
 // ─── USER LOOKUP (fetches profile from DB) ──────────────────────────────────
 interface UserProfile {
   id: string;
@@ -123,15 +136,16 @@ async function fetchUser(userId: string): Promise<UserProfile | null> {
   }
 
   // Build full display name: "Prefix First Last Suffix"
-  const fullName =
-    [profile?.prefix, profile?.first_name, profile?.last_name, profile?.suffix]
-      .filter(Boolean)
-      .join(' ')
-      .trim() ||
-    email.split('@')[0] ||
-    'Investor';
+  const realName = [profile?.prefix, profile?.first_name, profile?.last_name, profile?.suffix]
+    .filter(Boolean)
+    .join(' ')
+    .trim();
+  const fallbackName = beautifyHandle(email.split('@')[0]);
+  const fullName = realName || fallbackName || 'Investor';
 
-  const fname = profile?.first_name || firstName(fullName);
+  const fname = profile?.first_name
+    ? (profile.first_name.charAt(0).toUpperCase() + profile.first_name.slice(1).toLowerCase())
+    : fallbackName;
 
   return {
     id: userId,
@@ -228,7 +242,7 @@ function shell(opts: {
     .cta { background:#1a73e8 !important; color:#ffffff !important; }
   }
   @media only screen and (max-width:600px) {
-    .headline { font-size:22px !important; line-height:1.4 !important; padding:4px 24px 14px !important; }
+    .headline { font-size:26px !important; line-height:1.3 !important; padding:20px 24px 24px !important; }
     .card { border-radius:16px !important; }
   }
 </style>
@@ -251,8 +265,8 @@ function shell(opts: {
                  width="220" style="display:block;margin:0 auto;width:220px;max-width:70%;height:auto">
           </td></tr>
 
-          <!-- Big headline (Google style: weight 400, generous line-height) -->
-          <tr><td class="headline" style="padding:4px 40px 16px;font-family:'Google Sans',Inter,Arial,sans-serif;font-size:26px;font-weight:400;line-height:1.4;letter-spacing:-0.2px;text-align:center;white-space:pre-line">${opts.headline.split('\n').map(l => escape(l)).join('<br>')}</td></tr>
+          <!-- Big headline (Google style: lighter weight, more spacing) -->
+          <tr><td class="headline" style="padding:24px 32px 28px;font-family:'Google Sans',Inter,Arial,sans-serif;font-size:30px;font-weight:500;line-height:1.3;letter-spacing:-0.3px;text-align:center">${opts.headline.split('\n').map(l => escape(l)).join('<br style="line-height:1.55">')}</td></tr>
 
           ${subtitle}
           ${cta}
