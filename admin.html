@@ -2164,8 +2164,12 @@
       }
     }
 
-    // Holdings tab — load async
-    loadUserHoldings(u.id);
+    // Holdings tab — load async (lazy in case function declared later)
+    try {
+      if(typeof loadUserHoldings === 'function') loadUserHoldings(u.id);
+      else if(typeof window.loadUserHoldings === 'function') window.loadUserHoldings(u.id);
+      else setTimeout(function(){ if(typeof loadUserHoldings==='function') loadUserHoldings(u.id); }, 100);
+    } catch(e){ console.warn('holdings load skipped', e); }
   }
 
   // ============ APPROVE / REVOKE KYC ============
