@@ -33,12 +33,12 @@ Deno.serve(async (req) => {
         <tr><td align="left" style="padding:0 4px 24px">
           <table role="presentation" cellpadding="0" cellspacing="0">
             <tr>
-              <td style="padding-right:12px;vertical-align:middle">
-                <img src="https://apexipoaccess.com/assets/spacex-x.png" alt="APEX" width="34" height="34" style="display:block;width:34px;height:34px">
+              <td style="padding-right:14px;vertical-align:middle">
+                <img src="https://apexipoaccess.com/assets/spacex-x.svg" alt="APEX" width="48" height="48" style="display:block;width:48px;height:48px">
               </td>
               <td style="vertical-align:middle">
-                <div style="font-size:14px;font-weight:700;letter-spacing:2px;color:#ffffff;line-height:1.1">APEX IPO ACCESS</div>
-                <div style="font-size:9px;font-weight:600;letter-spacing:1.4px;color:#4a9eff;line-height:1.1;margin-top:4px">INVESTMENT INTELLIGENCE</div>
+                <div style="font-family:'Manrope','Helvetica Neue',Arial,sans-serif;font-size:20px;font-weight:300;letter-spacing:3px;color:#ffffff;line-height:1.1">APEX IPO ACCESS</div>
+                <div style="font-family:'Manrope','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:300;letter-spacing:2px;color:#4a9eff;line-height:1.1;margin-top:6px">INVESTMENT INTELLIGENCE</div>
               </td>
             </tr>
           </table>
