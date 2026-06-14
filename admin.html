@@ -869,6 +869,35 @@
     line-height:1;
   }
 
+  
+  /* Holdings v2 */
+  .holding-card-v2{background:#1a1d21;border:1px solid #2a2d31;border-radius:14px;padding:16px;margin-bottom:14px}
+  .hc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .hc-title{font-size:16px;font-weight:700;color:#fff}
+  .hc-meta{font-size:12px;color:#a8b2c1;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #2a2d31}
+  .hc-section{margin-bottom:14px}
+  .hc-section-title{font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;font-weight:600}
+  .hc-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:600px){.hc-grid2{grid-template-columns:1fr}}
+  .hc-grid2 label{display:flex;flex-direction:column;font-size:11px;color:#a8b2c1;gap:4px}
+  .hc-grid2 input,.hc-grid2 select,.hc-section textarea{background:#0f1114;border:1px solid #2a2d31;border-radius:8px;padding:9px 11px;color:#fff;font-size:13px;width:100%;box-sizing:border-box;font-family:inherit}
+  .hc-section textarea{resize:vertical;min-height:50px}
+  .hc-toggle-row{display:flex;align-items:center;gap:8px;font-size:13px;color:#fff;margin-top:10px;cursor:pointer}
+  .hc-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
+  @media(max-width:500px){.hc-actions{grid-template-columns:1fr}}
+  .hc-btn{padding:11px;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;color:#fff}
+  .hc-btn.primary{background:#5fb0ff}
+  .hc-btn.success{background:#22c55e}
+  .hc-btn.danger{background:#ef4444}
+
+  /* Full Profile */
+  .prof-sec{background:#1a1d21;border:1px solid #2a2d31;border-radius:12px;padding:14px;margin-bottom:12px}
+  .prof-sec-title{font-size:13px;font-weight:600;color:#fff;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #2a2d31}
+  .prof-rows{display:flex;flex-direction:column;gap:8px}
+  .prof-row{display:flex;justify-content:space-between;gap:12px;font-size:13px;padding:4px 0}
+  .prof-k{color:#a8b2c1;flex-shrink:0}
+  .prof-v{color:#fff;font-weight:500;text-align:right;word-break:break-word}
+
   </style>
 </head>
 <body>
@@ -1444,6 +1473,8 @@
 
       <!-- PROFILE -->
       <div class="m-pane" id="pane-profile">
+        <div id="profileFullView" style="margin-bottom:20px"></div>
+        <div class="prof-sec-title" style="margin-bottom:10px">✏️ EDIT FIELDS</div>
         <div class="field-grid">
           <div class="field-mini"><label>First Name</label><input id="pfFirst"></div>
           <div class="field-mini"><label>Last Name</label><input id="pfLast"></div>
@@ -3421,74 +3452,6 @@
   // PHASE 3: Holdings / Restrictions / KYC handlers
   // ═══════════════════════════════════════════════════════════
 
-  window.loadUserHoldings = async function(userId){
-    var list = document.getElementById('holdingsList');
-    if(!list) return;
-    list.innerHTML = '<div class="empty">Loading holdings...</div>';
-    try {
-      var res = await sb.from('allocations').select('*').eq('user_id', userId).order('created_at',{ascending:false});
-      if(res.error) throw res.error;
-      var holds = res.data || [];
-      var totalInv=0, totalCur=0, totalPnl=0;
-      holds.forEach(function(h){
-        totalInv += parseFloat(h.amount_invested || h.total_value || 0);
-        totalCur += parseFloat(h.current_value || h.total_value || 0);
-        totalPnl += parseFloat(h.profit_loss || 0);
-      });
-      var hti=document.getElementById('hTotalInv'); if(hti) hti.textContent=fmt(totalInv);
-      var hcv=document.getElementById('hCurVal'); if(hcv) hcv.textContent=fmt(totalCur);
-      var pn=document.getElementById('hPnl');
-      if(pn){ pn.textContent=(totalPnl>=0?'+':'')+fmt(totalPnl); pn.style.color=totalPnl>0?'#22c55e':totalPnl<0?'#ef4444':'#fff'; }
-      if(!holds.length){ list.innerHTML='<div class="empty">No allocations yet</div>'; return; }
-      list.innerHTML = holds.map(function(h){
-        var oc=(h.outcome||'pending').toLowerCase();
-        return '<div class="holding-card"><div class="holding-head"><div class="holding-title">'+escapeHtml(h.company_name||h.company_ticker||'—')+'</div><div class="holding-tag '+oc+'">'+oc+'</div></div>'+
-          '<div class="holding-grid">'+
-            '<div><div class="k">Shares</div><div class="v">'+(h.shares||0)+'</div></div>'+
-            '<div><div class="k">Invested</div><div class="v">'+fmt(h.amount_invested||h.total_value||0)+'</div></div>'+
-            '<div><div class="k">Current</div><div class="v">'+fmt(h.current_value||h.total_value||0)+'</div></div>'+
-            '<div><div class="k">P&L</div><div class="v" style="color:'+(parseFloat(h.profit_loss||0)>=0?'#22c55e':'#ef4444')+'">'+fmt(h.profit_loss||0)+'</div></div>'+
-            '<div><div class="k">Period</div><div class="v">'+(h.holding_period||'—')+'</div></div>'+
-            '<div><div class="k">Status</div><div class="v">'+(h.payout_credited?'Paid out':'Held')+'</div></div>'+
-          '</div>'+
-          '<div class="holding-pnl-form">'+
-            '<input type="number" step="0.01" placeholder="P&L $" id="pnlAmt_'+h.id+'" value="'+(h.profit_loss||0)+'">'+
-            '<select id="pnlOut_'+h.id+'">'+
-              '<option value="pending"'+(oc==='pending'?' selected':'')+'>Pending</option>'+
-              '<option value="active"'+(oc==='active'?' selected':'')+'>Active</option>'+
-              '<option value="win"'+(oc==='win'?' selected':'')+'>Win (credit payout)</option>'+
-              '<option value="loss"'+(oc==='loss'?' selected':'')+'>Loss</option>'+
-              '<option value="breakeven"'+(oc==='breakeven'?' selected':'')+'>Breakeven</option>'+
-            '</select>'+
-            '<button onclick="window._saveHolding(\''+h.id+'\')">Save</button>'+
-          '</div></div>';
-      }).join('');
-    } catch(e){ console.error('holdings err',e); list.innerHTML='<div class="empty">Failed: '+(e.message||e)+'</div>'; }
-  };
-
-  window._saveHolding = async function(id){
-    var amt = parseFloat(document.getElementById('pnlAmt_'+id).value) || 0;
-    var oc = document.getElementById('pnlOut_'+id).value;
-    if(!currentUser){ alert('No user'); return; }
-    var updates = { profit_loss: amt, outcome: oc, updated_at: new Date().toISOString() };
-    var credited = false;
-    if(oc==='win' && amt>0){
-      if(!confirm('Mark WIN and credit $'+amt.toFixed(2)+' to user balance?')) return;
-      updates.payout_credited = true;
-      updates.payout_date = new Date().toISOString();
-      var newBal = parseFloat(currentUser.cash_balance||0) + amt;
-      var r1 = await sb.from('profiles').update({cash_balance:newBal}).eq('id', currentUser.id);
-      if(r1.error){ alert('Credit failed: '+r1.error.message); return; }
-      currentUser.cash_balance = newBal;
-      await sb.from('balance_adjustments').insert({user_id:currentUser.id, amount:amt, type:'credit', reason:'IPO payout (WIN)', balance_after:newBal});
-      credited = true;
-    }
-    var r2 = await sb.from('allocations').update(updates).eq('id', id);
-    if(r2.error){ alert('Save failed: '+r2.error.message); return; }
-    alert(credited?'WIN — payout credited':'Holding updated');
-    window.loadUserHoldings(currentUser.id);
-  };
-
   window._toggleRestriction = async function(field, value){
     if(!currentUser) return;
     var upd = {}; upd[field] = value;
@@ -3543,6 +3506,248 @@
     alert('KYC rejected + email sent');
     if(typeof populateModal==='function') populateModal(currentUser);
   };
+
+  
+  // ═══════════════════════════════════════════════════════════
+  // PHASE 4: Enhanced Holdings + Full Profile Viewer
+  // ═══════════════════════════════════════════════════════════
+
+  window.loadUserHoldings = async function(userId){
+    var list = document.getElementById('holdingsList');
+    if(!list) return;
+    list.innerHTML = '<div class="empty">Loading holdings...</div>';
+    try {
+      var res = await sb.from('allocations').select('*').eq('user_id', userId).order('created_at',{ascending:false});
+      if(res.error) throw res.error;
+      var holds = res.data || [];
+      var totalInv=0, totalCur=0, totalPnl=0;
+      holds.forEach(function(h){
+        totalInv += parseFloat(h.amount_invested || h.total_value || 0);
+        totalCur += parseFloat(h.current_value || h.total_value || 0);
+        totalPnl += parseFloat(h.profit_loss || 0);
+      });
+      var hti=document.getElementById('hTotalInv'); if(hti) hti.textContent=fmt(totalInv);
+      var hcv=document.getElementById('hCurVal'); if(hcv) hcv.textContent=fmt(totalCur);
+      var pn=document.getElementById('hPnl');
+      if(pn){ pn.textContent=(totalPnl>=0?'+':'')+fmt(totalPnl); pn.style.color=totalPnl>0?'#22c55e':totalPnl<0?'#ef4444':'#fff'; }
+      if(!holds.length){ list.innerHTML='<div class="empty">No allocations yet</div>'; return; }
+
+      list.innerHTML = holds.map(function(h){
+        var oc=(h.outcome||'pending').toLowerCase();
+        var invested = parseFloat(h.amount_invested||h.total_value||0);
+        var current = parseFloat(h.current_value||h.total_value||0);
+        var profit = parseFloat(h.profit_loss||0);
+        var target = parseFloat(h.target_profit||0);
+        var targetPct = parseFloat(h.target_profit_percent||0);
+        var currentPct = invested > 0 ? ((profit/invested)*100).toFixed(2) : 0;
+        var daysLeft = '—';
+        if(h.payout_date){
+          var d = Math.ceil((new Date(h.payout_date) - new Date())/86400000);
+          daysLeft = d > 0 ? d + ' days left' : 'Ready to pay out';
+        }
+        return '<div class="holding-card-v2" data-id="'+h.id+'">'+
+          '<div class="hc-head">'+
+            '<div class="hc-title">'+escapeHtml(h.company_name||h.company_ticker||'—')+'</div>'+
+            '<div class="holding-tag '+oc+'">'+oc+'</div>'+
+          '</div>'+
+          '<div class="hc-meta">Shares: <b>'+(h.shares||0)+'</b>  •  Invested: <b>'+fmt(invested)+'</b>  •  Period: <b>'+(h.holding_period||'—')+'</b>  •  '+daysLeft+'</div>'+
+
+          '<div class="hc-section">'+
+            '<div class="hc-section-title">🎯 TARGET (what user is promised)</div>'+
+            '<div class="hc-grid2">'+
+              '<label>Target Profit ($)<input type="number" step="0.01" id="tp_'+h.id+'" value="'+target+'"></label>'+
+              '<label>Target Profit (%)<input type="number" step="0.01" id="tpp_'+h.id+'" value="'+targetPct+'"></label>'+
+              '<label>Payout Date<input type="date" id="pd_'+h.id+'" value="'+(h.payout_date?h.payout_date.slice(0,10):'')+'"></label>'+
+              '<label>Holding Period<select id="hp_'+h.id+'">'+
+                ['','3 Months','6 Months','12 Months','18 Months','24 Months'].map(function(x){
+                  return '<option value="'+x+'"'+(h.holding_period===x?' selected':'')+'>'+(x||'—')+'</option>';
+                }).join('')+
+              '</select></label>'+
+            '</div>'+
+          '</div>'+
+
+          '<div class="hc-section">'+
+            '<div class="hc-section-title">📈 CURRENT (what user sees right now)</div>'+
+            '<div class="hc-grid2">'+
+              '<label>Current Profit ($)<input type="number" step="0.01" id="cp_'+h.id+'" value="'+profit+'"></label>'+
+              '<label>Current Profit (%)<input type="number" step="0.01" id="cpp_'+h.id+'" value="'+currentPct+'"></label>'+
+              '<label>Current Value ($)<input type="number" step="0.01" id="cv_'+h.id+'" value="'+current+'"></label>'+
+              '<label>Outcome<select id="oc_'+h.id+'">'+
+                ['pending','active','win','loss','breakeven','cancelled'].map(function(x){
+                  return '<option value="'+x+'"'+(oc===x?' selected':'')+'>'+x.toUpperCase()+'</option>';
+                }).join('')+
+              '</select></label>'+
+            '</div>'+
+            '<label class="hc-toggle-row"><input type="checkbox" id="ap_'+h.id+'" '+(h.auto_progress?'checked':'')+'> Auto-progress toward target daily</label>'+
+          '</div>'+
+
+          '<div class="hc-section">'+
+            '<div class="hc-section-title">📝 ADMIN NOTES (private)</div>'+
+            '<textarea id="an_'+h.id+'" rows="2" placeholder="Internal notes...">'+escapeHtml(h.admin_notes||'')+'</textarea>'+
+          '</div>'+
+
+          '<div class="hc-actions">'+
+            '<button class="hc-btn primary" onclick="window._holdingSave(\''+h.id+'\')">💾 Save</button>'+
+            '<button class="hc-btn success" onclick="window._holdingPayout(\''+h.id+'\')">💰 Pay Out Now</button>'+
+            '<button class="hc-btn danger" onclick="window._holdingRefund(\''+h.id+'\')">❌ Refund</button>'+
+          '</div>'+
+        '</div>';
+      }).join('');
+    } catch(e){ console.error('holdings err',e); list.innerHTML='<div class="empty">Failed: '+(e.message||e)+'</div>'; }
+  };
+
+  window._holdingSave = async function(id){
+    if(!currentUser){ alert('No user'); return; }
+    var updates = {
+      target_profit: parseFloat(document.getElementById('tp_'+id).value)||0,
+      target_profit_percent: parseFloat(document.getElementById('tpp_'+id).value)||0,
+      payout_date: document.getElementById('pd_'+id).value || null,
+      holding_period: document.getElementById('hp_'+id).value || null,
+      profit_loss: parseFloat(document.getElementById('cp_'+id).value)||0,
+      profit_loss_percent: parseFloat(document.getElementById('cpp_'+id).value)||0,
+      current_value: parseFloat(document.getElementById('cv_'+id).value)||0,
+      outcome: document.getElementById('oc_'+id).value,
+      auto_progress: document.getElementById('ap_'+id).checked,
+      admin_notes: document.getElementById('an_'+id).value || null,
+      updated_at: new Date().toISOString()
+    };
+    var r = await sb.from('allocations').update(updates).eq('id', id);
+    if(r.error){ alert('Save failed: '+r.error.message); return; }
+    alert('Holding saved');
+    window.loadUserHoldings(currentUser.id);
+  };
+
+  window._holdingPayout = async function(id){
+    if(!currentUser){ alert('No user'); return; }
+    var inv = parseFloat(prompt('Original investment amount to return:', '0')||'0');
+    var profit = parseFloat(prompt('Profit amount to credit:', '0')||'0');
+    var total = inv + profit;
+    if(total <= 0){ alert('Amount must be positive'); return; }
+    if(!confirm('Credit '+fmt(total)+' ('+fmt(inv)+' return + '+fmt(profit)+' profit) to user balance?')) return;
+    var newBal = parseFloat(currentUser.cash_balance||0) + total;
+    var r1 = await sb.from('profiles').update({cash_balance:newBal}).eq('id', currentUser.id);
+    if(r1.error){ alert('Failed: '+r1.error.message); return; }
+    currentUser.cash_balance = newBal;
+    await sb.from('balance_adjustments').insert({
+      user_id: currentUser.id, amount: total, type: 'credit',
+      reason: 'IPO payout: '+fmt(inv)+' principal + '+fmt(profit)+' profit',
+      balance_after: newBal
+    });
+    await sb.from('allocations').update({
+      payout_credited: true,
+      payout_date: new Date().toISOString(),
+      outcome: profit > 0 ? 'win' : profit < 0 ? 'loss' : 'breakeven',
+      profit_loss: profit,
+      updated_at: new Date().toISOString()
+    }).eq('id', id);
+    alert('Paid out '+fmt(total)+' to user balance');
+    window.loadUserHoldings(currentUser.id);
+    if(typeof populateModal==='function') populateModal(currentUser);
+  };
+
+  window._holdingRefund = async function(id){
+    if(!currentUser){ alert('No user'); return; }
+    var inv = parseFloat(prompt('Refund amount (original investment):', '0')||'0');
+    if(inv<=0){ alert('Invalid amount'); return; }
+    if(!confirm('Refund '+fmt(inv)+' to user balance and cancel allocation?')) return;
+    var newBal = parseFloat(currentUser.cash_balance||0) + inv;
+    var r1 = await sb.from('profiles').update({cash_balance:newBal}).eq('id', currentUser.id);
+    if(r1.error){ alert('Failed: '+r1.error.message); return; }
+    currentUser.cash_balance = newBal;
+    await sb.from('balance_adjustments').insert({
+      user_id: currentUser.id, amount: inv, type: 'credit',
+      reason: 'Allocation refunded',
+      balance_after: newBal
+    });
+    await sb.from('allocations').update({
+      outcome: 'cancelled', payout_credited: true,
+      updated_at: new Date().toISOString()
+    }).eq('id', id);
+    alert('Refunded '+fmt(inv));
+    window.loadUserHoldings(currentUser.id);
+    if(typeof populateModal==='function') populateModal(currentUser);
+  };
+
+  // ── FULL PROFILE VIEWER ──────────────────────────────────
+  window._populateFullProfile = function(u){
+    var sections = [
+      {title:'👤 Personal Information', rows:[
+        ['Prefix', u.prefix],
+        ['First Name', u.first_name],
+        ['Last Name', u.last_name],
+        ['Suffix', u.suffix],
+        ['Email', u.email],
+        ['Phone', u.phone],
+        ['Phone Type', u.phone_type],
+        ['Date of Birth', u.dob || u.date_of_birth],
+      ]},
+      {title:'🏠 Address', rows:[
+        ['Address Line 1', u.address_line1],
+        ['Address Line 2', u.address_line2],
+        ['City', u.city],
+        ['State', u.state],
+        ['ZIP / Postal', u.zip || u.postal_code],
+        ['Country', u.country],
+        ['Citizenship', u.citizenship],
+      ]},
+      {title:'🪪 Identity & Tax', rows:[
+        ['SSN/ITIN (last 4)', u.ssn_last4 ? '***-**-'+u.ssn_last4 : null],
+        ['KYC Status', u.kyc_status],
+        ['KYC Submitted', u.kyc_submitted_at ? new Date(u.kyc_submitted_at).toLocaleString() : null],
+      ]},
+      {title:'💼 Account & Investment', rows:[
+        ['Account Types', Array.isArray(u.account_types) ? u.account_types.join(', ') : u.account_types],
+        ['Has Existing Account', u.has_existing_account ? 'Yes' : 'No'],
+        ['Employment Status', u.employment_status],
+        ['Annual Income', u.annual_income],
+        ['Net Worth', u.net_worth],
+        ['Investment Experience', u.investment_experience],
+      ]},
+      {title:'📋 Account Metadata', rows:[
+        ['User ID', u.id],
+        ['Account Created', u.created_at ? new Date(u.created_at).toLocaleString() : null],
+        ['Last Login', u.last_login_at ? new Date(u.last_login_at).toLocaleString() : null],
+        ['Last Login IP', u.last_login_ip],
+        ['Cash Balance', fmt(u.cash_balance||0)],
+        ['Can Deposit', u.can_deposit !== false ? '✅ Yes' : '🚫 Blocked'],
+        ['Can Withdraw', u.can_withdraw !== false ? '✅ Yes' : '🚫 Blocked'],
+        ['Suspended', u.is_suspended ? '🚫 Yes' : '✅ No'],
+        ['Admin', u.is_admin ? '👑 Yes' : 'No'],
+      ]},
+    ];
+
+    var html = sections.map(function(sec){
+      var rows = sec.rows.filter(function(r){ return r[1] !== null && r[1] !== undefined && r[1] !== ''; });
+      if(!rows.length) return '';
+      return '<div class="prof-sec"><div class="prof-sec-title">'+sec.title+'</div>'+
+        '<div class="prof-rows">'+
+          rows.map(function(r){
+            return '<div class="prof-row"><div class="prof-k">'+escapeHtml(r[0])+'</div><div class="prof-v">'+escapeHtml(String(r[1]))+'</div></div>';
+          }).join('')+
+        '</div></div>';
+    }).join('');
+
+    var c = document.getElementById('profileFullView');
+    if(c) c.innerHTML = html || '<div class="empty">No data</div>';
+  };
+
+  // Hook into existing populateModal
+  if(typeof window.populateModal === 'function'){
+    var _pm = window.populateModal;
+    window.populateModal = function(u){
+      _pm(u);
+      try { window._populateFullProfile(u); } catch(e){ console.warn(e); }
+    };
+  } else {
+    // Hook by monkey-patching when modal opens via openUser
+    var _origOpen = window._openUser;
+    if(typeof _origOpen === 'function'){
+      window._openUser = async function(id){
+        await _origOpen(id);
+        try { if(currentUser) window._populateFullProfile(currentUser); } catch(e){}
+      };
+    }
+  }
 
   </script>
 
