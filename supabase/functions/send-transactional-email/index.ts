@@ -229,7 +229,7 @@ function shell(opts: {
   }
   @media only screen and (max-width:600px) {
     .headline { font-size:23px !important; line-height:1.45 !important; padding:8px 28px 20px !important; }
-    .brand-apex, .brand-rest { font-size:28px !important; }
+    .brand-apex, .brand-rest { font-size:24px !important; }
     .card { border-radius:16px !important; }
   }
 </style>
@@ -246,11 +246,18 @@ function shell(opts: {
       <tr><td class="card" style="border-radius:20px;padding:0">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 
-          <!-- Brand wordmark (Google-style centered) -->
-          <tr><td align="center" style="padding:52px 32px 40px">
-            <div style="font-family:'Google Sans','Product Sans',Inter,Roboto,Arial,sans-serif;font-size:34px;font-weight:500;letter-spacing:-0.5px;line-height:1">
-              <span class="brand-apex" style="color:#1a73e8">APEX</span><span class="brand-rest" style="color:#202124;margin-left:10px;font-weight:400">IPO Access</span>
-            </div>
+          <!-- Brand wordmark (logo + lowercase Google-style) -->
+          <tr><td align="center" style="padding:48px 32px 36px">
+            <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto">
+              <tr>
+                <td style="padding-right:14px;vertical-align:middle">
+                  <img src="https://apexipoaccess.com/assets/spacex-logo.png" alt="" width="42" height="42" style="display:block;width:42px;height:42px">
+                </td>
+                <td style="vertical-align:middle;font-family:'Google Sans','Product Sans',Inter,Roboto,Arial,sans-serif;font-size:30px;font-weight:500;letter-spacing:-0.4px;line-height:1">
+                  <span class="brand-apex" style="color:#1a73e8">apex</span><span class="brand-rest" style="color:#202124;margin-left:8px;font-weight:400">ipo access</span>
+                </td>
+              </tr>
+            </table>
           </td></tr>
 
           <!-- Big headline (Google style: weight 400, generous line-height) -->
