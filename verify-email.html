@@ -44,6 +44,7 @@
 <div class="wrap">
   <div class="card">
     <div class="brand">APEX <span>·</span> IPO ACCESS</div>
+    <div id="debugStatus" style="background:#1a1f2e;color:#ffb800;font-size:11px;padding:8px;border-radius:6px;margin-bottom:16px;font-family:monospace">Loading...</div>
 
     <div class="icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -194,8 +195,15 @@
   document.addEventListener('sb-ready', async function(){
     SUPABASE_URL = sb.supabaseUrl;
     var { data } = await sb.auth.getUser();
-    if(!data.user){ window.location.href = 'login.html'; return; }
+    if(!data.user){
+      var dbg = document.getElementById('debugStatus');
+      if(dbg) dbg.textContent = 'ERROR: Not logged in. Redirecting...';
+      setTimeout(function(){ window.location.href = 'login.html'; }, 2000);
+      return;
+    }
     currentUser = data.user;
+    var dbg = document.getElementById('debugStatus');
+    if(dbg) dbg.textContent = 'User: ' + (currentUser.email || 'NONE');
 
     var { data: profile } = await sb.from('profiles').select('*').eq('id', data.user.id).single();
     currentProfile = profile;
