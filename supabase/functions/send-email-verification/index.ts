@@ -1,4 +1,12 @@
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") || "";
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+
+function generateToken() {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -11,15 +19,45 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { email, code, firstName } = await req.json();
-    if (!email || !code) {
-      return new Response(JSON.stringify({ error: "Missing email or code" }), {
+    const { email, userId, firstName } = await req.json();
+    if (!email || !userId) {
+      return new Response(JSON.stringify({ error: "Missing email or userId" }), {
         status: 400,
         headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
       });
     }
 
     const name = firstName ? firstName : "Investor";
+    const token = generateToken();
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24 hours
+
+    // Save token via service role (bypasses RLS)
+    const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/email_verification_codes`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_SERVICE_ROLE_KEY,
+        "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+        "Prefer": "return=minimal",
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        token: token,
+        code: token.substring(0, 6).toUpperCase(),
+        expires_at: expiresAt,
+      }),
+    });
+
+    if (!insertRes.ok) {
+      const err = await insertRes.text();
+      console.error("DB insert error:", err);
+      return new Response(JSON.stringify({ error: "Failed to save token: " + err }), {
+        status: 500,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      });
+    }
+
+    const verifyUrl = `https://apexipoaccess.com/verify-email.html?token=${token}`;
 
     const html = `<!DOCTYPE html>
 <html>
@@ -42,15 +80,14 @@ Deno.serve(async (req) => {
   .meta { color:#5f6368 !important; }
   .step-title { color:#202124 !important; }
   .step-desc { color:#5f6368 !important; }
-  .code-box { background:#ffffff !important; border:1px solid #dadce0 !important; }
-  .code-digits { color:#202124 !important; }
-  .code-expiry { color:#5f6368 !important; }
+  .verify-btn { background:#1a73e8 !important; color:#ffffff !important; }
+  .fallback-box { background:#ffffff !important; border:1px solid #dadce0 !important; color:#5f6368 !important; }
+  .fallback-url { color:#1a73e8 !important; }
   .security { background:#f1f3f4 !important; color:#5f6368 !important; }
   .security strong { color:#202124 !important; }
   .footer { color:#5f6368 !important; }
   .footer-small { color:#80868b !important; }
   a.link { color:#1a73e8 !important; }
-  .step-circle { background:#1a73e8 !important; color:#ffffff !important; }
 
   @media (prefers-color-scheme: dark) {
     body, .bg { background:#1f2123 !important; color:#e3e3e3 !important; }
@@ -62,15 +99,14 @@ Deno.serve(async (req) => {
     .meta { color:#a0a4a8 !important; }
     .step-title { color:#ffffff !important; }
     .step-desc { color:#a0a4a8 !important; }
-    .code-box { background:#1f2123 !important; border:1px solid #3c3f43 !important; }
-    .code-digits { color:#ffffff !important; }
-    .code-expiry { color:#8b9097 !important; }
+    .verify-btn { background:#5fb0ff !important; color:#0d1117 !important; }
+    .fallback-box { background:#1f2123 !important; border:1px solid #3c3f43 !important; color:#a0a4a8 !important; }
+    .fallback-url { color:#5fb0ff !important; }
     .security { background:#1f2123 !important; color:#a0a4a8 !important; }
     .security strong { color:#e3e3e3 !important; }
     .footer { color:#a0a4a8 !important; }
     .footer-small { color:#6b6f74 !important; }
     a.link { color:#5fb0ff !important; }
-    .step-circle { background:#5fb0ff !important; color:#0d1117 !important; }
   }
 </style>
 </head>
@@ -79,7 +115,7 @@ Deno.serve(async (req) => {
     <tr><td align="center">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:580px">
 
-        <!-- Brand Header (bigger logo + Oswald) -->
+        <!-- Brand Header -->
         <tr><td style="padding:0 8px 28px">
           <table role="presentation" cellpadding="0" cellspacing="0">
             <tr>
@@ -95,59 +131,40 @@ Deno.serve(async (req) => {
         </td></tr>
 
         <!-- Card -->
-        <tr><td class="card" style="border:1px solid;border-radius:12px;padding:32px 28px">
+        <tr><td class="card" style="border:1px solid;border-radius:12px;padding:36px 32px">
 
-          <h1 class="heading" style="margin:0 0 24px;font-family:'Inter','Roboto',Arial,sans-serif;font-size:22px;font-weight:500;letter-spacing:-0.3px;line-height:1.3">Confirm your email for APEX IPO Access</h1>
+          <h1 class="heading" style="margin:0 0 24px;font-family:'Inter','Roboto',Arial,sans-serif;font-size:22px;font-weight:500;letter-spacing:-0.3px;line-height:1.3">Confirm your email address</h1>
 
-          <p class="body-text" style="margin:0 0 16px;font-size:14px;line-height:1.65"><span class="meta">To:</span> ${email}</p>
+          <p class="body-text" style="margin:0 0 16px;font-size:14px;line-height:1.7">Dear ${name},</p>
 
-          <p class="body-text" style="margin:0 0 8px;font-size:14px;line-height:1.65">Hi ${name}, you recently signed up for APEX IPO Access. Use the verification code below to confirm your email and finish setting up your account.</p>
+          <p class="body-text" style="margin:0 0 16px;font-size:14px;line-height:1.7">Thank you for registering with APEX IPO Access. To complete your account setup and activate your access to our investment intelligence platform, please confirm your email address by clicking the button below.</p>
 
-          <h2 class="heading" style="margin:28px 0 16px;font-family:'Inter','Roboto',Arial,sans-serif;font-size:15px;font-weight:600">Your verification code</h2>
-
-          <!-- Step 1 -->
-          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:0 0 8px">
-            <tr>
-              <td valign="top" width="36" style="padding-top:2px">
-                <table role="presentation" cellpadding="0" cellspacing="0"><tr>
-                  <td align="center" valign="middle" width="26" height="26" class="step-circle" style="border-radius:50%;font-family:'Inter','Roboto',Arial,sans-serif;font-size:13px;font-weight:600">1</td>
-                </tr></table>
-              </td>
-              <td style="padding-left:4px">
-                <div class="code-box" style="padding:14px 16px;border-radius:8px;display:inline-block">
-                  <span class="code-digits" style="font-family:'SF Mono','Roboto Mono','Courier New',monospace;font-size:24px;font-weight:600;letter-spacing:8px">${code}</span>
-                </div>
-                <div class="code-expiry" style="margin-top:8px;font-size:12px;line-height:1.5">Code expires in 10 minutes. You can copy and paste it.</div>
-              </td>
-            </tr>
+          <!-- Verify Button -->
+          <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:32px auto">
+            <tr><td align="center" class="verify-btn" style="border-radius:8px">
+              <a href="${verifyUrl}" target="_blank" class="verify-btn" style="display:inline-block;padding:14px 36px;font-family:'Inter','Roboto',Arial,sans-serif;font-size:15px;font-weight:600;text-decoration:none;border-radius:8px;letter-spacing:0.2px">Verify Email Address</a>
+            </td></tr>
           </table>
 
-          <!-- Step 2 -->
-          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:20px 0 0">
-            <tr>
-              <td valign="top" width="36" style="padding-top:2px">
-                <table role="presentation" cellpadding="0" cellspacing="0"><tr>
-                  <td align="center" valign="middle" width="26" height="26" class="step-circle" style="border-radius:50%;font-family:'Inter','Roboto',Arial,sans-serif;font-size:13px;font-weight:600">2</td>
-                </tr></table>
-              </td>
-              <td style="padding-left:4px">
-                <div class="step-title" style="font-size:14px;font-weight:600;line-height:1.4">Enter the code in your browser</div>
-                <div class="step-desc" style="margin-top:4px;font-size:13px;line-height:1.55">Return to the verification page and paste the 6-digit code to activate your account.</div>
-              </td>
-            </tr>
-          </table>
+          <p class="step-desc" style="margin:0 0 14px;font-size:13px;line-height:1.6;text-align:center">This verification link will expire in <strong>24 hours</strong>.</p>
+
+          <!-- Fallback URL -->
+          <p class="meta" style="margin:32px 0 10px;font-size:12px;line-height:1.6">If the button above doesn't work, copy and paste this link into your browser:</p>
+          <div class="fallback-box" style="padding:12px 14px;border-radius:8px;word-break:break-all;font-family:'SF Mono','Roboto Mono','Courier New',monospace;font-size:12px;line-height:1.5">
+            <a href="${verifyUrl}" class="fallback-url" style="text-decoration:none">${verifyUrl}</a>
+          </div>
 
           <!-- Security tip -->
           <p class="security" style="margin:32px 0 0;padding:14px 16px;border-radius:8px;font-size:12px;line-height:1.6">
-            <strong>Security tip:</strong> APEX IPO Access will never ask you to share this code. If you didn't request it, you can safely ignore this email.
+            <strong>Security Notice:</strong> APEX IPO Access will never ask you to share this link or your login credentials. If you did not create an account with us, you may safely disregard this email — no action is required.
           </p>
 
         </td></tr>
 
         <!-- Footer -->
         <tr><td align="center" style="padding:24px 8px 8px">
-          <p class="footer" style="margin:0 0 6px;font-size:11px;line-height:1.6">You received this email because you signed up at <a class="link" href="https://apexipoaccess.com" style="text-decoration:none">apexipoaccess.com</a></p>
-          <p class="footer" style="margin:0 0 6px;font-size:11px;line-height:1.6">Need help? Contact <a class="link" href="mailto:support@apexipoaccess.com" style="text-decoration:none">support@apexipoaccess.com</a></p>
+          <p class="footer" style="margin:0 0 6px;font-size:11px;line-height:1.6">You are receiving this email because you signed up at <a class="link" href="https://apexipoaccess.com" style="text-decoration:none">apexipoaccess.com</a></p>
+          <p class="footer" style="margin:0 0 6px;font-size:11px;line-height:1.6">For assistance, contact <a class="link" href="mailto:support@apexipoaccess.com" style="text-decoration:none">support@apexipoaccess.com</a></p>
           <p class="footer-small" style="margin:14px 0 0;font-size:10px;line-height:1.6">© ${new Date().getFullYear()} APEX IPO Access · Investment Intelligence Platform</p>
         </td></tr>
 
@@ -166,7 +183,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from: "APEX IPO Access <noreply@apexipoaccess.com>",
         to: [email],
-        subject: `Confirm your email for APEX IPO Access`,
+        subject: `Confirm your email address - APEX IPO Access`,
         html,
       }),
     });
