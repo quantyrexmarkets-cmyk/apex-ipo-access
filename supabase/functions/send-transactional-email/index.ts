@@ -127,15 +127,32 @@ function getEmailShell(heading: string, preheader: string, iconHtml: string, bod
 }
 
 // ============ INFO TABLE HELPER ============
-function infoTable(rows: Array<[string, string]>) {
-  return `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" class="info-row" style="border-radius:8px;margin:20px 0">
-    ${rows.map(([label, value]) => `
-      <tr>
-        <td class="info-label" style="padding:12px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.05)">${label}</td>
-        <td class="info-value" style="padding:12px 16px;font-size:13px;font-weight:600;text-align:right;border-bottom:1px solid rgba(255,255,255,0.05)">${value}</td>
-      </tr>
-    `).join('')}
-  </table>`;
+function infoTable(
+  rows: Array<{ label: string; value: unknown }> | null | undefined,
+) {
+  if (!Array.isArray(rows) || rows.length === 0) return '';
+
+  const html = rows
+    .map((row) => {
+      const label = String(row?.label ?? '');
+      const value = String(row?.value ?? '');
+      return `
+        <tr>
+          <td style="padding:10px 12px;border-bottom:1px solid #e6e8eb;font-family:Inter,sans-serif;font-size:13px;color:#6b7280;width:42%">
+            ${label}
+          </td>
+          <td style="padding:10px 12px;border-bottom:1px solid #e6eeb;font-family:Inter,sans-serif;font-size:13px;color:#111827;font-weight:600">
+            ${value}
+          </td>
+        </tr>`;
+    })
+    .join('');
+
+  return `
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+           style="margin:0 0 20px;border:1px solid #e6e8eb;border-radius:10px;border-collapse:separate;border-spacing:0;overflow:hidden">
+      ${html}
+    </table>`;
 }
 
 function fmtMoney(n: number) {
@@ -148,6 +165,11 @@ function greeting(name: string) {
 
 // ─── TEMPLATE: WELCOME (KYC Approved) ────────────────────────────────────────
 function tplWelcome(p: { name: string; email: string }) {
+  const rows = [
+    { label: 'Account Email', value: p.email },
+    { label: 'KYC Status', value: 'Verified' },
+    { label: 'Account Type', value: 'Individual Investor' },
+  ];
   const body = `
     ${greeting(p.name)}
     <p class="body-text" style="margin:0 0 20px;font-size:14px;line-height:1.7">
@@ -155,11 +177,7 @@ function tplWelcome(p: { name: string; email: string }) {
       <strong>APEX IPO Access</strong> account is now fully activated.
       You can now deposit funds and participate in upcoming IPO allocations.
     </p>
-    ${infoTable([
-      { label: 'Account Email', value: p.email },
-      { label: 'KYC Status', value: '✅ Verified' },
-      { label: 'Account Type', value: 'Individual Investor' },
-    ])}
+    ${infoTable(rows)}
     <p class="body-text" style="margin:20px 0 28px;font-size:14px;line-height:1.7">
       Log in to your dashboard to explore current IPO opportunities and
       make your first deposit.
