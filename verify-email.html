@@ -193,8 +193,20 @@
   }
 
   function __runWhenReady(fn){
-    if(window.__sbReady && window.sb) { fn(); }
-    else { document.addEventListener('sb-ready', fn, { once: true }); }
+    var dbg = document.getElementById('debugStatus');
+    if(dbg) dbg.textContent = '__runWhenReady called, sb=' + (typeof window.sb) + ' ready=' + window.__sbReady;
+    if(window.sb) {
+      setTimeout(fn, 0);
+    } else {
+      document.addEventListener('sb-ready', function(){ fn(); }, { once: true });
+      // Fallback: poll for sb in case event was missed
+      var tries = 0;
+      var iv = setInterval(function(){
+        tries++;
+        if(window.sb){ clearInterval(iv); fn(); }
+        if(tries > 50){ clearInterval(iv); if(dbg) dbg.textContent = 'TIMEOUT: sb never loaded'; }
+      }, 100);
+    }
   }
   __runWhenReady(async function(){
     var dbg = document.getElementById('debugStatus');
