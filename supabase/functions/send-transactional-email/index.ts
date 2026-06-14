@@ -39,6 +39,31 @@ function wrap(opts: {
 }
 
 // ============ HTML SHELL ============
+const ICONS = {
+  success: `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="32" cy="32" r="32" fill="rgba(62,213,152,0.14)"/>
+    <circle cx="32" cy="32" r="23" fill="none" stroke="#3ed598" stroke-width="2.5"/>
+    <path d="M22 32.5l7 7 13-15" stroke="#3ed598" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`,
+  info: `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="32" cy="32" r="32" fill="rgba(95,176,255,0.14)"/>
+    <circle cx="32" cy="32" r="23" fill="none" stroke="#5fb0ff" stroke-width="2.5"/>
+    <path d="M32 28v14" stroke="#5fb0ff" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="32" cy="22" r="2.5" fill="#5fb0ff"/>
+  </svg>`,
+  warn: `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="32" cy="32" r="32" fill="rgba(255,184,0,0.14)"/>
+    <path d="M32 16l18 31H14l18-31z" fill="none" stroke="#ffb800" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M32 27v10" stroke="#ffb800" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="32" cy="42" r="2.2" fill="#ffb800"/>
+  </svg>`,
+  error: `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="32" cy="32" r="32" fill="rgba(255,106,106,0.14)"/>
+    <circle cx="32" cy="32" r="23" fill="none" stroke="#ff6a6a" stroke-width="2.5"/>
+    <path d="M25 25l14 14M39 25L25 39" stroke="#ff6a6a" stroke-width="3" stroke-linecap="round"/>
+  </svg>`,
+} as const;
+
 function getEmailShell(heading: string, preheader: string, iconHtml: string, body: string, ctaHtml: string, noticeHtml: string) {
   return `<!DOCTYPE html>
 <html>
@@ -193,7 +218,7 @@ function tplWelcome(p: { name: string; email: string }) {
   return getEmailShell({
     title: 'Account Activated — APEX IPO Access',
     preview: 'Your account is verified and ready to invest.',
-    icon: icons.success,
+    icon: ICONS.success,
     heading: 'Account Activated',
     body,
   });
@@ -226,7 +251,7 @@ function tplKycRejected(p: { name: string; reason: string }) {
   return getEmailShell({
     title: 'KYC Application Declined — APEX IPO Access',
     preview: 'Your identity verification was not approved.',
-    icon: icons.error,
+    icon: ICONS.error,
     heading: 'Identity Verification Declined',
     body,
   });
@@ -266,7 +291,7 @@ function tplDepositPending(p: {
   return getEmailShell({
     title: 'Deposit Submitted — APEX IPO Access',
     preview: 'Your deposit is pending review.',
-    icon: icons.info,
+    icon: ICONS.info,
     heading: 'Deposit Pending Review',
     body,
   });
@@ -308,7 +333,7 @@ function tplDepositApproved(p: {
   return getEmailShell({
     title: 'Deposit Approved — APEX IPO Access',
     preview: 'Your deposit has been credited to your account.',
-    icon: icons.success,
+    icon: ICONS.success,
     heading: 'Deposit Approved',
     body,
   });
@@ -348,7 +373,7 @@ function tplDepositRejected(p: {
   return getEmailShell({
     title: 'Deposit Rejected — APEX IPO Access',
     preview: 'Your deposit submission was not approved.',
-    icon: icons.warn,
+    icon: ICONS.warn,
     heading: 'Deposit Rejected',
     body,
   });
@@ -390,7 +415,7 @@ function tplWithdrawalPending(p: {
   return getEmailShell({
     title: 'Withdrawal Submitted — APEX IPO Access',
     preview: 'Your withdrawal request is pending review.',
-    icon: icons.info,
+    icon: ICONS.info,
     heading: 'Withdrawal Pending Review',
     body,
   });
@@ -436,7 +461,7 @@ function tplWithdrawalApproved(p: {
   return getEmailShell({
     title: 'Withdrawal Approved — APEX IPO Access',
     preview: 'Your withdrawal request has been approved.',
-    icon: icons.success,
+    icon: ICONS.success,
     heading: 'Withdrawal Approved',
     body,
   });
@@ -478,7 +503,7 @@ function tplWithdrawalRejected(p: {
   return getEmailShell({
     title: 'Withdrawal Rejected — APEX IPO Access',
     preview: 'Your withdrawal request was not approved.',
-    icon: icons.warn,
+    icon: ICONS.warn,
     heading: 'Withdrawal Rejected',
     body,
   });
@@ -519,7 +544,7 @@ function tplPasswordReset(p: {
   return getEmailShell({
     title: 'Password Reset — APEX IPO Access',
     preview: 'Reset your APEX IPO Access account password.',
-    icon: icons.warn,
+    icon: ICONS.warn,
     heading: 'Password Reset Request',
     body,
   });
@@ -565,7 +590,7 @@ function tplLoginAlert(p: {
   return getEmailShell({
     title: 'New Sign-In Detected — APEX IPO Access',
     preview: 'A new sign-in was detected on your account.',
-    icon: icons.warn,
+    icon: ICONS.warn,
     heading: 'New Sign-In Detected',
     body,
   });
