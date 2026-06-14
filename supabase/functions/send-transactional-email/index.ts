@@ -256,7 +256,7 @@ function shell(opts: {
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px">
 
       <!-- Main card -->
-      <tr><td class="card" style="border-radius:20px;padding:0">
+      <tr><td class="card" style="border-radius:20px;padding:0;border:1px solid #3c3f43">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 
           <!-- Brand logo (dark version - white text works on dark card) -->
