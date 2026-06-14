@@ -3105,8 +3105,8 @@
         renderBellDropdown(); updateBellBadge();
       });
     }
-    // Initial load
-    loadAdminNotifications();
+    // Skip initial load — fetch only on first bell click
+    updateBellBadge();
     // Realtime subscription
     try {
       bellRealtimeSub = sb.channel('admin_notif_rt')
@@ -3126,11 +3126,19 @@
     setInterval(function(){ if(dd.classList.contains('open')) renderBellDropdown(); }, 60000);
   }
 
-  // Boot bell after DOM ready (and after sb client exists)
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded', function(){ setTimeout(initBell, 500); });
+  // Boot bell LAZILY — only after page fully loaded + idle
+  function _bootBell(){
+    try {
+      if(typeof sb === 'undefined' || !sb){
+        setTimeout(_bootBell, 1000); return;
+      }
+      initBell();
+    } catch(e){ console.warn('bell init failed', e); }
+  }
+  if(document.readyState==='complete'){
+    setTimeout(_bootBell, 2000);
   } else {
-    setTimeout(initBell, 500);
+    window.addEventListener('load', function(){ setTimeout(_bootBell, 2000); });
   }
 
 </script>
