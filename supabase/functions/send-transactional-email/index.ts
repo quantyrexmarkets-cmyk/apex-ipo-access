@@ -94,40 +94,57 @@ interface UserProfile {
 async function fetchUser(userId: string): Promise<UserProfile | null> {
   if (!userId) return null;
 
-  // Get profile row
+  // Get profile row (service role bypasses RLS)
   const { data: profile, error: pErr } = await sb
     .from('profiles')
-    .select('*')
+    .select('id,email,first_name,last_name,prefix,suffix,account_types,cash_balance,kyc_status,created_at,country,jurisdiction')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
 
-  if (pErr || !profile) {
-    console.error('fetchUser: profile not found', userId, pErr);
+  if (pErr) {
+    console.error('fetchUser profile error:', pErr);
+  }
+
+  // Get auth user (for email + created_at fallback)
+  let authEmail = '';
+  let authCreatedAt = '';
+  try {
+    const { data: authData } = await sb.auth.admin.getUserById(userId);
+    authEmail = authData?.user?.email || '';
+    authCreatedAt = authData?.user?.created_at || '';
+  } catch (e) {
+    console.error('fetchUser auth lookup error:', e);
+  }
+
+  const email = (profile?.email) || authEmail || '';
+  if (!email && !profile) {
+    console.error('fetchUser: no profile and no auth user for', userId);
     return null;
   }
 
-  // Get auth user (for email)
-  const { data: authData } = await sb.auth.admin.getUserById(userId);
-  const email = authData?.user?.email || profile.email || '';
-
+  // Build full display name: "Prefix First Last Suffix"
   const fullName =
-    profile.full_name ||
-    [profile.first_name, profile.last_name].filter(Boolean).join(' ') ||
+    [profile?.prefix, profile?.first_name, profile?.last_name, profile?.suffix]
+      .filter(Boolean)
+      .join(' ')
+      .trim() ||
     email.split('@')[0] ||
     'Investor';
 
+  const fname = profile?.first_name || firstName(fullName);
+
   return {
-    id: profile.id,
+    id: userId,
     email,
     full_name: fullName,
-    first_name: firstName(fullName),
-    account_types: profile.account_types || null,
-    account_type_label: formatAccountTypes(profile.account_types),
-    account_ref: shortId(profile.id),
-    jurisdiction: profile.country || profile.jurisdiction || 'United States',
-    cash_balance: Number(profile.cash_balance ?? 0),
-    created_at: profile.created_at || new Date().toISOString(),
-    kyc_status: profile.kyc_status || null,
+    first_name: fname,
+    account_types: profile?.account_types || null,
+    account_type_label: formatAccountTypes(profile?.account_types),
+    account_ref: shortId(userId),
+    jurisdiction: profile?.country || profile?.jurisdiction || 'United States',
+    cash_balance: Number(profile?.cash_balance ?? 0),
+    created_at: profile?.created_at || authCreatedAt || new Date().toISOString(),
+    kyc_status: profile?.kyc_status || null,
   };
 }
 
