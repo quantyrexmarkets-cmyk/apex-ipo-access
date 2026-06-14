@@ -179,7 +179,7 @@ function shell(opts: {
     </td></tr>` : '';
 
   const subtitle = opts.subtitle ? `
-    <tr><td style="padding:0 32px 36px;font-family:'Google Sans',Inter,Arial,sans-serif;font-size:15px;line-height:1.6;color:#5f6368;text-align:center" class="subtitle">
+    <tr><td style="padding:0 32px 36px;font-family:'Google Sans',Inter,Arial,sans-serif;font-size:15.5px;line-height:1.65;color:#5f6368;text-align:center;padding-bottom:8px" class="subtitle">
       ${escape(opts.subtitle)}
     </td></tr>` : '';
 
@@ -228,7 +228,7 @@ function shell(opts: {
     .cta { background:#1a73e8 !important; color:#ffffff !important; }
   }
   @media only screen and (max-width:600px) {
-    .headline { font-size:22px !important; line-height:1.4 !important; padding:8px 24px 18px !important; }
+    .headline { font-size:23px !important; line-height:1.45 !important; padding:8px 28px 20px !important; }
     .card { border-radius:16px !important; }
   }
 </style>
@@ -260,8 +260,8 @@ function shell(opts: {
             </table>
           </td></tr>
 
-          <!-- Big headline -->
-          <tr><td class="headline" style="padding:8px 40px 20px;font-family:'Google Sans',Inter,Arial,sans-serif;font-size:24px;font-weight:500;line-height:1.4;letter-spacing:-0.3px;text-align:center;white-space:pre-line">${escape(opts.headline)}</td></tr>
+          <!-- Big headline (Google style: weight 400, generous line-height) -->
+          <tr><td class="headline" style="padding:8px 40px 24px;font-family:'Google Sans',Inter,Arial,sans-serif;font-size:26px;font-weight:400;line-height:1.45;letter-spacing:-0.2px;text-align:center;white-space:pre-line">${opts.headline.split('\n').map(l => escape(l)).join('<br>')}</td></tr>
 
           ${subtitle}
           ${cta}
