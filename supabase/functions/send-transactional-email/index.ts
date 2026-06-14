@@ -302,7 +302,7 @@ function shell(opts: {
 
 // ─── Reusable detail-row helper for inside `detailsHtml` ────────────────────
 function detailLine(label: string, value: string): string {
-  return `<div style="margin:6px 0"><span style="opacity:0.7">${escape(label)}:</span> <strong style="color:inherit">${escape(value)}</strong></div>`;
+  return `<div style="margin:6px 0;color:#ffffff"><span style="color:#ffffff;font-weight:400">${escape(label)}:</span> <strong style="color:#ffffff;font-weight:600">${escape(value)}</strong></div>`;
 }
 
 // ─── Reusable detail block (boxed, slightly highlighted) ────────────────────
