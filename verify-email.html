@@ -192,7 +192,11 @@
     setTimeout(function(){ window.location.href = 'dashboard.html'; }, 800);
   }
 
-  document.addEventListener('sb-ready', async function(){
+  function __runWhenReady(fn){
+    if(window.__sbReady && window.sb) { fn(); }
+    else { document.addEventListener('sb-ready', fn, { once: true }); }
+  }
+  __runWhenReady(async function(){
     SUPABASE_URL = sb.supabaseUrl;
     var { data } = await sb.auth.getUser();
     if(!data.user){
