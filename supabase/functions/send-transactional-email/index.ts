@@ -247,7 +247,7 @@ function shell(opts: {
 
           <!-- Full brand logo (single image, centered) -->
           <tr><td align="center" style="padding:32px 32px 0">
-            <img src="https://apexipoaccess.com/assets/apex-logo-full.png?v=3" alt="Apex IPO Access"
+            <img src="https://apexipoaccess.com/assets/apex-logo-full.png?v=4" alt="Apex IPO Access"
                  width="220" style="display:block;margin:0 auto;width:220px;max-width:70%;height:auto">
           </td></tr>
 
