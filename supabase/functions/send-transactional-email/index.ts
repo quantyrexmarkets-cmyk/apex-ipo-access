@@ -353,7 +353,7 @@ function tplKycRejected(user: UserProfile, params: { reason?: string; reviewedAt
   return shell({
     preheader: 'Your identity verification was not approved. Review the reason and contact support if needed.',
     headline: `Hi ${user.first_name},\nWe couldn't verify your identity`,
-    subtitle: 'Following review of your submitted documents, we are unable to verify your identity at this time. Your application has not been approved.',
+    subtitle: 'We could not verify your identity at this time.',
     ctaLabel: 'Contact Compliance',
     ctaUrl: 'mailto:support@apexipoaccess.com?subject=KYC%20Appeal',
     detailsHtml: details,
@@ -384,7 +384,7 @@ function tplDepositPending(user: UserProfile, params: {
   return shell({
     preheader: `Your deposit of ${fmtMoney(params.amount)} has been received and is pending verification.`,
     headline: `Hi ${user.first_name},\nWe received your deposit`,
-    subtitle: `Your deposit of ${fmtMoney(params.amount)} is now in our operations queue and will be credited to your account once verified.`,
+    subtitle: `Your deposit of ${fmtMoney(params.amount)} is pending verification.`,
     ctaLabel: 'View Account',
     ctaUrl: 'https://apexipoaccess.com/dashboard.html',
     detailsHtml: details,
@@ -417,7 +417,7 @@ function tplDepositApproved(user: UserProfile, params: {
   return shell({
     preheader: `Your deposit of ${fmtMoney(params.amount)} has been credited. New balance: ${fmtMoney(newBal)}.`,
     headline: `Hi ${user.first_name},\nYour deposit has been credited`,
-    subtitle: `${fmtMoney(params.amount)} has been added to your Apex Ipo Access account and is now available to invest.`,
+    subtitle: `${fmtMoney(params.amount)} has been credited to your account.`,
     ctaLabel: 'Browse Available IPOs',
     ctaUrl: 'https://apexipoaccess.com/dashboard.html',
     detailsHtml: details,
@@ -449,7 +449,7 @@ function tplDepositRejected(user: UserProfile, params: {
   return shell({
     preheader: `Your deposit of ${fmtMoney(params.amount)} could not be processed.`,
     headline: `Hi ${user.first_name},\nWe couldn't process your deposit`,
-    subtitle: `Your deposit submission of ${fmtMoney(params.amount)} has not been approved. Please review the details below.`,
+    subtitle: `Your deposit of ${fmtMoney(params.amount)} was not approved.`,
     ctaLabel: 'Contact Operations',
     ctaUrl: 'mailto:support@apexipoaccess.com?subject=Deposit%20Inquiry',
     detailsHtml: details,
@@ -482,7 +482,7 @@ function tplWithdrawalPending(user: UserProfile, params: {
   return shell({
     preheader: `Your withdrawal request of ${fmtMoney(params.amount)} is pending review.`,
     headline: `Hi ${user.first_name},\nWe received your withdrawal request`,
-    subtitle: `Your request to withdraw ${fmtMoney(params.amount)} has been received and is now in compliance review.`,
+    subtitle: `Your withdrawal request of ${fmtMoney(params.amount)} is under review.`,
     ctaLabel: 'View Status',
     ctaUrl: 'https://apexipoaccess.com/dashboard.html',
     detailsHtml: details,
@@ -519,7 +519,7 @@ function tplWithdrawalApproved(user: UserProfile, params: {
   return shell({
     preheader: `Your withdrawal of ${fmtMoney(params.amount)} has been approved and disbursed.`,
     headline: `Hi ${user.first_name},\nYour withdrawal is on its way`,
-    subtitle: `${fmtMoney(params.amount)} has been approved and disbursed to your verified destination account.`,
+    subtitle: `${fmtMoney(params.amount)} has been approved and disbursed.`,
     ctaLabel: 'View Transaction',
     ctaUrl: 'https://apexipoaccess.com/dashboard.html',
     detailsHtml: details,
@@ -553,7 +553,7 @@ function tplWithdrawalRejected(user: UserProfile, params: {
   return shell({
     preheader: `Your withdrawal of ${fmtMoney(params.amount)} could not be processed. Funds returned to your balance.`,
     headline: `Hi ${user.first_name},\nWe couldn't process your withdrawal`,
-    subtitle: `Your withdrawal request of ${fmtMoney(params.amount)} has not been approved. Your funds have been returned to your available balance.`,
+    subtitle: `Your withdrawal of ${fmtMoney(params.amount)} was not approved. Funds returned to your balance.`,
     ctaLabel: 'Contact Compliance',
     ctaUrl: 'mailto:support@apexipoaccess.com?subject=Withdrawal%20Inquiry',
     detailsHtml: details,
@@ -584,7 +584,7 @@ function tplPasswordReset(user: UserProfile, params: {
   return shell({
     preheader: 'Reset your APEX IPO Access password. The secure link expires in 1 hour.',
     headline: `Hi ${user.first_name},\nReset your password`,
-    subtitle: 'We received a request to reset your APEX IPO Access password. Click the button below to set a new password. This link is single-use and time-limited.',
+    subtitle: 'Click below to set a new password. This link expires in 1 hour.',
     ctaLabel: 'Reset Password',
     ctaUrl: params.resetLink,
     detailsHtml: details,
@@ -616,7 +616,7 @@ function tplLoginAlert(user: UserProfile, params: {
   return shell({
     preheader: 'A new sign-in was detected on your Apex Ipo Access account.',
     headline: `Hi ${user.first_name},\nNew sign-in to your account`,
-    subtitle: 'We detected a new sign-in to your Apex Ipo Access account. If this was you, no action is needed.',
+    subtitle: 'A new sign-in was detected on your account.',
     ctaLabel: 'Secure My Account',
     ctaUrl: 'https://apexipoaccess.com/account.html',
     detailsHtml: details,
@@ -663,7 +663,7 @@ function tplSharePurchase(user: UserProfile, params: {
   return shell({
     preheader: `Your purchase of ${fmtNum(params.shares)} shares of ${params.company} for ${fmtMoney(params.totalCost)} has been executed.`,
     headline: `Hi ${user.first_name},\nYour purchase is confirmed`,
-    subtitle: `You acquired ${fmtNum(params.shares)} shares of ${params.company} for ${fmtMoney(params.totalCost)}. The position has been added to your portfolio.`,
+    subtitle: `You acquired ${fmtNum(params.shares)} shares of ${params.company} for ${fmtMoney(params.totalCost)}.`,
     ctaLabel: 'View Portfolio',
     ctaUrl: 'https://apexipoaccess.com/portfolio.html',
     detailsHtml: details,
@@ -704,7 +704,7 @@ function tplIpoAllocation(user: UserProfile, params: {
   return shell({
     preheader: `You have been granted ${fmtNum(params.shares)} shares of ${params.company} at the subscription price.`,
     headline: `Hi ${user.first_name},\nYou received an IPO allocation`,
-    subtitle: `Congratulations. You have been granted an institutional allocation in ${tickerDisplay} valued at ${fmtMoney(params.totalValue)} at the subscription price.`,
+    subtitle: `You have been granted an institutional allocation in ${tickerDisplay}.`,
     ctaLabel: 'View Allocation',
     ctaUrl: 'https://apexipoaccess.com/portfolio.html',
     detailsHtml: details,
@@ -736,7 +736,7 @@ function tplAccountBanned(user: UserProfile, params: {
   return shell({
     preheader: 'Your Apex Ipo Access account has been suspended. Review the reason and appeal process inside.',
     headline: `Hi ${user.first_name},\nYour account has been suspended`,
-    subtitle: 'Following review by our compliance and risk-management team, your Apex Ipo Access account has been suspended and access has been revoked.',
+    subtitle: 'Your account has been suspended following compliance review.',
     ctaLabel: 'File an Appeal',
     ctaUrl: 'mailto:compliance@apexipoaccess.com?subject=Account%20Suspension%20Appeal',
     detailsHtml: details,
