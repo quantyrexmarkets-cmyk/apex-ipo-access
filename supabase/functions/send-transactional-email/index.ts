@@ -212,6 +212,8 @@ function shell(opts: {
   .footer-strong { color:#3c4043 !important; }
   .footer-link { color:#1a73e8 !important; }
   .divider { border-color:#e8eaed !important; }
+  .logo-light { display:block !important; }
+  .logo-dark { display:none !important; }
   .cta { background:#1a73e8 !important; color:#ffffff !important; }
   @media (prefers-color-scheme: dark) {
     body, .bg { background:#1f2123 !important; }
@@ -225,6 +227,8 @@ function shell(opts: {
     .footer-strong { color:#e3e3e3 !important; }
     .footer-link { color:#5fb0ff !important; }
     .divider { border-color:#3c3f43 !important; }
+    .logo-light { display:none !important; }
+    .logo-dark { display:block !important; max-width:75% !important; margin:0 auto !important; }
     .cta { background:#1a73e8 !important; color:#ffffff !important; }
   }
   @media only screen and (max-width:600px) {
@@ -245,10 +249,16 @@ function shell(opts: {
       <tr><td class="card" style="border-radius:20px;padding:0">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 
-          <!-- Full brand logo (single image, centered) -->
+          <!-- Brand logo (auto-switches light/dark based on user color scheme) -->
           <tr><td align="center" style="padding:32px 32px 0">
-            <img src="https://apexipoaccess.com/assets/apex-logo-full.png?v=5" alt="Apex IPO Access"
-                 width="220" style="display:block;margin:0 auto;width:220px;max-width:70%;height:auto">
+            <!--[if !mso]><!-->
+            <img src="https://apexipoaccess.com/assets/apex-logo-light.png?v=1" alt="Apex IPO Access"
+                 class="logo-light"
+                 width="240" style="display:block;margin:0 auto;width:240px;max-width:75%;height:auto">
+            <img src="https://apexipoaccess.com/assets/apex-logo-dark.png?v=1" alt="Apex IPO Access"
+                 class="logo-dark"
+                 width="240" style="display:none;margin:0 auto;width:240px;max-width:75%;height:auto">
+            <!--<![endif]-->
           </td></tr>
 
           <!-- Big headline (Google style: weight 400, generous line-height) -->
