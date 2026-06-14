@@ -64,7 +64,25 @@ const ICONS = {
   </svg>`,
 } as const;
 
-function getEmailShell(heading: string, preheader: string, iconHtml: string, body: string, ctaHtml: string, noticeHtml: string) {
+function getEmailShell(opts: {
+  title?: string;
+  heading: string;
+  preview?: string;
+  preheader?: string;
+  icon?: string;
+  iconHtml?: string;
+  body: string;
+  cta?: string;
+  ctaHtml?: string;
+  notice?: string;
+  noticeHtml?: string;
+}) {
+  const heading    = opts.heading || opts.title || '';
+  const preheader  = opts.preheader || opts.preview || '';
+  const iconHtml   = opts.iconHtml || opts.icon || '';
+  const body       = opts.body || '';
+  const ctaHtml    = opts.ctaHtml || opts.cta || '';
+  const noticeHtml = opts.noticeHtml || opts.notice || '';
   return `<!DOCTYPE html>
 <html>
 <head>
