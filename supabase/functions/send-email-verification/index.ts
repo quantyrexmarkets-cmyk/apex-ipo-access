@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
 <title>Confirm your email</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root { color-scheme: light dark; supported-color-schemes: light dark; }
   body, .bg { background:#ffffff !important; color:#202124 !important; }
@@ -87,8 +87,8 @@ Deno.serve(async (req) => {
                 <img src="https://apexipoaccess.com/assets/spacex-logo.png" alt="" width="28" height="28" style="display:block;width:28px;height:28px">
               </td>
               <td style="vertical-align:middle">
-                <span class="brand-text" style="font-family:'Inter','Roboto',Arial,sans-serif;font-size:20px;font-weight:700;letter-spacing:-0.2px">APEX</span>
-                <span class="brand-sub" style="font-family:'Inter','Roboto',Arial,sans-serif;font-size:20px;font-weight:400;letter-spacing:-0.2px;margin-left:4px">IPO Access</span>
+                <span class="brand-text" style="font-family:'Oswald','Impact','Helvetica Neue',Arial,sans-serif;font-size:24px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase">APEX</span>
+                <span class="brand-sub" style="font-family:'Oswald','Impact','Helvetica Neue',Arial,sans-serif;font-size:24px;font-weight:300;letter-spacing:1.5px;text-transform:uppercase;margin-left:6px">IPO Access</span>
               </td>
             </tr>
           </table>
