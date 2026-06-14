@@ -2974,17 +2974,34 @@
     document.getElementById('sbName').textContent = fullName;
     document.getElementById('sbEmail').textContent = profile.email || '—';
 
-    await loadCustomers();
-    await loadDeposits();
-    await loadWithdrawals();
-    await loadAllTransactions();
-    await loadWireSettings();
-    await loadWallets();
-    initCompaniesUI();
-    await loadCompanies();
-    await loadNotifications();
-    await loadPlatformSettings();
-    await loadAdminLog();
+    // FAST BOOT: only load what's needed for dashboard immediately
+    // Other tabs lazy-load on first click
+    window._loadedTabs = window._loadedTabs || {};
+    try { initCompaniesUI(); } catch(e){}
+
+    // Parallel critical loads (dashboard needs these counts)
+    Promise.all([
+      loadCustomers().catch(e=>console.warn('customers',e)),
+      loadDeposits().catch(e=>console.warn('deposits',e)),
+      loadWithdrawals().catch(e=>console.warn('withdrawals',e))
+    ]).then(function(){
+      window._loadedTabs.customers = true;
+      window._loadedTabs.deposits = true;
+      window._loadedTabs.withdrawals = true;
+    });
+
+    // Lazy load the rest in background (non-blocking)
+    setTimeout(function(){
+      Promise.all([
+        loadAllTransactions().then(()=>window._loadedTabs.transactions=true).catch(e=>console.warn(e)),
+        loadCompanies().then(()=>window._loadedTabs.companies=true).catch(e=>console.warn(e)),
+        loadWireSettings().catch(e=>console.warn(e)),
+        loadWallets().catch(e=>console.warn(e)),
+        loadNotifications().then(()=>window._loadedTabs.notifications=true).catch(e=>console.warn(e)),
+        loadPlatformSettings().catch(e=>console.warn(e)),
+        loadAdminLog().then(()=>window._loadedTabs.adminlog=true).catch(e=>console.warn(e))
+      ]);
+    }, 100);
   });
 
   // ═══════════════════════════════════════════════════════════
