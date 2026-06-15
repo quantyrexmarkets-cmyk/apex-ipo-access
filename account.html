@@ -167,7 +167,16 @@
     border-radius:4px;color:transparent;min-width:80px;
   }
   @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
-</style>
+
+  .ph-avatar:hover .avatar-edit-overlay{opacity:1 !important}
+  .ph-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+  .kyc-cta-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:linear-gradient(135deg,#4a9eff,#3a86d6);color:#000;border:none;border-radius:11px;font-weight:700;font-size:13px;letter-spacing:0.4px;cursor:pointer;margin-top:12px;text-decoration:none;font-family:inherit}
+  .kyc-cta-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(74,158,255,0.3)}
+  .kyc-cta-btn.danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
+  .kyc-cta-btn.success{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff}
+  .kyc-cta-btn svg{width:15px;height:15px}
+
+  </style>
 
 <style>
   /* ============ ACCOUNT SETTINGS MODALS ============ */
@@ -327,7 +336,12 @@
 
   <!-- PROFILE HERO -->
   <div class="profile-hero">
-    <div class="ph-avatar" id="phAvatar">·</div>
+    <label class="ph-avatar" id="phAvatar" for="avatarUpload" style="cursor:pointer;position:relative;overflow:hidden">·
+      <input type="file" id="avatarUpload" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer">
+      <div class="avatar-edit-overlay" id="avatarEditOverlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.15s;pointer-events:none">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </div>
+    </label>
     <div class="ph-body">
       <div class="ph-name" id="phName"><span class="skel">·········</span></div>
       <div class="ph-email" id="phEmail"><span class="skel">·············</span></div>
@@ -375,7 +389,11 @@
       </div>
       <div class="row-val"><span id="vAddress">—</span></div>
     </div>
-    <div class="row" onclick="window.openEditProfile()">
+    <a href="kyc.html" id="kycCtaBtn" class="kyc-cta-btn" style="display:none">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M15 8h2M15 12h2M7 16h10"/></svg>
+    <span id="kycCtaLabel">Verify Your Identity</span>
+  </a>
+  <div class="row" onclick="window.openEditProfile()">
       <div class="row-lbl">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
         Edit personal details
@@ -952,5 +970,102 @@
 
 <script src="js/floating-widget.js?v=1781343118" defer></script>
   <script src="js/user-bell.js?v=1"></script>
+
+<!-- Avatar upload + KYC CTA wiring -->
+<script>
+(async function(){
+  function waitForUser(){
+    return new Promise(function(res){
+      var tries = 0;
+      var iv = setInterval(async function(){
+        tries++;
+        if(typeof sb !== 'undefined' && window.apex){
+          var u = await window.apex.getUser();
+          if(u){ clearInterval(iv); res(u); }
+        }
+        if(tries > 30){ clearInterval(iv); res(null); }
+      }, 200);
+    });
+  }
+
+  var user = await waitForUser();
+  if(!user) return;
+  var profile = await window.apex.getProfile();
+
+  // Show existing avatar if set
+  if(profile?.avatar_url){
+    var av = document.getElementById('phAvatar');
+    if(av){
+      // Clear text and insert img
+      var existing = av.querySelector('img');
+      if(!existing){
+        var img = document.createElement('img');
+        img.src = profile.avatar_url + '?t=' + Date.now();
+        img.alt = 'Avatar';
+        av.insertBefore(img, av.firstChild);
+      }
+      av.style.color = 'transparent';
+    }
+  }
+
+  // Configure KYC CTA based on status
+  var btn = document.getElementById('kycCtaBtn');
+  var lbl = document.getElementById('kycCtaLabel');
+  if(btn && lbl){
+    var st = (profile?.kyc_status || 'pending').toLowerCase();
+    if(st === 'verified'){
+      btn.style.display = 'none';
+    } else if(st === 'rejected'){
+      btn.style.display = 'flex';
+      btn.classList.add('danger');
+      lbl.textContent = 'Re-submit Documents';
+    } else if(profile?.kyc_submitted_at){
+      btn.style.display = 'flex';
+      btn.classList.add('success');
+      lbl.textContent = 'View Submitted Documents';
+    } else {
+      btn.style.display = 'flex';
+      lbl.textContent = 'Verify Your Identity';
+    }
+  }
+
+  // Wire avatar upload
+  var input = document.getElementById('avatarUpload');
+  if(input){
+    input.addEventListener('change', async function(e){
+      var f = e.target.files[0];
+      if(!f) return;
+      if(f.size > 3*1024*1024){ alert('Image too large (max 3MB)'); return; }
+      if(!f.type.startsWith('image/')){ alert('Please select an image'); return; }
+      try {
+        var ext = (f.name.split('.').pop()||'jpg').toLowerCase();
+        var path = user.id + '/avatar.' + ext;
+        var up = await sb.storage.from('avatars').upload(path, f, { upsert:true, cacheControl:'3600' });
+        if(up.error) throw up.error;
+        var pub = sb.storage.from('avatars').getPublicUrl(path);
+        var url = pub.data?.publicUrl;
+        if(!url) throw new Error('Could not get public URL');
+        var r = await sb.from('profiles').update({ avatar_url: url }).eq('id', user.id);
+        if(r.error) throw r.error;
+        // Update display
+        var av = document.getElementById('phAvatar');
+        var existing = av.querySelector('img');
+        if(existing){ existing.src = url + '?t=' + Date.now(); }
+        else {
+          var img = document.createElement('img');
+          img.src = url + '?t=' + Date.now();
+          av.insertBefore(img, av.firstChild);
+          av.style.color = 'transparent';
+        }
+        if(window.apexToast) window.apexToast('Profile photo updated');
+        else alert('Profile photo updated');
+      } catch(err){
+        alert('Upload failed: ' + (err.message || err));
+      }
+    });
+  }
+})();
+</script>
+
 </body>
 </html>
