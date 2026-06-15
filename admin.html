@@ -974,6 +974,32 @@
 
   </style>
 </head>
+
+<!-- HUGE DEBUG BANNER -->
+<div id="DEBUG_BANNER" style="position:fixed;top:0;left:0;right:0;background:#ff0000;color:#fff;padding:10px;z-index:99999;font-size:14px;text-align:center;font-family:monospace">DEBUG: Page loaded at <span id="DEBUG_TIME"></span></div>
+<script>
+document.getElementById('DEBUG_TIME').textContent = new Date().toLocaleTimeString();
+setTimeout(async function(){
+  var banner = document.getElementById('DEBUG_BANNER');
+  if(!banner) return;
+  try {
+    if(typeof sb === 'undefined'){ banner.textContent = 'ERROR: sb (supabase) is not defined'; banner.style.background='#ff0000'; return; }
+    banner.textContent = 'Testing query...';
+    var r = await sb.from('profiles').select('id,email').limit(10);
+    if(r.error){
+      banner.innerHTML = 'QUERY ERROR: ' + r.error.message + ' (code: ' + (r.error.code || 'none') + ')';
+      banner.style.background='#ff8800';
+    } else {
+      banner.innerHTML = 'SUCCESS: Got ' + (r.data?.length || 0) + ' users. First email: ' + (r.data?.[0]?.email || 'none');
+      banner.style.background='#22c55e';
+    }
+  } catch(e){
+    banner.textContent = 'EXCEPTION: ' + (e.message || e);
+    banner.style.background='#ff0000';
+  }
+}, 2000);
+</script>
+
 <body>
 
 <!-- TOP BAR -->
