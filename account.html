@@ -338,10 +338,11 @@
   <!-- PROFILE HERO -->
   <div class="profile-hero">
     <label class="ph-avatar" id="phAvatar" for="avatarUpload" style="cursor:pointer;position:relative;overflow:hidden">·
-      <input type="file" id="avatarUpload" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer">
-      <div class="avatar-edit-overlay" id="avatarEditOverlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.15s;pointer-events:none">
+      <input type="file" id="avatarUpload" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;z-index:5">
+      <div class="avatar-edit-overlay" id="avatarEditOverlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;opacity:1;transition:opacity 0.15s;pointer-events:none">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
       </div>
+      <div style="position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:10px;color:#4a9eff;font-weight:600;white-space:nowrap;pointer-events:none">Tap to change</div>
     </label>
     <div class="ph-body">
       <div class="ph-name" id="phName"><span class="skel">·········</span></div>
@@ -1015,7 +1016,8 @@
   if(btn && lbl){
     var st = (profile?.kyc_status || 'pending').toLowerCase();
     if(st === 'verified'){
-      btn.style.display = 'none';
+      lbl.textContent = '✓ Identity Verified';
+      btn.classList.add('success');
     } else if(st === 'rejected'){
       btn.style.display = 'flex';
       btn.classList.add('danger');
