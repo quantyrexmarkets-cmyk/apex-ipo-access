@@ -90,9 +90,19 @@
   </button>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js?v=100"></script>
 <script src="js/notify.js?v=1"></script>
 <script>
+// Ensure sb is available
+const SUPABASE_URL = 'https://tbivhlxkwtklhvsaggwg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiaXZobHhrd3RrbGh2c2FnZ3dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMjc5MTEsImV4cCI6MjA5NjcwMzkxMX0.rw-LXJTPzYJu5TdEP0pgqUguviMJNwzJkpI5uGtR6XY';
+if (typeof sb === 'undefined' || !sb) {
+  if (typeof supabase !== 'undefined' && supabase.createClient) {
+    window.sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+}
+
 (async function(){
   var user = await window.apex.getUser();
   if(!user){ window.location.href = 'login.html'; return; }
