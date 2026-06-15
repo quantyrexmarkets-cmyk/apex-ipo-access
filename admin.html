@@ -1788,11 +1788,28 @@
 
   // ========== LOAD DATA ==========
   async function loadCustomers(){
-    var { data, error } = await sb.from('profiles').select('*').order('created_at',{ascending:false});
-    if(error){ console.error(error); return; }
-    state.users = data || [];
-    renderStats();
-    renderCustomers();
+    try {
+      console.log('[loadCustomers] starting...');
+      var res = await sb.from('profiles').select('*').order('created_at',{ascending:false});
+      console.log('[loadCustomers] response:', res);
+      if(res.error){
+        console.error('[loadCustomers] ERROR:', res.error);
+        var listEl = document.querySelector('#page-customers .loading') || document.querySelector('.loading');
+        if(listEl) listEl.innerHTML = '<div style="color:#ef4444;padding:20px;text-align:center">Failed to load: ' + (res.error.message || res.error) + '</div>';
+        return;
+      }
+      state.users = res.data || [];
+      console.log('[loadCustomers] got', state.users.length, 'users');
+      if(typeof renderStats === 'function') renderStats();
+      if(typeof renderCustomers === 'function') renderCustomers();
+      else {
+        var listEl = document.querySelector('#page-customers .loading') || document.querySelector('.loading');
+        if(listEl) listEl.innerHTML = '<div style="color:#ef4444;padding:20px;text-align:center">renderCustomers not found</div>';
+      }
+    } catch(e){
+      console.error('[loadCustomers] exception:', e);
+      alert('loadCustomers failed: ' + (e.message || e));
+    }
   }
 
   async function loadDeposits(){
