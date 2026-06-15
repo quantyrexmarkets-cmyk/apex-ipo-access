@@ -967,6 +967,9 @@
   .fn-input:focus{outline:none}
   .fn-auto{font-size:9px;color:#5fb0ff;background:rgba(95,176,255,0.15);padding:1px 5px;border-radius:8px;margin-left:4px;font-weight:500;letter-spacing:0.3px;text-transform:uppercase}
 
+  
+  .qr-up-btn:hover{background:rgba(95,176,255,0.15);color:#5fb0ff}
+
   </style>
 </head>
 <body>
@@ -2846,7 +2849,12 @@
             '<div class="wallet-addr">'+escapeHtml(w.address||'')+'</div>' +
             (w.memo?'<div class="wallet-meta">Memo: '+escapeHtml(w.memo)+'</div>':'') +
           '</div>' +
-          '<div class="wallet-actions">' +
+          (w.qr_code_url?'<div class="wallet-meta" style="margin-top:6px"><img src="'+w.qr_code_url+'?t='+Date.now()+'" alt="QR" style="width:60px;height:60px;border-radius:6px;border:1px solid #2a2d31;cursor:pointer" onclick="window.open(this.src,\'_blank\')"></div>':'') +
+        '</div><div class="wallet-actions">' +
+          '<label class="qr-up-btn" title="Upload QR" style="cursor:pointer;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:6px;color:#a8b2c1;position:relative">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>' +
+            '<input type="file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer" onchange="window._uploadWalletQR(\''+w.id+'\', this)">' +
+          '</label>' +
             '<button onclick="window._copyWallet(\''+escapeHtml(w.address)+'\')" title="Copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>' +
             '<button onclick="window._toggleWallet(\''+w.id+'\','+w.active+')" title="'+(w.active?'Deactivate':'Activate')+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+(w.active?'<circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>':'<polyline points="20 6 9 17 4 12"/>')+'</svg></button>' +
             '<button class="del" onclick="window._deleteWallet(\''+w.id+'\')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>' +
