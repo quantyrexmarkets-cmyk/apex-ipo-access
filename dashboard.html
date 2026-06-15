@@ -592,7 +592,7 @@
     if(profile){
       if(profile.banned){
         await sb.auth.signOut();
-        alert('Your account has been suspended.' + (profile.banned_reason ? '\n\nReason: ' + profile.banned_reason : '') + '\n\nContact support@apexipo.com');
+        alert('Your account has been suspended.' + (profile.banned_reason ? '\n\nReason: ' + profile.banned_reason : '') + '\n\nContact support@apexipoaccess.com');
         window.location.href = 'login.html';
         return;
       }
