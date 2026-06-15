@@ -183,7 +183,7 @@
       </div>
 
       <div class="notice" style="background:rgba(62,213,152,0.06);border-color:rgba(62,213,152,0.18)">
-        <b style="color:#3ed598">✓ Verification complete</b>
+        <b style="color:#3ed598"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> Verification complete</b>
         You now have full access to APEX IPO ACCESS — including pre-IPO opportunities, deposits, and your investor dashboard.
       </div>
 
@@ -226,7 +226,7 @@
         document.getElementById('submitDate').textContent = new Date(profile.created_at).toLocaleDateString('en-US',{month:'short', day:'numeric', year:'numeric'});
       }
 
-      // ✅ Approved — switch to success state
+      // <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> Approved — switch to success state
       if(profile.kyc_status === 'verified' || profile.is_admin){
         showApprovedState();
       }

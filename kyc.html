@@ -117,7 +117,7 @@
 
   if(st === 'verified'){
     document.getElementById('submitBtn').disabled = true;
-    document.getElementById('submitBtn').innerHTML = '✓ Already Verified';
+    document.getElementById('submitBtn').innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> Already Verified';
     return;
   }
 
@@ -134,11 +134,11 @@
       // Preview if image
       if(f.type.startsWith('image/')){
         var url = URL.createObjectURL(f);
-        box.innerHTML = '<input type="file" id="'+inputId+'" accept="image/*,.pdf"><img src="'+url+'" class="upload-preview"><div class="upload-status">✓ Ready to upload</div>';
+        box.innerHTML = '<input type="file" id="'+inputId+'" accept="image/*,.pdf"><img src="'+url+'" class="upload-preview"><div class="upload-status"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> Ready to upload</div>';
         // Re-attach handler since we replaced innerHTML
         handleFile(slot, inputId, boxId);
       } else {
-        box.querySelector('.upload-title').textContent = '✓ ' + f.name;
+        box.querySelector('.upload-title').textContent = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> ' + f.name;
         box.querySelector('.upload-hint').textContent = 'Ready to upload';
       }
       checkSubmit();

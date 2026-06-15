@@ -194,7 +194,7 @@
     selectedFile = file;
     fileName.textContent = file.name;
     fileDrop.classList.add('has-file');
-    dropTitle.textContent = '✓ ' + file.name;
+    dropTitle.textContent = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> ' + file.name;
     dropSub.textContent = (file.size/1024).toFixed(0) + ' KB · Tap to change';
 
     if(file.type.startsWith('image/')){
