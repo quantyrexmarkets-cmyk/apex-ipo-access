@@ -4696,5 +4696,42 @@ window._approveKycDocs = async function(){
 };
 </script>
 
+
+<!-- Add User Quick Flow -->
+<script>
+window._openAddUser = async function(){
+  var email = prompt('New user email address:');
+  if(!email || email.indexOf('@')<0) return;
+  email = email.trim().toLowerCase();
+  var firstName = prompt('First name:') || '';
+  var lastName = prompt('Last name (optional):') || '';
+  var tempPwd = prompt('Temporary password (min 8 chars, share with user):', 'Apex' + Math.floor(Math.random()*9000+1000) + '!');
+  if(!tempPwd || tempPwd.length < 8){ alert('Password must be at least 8 characters'); return; }
+  if(!confirm('Create account for ' + email + '?\n\nYou will need to share the temporary password with them.')) return;
+  try {
+    var r = await sb.auth.signUp({
+      email: email,
+      password: tempPwd,
+      options: { data: { first_name: firstName, last_name: lastName } }
+    });
+    if(r.error){ alert('Create failed: ' + r.error.message); return; }
+    if(r.data && r.data.user && r.data.user.id){
+      await new Promise(function(res){ setTimeout(res, 800); });
+      await sb.from('profiles').update({
+        first_name: firstName || null,
+        last_name: lastName || null,
+        email: email,
+        account_status: 'pending',
+        kyc_status: 'not_submitted'
+      }).eq('id', r.data.user.id);
+    }
+    alert('User created!\n\nEmail: ' + email + '\nTemporary password: ' + tempPwd + '\n\nSave this password and share it with the user.');
+    if(typeof loadCustomers === 'function') await loadCustomers();
+  } catch(e){
+    alert('Error: ' + (e.message || e));
+  }
+};
+</script>
+
 </body>
 </html>
