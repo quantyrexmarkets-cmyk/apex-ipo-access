@@ -975,48 +975,6 @@
   </style>
 </head>
 
-<!-- HUGE DEBUG BANNER -->
-<div id="DEBUG_BANNER" style="position:fixed;top:0;left:0;right:0;background:#ff0000;color:#fff;padding:10px;z-index:99999;font-size:14px;text-align:center;font-family:monospace">DEBUG: Page loaded at <span id="DEBUG_TIME"></span></div>
-<script>
-document.getElementById('DEBUG_TIME').textContent = new Date().toLocaleTimeString();
-window.addEventListener('load', function(){ setTimeout(async function(){
-  var banner = document.getElementById('DEBUG_BANNER');
-  if(!banner) return;
-  try {
-    if(typeof sb === 'undefined'){ banner.textContent = 'ERROR: sb (supabase) is not defined'; banner.style.background='#ff0000'; return; }
-    banner.textContent = 'Testing query...';
-    var r = await sb.from('profiles').select('id,email').limit(10);
-    if(r.error){
-      banner.innerHTML = 'QUERY ERROR: ' + r.error.message + ' (code: ' + (r.error.code || 'none') + ')';
-      banner.style.background='#ff8800';
-    } else {
-      banner.innerHTML = 'SUCCESS: Got ' + (r.data?.length || 0) + ' users — rendering now...';
-      banner.style.background='#22c55e';
-      // FORCE call loadCustomers if it hasn't fired
-      try {
-        if(typeof loadCustomers === 'function'){
-          await loadCustomers();
-          banner.innerHTML += ' ✓ loadCustomers fired';
-        } else {
-          banner.innerHTML += ' ✗ loadCustomers NOT DEFINED';
-        }
-        // Also try to fire the other loaders
-        if(typeof loadDeposits === 'function') await loadDeposits();
-        if(typeof loadWithdrawals === 'function') await loadWithdrawals();
-        // Hide banner after 3s
-        setTimeout(function(){ banner.style.display='none'; }, 3000);
-      } catch(e){
-        banner.innerHTML += ' ERR: ' + (e.message||e);
-        banner.style.background='#ff8800';
-      }
-    }
-  } catch(e){
-    banner.textContent = 'EXCEPTION: ' + (e.message || e);
-    banner.style.background='#ff0000';
-  }
-}, 2000); });
-</script>
-
 <body>
 
 <!-- TOP BAR -->
@@ -3459,8 +3417,8 @@ window.addEventListener('load', function(){ setTimeout(async function(){
     document.getElementById('sbName').textContent = fullName;
     document.getElementById('sbEmail').textContent = profile.email || '—';
 
-    // FAST BOOT: only load what's needed for dashboard immediately
-    // Other tabs lazy-load on first click
+    // FAST BOOT — defer to window.load so all functions are defined
+    function _apexBoot(){
     window._loadedTabs = window._loadedTabs || {};
     try { initCompaniesUI(); } catch(e){}
 
@@ -3487,6 +3445,9 @@ window.addEventListener('load', function(){ setTimeout(async function(){
         loadAdminLog().then(()=>window._loadedTabs.adminlog=true).catch(e=>console.warn(e))
       ]);
     }, 100);
+    } // end _apexBoot
+    if(document.readyState === 'complete') _apexBoot();
+    else window.addEventListener('load', _apexBoot);
   });
 
   // ═══════════════════════════════════════════════════════════
