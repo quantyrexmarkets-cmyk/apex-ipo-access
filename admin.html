@@ -3417,8 +3417,8 @@
     document.getElementById('sbName').textContent = fullName;
     document.getElementById('sbEmail').textContent = profile.email || '—';
 
-    // FAST BOOT — defer to window.load so all functions are defined
-    function _apexBoot(){
+    // FAST BOOT: only load what's needed for dashboard immediately
+    // Other tabs lazy-load on first click
     window._loadedTabs = window._loadedTabs || {};
     try { initCompaniesUI(); } catch(e){}
 
@@ -3445,9 +3445,6 @@
         loadAdminLog().then(()=>window._loadedTabs.adminlog=true).catch(e=>console.warn(e))
       ]);
     }, 100);
-    } // end _apexBoot
-    if(document.readyState === 'complete') _apexBoot();
-    else window.addEventListener('load', _apexBoot);
   });
 
   // ═══════════════════════════════════════════════════════════
@@ -4630,6 +4627,22 @@ window._fnEditStat = async function(field, label, isInt, isPercent){
   alert(label+' updated to '+displayVal);
   if(typeof window.loadUserFinances === 'function') window.loadUserFinances(currentUser.id);
 };
+</script>
+
+
+<script>
+// Auto-fire loaders after window load (functions are defined by then)
+window.addEventListener('load', function(){
+  setTimeout(async function(){
+    try {
+      if(typeof loadCustomers === 'function' && (!window.state || !window.state.users || !window.state.users.length)){
+        await loadCustomers();
+      }
+      if(typeof loadDeposits === 'function') await loadDeposits().catch(()=>{});
+      if(typeof loadWithdrawals === 'function') await loadWithdrawals().catch(()=>{});
+    } catch(e){ console.warn('auto-fire err', e); }
+  }, 800);
+});
 </script>
 
 </body>
