@@ -979,7 +979,7 @@
 <div id="DEBUG_BANNER" style="position:fixed;top:0;left:0;right:0;background:#ff0000;color:#fff;padding:10px;z-index:99999;font-size:14px;text-align:center;font-family:monospace">DEBUG: Page loaded at <span id="DEBUG_TIME"></span></div>
 <script>
 document.getElementById('DEBUG_TIME').textContent = new Date().toLocaleTimeString();
-setTimeout(async function(){
+window.addEventListener('load', function(){ setTimeout(async function(){
   var banner = document.getElementById('DEBUG_BANNER');
   if(!banner) return;
   try {
@@ -1014,7 +1014,7 @@ setTimeout(async function(){
     banner.textContent = 'EXCEPTION: ' + (e.message || e);
     banner.style.background='#ff0000';
   }
-}, 2000);
+}, 2000); });
 </script>
 
 <body>
