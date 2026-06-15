@@ -104,6 +104,16 @@ if (typeof sb === 'undefined' || !sb) {
 }
 
 (async function(){
+  // Wait for window.sb to be initialized
+  var tries = 0;
+  while((typeof sb === 'undefined' || !sb) && tries < 50){
+    await new Promise(r => setTimeout(r, 100));
+    tries++;
+  }
+  if(typeof sb === 'undefined' || !sb){
+    alert('Supabase failed to load. Please refresh.');
+    return;
+  }
   var user = await window.apex.getUser();
   if(!user){ window.location.href = 'login.html'; return; }
   var profile = await window.apex.getProfile();
