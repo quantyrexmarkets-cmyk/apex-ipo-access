@@ -4521,5 +4521,39 @@ window._quickChangePassword = async function(){
 })();
 </script>
 
+
+<!-- Wallet QR upload -->
+<script>
+window._uploadWalletQR = async function(walletId, input){
+  var file = input.files[0];
+  if(!file) return;
+  if(file.size > 2*1024*1024){ alert('QR image too large (max 2MB)'); input.value=''; return; }
+  if(!file.type.startsWith('image/')){ alert('Please select an image'); input.value=''; return; }
+  try {
+    var ext = (file.name.split('.').pop()||'png').toLowerCase();
+    var path = walletId + '/qr_' + Date.now() + '.' + ext;
+    var up = await sb.storage.from('wallet-qrs').upload(path, file, { upsert:true, cacheControl:'3600' });
+    if(up.error) throw up.error;
+    var pub = sb.storage.from('wallet-qrs').getPublicUrl(path);
+    var url = pub.data && pub.data.publicUrl;
+    if(!url) throw new Error('Could not get public URL');
+    var r = await sb.from('crypto_wallets').update({ qr_code_url: url }).eq('id', walletId);
+    if(r.error) throw r.error;
+    if(window.apexSuccess) apexSuccess('QR code uploaded');
+    else alert('QR code uploaded');
+    if(typeof loadWallets === 'function') await loadWallets();
+  } catch(e){
+    alert('Upload failed: ' + (e.message || e));
+  }
+};
+
+window._removeWalletQR = async function(walletId){
+  if(!confirm('Remove the QR code from this wallet?')) return;
+  var r = await sb.from('crypto_wallets').update({ qr_code_url: null }).eq('id', walletId);
+  if(r.error){ alert('Failed: '+r.error.message); return; }
+  if(typeof loadWallets === 'function') await loadWallets();
+};
+</script>
+
 </body>
 </html>
