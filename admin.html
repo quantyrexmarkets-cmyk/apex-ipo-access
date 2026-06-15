@@ -4645,5 +4645,56 @@ window.addEventListener('load', function(){
 });
 </script>
 
+
+<!-- Account vs KYC approval separation -->
+<script>
+window._approveAccount = async function(){
+  if(!currentUser) return;
+  if(!confirm('Approve this account?\n\nUser will be able to log in and see their dashboard.\nKYC verification is still required for deposits/withdrawals.')) return;
+  var r = await sb.from('profiles').update({account_status:'approved'}).eq('id', currentUser.id);
+  if(r.error){ alert('Failed: '+r.error.message); return; }
+  currentUser.account_status = 'approved';
+  alert('Account approved — user can now access dashboard');
+  if(typeof populateModal === 'function') populateModal(currentUser);
+  if(typeof loadCustomers === 'function') loadCustomers();
+};
+
+window._rejectAccount = async function(){
+  if(!currentUser) return;
+  var reason = prompt('Reason for rejecting account application:');
+  if(!reason) return;
+  var r = await sb.from('profiles').update({account_status:'rejected'}).eq('id', currentUser.id);
+  if(r.error){ alert('Failed: '+r.error.message); return; }
+  currentUser.account_status = 'rejected';
+  alert('Account rejected');
+  if(typeof populateModal === 'function') populateModal(currentUser);
+  if(typeof loadCustomers === 'function') loadCustomers();
+};
+
+window._approveKycDocs = async function(){
+  if(!currentUser) return;
+  if(currentUser.account_status !== 'approved'){
+    if(!confirm('Account is not yet approved. Approve account first?')) return;
+    await window._approveAccount();
+  }
+  if(!confirm('Approve KYC documents?\n\nUser will then be able to deposit, invest, and withdraw.')) return;
+  var r = await sb.from('profiles').update({kyc_status:'verified'}).eq('id', currentUser.id);
+  if(r.error){ alert('Failed: '+r.error.message); return; }
+  currentUser.kyc_status = 'verified';
+  // Send welcome email
+  try {
+    var sess = await sb.auth.getSession();
+    var tok = (sess.data.session && sess.data.session.access_token) || '';
+    await fetch('https://tbivhlxkwtklhvsaggwg.supabase.co/functions/v1/send-transactional-email',{
+      method:'POST', headers:{'Authorization':'Bearer '+tok,'Content-Type':'application/json'},
+      body: JSON.stringify({userId:currentUser.id, template:'welcome'})
+    });
+  } catch(e){ console.warn(e); }
+  alert('KYC approved + welcome email sent');
+  if(typeof populateModal === 'function') populateModal(currentUser);
+  if(typeof loadCustomers === 'function') loadCustomers();
+};
+</script>
+
 </body>
 </html>

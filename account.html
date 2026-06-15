@@ -1014,8 +1014,12 @@
   var btn = document.getElementById('kycCtaBtn');
   var lbl = document.getElementById('kycCtaLabel');
   if(btn && lbl){
-    var st = (profile?.kyc_status || 'pending').toLowerCase();
-    if(st === 'verified'){
+    var accSt = (profile?.account_status || 'pending').toLowerCase();
+    var st = (profile?.kyc_status || 'not_submitted').toLowerCase();
+    // Only show KYC button if account is approved
+    if(accSt !== 'approved'){
+      btn.style.display = 'none';
+    } else if(st === 'verified'){
       lbl.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> Identity Verified';
       btn.classList.add('success');
     } else if(st === 'rejected'){
