@@ -298,13 +298,13 @@
   // Smart redirect: pending-approval → verify-email → dashboard
   async function smartRedirect(userId){
     try {
-      var { data: prof } = await sb.from('profiles').select('kyc_status,is_admin,banned,banned_reason,email_verified_at').eq('id', userId).single();
+      var { data: prof } = await sb.from('profiles').select('account_status,kyc_status,is_admin,banned,banned_reason,email_verified_at').eq('id', userId).single();
       if(prof && prof.banned){
         await sb.auth.signOut();
         alert('Your account has been suspended.' + (prof.banned_reason ? '\n\nReason: ' + prof.banned_reason : ''));
         return;
       }
-      if(prof && !prof.is_admin && prof.kyc_status !== 'verified'){
+      if(prof && !prof.is_admin && prof.account_status !== 'approved'){
         window.location.href = 'pending-approval.html';
         return;
       }

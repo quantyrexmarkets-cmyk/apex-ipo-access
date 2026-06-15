@@ -2239,8 +2239,8 @@
 
   function renderStats(){
     var nonAdmins = state.users.filter(function(u){ return !u.is_admin; });
-    var active = nonAdmins.filter(function(u){ return u.kyc_status==='verified'; }).length;
-    var pending = nonAdmins.filter(function(u){ return u.kyc_status!=='verified'; }).length;
+    var active = nonAdmins.filter(function(u){ return u.account_status==='approved'; }).length;
+    var pending = nonAdmins.filter(function(u){ return u.account_status!=='approved'; }).length;
     var totalDep = state.deposits.filter(function(d){ return d.status==='approved'; }).reduce(function(s,d){ return s+parseFloat(d.amount||0); },0);
     var pendDep = state.deposits.filter(function(d){ return d.status==='pending'||d.status==='awaiting_review'; }).length;
     var pendWd = state.withdrawals.filter(function(w){ return w.status==='pending'; }).length;
