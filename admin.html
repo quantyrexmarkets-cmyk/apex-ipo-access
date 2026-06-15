@@ -4557,5 +4557,59 @@ window._removeWalletQR = async function(walletId){
 };
 </script>
 
+
+<!-- Editable stats handler -->
+<script>
+window._fnEditStat = async function(field, label, isInt, isPercent){
+  if(!currentUser){ alert('No user selected'); return; }
+  if(field === 'cash_balance'){
+    alert('Cash Balance is auto-calculated.\n\nUse the Credit/Debit/Bonus/Set Exact buttons below to modify it.');
+    return;
+  }
+  // Get the current displayed value to suggest in prompt
+  var idMap = {
+    'total_deposits_override': 'fnTotalDeps',
+    'total_withdrawals_override': 'fnTotalWds',
+    'total_profit_override': 'fnTotalProfit',
+    'active_holdings_override': 'fnActiveHolds',
+    'total_invested_override': 'fnTotalInv',
+    'avg_pnl_override': 'fnAvgPnl',
+    'win_rate_override': 'fnWinRate'
+  };
+  var elId = idMap[field];
+  var raw = '';
+  if(elId){
+    var el = document.getElementById(elId);
+    if(el) raw = (el.value || el.textContent || '').replace(/[$,%+\s]/g,'').trim();
+  }
+  var prompt_msg = 'Override ' + label + (isPercent?' (enter %):':isInt?' (number):':' (enter $):') + '\n\nType "auto" to reset to calculated value.';
+  var newVal = prompt(prompt_msg, raw);
+  if(newVal === null) return;
+  newVal = newVal.trim();
+  if(newVal === '' || newVal.toLowerCase() === 'auto' || newVal.toLowerCase() === 'reset'){
+    var upd = {}; upd[field] = null;
+    var r = await sb.from('profiles').update(upd).eq('id', currentUser.id);
+    if(r.error){ alert('Failed: '+r.error.message); return; }
+    currentUser[field] = null;
+    alert(label+' reset to auto-calculated');
+    if(typeof window.loadUserFinances === 'function') window.loadUserFinances(currentUser.id);
+    return;
+  }
+  var num = parseFloat(newVal);
+  if(isNaN(num)){
+    alert('Invalid number. Try again or type "auto" to reset.');
+    return;
+  }
+  var displayVal = isPercent ? num+'%' : isInt ? num : '$'+num.toFixed(2);
+  if(!confirm('Set '+label+' to '+displayVal+' ?')) return;
+  var upd = {}; upd[field] = num;
+  var r = await sb.from('profiles').update(upd).eq('id', currentUser.id);
+  if(r.error){ alert('Failed: '+r.error.message); return; }
+  currentUser[field] = num;
+  alert(label+' updated to '+displayVal);
+  if(typeof window.loadUserFinances === 'function') window.loadUserFinances(currentUser.id);
+};
+</script>
+
 </body>
 </html>
