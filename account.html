@@ -880,7 +880,7 @@
     if(!box || !lbl || !sub || !btn) return;
     if(tfState.enabled){
       box.classList.add('on');
-      lbl.textContent = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> Two-factor authentication is ON';
+      lbl.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> Two-factor authentication is ON';
       sub.textContent = "You'll receive a 5-digit code by email each time you sign in.";
       btn.textContent = 'Disable 2FA';
       btn.className = 'm-btn danger';
@@ -1016,7 +1016,7 @@
   if(btn && lbl){
     var st = (profile?.kyc_status || 'pending').toLowerCase();
     if(st === 'verified'){
-      lbl.textContent = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> Identity Verified';
+      lbl.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> Identity Verified';
       btn.classList.add('success');
     } else if(st === 'rejected'){
       btn.style.display = 'flex';
