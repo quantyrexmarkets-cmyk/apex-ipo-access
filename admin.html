@@ -990,8 +990,25 @@ setTimeout(async function(){
       banner.innerHTML = 'QUERY ERROR: ' + r.error.message + ' (code: ' + (r.error.code || 'none') + ')';
       banner.style.background='#ff8800';
     } else {
-      banner.innerHTML = 'SUCCESS: Got ' + (r.data?.length || 0) + ' users. First email: ' + (r.data?.[0]?.email || 'none');
+      banner.innerHTML = 'SUCCESS: Got ' + (r.data?.length || 0) + ' users — rendering now...';
       banner.style.background='#22c55e';
+      // FORCE call loadCustomers if it hasn't fired
+      try {
+        if(typeof loadCustomers === 'function'){
+          await loadCustomers();
+          banner.innerHTML += ' ✓ loadCustomers fired';
+        } else {
+          banner.innerHTML += ' ✗ loadCustomers NOT DEFINED';
+        }
+        // Also try to fire the other loaders
+        if(typeof loadDeposits === 'function') await loadDeposits();
+        if(typeof loadWithdrawals === 'function') await loadWithdrawals();
+        // Hide banner after 3s
+        setTimeout(function(){ banner.style.display='none'; }, 3000);
+      } catch(e){
+        banner.innerHTML += ' ERR: ' + (e.message||e);
+        banner.style.background='#ff8800';
+      }
     }
   } catch(e){
     banner.textContent = 'EXCEPTION: ' + (e.message || e);
