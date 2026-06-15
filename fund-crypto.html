@@ -364,7 +364,7 @@
 
     <!-- QR Code -->
     <div class="qr-wrap" id="qrWrap" style="display:none">
-      <img id="qrImg" alt="Wallet QR code">
+      <img id="qrImg" alt="Wallet QR code" style="cursor:pointer" onclick="window.open(this.src)">
     </div>
 
     <!-- Address -->
@@ -522,7 +522,11 @@
     if(wallet && wallet.address){
       addrEl.textContent = wallet.address;
       // Generate QR via free public API
-      qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(wallet.address);
+      if(wallet.qr_code_url){
+        qrImg.src = wallet.qr_code_url + '?t=' + Date.now();
+      } else {
+        qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(wallet.address);
+      }
       qrWrap.style.display = 'flex';
     } else {
       addrEl.innerHTML = '<em style="color:#6a7585">Not configured — contact support</em>';
