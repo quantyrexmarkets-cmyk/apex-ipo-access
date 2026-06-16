@@ -1,17 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>
-  // Global error visibility (for Eruda debugging)
-  window.addEventListener('error', function(e){
-    console.error('[GLOBAL ERROR]', e.message, '@', e.filename, ':', e.lineno);
-  });
-  window.addEventListener('unhandledrejection', function(e){
-    console.error('[UNHANDLED PROMISE]', e.reason);
-  });
-  console.log('[BOOT] dashboard.html script start, time:', new Date().toISOString());
-</script>
-
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -588,8 +577,8 @@
 
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js?v=1781643381"></script>
-<script src="js/notify.js?v=1781643381"></script>
+<script src="js/supabase.js?v=1781242485"></script>
+<script src="js/notify.js?v=1"></script>
 <script>
   // AUTH GUARD
   document.addEventListener('sb-ready', async () => {
@@ -599,7 +588,7 @@
       return;
     }
     // Check account status — banned or pending KYC
-    const { data: profile } = await sb.from('profiles').select('*').eq('id', data.user.id).single();
+    const { data: profile } = await sb.from('profiles').select('account_status,kyc_status,is_admin,banned,banned_reason').eq('id', data.user.id).single();
     if(profile){
       if(profile.banned){
         await sb.auth.signOut();
@@ -615,10 +604,7 @@
     }
   });
 </script>
-<script src="js/sidebar.js?v=1781643381" defer></script>
-<!-- Eruda mobile console (temporary diagnostic) -->
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
+<script src="js/sidebar.js?v=1781345031" defer></script>
 </head>
 <body>
 
@@ -1405,16 +1391,12 @@
   // Welcome bonus banner logic added below
   // ============================================
   document.addEventListener('sb-ready', async () => {
-    console.log('[DASH] sb-ready fired');
     const { data: { user } } = await sb.auth.getUser();
-    console.log('[DASH] user:', user && user.email, user && user.id);
-    if(!user) { console.warn('[DASH] No user — aborting'); return; }
+    if(!user) return; // auth guard handles redirect
 
-    // 1. Profile → greeting (fetch full row including cash_balance)
-    const profRes = await sb.from('profiles').select('*').eq('id', user.id).single();
-    console.log('[DASH] Profile query result:', profRes);
-    const profile = profRes.data;
-    if(profRes.error) console.error('[DASH] Profile error:', profRes.error);
+    // 1. Profile → greeting
+    const profile = await window.apex.getProfile();
+    console.log('Profile loaded:', profile);
     if(profile){
       const name = profile.first_name || (user.email || '').split('@')[0] || 'Investor';
       const nameEl = document.getElementById('userName');
@@ -1443,15 +1425,14 @@
       ll.textContent = `Last login: ${fmt} · Secure session active`;
     }
 
-    // 3. Allocations + cash → portfolio totals (matches portfolio.html logic)
+    // 3. Allocations → portfolio totals
     const { data: allocations } = await sb.from('allocations').select('*').eq('user_id', user.id);
     let totalReserved = 0;
     (allocations || []).forEach(a => { totalReserved += parseFloat(a.total_value || 0); });
 
     const fmtMoney = (n) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    // Fetch real cash balance from profile
-    const cash = parseFloat((profile && profile.cash_balance) || 0);
+    const cash = 0;          // No cash funded yet
     const total = cash + totalReserved;
 
     const pv = document.getElementById('portfolioValue');
@@ -1468,12 +1449,8 @@
       if(total === 0){
         pc.textContent = 'Fund your account to begin investing';
         pc.style.color = '#8a94a3';
-      } else if(totalReserved > 0){
-        pc.textContent = `Committed: ${fmtMoney(totalReserved)} · Cash: ${fmtMoney(cash)}`;
-        pc.style.color = '#22c55e';
       } else {
-        pc.textContent = `Cash available: ${fmtMoney(cash)}`;
-        pc.style.color = '#22c55e';
+        pc.textContent = `Total committed: ${fmtMoney(totalReserved)}`;
       }
     }
 
