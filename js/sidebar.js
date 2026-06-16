@@ -403,7 +403,7 @@
     try {
       var { data: { user } } = await sb.auth.getUser();
       if(!user) return;
-      var { data: profile } = await sb.from('profiles').select('kyc_status, account_tier, first_name, last_name').eq('id', user.id).single();
+      var { data: profile } = await sb.from('profiles').select('kyc_status, first_name, last_name').eq('id', user.id).single();
       if(!profile) return;
 
       var kycBadge = document.getElementById('axSbBadgeKyc');
