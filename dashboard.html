@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+window.addEventListener('error', function(e){
+  console.error('[GLOBAL ERROR]', e.message, '@', e.filename || '?', ':', e.lineno);
+});
+window.addEventListener('unhandledrejection', function(e){
+  console.error('[UNHANDLED PROMISE]', e.reason && e.reason.message || e.reason);
+});
+</script>
+
+<!-- Eruda mobile console (temporary - REMOVE AFTER FIX) -->
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script>
+
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -1391,8 +1404,11 @@
   // Welcome bonus banner logic added below
   // ============================================
   document.addEventListener('sb-ready', async () => {
-    const { data: { user } } = await sb.auth.getUser();
-    if(!user) return; // auth guard handles redirect
+    console.log('[DASH] sb-ready fired at', new Date().toISOString());
+    try {
+      const { data: { user }, error: userErr } = await sb.auth.getUser();
+      console.log('[DASH] user:', user && user.email, 'err:', userErr);
+      if(!user) { console.warn('[DASH] No user'); return; } // auth guard handles redirect
 
     // 1. Profile → greeting
     const profile = await window.apex.getProfile();
