@@ -1,19 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>
-window.addEventListener('error', function(e){
-  console.error('[GLOBAL ERROR]', e.message, '@', e.filename || '?', ':', e.lineno);
-});
-window.addEventListener('unhandledrejection', function(e){
-  console.error('[UNHANDLED PROMISE]', e.reason && e.reason.message || e.reason);
-});
-</script>
-
-<!-- Eruda mobile console (temporary - REMOVE AFTER FIX) -->
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
-
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -1404,17 +1391,14 @@ window.addEventListener('unhandledrejection', function(e){
   // Welcome bonus banner logic added below
   // ============================================
   document.addEventListener('sb-ready', async () => {
-    console.log('[DASH] sb-ready fired at', new Date().toISOString());
-    try {
-      const { data: { user }, error: userErr } = await sb.auth.getUser();
-      console.log('[DASH] user:', user && user.email, 'err:', userErr);
-      if(!user) { console.warn('[DASH] No user'); return; } // auth guard handles redirect
+    const { data: { user } } = await sb.auth.getUser();
+    if(!user) return; // auth guard handles redirect
 
     // 1. Profile → greeting
     const profile = await window.apex.getProfile();
     console.log('Profile loaded:', profile);
     if(profile){
-      const name = (profile && profile.first_name) || (user.email || '').split('@')[0] || 'Investor';
+      const name = profile.first_name || (user.email || '').split('@')[0] || 'Investor';
       const nameEl = document.getElementById('userName');
       if(nameEl) nameEl.textContent = name;
 
@@ -1441,18 +1425,15 @@ window.addEventListener('unhandledrejection', function(e){
       ll.textContent = `Last login: ${fmt} · Secure session active`;
     }
 
-    // 3. Portfolio totals — single RPC call (bulletproof, no column drift)
-    const fmtMoney = (n) => '$' + Number(n||0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    let cash = 0, totalReserved = 0, total = 0, buyingPower = 0;
-    try {
-      const { data: fin, error: finErr } = await sb.rpc('get_user_finances', { p_user_id: user.id });
-      if (finErr) { console.warn('[DASH] finance RPC error:', finErr); }
-      const row = (fin && fin[0]) || {};
-      cash = parseFloat(row.cash || 0);
-      totalReserved = parseFloat(row.committed || 0);
-      total = parseFloat(row.total || 0);
-      buyingPower = parseFloat(row.buying_power || 0);
-    } catch(e){ console.warn('[DASH] finance fetch failed:', e); }
+    // 3. Allocations → portfolio totals
+    const { data: allocations } = await sb.from('allocations').select('*').eq('user_id', user.id);
+    let totalReserved = 0;
+    (allocations || []).forEach(a => { totalReserved += parseFloat(a.total_value || 0); });
+
+    const fmtMoney = (n) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    const cash = 0;          // No cash funded yet
+    const total = cash + totalReserved;
 
     const pv = document.getElementById('portfolioValue');
     if(pv) pv.textContent = fmtMoney(total);
@@ -1461,7 +1442,7 @@ window.addEventListener('unhandledrejection', function(e){
     const cv = document.getElementById('cashVal');
     if(cv) cv.textContent = fmtMoney(cash);
     const bp = document.getElementById('buyingPower');
-    if(bp) bp.textContent = fmtMoney(buyingPower);
+    if(bp) bp.textContent = fmtMoney(cash);
 
     const pc = document.getElementById('portfolioChange');
     if(pc){
