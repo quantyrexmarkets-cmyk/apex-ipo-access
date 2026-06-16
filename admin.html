@@ -3025,11 +3025,7 @@
     document.getElementById('walletMemo').value = '';
     document.getElementById('walletLabel').value = '';
     await loadWallets();
-    initCompaniesUI();
-    await loadCompanies();
-    await loadNotifications();
-    await loadPlatformSettings();
-    await loadAdminLog();
+    
   };
 
   window._toggleWallet = async function(id, currentActive){
@@ -3038,11 +3034,7 @@
     if(error){ apexError(error.message); return; }
     apexSuccess(newActive?'Wallet activated':'Wallet deactivated');
     await loadWallets();
-    initCompaniesUI();
-    await loadCompanies();
-    await loadNotifications();
-    await loadPlatformSettings();
-    await loadAdminLog();
+    
   };
 
   window._deleteWallet = async function(id){
@@ -3052,11 +3044,7 @@
     if(error){ apexError(error.message); return; }
     apexSuccess('Wallet deleted');
     await loadWallets();
-    initCompaniesUI();
-    await loadCompanies();
-    await loadNotifications();
-    await loadPlatformSettings();
-    await loadAdminLog();
+    
   };
 
   window._copyWallet = function(addr){
