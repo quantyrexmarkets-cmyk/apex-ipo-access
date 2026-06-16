@@ -1425,14 +1425,15 @@
       ll.textContent = `Last login: ${fmt} · Secure session active`;
     }
 
-    // 3. Allocations → portfolio totals
+    // 3. Allocations + cash → portfolio totals (matches portfolio.html logic)
     const { data: allocations } = await sb.from('allocations').select('*').eq('user_id', user.id);
     let totalReserved = 0;
     (allocations || []).forEach(a => { totalReserved += parseFloat(a.total_value || 0); });
 
     const fmtMoney = (n) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    const cash = 0;          // No cash funded yet
+    // Fetch real cash balance from profile
+    const cash = parseFloat((profile && profile.cash_balance) || 0);
     const total = cash + totalReserved;
 
     const pv = document.getElementById('portfolioValue');
@@ -1449,8 +1450,12 @@
       if(total === 0){
         pc.textContent = 'Fund your account to begin investing';
         pc.style.color = '#8a94a3';
+      } else if(totalReserved > 0){
+        pc.textContent = `Committed: ${fmtMoney(totalReserved)} · Cash: ${fmtMoney(cash)}`;
+        pc.style.color = '#22c55e';
       } else {
-        pc.textContent = `Total committed: ${fmtMoney(totalReserved)}`;
+        pc.textContent = `Cash available: ${fmtMoney(cash)}`;
+        pc.style.color = '#22c55e';
       }
     }
 
