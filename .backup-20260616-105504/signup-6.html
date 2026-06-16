@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Identity Verification | APEX IPO ACCESS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&family=Inter:wght@300;400;500;600&family=Orbitron:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+
+  .signup-header{
+    position:sticky;top:0;z-index:100;
+    background:rgba(0,0,0,0.92);backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding:18px 24px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .header-icons{display:flex;align-items:center;gap:14px}
+  .header-icons .icon-link{
+    width:38px;height:38px;border-radius:50%;
+    border:1px solid rgba(255,255,255,0.15);
+    display:flex;align-items:center;justify-content:center;
+    color:#4a9eff;
+  }
+
+  .progress-bar{
+    position:sticky;top:72px;z-index:99;
+    height:4px;background:rgba(255,255,255,0.08);width:100%;
+  }
+  .progress-fill{height:100%;background:#4a9eff;width:94%}
+
+  .step-indicator{
+    text-align:center;padding:32px 24px 8px;
+    font-size:14px;color:#8a94a3;letter-spacing:0.3px;
+  }
+
+  .signup-wrap{max-width:680px;margin:0 auto;padding:0 24px 140px}
+  .signup-wrap h1{
+    font-family:'Plus Jakarta Sans',sans-serif;font-weight:400;
+    font-size:clamp(32px,6vw,42px);line-height:1.15;
+    letter-spacing:-0.8px;margin-bottom:14px;text-align:center;color:#fff;
+  }
+  .lede{
+    text-align:center;color:#a8b2c1;font-size:15px;line-height:1.55;
+    max-width:520px;margin:0 auto 36px;
+  }
+
+  .back-link{
+    display:inline-flex;align-items:center;gap:8px;
+    margin:24px 0 8px;
+    font-size:14px;color:#4a9eff;font-weight:500;
+  }
+
+  .form-grid{display:flex;flex-direction:column;gap:22px}
+
+  .form-group{display:flex;flex-direction:column;position:relative}
+  .form-group label{
+    font-size:13px;color:#a8b2c1;
+    margin-bottom:8px;font-weight:500;letter-spacing:0.2px;
+    display:flex;align-items:center;gap:6px;
+  }
+  .info-icon{
+    width:14px;height:14px;border-radius:50%;
+    border:1px solid #5a6473;color:#5a6473;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:10px;font-weight:600;cursor:help;
+  }
+
+  .input-wrap{position:relative}
+  .form-group input{
+    width:100%;
+    background:transparent;color:#fff;
+    border:1px solid rgba(255,255,255,0.18);
+    padding:14px 12px;font-size:14px;
+    font-family:inherit;letter-spacing:0.5px;
+    transition:border .15s;border-radius:0;
+  }
+  .form-group input:focus{outline:none;border-color:#4a9eff}
+  .form-group input::placeholder{color:#5a6473}
+  .form-group input.invalid{border-color:#ff4a4a}
+  .form-group input.valid{border-color:#3ed598}
+
+  .eye-toggle{
+    position:absolute;right:8px;top:50%;transform:translateY(-50%);
+    width:38px;height:38px;border:none;background:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    color:#8b95a8;border-radius:8px;transition:all .15s;
+  }
+  .eye-toggle:hover{color:#4a9eff;background:rgba(74,158,255,0.08)}
+  .eye-toggle svg{display:block}
+  .lock-icon{
+    position:absolute;right:12px;top:50%;
+    transform:translateY(-50%);
+    color:#4a9eff;pointer-events:none;
+  }
+
+  .field-error{
+    font-size:12px;color:#ff6a6a;margin-top:6px;
+    min-height:14px;letter-spacing:.2px;
+  }
+
+  .continue-bar{
+    position:fixed;bottom:0;left:0;right:0;
+    background:#000;padding:20px 24px 28px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    z-index:50;
+  }
+  .continue-btn{
+    display:block;width:100%;max-width:632px;margin:0 auto;
+    background:#4a9eff;color:#000;
+    padding:18px;text-align:center;
+    font-size:16px;font-weight:600;
+    border:none;cursor:pointer;
+  }
+  .continue-btn:hover{background:#6db1ff}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+</head>
+<body>
+
+<header class="signup-header">
+  <a href="index.html" class="logo">
+    <img src="assets/spacex-logo.png" class="logo-x" alt="X" />
+    <div class="logo-text-stack">
+      <span class="logo-line1">APEX</span>
+      <span class="logo-line2">IPO ACCESS</span>
+      <span class="logo-tagline">INVESTMENT INTELLIGENCE</span>
+    </div>
+  </a>
+  <div class="header-icons">
+    <a href="#" class="icon-link" title="Secure session" aria-label="Secure session">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </a>
+    <a href="contact.html" class="icon-link" title="Contact support" aria-label="Contact support">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+    </a>
+  </div>
+</header>
+
+<div class="progress-bar"><div class="progress-fill"></div></div>
+
+<div class="step-indicator">Brokerage · Personal information</div>
+
+<div class="signup-wrap">
+  <a href="signup-5.html" class="back-link">← Back</a>
+  <h1>Identity verification</h1>
+  <p class="lede">We're required by law to collect this information, and we'll use it to verify your identity.</p>
+
+  <form id="identityForm" novalidate>
+    <div class="form-grid">
+
+      <div class="form-group">
+        <label for="dob">Date of birth (MM/DD/YYYY)</label>
+        <div class="input-wrap">
+          <input type="text" id="dob" name="dob" inputmode="numeric" maxlength="10" placeholder="MM/DD/YYYY" autocomplete="bday">
+        </div>
+      </div>
+
+      <div id="ssnSection">
+        <div class="form-group">
+          <label for="ssn">
+            Social Security number
+            <span class="info-icon" title="Required by USA PATRIOT Act for identity verification">i</span>
+          </label>
+          <div class="input-wrap">
+            <input type="password" id="ssn" name="ssn" inputmode="numeric" maxlength="11" placeholder="•••-••-••••" autocomplete="off">
+            <button type="button" class="eye-toggle" data-target="ssn" aria-label="Show SSN">
+              <svg class="eye-show" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg class="eye-hide" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="ssn2">Confirm Social Security number</label>
+          <div class="input-wrap">
+            <input type="password" id="ssn2" name="ssn2" inputmode="numeric" maxlength="11" placeholder="•••-••-••••" autocomplete="off">
+            <button type="button" class="eye-toggle" data-target="ssn2" aria-label="Show SSN">
+              <svg class="eye-show" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg class="eye-hide" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Non-US: passport/ID alternative -->
+      <div id="passportSection" style="display:none">
+        <div class="form-group">
+          <label for="passport">
+            Passport Number or National ID
+            <span class="info-icon" title="Required for international identity verification">i</span>
+          </label>
+          <div class="input-wrap">
+            <input type="text" id="passport" name="passport" maxlength="30" placeholder="Enter your passport or national ID number" autocomplete="off">
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </form>
+</div>
+
+<div class="continue-bar">
+  <button class="continue-btn" form="identityForm" type="submit">Continue</button>
+</div>
+
+<script>
+(function(){
+  const form = document.getElementById('identityForm');
+
+  // ===== Hide SSN section if non-US resident =====
+  try {
+    var saved = JSON.parse(localStorage.getItem('apex_signup') || '{}');
+    var citizenship = (saved.citizenship || (saved.address && saved.address.citizenship) || '').toString().trim();
+    if(citizenship && !['US_CITIZEN','US_RESIDENT','US_VISA_HOLDER','US_PERMANENT_RESIDENT','us_citizen','us_resident','us_visa_holder','us_permanent_resident'].includes(citizenship)){
+      var ssnSec = document.getElementById('ssnSection');
+      var ppSec = document.getElementById('passportSection');
+      if(ssnSec) ssnSec.style.display = 'none';
+      if(ppSec) ppSec.style.display = 'block';
+    }
+  } catch(e){ console.warn(e); }
+
+  // ===== Eye toggle for SSN =====
+  document.querySelectorAll('.eye-toggle').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var targetId = btn.getAttribute('data-target');
+      var input = document.getElementById(targetId);
+      if(!input) return;
+      var showIcon = btn.querySelector('.eye-show');
+      var hideIcon = btn.querySelector('.eye-hide');
+      if(input.type === 'password'){
+        input.type = 'text';
+        showIcon.style.display = 'none';
+        hideIcon.style.display = 'block';
+      } else {
+        input.type = 'password';
+        showIcon.style.display = 'block';
+        hideIcon.style.display = 'none';
+      }
+    });
+  });
+
+  const dob  = document.getElementById('dob');
+  const ssn  = document.getElementById('ssn');
+  const ssn2 = document.getElementById('ssn2');
+
+  function errEl(input){
+    let e = input.parentElement.parentElement.querySelector('.field-error');
+    if(!e){
+      e = document.createElement('div');
+      e.className = 'field-error';
+      input.parentElement.parentElement.appendChild(e);
+    }
+    return e;
+  }
+
+  // ---- DOB auto-format MM/DD/YYYY ----
+  dob.addEventListener('input', () => {
+    let d = dob.value.replace(/\D/g,'').slice(0,8);
+    let out = d;
+    if(d.length > 4) out = d.slice(0,2) + '/' + d.slice(2,4) + '/' + d.slice(4);
+    else if(d.length > 2) out = d.slice(0,2) + '/' + d.slice(2);
+    dob.value = out;
+  });
+
+  function validDOB(v){
+    const m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if(!m) return {ok:false, msg:'Enter date as MM/DD/YYYY'};
+    const mm = +m[1], dd = +m[2], yy = +m[3];
+    if(mm < 1 || mm > 12) return {ok:false, msg:'Invalid month'};
+    if(dd < 1 || dd > 31) return {ok:false, msg:'Invalid day'};
+    const date = new Date(yy, mm-1, dd);
+    if(date.getFullYear() !== yy || date.getMonth() !== mm-1 || date.getDate() !== dd){
+      return {ok:false, msg:'Invalid date'};
+    }
+    // Age check
+    const today = new Date();
+    let age = today.getFullYear() - yy;
+    const monthDiff = today.getMonth() - (mm-1);
+    if(monthDiff < 0 || (monthDiff === 0 && today.getDate() < dd)) age--;
+    if(age < 18) return {ok:false, msg:'You must be at least 18 years old'};
+    if(age > 120) return {ok:false, msg:'Enter a valid birth year'};
+    return {ok:true};
+  }
+
+  // ---- SSN auto-format XXX-XX-XXXX ----
+  function formatSSN(el){
+    el.addEventListener('input', () => {
+      let d = el.value.replace(/\D/g,'').slice(0,9);
+      let out = d;
+      if(d.length > 5) out = d.slice(0,3) + '-' + d.slice(3,5) + '-' + d.slice(5);
+      else if(d.length > 3) out = d.slice(0,3) + '-' + d.slice(3);
+      el.value = out;
+    });
+  }
+  formatSSN(ssn);
+  formatSSN(ssn2);
+
+  function validSSN(v){
+    // Accept SSN or ITIN format: XXX-XX-XXXX
+    if(!/^\d{3}-\d{2}-\d{4}$/.test(v)) return {ok:false, msg:'Enter as XXX-XX-XXXX'};
+    const digits = v.replace(/-/g,'');
+    if(/^0{9}$/.test(digits) || /^1{9}$/.test(digits)) return {ok:false, msg:'Invalid number'};
+    if(digits.startsWith('000') || digits.slice(3,5) === '00' || digits.slice(5) === '0000'){
+      return {ok:false, msg:'Invalid SSN/ITIN'};
+    }
+    return {ok:true};
+  }
+
+  function mark(el, ok, msg){
+    el.classList.toggle('valid', ok);
+    el.classList.toggle('invalid', !ok);
+    errEl(el).textContent = ok ? '' : msg;
+  }
+
+  function checkDOB(showReq){
+    const v = dob.value.trim();
+    if(!v){
+      if(showReq){ mark(dob, false, 'Date of birth is required'); }
+      else { dob.classList.remove('valid','invalid'); errEl(dob).textContent=''; }
+      return false;
+    }
+    const r = validDOB(v);
+    mark(dob, r.ok, r.msg || '');
+    return r.ok;
+  }
+
+  function checkSSN(showReq){
+    const v = ssn.value.trim();
+    if(!v){
+      if(showReq){ mark(ssn, false, 'SSN or ITIN is required'); }
+      else { ssn.classList.remove('valid','invalid'); errEl(ssn).textContent=''; }
+      return false;
+    }
+    const r = validSSN(v);
+    mark(ssn, r.ok, r.msg || '');
+    return r.ok;
+  }
+
+  function checkSSN2(showReq){
+    const v = ssn2.value.trim();
+    if(!v){
+      if(showReq){ mark(ssn2, false, 'Please confirm your SSN or ITIN'); }
+      else { ssn2.classList.remove('valid','invalid'); errEl(ssn2).textContent=''; }
+      return false;
+    }
+    if(v !== ssn.value.trim()){
+      mark(ssn2, false, 'Numbers do not match');
+      return false;
+    }
+    const r = validSSN(v);
+    mark(ssn2, r.ok, r.msg || '');
+    return r.ok;
+  }
+
+  dob.addEventListener('blur',  () => checkDOB(true));
+  dob.addEventListener('input', () => checkDOB(false));
+  ssn.addEventListener('blur',  () => checkSSN(true));
+  ssn.addEventListener('input', () => checkSSN(false));
+  ssn2.addEventListener('blur',  () => checkSSN2(true));
+  ssn2.addEventListener('input', () => checkSSN2(false));
+
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const signupData = JSON.parse(localStorage.getItem("apex_signup") || "{}");
+      const citizenship = (signupData.citizenship || (signupData.address && signupData.address.citizenship) || "").toString().trim();
+      const isUS = ["US_CITIZEN","US_RESIDENT","US_VISA_HOLDER","US_PERMANENT_RESIDENT","us_citizen","us_resident","us_visa_holder","us_permanent_resident"].includes(citizenship);
+
+      const isDobValid = checkDOB(true);
+      let isIdValid = false;
+
+      if (isUS) {
+        const s1 = checkSSN(true);
+        const s2 = checkSSN2(true);
+        isIdValid = s1 && s2;
+      } else {
+        const passportVal = (document.getElementById("passport")?.value || "").trim();
+        isIdValid = passportVal.length >= 6;
+        if (!isIdValid) {
+          document.getElementById("passport")?.classList.add("invalid");
+        } else {
+          document.getElementById("passport")?.classList.remove("invalid");
+        }
+      }
+
+      if (isDobValid && isIdValid) {
+        const dobRaw = document.getElementById("dob")?.value || "";
+        const m = dobRaw.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+        const dobISO = m ? `${m[3]}-${m[1]}-${m[2]}` : null;
+
+        const idValue = isUS
+          ? document.getElementById("ssn")?.value
+          : document.getElementById("passport")?.value;
+
+        window.apex.saveStep("identity", {
+          dob: dobISO,
+          ssn: idValue
+        });
+        window.location.href = "signup-7.html";
+      } else {
+        const bad = form.querySelector(".invalid");
+        if (bad) bad.focus();
+      }
+    });
+
+  })();
+  </script>
+
+</body>
+</html>

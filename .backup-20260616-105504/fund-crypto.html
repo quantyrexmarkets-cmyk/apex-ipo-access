@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crypto Deposit | APEX IPO ACCESS</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js?v=100"></script>
+<script src="js/notify.js?v=1"></script>
+<script src="js/sidebar.js?v=1781345031" defer></script>
+<script>
+  document.addEventListener('sb-ready', async () => {
+    const { data } = await sb.auth.getUser();
+    if(!data.user) window.location.href = 'login.html';
+  });
+</script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+  a{color:inherit;text-decoration:none}
+
+  .dash-header{
+    position:sticky;top:0;z-index:100;
+    background:rgba(0,0,0,0.92);backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding:16px 20px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .menu-btn{
+    width:38px;height:38px;display:flex;flex-direction:column;
+    justify-content:center;align-items:center;gap:5px;
+    background:none;border:none;cursor:pointer;
+  }
+  .menu-btn span{width:22px;height:2px;background:#4a9eff;display:block;border-radius:2px}
+  .header-icons{display:flex;gap:10px;align-items:center}
+  .icon-btn{
+    width:38px;height:38px;border-radius:50%;
+    border:1px solid rgba(255,255,255,0.15);
+    display:flex;align-items:center;justify-content:center;
+    color:#4a9eff;background:none;cursor:pointer;
+  }
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo-x{height:32px}
+  .logo-text-stack{display:flex;flex-direction:column;line-height:1}
+  .logo-line1{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#fff;letter-spacing:2px}
+  .logo-line2{font-size:7px;color:#4a9eff;letter-spacing:3px;font-weight:600}
+  .logo-tagline{font-size:5.5px;color:#6a7585;letter-spacing:2.5px;margin-top:1px}
+
+  .wrap{max-width:600px;margin:0 auto;padding:20px 20px 120px}
+
+  .back-btn{
+    display:inline-flex;align-items:center;gap:6px;
+    color:#4a9eff;font-size:13px;font-weight:500;
+    margin-bottom:20px;cursor:pointer;
+  }
+  .back-btn svg{width:16px;height:16px}
+
+  .page-h{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:700;font-size:24px;color:#fff;
+    letter-spacing:-0.5px;margin-bottom:4px;
+  }
+  .page-sub{font-size:13px;color:#8a94a3;margin-bottom:24px}
+
+  .amount-banner{
+    background:linear-gradient(135deg,rgba(74,158,255,0.12),rgba(74,158,255,0.04));
+    border:1px solid rgba(74,158,255,0.2);
+    border-radius:14px;padding:18px;
+    text-align:center;margin-bottom:24px;
+  }
+  .amount-banner .val{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:44px;font-weight:200;color:#fff;
+    letter-spacing:-1.5px;line-height:1.1;
+    font-feature-settings:"tnum";
+  }
+  .amount-banner .lbl{text-transform:uppercase;letter-spacing:1.5px;font-size:10px;font-weight:600;color:#a8b2c1;margin-bottom:8px;
+  }
+
+  /* Coin selector tabs */
+  .coin-tabs{
+    display:flex;gap:8px;margin-bottom:20px;
+    overflow-x:auto;-webkit-overflow-scrolling:touch;
+    padding-bottom:4px;
+  }
+  .coin-tab{
+    display:flex;align-items:center;gap:8px;
+    padding:10px 16px;border-radius:10px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    cursor:pointer;white-space:nowrap;
+    font-size:13px;color:#8a94a3;font-weight:500;
+    transition:all .15s;flex-shrink:0;
+  }
+  .coin-tab:hover{border-color:rgba(255,255,255,0.15)}
+  .coin-tab.active{
+    background:rgba(74,158,255,0.1);
+    border-color:rgba(74,158,255,0.4);
+    color:#fff;
+  }
+  .coin-tab .coin-icon{width:22px;height:22px;border-radius:50%}
+
+  .info-card{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px;padding:20px;margin-bottom:16px;
+  }
+  .info-card .title{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:15px;color:#fff;
+    margin-bottom:14px;display:flex;align-items:center;gap:8px;
+  }
+  .info-card .title svg{width:18px;height:18px;color:#4a9eff}
+
+  .wallet-block{display:none}
+  .wallet-block.active{display:block}
+
+  .wallet-label{font-size:12px;color:#8a94a3;margin-bottom:8px}
+  .wallet-addr{
+    background:rgba(0,0,0,0.4);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:10px;padding:14px;
+    font-family:'Manrope',sans-serif;
+    font-size:12px;color:#fff;
+    word-break:break-all;line-height:1.6;
+    display:flex;align-items:flex-start;justify-content:space-between;gap:10px;
+    margin-bottom:12px;
+  }
+  .wallet-addr .addr-text{flex:1;user-select:all}
+  .copy-btn{
+    width:34px;height:34px;border-radius:8px;
+    background:rgba(74,158,255,0.15);color:#4a9eff;
+    border:none;cursor:pointer;display:flex;
+    align-items:center;justify-content:center;
+    transition:all .15s;flex-shrink:0;
+  }
+  .copy-btn:hover{background:rgba(74,158,255,0.3)}
+  .copy-btn svg{width:15px;height:15px}
+
+  .network-badge{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:5px 10px;border-radius:6px;
+    background:rgba(74,158,255,0.1);
+    font-size:11px;color:#4a9eff;font-weight:600;
+    margin-bottom:8px;
+  }
+
+  .warn-box{
+    background:rgba(255,184,0,0.08);
+    border:1px solid rgba(255,184,0,0.2);
+    border-radius:12px;padding:14px 16px;
+    margin-bottom:24px;
+    display:flex;gap:10px;align-items:flex-start;
+  }
+  .warn-box svg{width:18px;height:18px;color:#ffb800;flex-shrink:0;margin-top:1px}
+  .warn-box .txt{font-size:12px;color:#ccc;line-height:1.5}
+
+  .upload-area{
+    border:2px dashed rgba(255,255,255,0.12);
+    border-radius:14px;padding:32px 20px;
+    text-align:center;cursor:pointer;
+    transition:all .15s;margin-bottom:16px;
+  }
+  .upload-area:hover{border-color:rgba(74,158,255,0.4);background:rgba(162,89,255,0.03)}
+  .upload-area.has-file{border-color:rgba(62,213,152,0.4);background:rgba(62,213,152,0.03)}
+  .upload-area .ic{
+    width:52px;height:52px;border-radius:50%;
+    background:rgba(74,158,255,0.1);color:#4a9eff;
+    display:inline-flex;align-items:center;justify-content:center;
+    margin-bottom:12px;
+  }
+  .upload-area .ic svg{width:24px;height:24px}
+  .upload-area .title{font-size:14px;color:#fff;font-weight:500;margin-bottom:4px}
+  .upload-area .desc{font-size:11px;color:#8a94a3}
+  .upload-area .file-name{
+    font-size:13px;color:#3ed598;font-weight:500;
+    margin-top:8px;display:none;
+  }
+
+  .submit-btn{
+    width:100%;padding:16px;border:none;border-radius:12px;
+    background:linear-gradient(135deg,#4a9eff,#7c3aed);
+    color:#fff;font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:16px;cursor:pointer;
+    transition:all .15s;margin-top:8px;
+  }
+  .submit-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(74,158,255,0.3)}
+  .submit-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
+
+  .fee-note{
+    text-align:center;font-size:11px;color:#6a7585;margin-top:12px;
+  }
+
+  /* Fixed upload-area override */
+  .upload-area{
+    display:block;width:100%;box-sizing:border-box;
+    border:2px dashed rgba(255,255,255,0.15) !important;
+    border-radius:14px;padding:28px 20px !important;
+    text-align:center;cursor:pointer;
+    transition:all .15s;margin-bottom:16px;
+    background:rgba(74,158,255,0.02);
+  }
+  .upload-area:hover{border-color:rgba(74,158,255,0.4) !important;background:rgba(74,158,255,0.05)}
+  .upload-area.has-file{border-color:rgba(62,213,152,0.5) !important;background:rgba(62,213,152,0.05)}
+  .upload-area .ic{
+    width:52px;height:52px;border-radius:50%;
+    background:rgba(74,158,255,0.1);color:#4a9eff;
+    display:inline-flex !important;align-items:center;justify-content:center;
+    margin:0 auto 12px !important;
+  }
+  .upload-area .ic svg{width:24px;height:24px}
+  .upload-area .title{
+    font-size:14px !important;color:#fff;font-weight:600 !important;
+    margin-bottom:4px !important;
+    font-family:'Plus Jakarta Sans',sans-serif;display:block !important;
+  }
+  .upload-area .desc{font-size:11px;color:#8a94a3;line-height:1.5;display:block}
+  .upload-area .file-name{
+    font-size:13px;color:#3ed598;font-weight:500;
+    margin-top:10px;display:none;
+  }
+  .upload-area.has-file .file-name{display:block}
+</style>
+<style>
+  /* QR Code & enhanced wallet display */
+  .qr-wrap{
+    display:flex;justify-content:center;
+    margin-bottom:16px;padding:16px;
+    background:#fff;border-radius:12px;
+  }
+  .qr-wrap img{width:180px;height:180px;display:block}
+  .wallet-skel{
+    background:linear-gradient(90deg,rgba(255,255,255,0.04),rgba(255,255,255,0.08),rgba(255,255,255,0.04));
+    background-size:200% 100%;animation:sk 1.4s infinite;
+    height:14px;border-radius:6px;
+  }
+  @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:#3ed598;color:#000;
+    padding:10px 18px;border-radius:24px;
+    font-size:13px;font-weight:600;
+    box-shadow:0 8px 24px rgba(0,0,0,0.4);
+    opacity:0;pointer-events:none;
+    transition:opacity .2s;z-index:200;
+  }
+  .toast.show{opacity:1}
+  .toast.err{background:#ff6a6a;color:#fff}
+
+  /* Fixed upload-area override */
+  .upload-area{
+    display:block;width:100%;box-sizing:border-box;
+    border:2px dashed rgba(255,255,255,0.15) !important;
+    border-radius:14px;padding:28px 20px !important;
+    text-align:center;cursor:pointer;
+    transition:all .15s;margin-bottom:16px;
+    background:rgba(74,158,255,0.02);
+  }
+  .upload-area:hover{border-color:rgba(74,158,255,0.4) !important;background:rgba(74,158,255,0.05)}
+  .upload-area.has-file{border-color:rgba(62,213,152,0.5) !important;background:rgba(62,213,152,0.05)}
+  .upload-area .ic{
+    width:52px;height:52px;border-radius:50%;
+    background:rgba(74,158,255,0.1);color:#4a9eff;
+    display:inline-flex !important;align-items:center;justify-content:center;
+    margin:0 auto 12px !important;
+  }
+  .upload-area .ic svg{width:24px;height:24px}
+  .upload-area .title{
+    font-size:14px !important;color:#fff;font-weight:600 !important;
+    margin-bottom:4px !important;
+    font-family:'Plus Jakarta Sans',sans-serif;display:block !important;
+  }
+  .upload-area .desc{font-size:11px;color:#8a94a3;line-height:1.5;display:block}
+  .upload-area .file-name{
+    font-size:13px;color:#3ed598;font-weight:500;
+    margin-top:10px;display:none;
+  }
+  .upload-area.has-file .file-name{display:block}
+</style>
+</head>
+<body>
+
+<header class="dash-header">
+  <button class="menu-btn" aria-label="Menu" onclick="toggleSidebar && toggleSidebar()">
+    <span></span><span></span><span></span>
+  </button>
+  <a href="dashboard.html" class="logo">
+    <img src="assets/spacex-logo.png" class="logo-x" alt="X" />
+    <div class="logo-text-stack">
+      <span class="logo-line1">APEX</span>
+      <span class="logo-line2">IPO ACCESS</span>
+      <span class="logo-tagline">CRYPTO DEPOSIT</span>
+    </div>
+  </a>
+  <div class="header-icons">
+    <button class="icon-btn" aria-label="Notifications">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <a href="fund-account.html" class="back-btn">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    Back
+  </a>
+
+  <div class="page-h">Crypto Deposit</div>
+  <div class="page-sub">Send crypto to the wallet address below to fund your account.</div>
+
+  <div class="amount-banner">
+    <div class="lbl">DEPOSIT AMOUNT (USD)</div>
+    <div class="val" id="depositAmt">$0.00</div>
+  </div>
+
+  <!-- Warning -->
+  <div class="warn-box">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/>
+      <line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+    <div class="txt"><strong>Send only on the correct network.</strong> Wrong-network deposits cannot be recovered.</div>
+  </div>
+
+  <!-- Coin Tabs -->
+  <div class="coin-tabs">
+    <div class="coin-tab active" data-coin="BTC">
+      <span style="font-size:18px">₿</span> Bitcoin
+    </div>
+    <div class="coin-tab" data-coin="ETH">
+      <span style="font-size:18px">⟠</span> Ethereum
+    </div>
+    <div class="coin-tab" data-coin="USDT">
+      <span style="font-size:18px">₮</span> USDT
+    </div>
+    <div class="coin-tab" data-coin="USDC">
+      <span style="font-size:18px;color:#2775ca">◉</span> USDC
+    </div>
+    <div class="coin-tab" data-coin="DOGE">
+      <span style="font-size:18px">Ð</span> Dogecoin
+    </div>
+  </div>
+
+  <!-- Wallet Address Card (dynamic) -->
+  <div class="info-card">
+    <div class="title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <rect x="2" y="5" width="20" height="14" rx="2"/>
+        <path d="M16 12h.01"/>
+      </svg>
+      Wallet Address
+    </div>
+
+    <div class="network-badge" id="networkBadge">Loading network…</div>
+    <div class="wallet-label" id="walletLabel">Deposit Address</div>
+
+    <!-- QR Code -->
+    <div class="qr-wrap" id="qrWrap" style="display:none">
+      <img id="qrImg" alt="Wallet QR code" style="cursor:pointer" onclick="window.open(this.src)">
+    </div>
+
+    <!-- Address -->
+    <div class="wallet-addr">
+      <span class="addr-text" id="walletAddr">
+        <span class="wallet-skel" style="display:inline-block;width:100%;height:14px"></span>
+      </span>
+      <button class="copy-btn" id="copyAddrBtn" aria-label="Copy address">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <rect x="9" y="9" width="13" height="13" rx="2"/>
+          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+        </svg>
+      </button>
+    </div>
+
+    <div style="font-size:11px;color:#6a7585;line-height:1.6" id="walletNote">
+      Send any amount worth approximately the USD value above.
+    </div>
+  </div>
+
+  <!-- Reference code -->
+  <div class="info-card">
+    <div class="title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M9 11l3 3L22 4"/>
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+      Reference Code
+    </div>
+    <div style="font-size:13px;color:#a8b2c1;line-height:1.5;margin-bottom:12px">
+      Include this code in your transaction memo (if your wallet supports it) for faster matching.
+    </div>
+    <div class="wallet-addr" style="margin-bottom:0">
+      <span class="addr-text" id="refCode" style="color:#4a9eff;font-weight:600">—</span>
+      <button class="copy-btn" id="copyRefBtn" aria-label="Copy reference">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <rect x="9" y="9" width="13" height="13" rx="2"/>
+          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Upload screenshot -->
+  <label class="upload-area" id="uploadArea" for="receiptFile">
+    <div class="ic">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+      </svg>
+    </div>
+    <div class="title">Upload transaction screenshot</div>
+    <div class="desc">Helps us match your deposit faster · PNG, JPG, or PDF (max 10 MB)</div>
+    <div class="file-name" id="fileName"></div>
+    <input type="file" id="receiptFile" accept="image/*,application/pdf" style="display:none">
+  </label>
+
+  <button class="submit-btn" id="submitBtn">I've sent the deposit</button>
+  <div class="fee-note">No deposit fee · Credited after network confirmation</div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">Copied!</div>
+
+<!-- Sidebar mounts -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar && toggleSidebar()"></div>
+<div class="sidebar" id="sidebar"></div>
+
+<script>
+(function(){
+  // ─────────────────────────────────────────────
+  // Network config per coin (for warnings + QR)
+  // ─────────────────────────────────────────────
+  var COIN_CONFIG = {
+    BTC:  { label: 'BTC Deposit Address',   network: 'Bitcoin Network',           note: 'Minimum: 0.0001 BTC · Confirmations: 2' },
+    ETH:  { label: 'ETH Deposit Address',   network: 'Ethereum Network (ERC-20)', note: 'Minimum: 0.005 ETH · Confirmations: 12' },
+    USDT: { label: 'USDT Deposit Address',  network: 'Tether (auto-detected)',    note: 'Send via TRC-20 or ERC-20 · Confirmations: 1-12' },
+    USDC: { label: 'USDC Deposit Address',  network: 'USD Coin (ERC-20)',         note: 'Minimum: 10 USDC · Confirmations: 12' },
+    DOGE: { label: 'DOGE Deposit Address',  network: 'Dogecoin Network',          note: 'Minimum: 50 DOGE · Confirmations: 20' }
+  };
+
+  // ─────────────────────────────────────────────
+  // State
+  // ─────────────────────────────────────────────
+  var params = new URLSearchParams(window.location.search);
+  var amount = parseFloat(params.get('amount') || sessionStorage.getItem('fund_amount') || '0');
+  var state = {
+    wallets: {},      // { BTC: {address, network, ...}, ... }
+    selectedCoin: 'BTC',
+    refCode: null,
+    file: null
+  };
+
+  // ─────────────────────────────────────────────
+  // Helpers
+  // ─────────────────────────────────────────────
+  var toast = document.getElementById('toast');
+  function showToast(msg, isErr){
+    toast.textContent = msg;
+    toast.className = 'toast show' + (isErr ? ' err' : '');
+    setTimeout(function(){ toast.className = 'toast' + (isErr ? ' err' : ''); }, 1800);
+  }
+
+  function copyText(text){
+    if(!text || text === '—'){ apexWarn('Nothing to copy'); return; }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ apexSuccess('Copied'); })
+        .catch(function(){ fallbackCopy(text); });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); apexSuccess('Copied'); }
+    catch(e){ apexError('Could not copy to clipboard'); }
+    document.body.removeChild(ta);
+  }
+
+  // ─────────────────────────────────────────────
+  // Display amount
+  // ─────────────────────────────────────────────
+  document.getElementById('depositAmt').textContent =
+    '$' + amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // ─────────────────────────────────────────────
+  // Reference code (persist for this deposit)
+  // ─────────────────────────────────────────────
+  state.refCode = sessionStorage.getItem('fund_ref_code');
+  if(!state.refCode){
+    state.refCode = 'APX-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+    sessionStorage.setItem('fund_ref_code', state.refCode);
+  }
+  document.getElementById('refCode').textContent = state.refCode;
+
+  // ─────────────────────────────────────────────
+  // Render current coin
+  // ─────────────────────────────────────────────
+  function renderCoin(coin){
+    state.selectedCoin = coin;
+    var cfg = COIN_CONFIG[coin] || { label: coin + ' Address', network: coin, note: '' };
+    var wallet = state.wallets[coin];
+
+    document.getElementById('networkBadge').textContent = (wallet && wallet.network) || cfg.network;
+    document.getElementById('walletLabel').textContent = cfg.label;
+    document.getElementById('walletNote').textContent = cfg.note;
+
+    var addrEl = document.getElementById('walletAddr');
+    var qrWrap = document.getElementById('qrWrap');
+    var qrImg = document.getElementById('qrImg');
+
+    if(wallet && wallet.address){
+      addrEl.textContent = wallet.address;
+      // Generate QR via free public API
+      if(wallet.qr_code_url){
+        qrImg.src = wallet.qr_code_url + '?t=' + Date.now();
+      } else {
+        qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(wallet.address);
+      }
+      qrWrap.style.display = 'flex';
+    } else {
+      addrEl.innerHTML = '<em style="color:#6a7585">Not configured — contact support</em>';
+      qrWrap.style.display = 'none';
+    }
+
+    // Toggle active tab
+    document.querySelectorAll('.coin-tab').forEach(function(t){
+      t.classList.toggle('active', t.getAttribute('data-coin') === coin);
+    });
+  }
+
+  // ─────────────────────────────────────────────
+  // Tab click handlers
+  // ─────────────────────────────────────────────
+  document.querySelectorAll('.coin-tab').forEach(function(t){
+    t.addEventListener('click', function(){
+      renderCoin(t.getAttribute('data-coin'));
+    });
+  });
+
+  // ─────────────────────────────────────────────
+  // Copy buttons
+  // ─────────────────────────────────────────────
+  document.getElementById('copyAddrBtn').addEventListener('click', function(){
+    var addr = document.getElementById('walletAddr').textContent.trim();
+    copyText(addr);
+  });
+  document.getElementById('copyRefBtn').addEventListener('click', function(){
+    copyText(state.refCode);
+  });
+
+  // ─────────────────────────────────────────────
+  // File upload
+  // ─────────────────────────────────────────────
+  var fileInput = document.getElementById('receiptFile');
+  var uploadArea = document.getElementById('uploadArea');
+  var fileName = document.getElementById('fileName');
+
+  fileInput.addEventListener('change', function(){
+    var file = fileInput.files && fileInput.files[0];
+    if(!file) return;
+    if(file.size > 10 * 1024 * 1024){
+      apexError('File too large. Maximum is 10 MB.');
+      fileInput.value = '';
+      return;
+    }
+    state.file = file;
+    uploadArea.classList.add('has-file');
+    fileName.textContent = '✓ ' + file.name;
+  });
+
+  // ─────────────────────────────────────────────
+  // Submit
+  // ─────────────────────────────────────────────
+  document.getElementById('submitBtn').addEventListener('click', async function(){
+    var btn = this;
+    if(amount <= 0){ apexError('Invalid deposit amount'); return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+
+    try {
+      var { data: userData } = await sb.auth.getUser();
+      var user = userData && userData.user;
+      if(!user){ window.location.href = 'login.html'; return; }
+
+      var screenshotUrl = null;
+
+      // Upload screenshot if provided
+      if(state.file){
+        try {
+          var fileExt = state.file.name.split('.').pop();
+          var filePath = user.id + '/' + Date.now() + '_' + state.refCode + '.' + fileExt;
+          var { data: upload, error: upErr } = await sb.storage
+            .from('deposit-receipts')
+            .upload(filePath, state.file, { upsert: false });
+          if(!upErr && upload){
+            var { data: urlData } = sb.storage.from('deposit-receipts').getPublicUrl(filePath);
+            screenshotUrl = urlData ? urlData.publicUrl : null;
+          }
+        } catch(e){ apexWarn('Screenshot upload failed — we\'ll still record your deposit. ' + (e.message||'')); }
+      }
+
+      // Record deposit
+      try {
+        await sb.from('deposits').insert({
+          user_id: user.id,
+          method: 'crypto',
+          asset: state.selectedCoin,
+          amount: amount,
+          reference_code: state.refCode,
+          status: 'pending',
+          screenshot_url: screenshotUrl,
+          wallet_address: (state.wallets[state.selectedCoin] || {}).address || null
+        });
+      } catch(e){ apexError('Could not record deposit: ' + (e.message||'database error')); btn.disabled = false; btn.textContent = "I've sent the deposit"; return; }
+
+      // Persist for fund-process.html
+      sessionStorage.setItem('fund_method', 'crypto');
+      sessionStorage.setItem('fund_amount', String(amount));
+      sessionStorage.setItem('fund_ref_code', state.refCode);
+      sessionStorage.setItem('fund_asset', state.selectedCoin);
+
+      window.location.href = 'fund-process.html';
+    } catch(err){
+      console.error(err);
+      btn.disabled = false;
+      btn.textContent = "I've sent the deposit";
+      apexError('Could not submit. Please try again. ' + (err && err.message ? err.message : ''));
+    }
+  });
+
+  // ─────────────────────────────────────────────
+  // Load wallets from Supabase
+  // ─────────────────────────────────────────────
+  function loadWallets(){
+    sb.from('crypto_wallets').select('*').eq('active', true).then(function(res){
+      if(res.error){
+        console.warn('Crypto wallets:', res.error);
+        renderCoin(state.selectedCoin);
+        return;
+      }
+      (res.data || []).forEach(function(w){
+        if(w.coin){
+          // Store first active wallet per coin (admin can have multiple, picks first)
+          var key = w.coin.toUpperCase();
+          if(!state.wallets[key]) state.wallets[key] = w;
+        }
+      });
+      renderCoin(state.selectedCoin);
+    }).catch(function(e){
+      console.warn(e);
+      renderCoin(state.selectedCoin);
+    });
+  }
+
+  if(window.sb) loadWallets();
+  else document.addEventListener('sb-ready', loadWallets, { once: true });
+})();
+</script>
+
+<script src="js/floating-widget.js?v=1781343118" defer></script>
+<script src="js/bottom-nav.js?v=1"></script>
+
+  <script src="js/user-bell.js?v=1"></script>
+</body>
+</html>

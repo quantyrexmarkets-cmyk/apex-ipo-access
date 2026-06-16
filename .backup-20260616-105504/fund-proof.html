@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload Payment Proof | APEX IPO ACCESS</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js?v=100"></script>
+<script src="js/notify.js?v=1"></script>
+<script src="js/sidebar.js?v=1781345031" defer></script>
+<script>
+  document.addEventListener('sb-ready', async () => {
+    const { data } = await sb.auth.getUser();
+    if(!data.user) window.location.href = 'login.html';
+  });
+</script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+  a{color:inherit;text-decoration:none}
+
+  .dash-header{
+    position:sticky;top:0;z-index:100;
+    background:rgba(0,0,0,0.92);backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding:16px 20px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .menu-btn{width:38px;height:38px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;cursor:pointer}
+  .menu-btn span{width:22px;height:2px;background:#4a9eff;display:block;border-radius:2px}
+  .logo-text-stack{display:flex;flex-direction:column;line-height:1;align-items:center}
+  .logo-line1{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#fff;letter-spacing:2px}
+  .logo-line2{font-size:7px;color:#4a9eff;letter-spacing:3px;font-weight:600}
+  .logo-tagline{font-size:5.5px;color:#6a7585;letter-spacing:2.5px;margin-top:1px}
+  .spacer{width:38px}
+
+  .wrap{max-width:600px;margin:0 auto;padding:20px 20px 120px}
+  .back-btn{display:inline-flex;align-items:center;gap:6px;color:#4a9eff;font-size:13px;font-weight:500;margin-bottom:20px;cursor:pointer}
+  .back-btn svg{width:16px;height:16px}
+
+  .page-h{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:24px;letter-spacing:-0.3px;margin-bottom:6px}
+  .page-sub{color:#8b95a8;font-size:13px;margin-bottom:24px;line-height:1.5}
+
+  .amount-banner{
+    background:linear-gradient(135deg,rgba(74,158,255,0.15),rgba(74,158,255,0.05));
+    border:1px solid rgba(74,158,255,0.3);
+    border-radius:14px;padding:18px;margin-bottom:24px;
+    text-align:center;
+  }
+  .amount-banner .lbl{text-transform:uppercase;letter-spacing:1.5px;font-size:10px;font-weight:600;color:#a8b2c1;margin-bottom:8px}
+  .amount-banner .val{font-family:'Manrope',sans-serif;font-size:28px;font-weight:700;color:#4a9eff;letter-spacing:-0.5px}
+
+  .field{margin-bottom:18px}
+  .field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#a8b2c1;font-weight:600;margin-bottom:8px}
+
+  .file-drop{
+    border:2px dashed rgba(74,158,255,0.3);
+    border-radius:14px;padding:32px 20px;
+    text-align:center;background:rgba(74,158,255,0.03);
+    cursor:pointer;transition:all .2s;
+  }
+  .file-drop:hover,.file-drop.dragging{background:rgba(74,158,255,0.08);border-color:rgba(74,158,255,0.6)}
+  .file-drop svg{width:42px;height:42px;color:#4a9eff;margin-bottom:10px}
+  .file-drop .ttl{font-weight:600;font-size:14px;margin-bottom:4px}
+  .file-drop .sub{font-size:12px;color:#8b95a8}
+  .file-drop.has-file{border-style:solid;border-color:#3ed598;background:rgba(62,213,152,0.05)}
+  .file-drop.has-file svg{color:#3ed598}
+  #fileInput{display:none}
+
+  .preview{margin-top:14px;display:none}
+  .preview.show{display:block}
+  .preview img{width:100%;max-height:320px;object-fit:contain;border-radius:10px;background:#0a0e14;border:1px solid rgba(255,255,255,0.08)}
+  .preview .meta{font-size:12px;color:#8b95a8;margin-top:8px;display:flex;justify-content:space-between}
+  .preview .remove{color:#ff6a6a;cursor:pointer;font-weight:600}
+
+  textarea{
+    width:100%;background:#0a0e14;border:1px solid rgba(255,255,255,0.08);
+    color:#fff;font-family:'Inter',sans-serif;font-size:14px;
+    padding:12px 14px;border-radius:10px;resize:vertical;min-height:80px;
+  }
+  textarea:focus{outline:none;border-color:rgba(74,158,255,0.5)}
+
+  .submit-btn{
+    width:100%;padding:16px;border-radius:12px;
+    background:#4a9eff;color:#000;border:none;cursor:pointer;
+    font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;letter-spacing:0.3px;
+    margin-top:8px;transition:all .2s;
+  }
+  .submit-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 24px rgba(74,158,255,0.3)}
+  .submit-btn:disabled{opacity:0.4;cursor:not-allowed}
+
+  .note{
+    background:rgba(74,158,255,0.06);
+    border:1px solid rgba(74,158,255,0.2);
+    border-radius:10px;padding:12px 14px;margin-top:18px;
+    font-size:12px;color:#a8b2c1;line-height:1.5;
+    display:flex;gap:10px;align-items:flex-start;
+  }
+  .note svg{width:16px;height:16px;flex-shrink:0;margin-top:1px;color:#4a9eff}
+</style>
+</head>
+<body>
+
+<header class="dash-header">
+  <button class="menu-btn" onclick="document.dispatchEvent(new Event('open-sidebar'))" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+  <a href="dashboard.html" class="logo">
+    <div class="logo-text-stack">
+      <span class="logo-line1">APEX</span>
+      <span class="logo-line2">IPO ACCESS</span>
+      <span class="logo-tagline">UPLOAD PROOF</span>
+    </div>
+  </a>
+  <div class="spacer"></div>
+</header>
+
+<div class="wrap">
+  <a href="fund-wire.html" class="back-btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    Back
+  </a>
+
+  <div class="page-h">Upload Payment Proof</div>
+  <div class="page-sub">Provide a screenshot or PDF confirming your wire was sent. We'll verify and credit your account.</div>
+
+  <div class="amount-banner">
+    <div class="lbl">DEPOSIT AMOUNT</div>
+    <div class="val" id="amountVal">$0.00</div>
+  </div>
+
+  <div class="field">
+    <label>Payment Proof</label>
+    <label for="fileInput" class="file-drop" id="fileDrop">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <div class="ttl" id="dropTitle">Tap to upload</div>
+      <div class="sub" id="dropSub">PNG, JPG or PDF · Max 10MB</div>
+    </label>
+    <input type="file" id="fileInput" accept="image/*,application/pdf">
+
+    <div class="preview" id="preview">
+      <img id="previewImg" alt="Preview">
+      <div class="meta">
+        <span id="fileName">file.png</span>
+        <span class="remove" id="removeBtn">Remove</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Notes (Optional)</label>
+    <textarea id="notes" placeholder="Reference number, bank name, or any details that help us verify..."></textarea>
+  </div>
+
+  <button class="submit-btn" id="submitBtn" disabled>Submit for Review</button>
+
+  <div class="note">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    <span>Your file is encrypted and only visible to our compliance team. Funds typically credit within 1 business day after verification.</span>
+  </div>
+</div>
+
+<script>
+  var amount = parseFloat(sessionStorage.getItem('fund_amount') || '0');
+  document.getElementById('amountVal').textContent = '$' + amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  if(!amount || amount <= 0){
+    if(window.apexWarn) apexWarn('No active deposit — redirecting');
+    setTimeout(function(){ window.location.href = 'fund-account.html'; }, 1600);
+  }
+
+  var selectedFile = null;
+  var fileInput = document.getElementById('fileInput');
+  var fileDrop = document.getElementById('fileDrop');
+  var preview = document.getElementById('preview');
+  var previewImg = document.getElementById('previewImg');
+  var fileName = document.getElementById('fileName');
+  var removeBtn = document.getElementById('removeBtn');
+  var submitBtn = document.getElementById('submitBtn');
+  var dropTitle = document.getElementById('dropTitle');
+  var dropSub = document.getElementById('dropSub');
+
+  fileInput.addEventListener('change', function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    if(file.size > 10 * 1024 * 1024){
+      apexError('File too large. Max 10MB.');
+      fileInput.value = '';
+      return;
+    }
+    selectedFile = file;
+    fileName.textContent = file.name;
+    fileDrop.classList.add('has-file');
+    dropTitle.textContent = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> ' + file.name;
+    dropSub.textContent = (file.size/1024).toFixed(0) + ' KB · Tap to change';
+
+    if(file.type.startsWith('image/')){
+      var reader = new FileReader();
+      reader.onload = function(ev){
+        previewImg.src = ev.target.result;
+        preview.classList.add('show');
+      };
+      reader.readAsDataURL(file);
+    } else {
+      previewImg.src = '';
+      preview.classList.remove('show');
+    }
+    submitBtn.disabled = false;
+  });
+
+  removeBtn.addEventListener('click', function(e){
+    e.preventDefault();
+    selectedFile = null;
+    fileInput.value = '';
+    preview.classList.remove('show');
+    fileDrop.classList.remove('has-file');
+    dropTitle.textContent = 'Tap to upload';
+    dropSub.textContent = 'PNG, JPG or PDF · Max 10MB';
+    submitBtn.disabled = true;
+  });
+
+  submitBtn.addEventListener('click', async function(){
+    if(!selectedFile){ apexError('Please select a file'); return; }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Uploading...';
+
+    try {
+      var { data: userData } = await sb.auth.getUser();
+      var user = userData?.user;
+      if(!user){ apexError('Session expired'); window.location.href='login.html'; return; }
+
+      // Generate unique filename
+      var ext = selectedFile.name.split('.').pop().toLowerCase();
+      var filename = Date.now() + '-' + Math.random().toString(36).substr(2,8) + '.' + ext;
+      var filepath = user.id + '/' + filename;
+
+      // Upload to Storage
+      var { error: upErr } = await sb.storage
+        .from('payment-proofs')
+        .upload(filepath, selectedFile, { cacheControl: '3600', upsert: false });
+
+      if(upErr){ throw upErr; }
+
+      // Generate reference code
+      var refCode = 'WIRE-' + Date.now().toString(36).toUpperCase();
+
+      // Insert deposit row
+      var notesVal = document.getElementById('notes').value.trim();
+      var { error: insErr } = await sb.from('deposits').insert({
+        user_id: user.id,
+        method: 'wire',
+        amount: amount,
+        reference_code: refCode,
+        status: 'awaiting_review',
+        proof_url: filepath,
+        notes: notesVal || null
+      });
+
+      if(insErr){ throw insErr; }
+
+      // Persist for process page
+      sessionStorage.setItem('fund_ref_code', refCode);
+
+      apexSuccess('Proof submitted — admin reviewing');
+      setTimeout(function(){ window.location.href = 'fund-process.html'; }, 800);
+
+    } catch(e){
+      console.error(e);
+      apexError('Upload failed: ' + (e.message || 'Please try again'));
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit for Review';
+    }
+  });
+</script>
+
+<script src="js/floating-widget.js?v=1781343118" defer></script>
+<script src="js/bottom-nav.js?v=1"></script>
+  <script src="js/user-bell.js?v=1"></script>
+</body>
+</html>

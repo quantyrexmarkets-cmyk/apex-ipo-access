@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify Identity | APEX IPO ACCESS</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js?v=100"></script>
+<script src="js/notify.js?v=1"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{
+    background:#000;color:#fff;
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  .container{
+    width:100%;max-width:400px;padding:24px;text-align:center;
+  }
+
+  .lock-icon{
+    width:64px;height:64px;border-radius:50%;
+    background:rgba(74,158,255,0.1);
+    display:inline-flex;align-items:center;justify-content:center;
+    margin-bottom:20px;
+  }
+  .lock-icon svg{width:28px;height:28px;color:#4a9eff}
+
+  .title{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:700;font-size:24px;color:#fff;
+    letter-spacing:-0.5px;margin-bottom:8px;
+  }
+  .subtitle{
+    font-size:13px;color:#8a94a3;line-height:1.6;
+    margin-bottom:32px;
+  }
+  .subtitle .email-highlight{color:#4a9eff;font-weight:500}
+
+  .code-wrap{
+    display:flex;gap:10px;justify-content:center;
+    margin-bottom:24px;
+  }
+  .code-box{
+    width:52px;height:60px;
+    background:rgba(255,255,255,0.04);
+    border:2px solid rgba(255,255,255,0.1);
+    border-radius:12px;
+    text-align:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:24px;font-weight:700;color:#fff;
+    outline:none;transition:border-color .15s;
+    -webkit-appearance:none;
+  }
+  .code-box:focus{
+    border-color:#4a9eff;background:rgba(74,158,255,0.05);
+  }
+  .code-box.error{
+    border-color:#ff6a6a;background:rgba(255,106,106,0.05);
+    animation:shake 0.4s;
+  }
+  .code-box.success{
+    border-color:#3ed598;background:rgba(62,213,152,0.05);
+  }
+
+  @keyframes shake{
+    0%,100%{transform:translateX(0)}
+    25%{transform:translateX(-6px)}
+    75%{transform:translateX(6px)}
+  }
+
+  .verify-btn{
+    width:100%;padding:16px;border:none;border-radius:12px;
+    background:linear-gradient(135deg,#4a9eff,#357abd);
+    color:#fff;font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:16px;cursor:pointer;
+    transition:all .15s;margin-bottom:16px;
+  }
+  .verify-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(74,158,255,0.3)}
+  .verify-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
+
+  .resend-row{font-size:13px;color:#8a94a3}
+  .resend-row a{color:#4a9eff;font-weight:500;cursor:pointer;text-decoration:none}
+  .resend-row a.disabled{color:#5a6473;pointer-events:none}
+
+  .timer{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;color:#6a7585;margin-top:12px;
+  }
+
+  .error-msg{
+    color:#ff6a6a;font-size:13px;
+    margin-bottom:16px;min-height:18px;
+  }
+
+  .back-link{
+    display:inline-flex;align-items:center;gap:6px;
+    color:#5a6473;font-size:12px;margin-top:24px;
+    cursor:pointer;
+  }
+  .back-link:hover{color:#8a94a3}
+  .back-link svg{width:14px;height:14px}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="lock-icon">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+  </div>
+
+  <h1 class="title">Verify your identity</h1>
+  <p class="subtitle">
+    We sent a 5-digit verification code to<br>
+    <span class="email-highlight" id="emailDisplay">your email</span>
+  </p>
+
+  <div class="code-wrap" id="codeWrap">
+    <input type="tel" maxlength="1" class="code-box" data-idx="0" autocomplete="one-time-code" inputmode="numeric" pattern="[0-9]">
+    <input type="tel" maxlength="1" class="code-box" data-idx="1" inputmode="numeric" pattern="[0-9]">
+    <input type="tel" maxlength="1" class="code-box" data-idx="2" inputmode="numeric" pattern="[0-9]">
+    <input type="tel" maxlength="1" class="code-box" data-idx="3" inputmode="numeric" pattern="[0-9]">
+    <input type="tel" maxlength="1" class="code-box" data-idx="4" inputmode="numeric" pattern="[0-9]">
+  </div>
+
+  <div class="error-msg" id="errorMsg"></div>
+
+  <button class="verify-btn" id="verifyBtn" disabled>Verify</button>
+
+  <div class="resend-row">
+    Didn't receive a code? <a id="resendLink" class="disabled">Resend</a>
+    <div class="timer" id="timer">Resend available in 60s</div>
+  </div>
+
+  <a href="login.html" class="back-link">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    Use a different account
+  </a>
+</div>
+
+<script>
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  var uid = params.get('uid');
+  var email = params.get('email');
+
+  if(!uid || !email){
+    window.location.href = 'login.html';
+    return;
+  }
+
+  document.getElementById('emailDisplay').textContent = email;
+
+  var boxes = document.querySelectorAll('.code-box');
+  var verifyBtn = document.getElementById('verifyBtn');
+  var errorMsg = document.getElementById('errorMsg');
+  var resendLink = document.getElementById('resendLink');
+  var timerEl = document.getElementById('timer');
+
+  function getCode(){
+    var code = '';
+    boxes.forEach(function(b){ code += b.value; });
+    return code;
+  }
+
+  function updateBtn(){
+    var code = getCode();
+    verifyBtn.disabled = code.length !== 5;
+    if(code.length === 5){
+      errorMsg.textContent = '';
+      boxes.forEach(function(b){ b.classList.remove('error'); });
+    }
+  }
+
+  // Auto-advance + paste support
+  boxes.forEach(function(box, idx){
+    box.addEventListener('input', function(e){
+      var v = e.target.value.replace(/\D/g, '');
+      e.target.value = v;
+      if(v && idx < boxes.length - 1){
+        boxes[idx + 1].focus();
+      }
+      updateBtn();
+    });
+
+    box.addEventListener('keydown', function(e){
+      if(e.key === 'Backspace' && !e.target.value && idx > 0){
+        boxes[idx - 1].focus();
+      }
+      if(e.key === 'Enter' && !verifyBtn.disabled){
+        verifyBtn.click();
+      }
+    });
+
+    box.addEventListener('paste', function(e){
+      e.preventDefault();
+      var text = (e.clipboardData || window.clipboardData).getData('text');
+      var digits = text.replace(/\D/g, '').slice(0, 5);
+      digits.split('').forEach(function(d, i){
+        if(boxes[i]) boxes[i].value = d;
+      });
+      if(digits.length === 5){
+        boxes[4].focus();
+      } else if(digits.length > 0){
+        boxes[Math.min(digits.length, 4)].focus();
+      }
+      updateBtn();
+    });
+  });
+
+  // Auto-focus first box
+  boxes[0].focus();
+
+  // Verify
+  verifyBtn.addEventListener('click', function(){
+    var code = getCode();
+    if(code.length !== 5) return;
+
+    verifyBtn.disabled = true;
+    verifyBtn.textContent = 'Verifying...';
+    errorMsg.textContent = '';
+
+    document.addEventListener('sb-ready', doVerify);
+    if(window.sb) doVerify();
+
+    function doVerify(){
+      document.removeEventListener('sb-ready', doVerify);
+
+      sb.rpc('verify_2fa_code', {
+        p_user_id: uid,
+        p_code: code
+      }).then(function(res){
+        if(res.error || !res.data){
+          showError('Invalid or expired code. Please try again.');
+          return;
+        }
+
+        // Restore session
+        var pending = sessionStorage.getItem('pending_2fa_session');
+        if(pending){
+          var tokens = JSON.parse(pending);
+          sb.auth.setSession({
+            access_token: tokens.access_token,
+            refresh_token: tokens.refresh_token
+          }).then(function(){
+            sessionStorage.removeItem('pending_2fa_session');
+            boxes.forEach(function(b){ b.classList.add('success'); });
+            setTimeout(async function(){
+              try {
+                var u = await sb.auth.getUser();
+                if(u.data && u.data.user){
+                  var { data: prof } = await sb.from('profiles').select('kyc_status,is_admin,banned').eq('id', u.data.user.id).single();
+                  if(prof && prof.banned){ await sb.auth.signOut(); window.location.href='login.html'; return; }
+                  if(prof && !prof.is_admin && prof.kyc_status !== 'verified'){
+                    window.location.href = 'pending-approval.html';
+                    return;
+                  }
+                  if(prof && !prof.is_admin && !prof.email_verified_at){
+                    window.location.href = 'verify-email.html';
+                    return;
+                  }
+                }
+              } catch(e){}
+              window.location.href = 'dashboard.html';
+            }, 400);
+          }).catch(function(e){
+            showError('Session restore failed. Please sign in again.');
+            setTimeout(function(){
+              window.location.href = 'login.html';
+            }, 1500);
+          });
+        } else {
+          // No pending session — go to login
+          window.location.href = 'login.html';
+        }
+      }).catch(function(e){
+        showError('Verification failed. Please try again.');
+      });
+    }
+  });
+
+  function showError(msg){
+    errorMsg.textContent = msg;
+    boxes.forEach(function(b){ b.classList.add('error'); });
+    verifyBtn.disabled = false;
+    verifyBtn.textContent = 'Verify';
+    setTimeout(function(){
+      boxes.forEach(function(b){ b.classList.remove('error'); b.value = ''; });
+      boxes[0].focus();
+      verifyBtn.disabled = true;
+    }, 1500);
+  }
+
+  // Resend cooldown timer
+  var cooldown = 60;
+  var timerInterval = setInterval(function(){
+    cooldown--;
+    if(cooldown <= 0){
+      clearInterval(timerInterval);
+      resendLink.classList.remove('disabled');
+      timerEl.textContent = '';
+    } else {
+      timerEl.textContent = 'Resend available in ' + cooldown + 's';
+    }
+  }, 1000);
+
+  // Resend code
+  resendLink.addEventListener('click', function(){
+    if(resendLink.classList.contains('disabled')) return;
+
+    resendLink.classList.add('disabled');
+    cooldown = 60;
+    timerEl.textContent = 'Resend available in 60s';
+    timerInterval = setInterval(function(){
+      cooldown--;
+      if(cooldown <= 0){
+        clearInterval(timerInterval);
+        resendLink.classList.remove('disabled');
+        timerEl.textContent = '';
+      } else {
+        timerEl.textContent = 'Resend available in ' + cooldown + 's';
+      }
+    }, 1000);
+
+    function doResend(){
+      sb.rpc('generate_2fa_code', {
+        p_user_id: uid,
+        p_email: email
+      }).then(function(r){
+        if(r.data){
+          fetch(sb.supabaseUrl + '/functions/v1/send-2fa-code', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + sb.supabaseKey
+            },
+            body: JSON.stringify({ email: email, code: r.data })
+          }).catch(function(e){
+            console.warn('Edge function not set up — code stored in DB:', r.data);
+          });
+        }
+      });
+    }
+
+    if(window.sb) doResend();
+    else document.addEventListener('sb-ready', doResend, { once: true });
+  });
+
+})();
+</script>
+
+<script src="js/floating-widget.js?v=1781343118" defer></script>
+</body>
+</html>

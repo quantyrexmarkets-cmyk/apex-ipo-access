@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel | APEX IPO ACCESS</title>
+<title>Admin Panel | Apex IPO Access</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js?v=1781545021"></script>
@@ -1484,7 +1484,7 @@
       </div>
 
       <div class="field-grid">
-        <div class="field-mini"><label>Platform Name</label><input id="psName" placeholder="APEX IPO ACCESS"></div>
+        <div class="field-mini"><label>Platform Name</label><input id="psName" placeholder="Apex IPO Access"></div>
         <div class="field-mini"><label>Support Email</label><input id="psEmail" type="email" placeholder="support@apexipoaccess.com"></div>
       </div>
       <div class="field-grid">
@@ -2527,7 +2527,7 @@
     var { error } = await sb.from('profiles').update({ kyc_status: newStatus }).eq('id', currentUser.id);
     if(error){ apexError(error.message); return; }
     if(newStatus==='verified'){
-      await notifyUser(currentUser.id, '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:6px"><polyline points="20 6 9 17 4 12"/></svg> Account Approved', 'Welcome to APEX IPO ACCESS. Your account has been verified and you now have full access to invest in pre-IPO opportunities.', 'success');
+      await notifyUser(currentUser.id, '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:6px"><polyline points="20 6 9 17 4 12"/></svg> Account Approved', 'Welcome to Apex IPO Access. Your account has been verified and you now have full access to invest in pre-IPO opportunities.', 'success');
     } else {
       await notifyUser(currentUser.id, '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:6px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Account Status Changed', 'Your KYC verification has been revoked. Please contact support for details.', 'warning');
     }
@@ -3302,7 +3302,7 @@
 
   window._savePlatformSettings = async function(){
     var updates = {
-      platform_name: document.getElementById('psName').value.trim() || 'APEX IPO ACCESS',
+      platform_name: document.getElementById('psName').value.trim() || 'Apex IPO Access',
       support_email: document.getElementById('psEmail').value.trim() || null,
       min_deposit: parseFloat(document.getElementById('psMinDep').value) || 0,
       max_deposit: parseFloat(document.getElementById('psMaxDep').value) || 1000000,
@@ -3360,7 +3360,7 @@
     if(!ok) return;
     var { error } = await sb.from('profiles').update({ kyc_status: 'verified' }).eq('id', id);
     if(error){ apexError(error.message); return; }
-    await notifyUser(id, '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:6px"><polyline points="20 6 9 17 4 12"/></svg> Account Approved', 'Welcome to APEX IPO ACCESS. Your account has been verified and you now have full access to invest in pre-IPO opportunities.', 'success');
+    await notifyUser(id, '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:6px"><polyline points="20 6 9 17 4 12"/></svg> Account Approved', 'Welcome to Apex IPO Access. Your account has been verified and you now have full access to invest in pre-IPO opportunities.', 'success');
     try {
       await sb.from('admin_log').insert({
         admin_id: state.user.id,

@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// APEX IPO Access — Transactional Email Service
+// Apex IPO Access — Transactional Email Service
 // Minimalist Google/Apple-style design with auto user-data lookup
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -287,7 +287,7 @@ function shell(opts: {
           ${recipientLine} ${escape(footerNote)} If you do not wish to receive these emails, please <a href="mailto:support@apexipoaccess.com?subject=Unsubscribe" class="footer-link" style="text-decoration:underline">contact support</a>.
         </p>
         <p class="footer" style="margin:0;font-family:'Google Sans',Inter,Arial,sans-serif;font-size:11.5px;line-height:1.6">
-          © ${new Date().getFullYear()} APEX IPO Access LLC ·
+          © ${new Date().getFullYear()} Apex IPO Access LLC ·
           <a href="https://apexipoaccess.com" class="footer-link" style="text-decoration:none">apexipoaccess.com</a>
         </p>
       </td></tr>
@@ -327,12 +327,12 @@ function tplWelcome(user: UserProfile): string {
   `;
   return shell({
     preheader: 'Your account is verified and ready. Start exploring launched IPO opportunities.',
-    headline: `Hi ${user.first_name},\nWelcome to Apex Ipo Access`,
+    headline: `Hi ${user.first_name},\nWelcome to Apex IPO Access`,
     subtitle: `Your account has been verified.`,
     ctaLabel: 'Go to Dashboard',
     ctaUrl: 'https://apexipoaccess.com/dashboard.html',
     detailsHtml: details,
-    footerNote: 'This email confirms that your Apex Ipo Access account has been activated following successful identity verification.',
+    footerNote: 'This email confirms that your Apex IPO Access account has been activated following successful identity verification.',
     recipientEmail: user.email,
   });
 }
@@ -388,7 +388,7 @@ function tplDepositPending(user: UserProfile, params: {
     ctaLabel: 'View Account',
     ctaUrl: 'https://apexipoaccess.com/dashboard.html',
     detailsHtml: details,
-    footerNote: 'You are receiving this email because a deposit was submitted to your Apex Ipo Access account.',
+    footerNote: 'You are receiving this email because a deposit was submitted to your Apex IPO Access account.',
     recipientEmail: user.email,
   });
 }
@@ -486,7 +486,7 @@ function tplWithdrawalPending(user: UserProfile, params: {
     ctaLabel: 'View Status',
     ctaUrl: 'https://apexipoaccess.com/dashboard.html',
     detailsHtml: details,
-    footerNote: 'You are receiving this email because a withdrawal was requested from your Apex Ipo Access account. If this was not you, contact support immediately.',
+    footerNote: 'You are receiving this email because a withdrawal was requested from your Apex IPO Access account. If this was not you, contact support immediately.',
     recipientEmail: user.email,
   });
 }
@@ -548,7 +548,7 @@ function tplWithdrawalRejected(user: UserProfile, params: {
       { label: 'Status', value: 'Rejected — Funds Returned to Balance' },
       { label: 'Reviewed', value: fmtDateTime(params.reviewedAt) },
     ])}
-    <p style="margin:18px 0 0;font-size:13px;line-height:1.65;opacity:0.75">Your funds remain safely in your Apex Ipo Access account and are reflected in your available balance.</p>
+    <p style="margin:18px 0 0;font-size:13px;line-height:1.65;opacity:0.75">Your funds remain safely in your Apex IPO Access account and are reflected in your available balance.</p>
   `;
   return shell({
     preheader: `Your withdrawal of ${fmtMoney(params.amount)} could not be processed. Funds returned to your balance.`,
@@ -582,13 +582,13 @@ function tplPasswordReset(user: UserProfile, params: {
     <p style="margin:18px 0 0;font-size:13px;line-height:1.65;opacity:0.75">If you did not request this, you can safely ignore this email — your password will remain unchanged.</p>
   `;
   return shell({
-    preheader: 'Reset your APEX IPO Access password. The secure link expires in 1 hour.',
+    preheader: 'Reset your Apex IPO Access password. The secure link expires in 1 hour.',
     headline: `Hi ${user.first_name},\nReset your password`,
     subtitle: 'Click below to set a new password. This link expires in 1 hour.',
     ctaLabel: 'Reset Password',
     ctaUrl: params.resetLink,
     detailsHtml: details,
-    footerNote: 'APEX IPO Access will never ask for your password, two-factor codes, or recovery information by email, phone, or text.',
+    footerNote: 'Apex IPO Access will never ask for your password, two-factor codes, or recovery information by email, phone, or text.',
     recipientEmail: user.email,
   });
 }
@@ -614,7 +614,7 @@ function tplLoginAlert(user: UserProfile, params: {
     <p style="margin:18px 0 0;font-size:13px;line-height:1.65;opacity:0.75">If this was not you, change your password immediately and enable two-factor authentication.</p>
   `;
   return shell({
-    preheader: 'A new sign-in was detected on your Apex Ipo Access account.',
+    preheader: 'A new sign-in was detected on your Apex IPO Access account.',
     headline: `Hi ${user.first_name},\nNew sign-in to your account`,
     subtitle: 'A new sign-in was detected on your account.',
     ctaLabel: 'Secure My Account',
@@ -734,7 +734,7 @@ function tplAccountBanned(user: UserProfile, params: {
   `;
 
   return shell({
-    preheader: 'Your Apex Ipo Access account has been suspended. Review the reason and appeal process inside.',
+    preheader: 'Your Apex IPO Access account has been suspended. Review the reason and appeal process inside.',
     headline: `Hi ${user.first_name},\nYour account has been suspended`,
     subtitle: 'Your account has been suspended following compliance review.',
     ctaLabel: 'File an Appeal',
@@ -769,7 +769,7 @@ const TEMPLATES: Record<string, (user: UserProfile, params: any) => string> = {
 // SUBJECT LINE DEFAULTS (if caller doesn't provide one)
 // ═══════════════════════════════════════════════════════════════════════════
 const DEFAULT_SUBJECTS: Record<string, string> = {
-  'welcome':             'Welcome to Apex Ipo Access',
+  'welcome':             'Welcome to Apex IPO Access',
   'kyc-rejected':        'Identity Verification Update',
   'deposit-pending':     'We received your deposit',
   'deposit-approved':    'Your deposit has been credited',
@@ -777,7 +777,7 @@ const DEFAULT_SUBJECTS: Record<string, string> = {
   'withdrawal-pending':  'We received your withdrawal request',
   'withdrawal-approved': 'Your withdrawal is on its way',
   'withdrawal-rejected': 'We couldn\'t process your withdrawal',
-  'password-reset':      'Reset your APEX IPO Access password',
+  'password-reset':      'Reset your Apex IPO Access password',
   'login-alert':         'New sign-in to your account',
   'share-purchase':      'Your purchase is confirmed',
   'ipo-allocation':      'You received an IPO allocation',
@@ -846,7 +846,7 @@ Deno.serve(async (req: Request) => {
 
     // Generate HTML
     const html = tplFn(user, params || {});
-    const finalSubject = subject || DEFAULT_SUBJECTS[template] || 'APEX IPO Access';
+    const finalSubject = subject || DEFAULT_SUBJECTS[template] || 'Apex IPO Access';
 
     // Send via Resend
     const res = await fetch('https://api.resend.com/emails', {
@@ -856,7 +856,7 @@ Deno.serve(async (req: Request) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'APEX IPO Access <noreply@apexipoaccess.com>',
+        from: 'Apex IPO Access <noreply@apexipoaccess.com>',
         to: [user.email],
         subject: finalSubject,
         html,

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Help & Support | APEX IPO ACCESS</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js?v=100"></script>
+<script src="js/notify.js?v=1"></script>
+<script src="js/sidebar.js?v=1781345031" defer></script>
+<script>
+  document.addEventListener('sb-ready', async () => {
+    const { data } = await sb.auth.getUser();
+    if(!data.user) window.location.href = 'login.html';
+  });
+</script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+  a{color:inherit;text-decoration:none}
+
+  .dash-header{
+    position:sticky;top:0;z-index:100;
+    background:rgba(0,0,0,0.92);backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding:16px 20px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .menu-btn{width:38px;height:38px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;cursor:pointer}
+  .menu-btn span{width:22px;height:2px;background:#4a9eff;display:block;border-radius:2px}
+  .header-icons{display:flex;gap:10px;align-items:center}
+  .icon-btn{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;color:#4a9eff;background:none;cursor:pointer}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo-text-stack{display:flex;flex-direction:column;line-height:1;align-items:center}
+  .logo-line1{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#fff;letter-spacing:2px}
+  .logo-line2{font-size:7px;color:#4a9eff;letter-spacing:3px;font-weight:600}
+  .logo-tagline{font-size:5.5px;color:#6a7585;letter-spacing:2.5px;margin-top:1px}
+
+  .wrap{max-width:680px;margin:0 auto;padding:24px 20px 120px}
+  .page-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:28px;color:#fff;letter-spacing:-0.5px;margin-bottom:6px}
+  .page-sub{font-size:13px;color:#8a94a3;margin-bottom:28px;line-height:1.5}
+
+  .quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:28px}
+  .quick-tile{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .15s;text-align:left}
+  .quick-tile:hover{background:rgba(74,158,255,0.05);border-color:rgba(74,158,255,0.3);transform:translateY(-1px)}
+  .quick-tile .ic{width:40px;height:40px;border-radius:10px;background:rgba(74,158,255,0.12);color:#4a9eff;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+  .quick-tile .ic svg{width:18px;height:18px}
+  .quick-tile.green .ic{background:rgba(62,213,152,0.12);color:#3ed598}
+  .quick-tile.amber .ic{background:rgba(255,184,0,0.12);color:#ffb800}
+  .quick-tile.purple .ic{background:rgba(255,106,106,0.12);color:#ff6a6a}
+  .quick-tile .title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:14px;color:#fff;letter-spacing:-0.2px;margin-bottom:3px}
+  .quick-tile .desc{font-size:11px;color:#8a94a3;line-height:1.4}
+
+  .sec-h{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:18px;color:#fff;letter-spacing:-0.3px;margin:24px 0 14px}
+
+  /* Support form */
+  .support-form{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:20px;margin-bottom:14px}
+  .form-field{margin-bottom:16px}
+  .form-field label{display:block;font-size:12px;color:#8a94a3;font-weight:600;margin-bottom:8px;letter-spacing:0.3px;text-transform:uppercase}
+  .form-field input,
+  .form-field select,
+  .form-field textarea{
+    width:100%;background:rgba(0,0,0,0.4);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:10px;padding:13px 14px;
+    color:#fff;font-family:inherit;font-size:14px;
+    transition:border-color .15s;
+  }
+  .form-field input:focus,
+  .form-field select:focus,
+  .form-field textarea:focus{outline:none;border-color:#4a9eff}
+  .form-field textarea{min-height:110px;resize:vertical}
+  .submit-btn{
+    width:100%;padding:14px;border:none;border-radius:10px;
+    background:linear-gradient(135deg,#4a9eff,#357abd);
+    color:#fff;font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:15px;cursor:pointer;
+    transition:all .15s;
+  }
+  .submit-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(74,158,255,0.3)}
+  .submit-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none}
+
+  .form-msg{font-size:13px;margin-top:12px;text-align:center;min-height:18px}
+  .form-msg.ok{color:#3ed598}
+  .form-msg.err{color:#ff6a6a}
+
+  /* FAQ */
+  .faq-item{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:12px;margin-bottom:10px;overflow:hidden;
+  }
+  .faq-q{
+    padding:16px 18px;cursor:pointer;
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+    font-size:14px;font-weight:500;color:#fff;
+    transition:background .15s;
+  }
+  .faq-q:hover{background:rgba(255,255,255,0.04)}
+  .faq-q .chev{
+    width:18px;height:18px;color:#4a9eff;flex-shrink:0;
+    transition:transform .2s;
+  }
+  .faq-item.open .faq-q .chev{transform:rotate(180deg)}
+  .faq-a{
+    max-height:0;overflow:hidden;
+    transition:max-height .3s ease;
+  }
+  .faq-item.open .faq-a{max-height:400px}
+  .faq-a-inner{
+    padding:0 18px 16px;
+    font-size:13px;color:#a8b2c1;line-height:1.6;
+  }
+
+  /* Bottom nav */
+  .tab-nav{
+    position:fixed;bottom:0;left:0;right:0;z-index:50;
+    background:rgba(0,0,0,0.95);backdrop-filter:blur(20px);
+    border-top:1px solid rgba(255,255,255,0.08);
+    display:flex;justify-content:space-around;padding:8px 0 12px;
+  }
+  .tab{display:flex;flex-direction:column;align-items:center;gap:3px;color:#5a6473;font-size:10px;cursor:pointer;padding:6px 12px;transition:color .15s}
+  .tab.active{color:#4a9eff}
+  .tab svg{width:20px;height:20px}
+  .tab .lbl{font-size:10px;font-weight:500;letter-spacing:0.3px}
+</style>
+</head>
+<body>
+
+<header class="dash-header">
+  <button class="menu-btn" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="logo">
+    <div class="logo-text-stack">
+      <span class="logo-line1">APEX</span>
+      <span class="logo-line2">IPO ACCESS</span>
+      <span class="logo-tagline">SUPPORT CENTER</span>
+    </div>
+  </div>
+  <button class="icon-btn" aria-label="Notifications">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    </svg>
+  </button>
+</header>
+
+<main class="wrap">
+  <h1 class="page-title">How can we help?</h1>
+  <p class="page-sub">Get answers fast — chat with our team, browse FAQs, or send a support request.</p>
+
+  <div class="quick-grid">
+    <div class="quick-tile" onclick="window.location.href='mailto:support@apexipoaccess.com'">
+      <div class="ic">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+      </div>
+      <div class="title">Email us</div>
+      <div class="desc">Reply within 1 business day</div>
+    </div>
+
+    <div class="quick-tile green" onclick="document.querySelector('.apex-fw-trigger')?.click()">
+      <div class="ic">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </div>
+      <div class="title">Live chat</div>
+      <div class="desc">Available 9am–6pm ET</div>
+    </div>
+
+    <div class="quick-tile amber" onclick="document.getElementById('faqSection').scrollIntoView({behavior:'smooth'})">
+      <div class="ic">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/>
+        </svg>
+      </div>
+      <div class="title">FAQ</div>
+      <div class="desc">Common questions answered</div>
+    </div>
+
+    <div class="quick-tile purple" onclick="window.location.href='docs.html'">
+      <div class="ic">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+      </div>
+      <div class="title">Documents</div>
+      <div class="desc">Statements & disclosures</div>
+    </div>
+  </div>
+
+  <h2 class="sec-h">Send us a message</h2>
+  <form class="support-form" id="supportForm">
+    <div class="form-field">
+      <label for="topic">Topic</label>
+      <select id="topic" required>
+        <option value="">Choose a topic…</option>
+        <option value="account">Account access</option>
+        <option value="funding">Deposits & funding</option>
+        <option value="trading">Trading & allocations</option>
+        <option value="kyc">Verification (KYC)</option>
+        <option value="other">Something else</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label for="message">Message</label>
+      <textarea id="message" placeholder="Tell us what's happening…" required></textarea>
+    </div>
+    <button type="submit" class="submit-btn" id="submitBtn">Send message</button>
+    <div class="form-msg" id="formMsg"></div>
+  </form>
+
+  <h2 class="sec-h" id="faqSection">Frequently asked questions</h2>
+
+  <div class="faq-item">
+    <div class="faq-q">
+      How do I fund my account?
+      <svg class="chev" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="faq-a"><div class="faq-a-inner">Go to <a href="fund-account.html" style="color:#4a9eff">Fund Account</a> and choose either Wire Transfer or Crypto. You'll see complete instructions and a unique reference code for tracking.</div></div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">
+      How long does verification (KYC) take?
+      <svg class="chev" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="faq-a"><div class="faq-a-inner">Most accounts are verified within 1–2 business days. We'll email you as soon as your account is approved. Check status on the <a href="account.html" style="color:#4a9eff">Account</a> page.</div></div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">
+      When can I invest in a pre-IPO opportunity?
+      <svg class="chev" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="faq-a"><div class="faq-a-inner">Pre-IPO allocations open in defined windows. Browse current opportunities on the <a href="ipos.html" style="color:#4a9eff">IPOs</a> page — you'll see a countdown timer for each round.</div></div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">
+      Are my funds protected?
+      <svg class="chev" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="faq-a"><div class="faq-a-inner">Brokerage cash is held with our SIPC-member custodian and protected up to $500,000 per account. Crypto deposits are held in segregated cold storage.</div></div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">
+      How do I enable two-factor authentication?
+      <svg class="chev" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="faq-a"><div class="faq-a-inner">Open your <a href="account.html" style="color:#4a9eff">Account</a> page and toggle the "Two-factor authentication" switch. We'll email a 5-digit code each time you sign in.</div></div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">
+      Can I withdraw my funds at any time?
+      <svg class="chev" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="faq-a"><div class="faq-a-inner">Yes — uninvested cash can be withdrawn at any time via wire. Pre-IPO allocations remain locked until the company's IPO event, per the offering terms.</div></div>
+  </div>
+</main>
+
+<nav class="tab-nav">
+  <div onclick="location.href='dashboard.html'" class="tab">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+    <span class="lbl">Home</span>
+  </div>
+  <div onclick="location.href='portfolio.html'" class="tab">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18M7 14l4-4 4 4 6-6"/></svg>
+    <span class="lbl">Portfolio</span>
+  </div>
+  <div onclick="location.href='ipos.html'" class="tab">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+    <span class="lbl">IPOs</span>
+  </div>
+  <div onclick="location.href='docs.html'" class="tab">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    <span class="lbl">Docs</span>
+  </div>
+  <div onclick="location.href='account.html'" class="tab">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg>
+    <span class="lbl">Account</span>
+  </div>
+</nav>
+
+<script>
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(function(q){
+    q.addEventListener('click', function(){
+      q.parentElement.classList.toggle('open');
+    });
+  });
+
+  // Support form submission
+  document.getElementById('supportForm').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var btn = document.getElementById('submitBtn');
+    var msg = document.getElementById('formMsg');
+    var topic = document.getElementById('topic').value;
+    var message = document.getElementById('message').value.trim();
+
+    if(!topic || !message){
+      msg.textContent = 'Please choose a topic and write a message.';
+      msg.className = 'form-msg err';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    msg.textContent = '';
+
+    try {
+      var { data: userData } = await sb.auth.getUser();
+      var user = userData?.user;
+      var userEmail = user?.email || 'unknown';
+      var userId = user?.id || '';
+
+      // Try insert into support_tickets table (silently fail if table doesn't exist)
+      try {
+        await sb.from('support_tickets').insert({
+          user_id: userId,
+          email: userEmail,
+          topic: topic,
+          message: message,
+          status: 'open'
+        });
+      } catch(e) { console.warn('support_tickets table not found, falling back to mailto'); }
+
+      // Always open mailto as backup
+      var body = 'Topic: ' + topic + '\n\n' + message + '\n\n---\nFrom: ' + userEmail + '\nUser ID: ' + userId;
+      window.location.href = 'mailto:support@apexipoaccess.com?subject=' + encodeURIComponent('[Support] ' + topic) + '&body=' + encodeURIComponent(body);
+
+      msg.textContent = '✓ Opening your email client…';
+      msg.className = 'form-msg ok';
+      document.getElementById('supportForm').reset();
+    } catch(err) {
+      msg.textContent = 'Could not send. Please email support@apexipoaccess.com directly.';
+      msg.className = 'form-msg err';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Send message';
+    }
+  });
+
+  // Highlight FAQ if URL has #faqSection
+  if(window.location.hash === '#faqSection'){
+    setTimeout(function(){
+      document.getElementById('faqSection').scrollIntoView({behavior:'smooth'});
+    }, 300);
+  }
+</script>
+
+<script src="js/floating-widget.js?v=1781343118" defer></script>
+
+<script src="js/bottom-nav.js?v=1"></script>
+
+<!-- Smartsupp Live Chat -->
+<script>
+(function(d) {
+  var s, c, o = window.smartsupp = function(){ o._.push(arguments); };
+  o._ = [];
+  window._smartsupp = window._smartsupp || {};
+  window._smartsupp.key = '7d6445f6308e329b33468a584f675c298bd2c871';
+  s = d.getElementsByTagName('script')[0];
+  c = d.createElement('script');
+  c.type = 'text/javascript';
+  c.charset = 'utf-8';
+  c.async = true;
+  c.src = 'https://www.smartsuppchat.com/loader.js?';
+  s.parentNode.insertBefore(c, s);
+})(document);
+</script>
+<!-- End Smartsupp -->
+
+</body>
+</html>

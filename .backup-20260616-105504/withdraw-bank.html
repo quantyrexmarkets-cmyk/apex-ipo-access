@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bank Withdrawal | APEX IPO ACCESS</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js?v=100"></script>
+<script src="js/notify.js?v=1"></script>
+<script src="js/sidebar.js?v=1781345031" defer></script>
+<script>
+  document.addEventListener('sb-ready', async () => {
+    const { data } = await sb.auth.getUser();
+    if(!data.user) window.location.href = 'login.html';
+  });
+</script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+  a{color:inherit;text-decoration:none}
+
+  .dash-header{position:sticky;top:0;z-index:100;background:rgba(0,0,0,0.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.08);padding:16px 20px;display:flex;justify-content:space-between;align-items:center}
+  .menu-btn{width:38px;height:38px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;cursor:pointer}
+  .menu-btn span{width:22px;height:2px;background:#4a9eff;display:block;border-radius:2px}
+  .header-icons{display:flex;gap:10px;align-items:center}
+  .icon-btn{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;color:#4a9eff;background:none;cursor:pointer}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo-x{height:32px}
+  .logo-text-stack{display:flex;flex-direction:column;line-height:1}
+  .logo-line1{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#fff;letter-spacing:2px}
+  .logo-line2{font-size:7px;color:#4a9eff;letter-spacing:3px;font-weight:600}
+  .logo-tagline{font-size:5.5px;color:#6a7585;letter-spacing:2.5px;margin-top:1px}
+
+  .wrap{max-width:600px;margin:0 auto;padding:20px 20px 140px}
+  .back-btn{display:inline-flex;align-items:center;gap:6px;color:#4a9eff;font-size:13px;font-weight:500;margin-bottom:18px;cursor:pointer}
+  .back-btn svg{width:16px;height:16px}
+
+  .page-h{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:24px;color:#fff;letter-spacing:-0.5px;margin-bottom:4px}
+  .page-sub{font-size:13px;color:#8a94a3;margin-bottom:22px;line-height:1.5}
+
+  .amount-banner{background:linear-gradient(135deg,rgba(74,158,255,0.12),rgba(74,158,255,0.04));border:1px solid rgba(74,158,255,0.2);border-radius:14px;padding:18px;text-align:center;margin-bottom:24px}
+  .amount-banner .lbl{text-transform:uppercase;letter-spacing:1.5px;font-size:10px;font-weight:600;color:#a8b2c1;margin-bottom:8px}
+  .amount-banner .val{font-family:'Plus Jakarta Sans',sans-serif;font-size:44px;font-weight:200;color:#fff;letter-spacing:-1.5px;line-height:1.1;font-feature-settings:"tnum"}
+
+  .info-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:20px;margin-bottom:16px}
+  .info-card .title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:15px;color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .info-card .title svg{width:18px;height:18px;color:#4a9eff}
+
+  .field{margin-bottom:14px}
+  .field-lbl{font-size:11px;color:#8a94a3;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:6px}
+  .field-input{width:100%;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:13px 14px;color:#fff;font-family:'Inter',sans-serif;font-size:14px;outline:none;transition:border-color .15s}
+  .field-input:focus{border-color:#4a9eff}
+  .field-input.invalid{border-color:#ff6a6a}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+  .submit-btn{width:100%;padding:16px;border:none;border-radius:12px;background:linear-gradient(135deg,#4a9eff,#357abd);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:16px;cursor:pointer;transition:all .15s;margin-top:8px}
+  .submit-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(74,158,255,0.3)}
+  .submit-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
+  .fee-note{text-align:center;font-size:11px;color:#6a7585;margin-top:12px}
+
+  .summary-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;font-size:13px;color:#a8b2c1}
+  .summary-row .v{color:#fff;font-weight:500}
+  .summary-row.total{padding-top:12px;margin-top:6px;font-size:14px;border-top:1px solid rgba(255,255,255,0.08)}
+  .summary-row.total .v{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;color:#3ed598}
+</style>
+</head>
+<body>
+
+<header class="dash-header">
+  <button class="menu-btn" aria-label="Menu" >
+    <span></span><span></span><span></span>
+  </button>
+  <a href="dashboard.html" class="logo">
+    <img src="assets/spacex-logo.png" class="logo-x" alt="X" />
+    <div class="logo-text-stack">
+      <span class="logo-line1">APEX</span>
+      <span class="logo-line2">IPO ACCESS</span>
+      <span class="logo-tagline">BANK WITHDRAWAL</span>
+    </div>
+  </a>
+  <div class="header-icons">
+    <button class="icon-btn" aria-label="Notifications">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <a href="withdraw.html" class="back-btn">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    Back
+  </a>
+
+  <div class="page-h">Bank Wire Withdrawal</div>
+  <div class="page-sub">Enter your bank details to receive funds via wire transfer.</div>
+
+  <div class="amount-banner">
+    <div class="lbl">WITHDRAWAL AMOUNT (USD)</div>
+    <div class="val" id="amountVal">$0.00</div>
+  </div>
+
+  <div class="info-card">
+    <div class="title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <rect x="3" y="11" width="18" height="11" rx="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      Receiving Bank Details
+    </div>
+
+    <div class="field">
+      <div class="field-lbl">Bank name</div>
+      <input type="text" class="field-input" id="bankName" placeholder="e.g. JPMorgan Chase">
+    </div>
+    <div class="field">
+      <div class="field-lbl">Account holder name</div>
+      <input type="text" class="field-input" id="beneficiary" placeholder="Your full legal name">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <div class="field-lbl">Routing (ABA)</div>
+        <input type="text" class="field-input" id="routing" placeholder="9 digits" inputmode="numeric">
+      </div>
+      <div class="field">
+        <div class="field-lbl">Account number</div>
+        <input type="text" class="field-input" id="account" placeholder="Account #" inputmode="numeric">
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-lbl">SWIFT / BIC (international only)</div>
+      <input type="text" class="field-input" id="swift" placeholder="Optional for US wires">
+    </div>
+    <div class="field">
+      <div class="field-lbl">Bank address</div>
+      <input type="text" class="field-input" id="bankAddress" placeholder="Street, City, State">
+    </div>
+  </div>
+
+  <div class="info-card">
+    <div class="title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <line x1="9" y1="6" x2="20" y2="6"/>
+        <line x1="9" y1="12" x2="20" y2="12"/>
+        <line x1="9" y1="18" x2="20" y2="18"/>
+        <circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>
+      </svg>
+      Summary
+    </div>
+    <div class="summary-row">
+      <span>Requested amount</span>
+      <span class="v" id="sumAmount">$0.00</span>
+    </div>
+    <div class="summary-row">
+      <span>Wire fee</span>
+      <span class="v">$25.00</span>
+    </div>
+    <div class="summary-row">
+      <span>Estimated arrival</span>
+      <span class="v">1–3 business days</span>
+    </div>
+    <div class="summary-row total">
+      <span>You'll receive</span>
+      <span class="v" id="sumNet">$0.00</span>
+    </div>
+  </div>
+
+  <button class="submit-btn" id="submitBtn" disabled>Submit withdrawal request</button>
+  <div class="fee-note">Reviewed within 24 business hours · Cancel anytime before approval</div>
+
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" ></div>
+<div class="sidebar" id="sidebar"></div>
+
+<script>
+(function(){
+  var amount = parseFloat(sessionStorage.getItem('withdraw_amount') || '0');
+  if(!amount || amount <= 0){
+    apexWarn('No withdrawal amount found — redirecting');
+    setTimeout(function(){ window.location.href = 'withdraw.html'; }, 1500);
+    return;
+  }
+
+  var WIRE_FEE = 25;
+
+  function fmt(n){
+    return '$' + (parseFloat(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  document.getElementById('amountVal').textContent = fmt(amount);
+  document.getElementById('sumAmount').textContent = fmt(amount);
+  document.getElementById('sumNet').textContent = fmt(amount - WIRE_FEE);
+
+  var fields = ['bankName','beneficiary','routing','account'];
+
+  function validate(){
+    var allFilled = fields.every(function(id){
+      return document.getElementById(id).value.trim().length > 0;
+    });
+    var routing = document.getElementById('routing').value.trim();
+    var account = document.getElementById('account').value.trim();
+    var routingValid = /^\d{9}$/.test(routing);
+    var accountValid = /^\d{4,20}$/.test(account);
+
+    document.getElementById('routing').classList.toggle('invalid', routing.length > 0 && !routingValid);
+    document.getElementById('account').classList.toggle('invalid', account.length > 0 && !accountValid);
+
+    document.getElementById('submitBtn').disabled = !(allFilled && routingValid && accountValid);
+  }
+
+  fields.concat(['swift','bankAddress']).forEach(function(id){
+    document.getElementById(id).addEventListener('input', validate);
+  });
+
+  document.getElementById('submitBtn').addEventListener('click', async function(){
+    var payload = {
+      bank: document.getElementById('bankName').value.trim(),
+      beneficiary: document.getElementById('beneficiary').value.trim(),
+      routing: document.getElementById('routing').value.trim(),
+      account: document.getElementById('account').value.trim(),
+      swift: document.getElementById('swift').value.trim(),
+      bankAddress: document.getElementById('bankAddress').value.trim()
+    };
+
+    var ok = await apexConfirm({
+      title: 'Confirm withdrawal',
+      body: 'Wire ' + fmt(amount - WIRE_FEE) + ' (net of $25 fee) to:\n\n' + payload.beneficiary + '\n' + payload.bank + '\nAccount: •••' + payload.account.slice(-4),
+      okLabel: 'Submit request'
+    });
+    if(!ok) return;
+
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+
+    try {
+      var { data: userData } = await sb.auth.getUser();
+      if(!userData || !userData.user){ window.location.href = 'login.html'; return; }
+
+      var refCode = 'WB-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      sessionStorage.setItem('withdraw_ref_code', refCode);
+
+      var { error: insErr } = await sb.from('withdrawals').insert({
+        user_id: userData.user.id,
+        method: 'bank',
+        amount: amount,
+        bank_name: payload.bank,
+        beneficiary_name: payload.beneficiary,
+        routing_number: payload.routing,
+        account_number: payload.account,
+        notes: [payload.swift && ('SWIFT: '+payload.swift), payload.bankAddress && ('Addr: '+payload.bankAddress)].filter(Boolean).join(' | ') || null,
+        reference_code: refCode,
+        status: 'pending'
+      });
+
+      if(insErr){
+        apexError('Could not submit: ' + insErr.message);
+        btn.disabled = false;
+        btn.textContent = 'Submit withdrawal request';
+        return;
+      }
+
+      window.location.href = 'withdraw-process.html';
+    } catch(e){
+      apexError('Submission failed: ' + (e.message || 'unknown error'));
+      btn.disabled = false;
+      btn.textContent = 'Submit withdrawal request';
+    }
+  });
+})();
+</script>
+
+<script src="js/floating-widget.js?v=1781343118" defer></script>
+<script src="js/bottom-nav.js?v=1"></script>
+
+  <script src="js/user-bell.js?v=1"></script>
+</body>
+</html>

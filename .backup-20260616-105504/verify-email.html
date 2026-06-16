@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify Email | APEX IPO ACCESS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Inter:wght@400;500;600&family=Oswald:wght@300;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;min-height:100vh}
+  .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .card{width:100%;max-width:480px;background:#0a0d12;border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:40px 32px;text-align:center}
+  .brand{font-family:'Oswald',sans-serif;font-weight:600;font-size:18px;letter-spacing:3px;color:#fff;margin-bottom:32px;text-transform:uppercase}
+  .brand span{font-weight:300}
+  .icon{width:72px;height:72px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:20px}
+  .icon.info{background:rgba(74,158,255,0.1);border:1px solid rgba(74,158,255,0.3)}
+  .icon.success{background:rgba(62,213,152,0.1);border:1px solid rgba(62,213,152,0.3)}
+  .icon.error{background:rgba(255,106,106,0.1);border:1px solid rgba(255,106,106,0.3)}
+  .icon svg{width:32px;height:32px}
+  .icon.info svg{color:#4a9eff}
+  .icon.success svg{color:#3ed598}
+  .icon.error svg{color:#ff6a6a}
+  h1{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:22px;margin-bottom:12px}
+  .sub{color:#8b95a8;font-size:14px;line-height:1.65;margin-bottom:24px}
+  .sub b{color:#fff;font-weight:600;word-break:break-all}
+  .btn{display:inline-block;width:100%;padding:14px;background:#4a9eff;color:#000;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;text-align:center;margin-bottom:14px;transition:background .2s}
+  .btn:hover{background:#5cacff}
+  .btn-outline{background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.15)}
+  .btn-outline:hover{background:rgba(255,255,255,0.05)}
+  .help-box{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:18px;margin:20px 0;text-align:left}
+  .help-box .title{font-size:13px;font-weight:600;color:#fff;margin-bottom:10px}
+  .help-box ul{list-style:none;padding:0}
+  .help-box li{font-size:13px;color:#a8b2c1;line-height:1.7;padding-left:14px;position:relative}
+  .help-box li:before{content:'•';position:absolute;left:0;color:#4a9eff}
+  .foot{margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.05);font-size:12px;color:#6a7585}
+  .foot a{color:#4a9eff;text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="card" id="card">
+    <div class="brand">APEX <span>IPO ACCESS</span></div>
+
+    <!-- State containers -->
+    <div id="state-loading">
+      <div class="icon info">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <h1 id="loadingHeading">Verify your email</h1>
+      <p class="sub" id="loadingMsg">Loading...</p>
+    </div>
+
+    <div id="state-success" style="display:none">
+      <div class="icon success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <h1>Email verified</h1>
+      <p class="sub">Your email has been confirmed successfully. Redirecting you to your dashboard...</p>
+      <a href="dashboard.html" class="btn">Continue to dashboard →</a>
+    </div>
+
+    <div id="state-error" style="display:none">
+      <div class="icon error">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+        </svg>
+      </div>
+      <h1>Link invalid or expired</h1>
+      <p class="sub" id="errorMsg">This verification link is no longer valid. Please request a new one.</p>
+      <button class="btn" onclick="resendEmail()">Send new verification email</button>
+      <a href="login.html" class="btn btn-outline">Back to sign in</a>
+    </div>
+
+    <div id="state-sent" style="display:none">
+      <div class="icon info">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+      </div>
+      <h1>Check your inbox</h1>
+      <p class="sub">We've sent a verification email to <b id="sentEmail">your address</b>. Please check your inbox and click the verification link.</p>
+      <div class="help-box">
+        <div class="title">Didn't receive the email?</div>
+        <ul>
+          <li>Check your spam or junk folder</li>
+          <li>Make sure you entered the correct email address</li>
+          <li>Wait a few minutes and check again</li>
+        </ul>
+      </div>
+      <button class="btn" onclick="resendEmail()">Resend email</button>
+      <a href="#" class="btn btn-outline" onclick="signOut();return false;">Back to sign in</a>
+    </div>
+
+    <div class="foot">
+      Need help? <a href="mailto:support@apexipoaccess.com">support@apexipoaccess.com</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://tbivhlxkwtklhvsaggwg.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiaXZobHhrd3RrbGh2c2FnZ3dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMjc5MTEsImV4cCI6MjA5NjcwMzkxMX0.rw-LXJTPzYJu5TdEP0pgqUguviMJNwzJkpI5uGtR6XY';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+function show(state){
+  ['loading','success','error','sent'].forEach(s => {
+    document.getElementById('state-' + s).style.display = (s === state) ? '' : 'none';
+  });
+}
+
+async function signOut(){
+  try { await sb.auth.signOut(); } catch(e){}
+  window.location.href = 'login.html';
+}
+
+async function resendEmail(){
+  try {
+    const { data: u } = await sb.auth.getUser();
+    if(!u.user){ window.location.href = 'login.html'; return; }
+
+    const { data: p } = await sb.from('profiles').select('first_name').eq('id', u.user.id).single();
+
+    const { data: sess } = await sb.auth.getSession();
+    const res = await fetch(SUPABASE_URL + '/functions/v1/send-email-verification', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + sess.session.access_token
+      },
+      body: JSON.stringify({
+        email: u.user.email,
+        userId: u.user.id,
+        firstName: p?.first_name || ''
+      })
+    });
+
+    if(res.ok){
+      document.getElementById('sentEmail').textContent = u.user.email;
+      show('sent');
+    } else {
+      alert('Failed to resend. Try again in a moment.');
+    }
+  } catch(e){
+    alert('Error: ' + e.message);
+  }
+}
+
+async function verifyToken(token){
+  document.getElementById('loadingMsg').textContent = 'Verifying your email...';
+
+  const { data: codes, error } = await sb.from('email_verification_codes')
+    .select('*')
+    .eq('token', token)
+    .is('used_at', null)
+    .gt('expires_at', new Date().toISOString())
+    .limit(1);
+
+  if(error || !codes || codes.length === 0){
+    show('error');
+    return;
+  }
+
+  const record = codes[0];
+
+  // Mark used + flag profile verified
+  await sb.from('email_verification_codes').update({ used_at: new Date().toISOString() }).eq('id', record.id);
+  await sb.from('profiles').update({ email_verified_at: new Date().toISOString() }).eq('id', record.user_id);
+
+  show('success');
+  setTimeout(() => { window.location.href = 'dashboard.html'; }, 2500);
+}
+
+(async function init(){
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+
+  if(token){
+    verifyToken(token);
+    return;
+  }
+
+  // No token — user came here directly. Show "check inbox" state.
+  const { data: u } = await sb.auth.getUser();
+  if(!u.user){ window.location.href = 'login.html'; return; }
+
+  const { data: p } = await sb.from('profiles').select('*').eq('id', u.user.id).single();
+  if(!p || (p.kyc_status !== 'verified' && !p.is_admin)){
+    window.location.href = 'pending-approval.html';
+    return;
+  }
+
+  if(p.email_verified_at){
+    window.location.href = 'dashboard.html';
+    return;
+  }
+
+  // Auto-send the verification email
+  await resendEmail();
+})();
+</script>
+
+</body>
+</html>

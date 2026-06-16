@@ -1,5 +1,5 @@
 // ============================================
-// APEX IPO ACCESS — Supabase Client
+// Apex IPO Access — Supabase Client
 // ============================================
 // Loaded via CDN. Provides: window.sb (Supabase client)
 // Usage: await sb.auth.signUp({...}), await sb.from('profiles').select()

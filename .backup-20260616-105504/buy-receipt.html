@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Confirmed | APEX IPO ACCESS</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js?v=1781218671"></script>
+<script src="js/notify.js?v=1"></script>
+<script src="js/sidebar.js?v=1781345031"></script>
+<script>
+  document.addEventListener('sb-ready', async () => {
+    const { data } = await sb.auth.getUser();
+    if(!data.user) window.location.href = 'login.html';
+  });
+</script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+
+  .top-bar{
+    position:sticky;top:0;z-index:100;
+    background:rgba(0,0,0,0.92);backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding:16px 20px;
+    display:flex;justify-content:center;align-items:center;
+  }
+  .top-title{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:14px;color:#fff;letter-spacing:0.3px;
+  }
+
+  .step-bar{display:flex;justify-content:center;gap:8px;padding:18px 20px 8px}
+  .step-dot{width:34px;height:3px;border-radius:3px;background:rgba(255,255,255,0.1)}
+  .step-dot.done{background:#3ed598}
+
+  .page{max-width:560px;margin:0 auto;padding:24px 20px 140px}
+
+  /* SUCCESS HEADER */
+  .success-wrap{text-align:center;margin-bottom:32px}
+  .success-icon{
+    width:84px;height:84px;border-radius:50%;
+    background:radial-gradient(circle,rgba(62,213,152,0.25),rgba(62,213,152,0.05));
+    border:2px solid rgba(62,213,152,0.4);
+    display:inline-flex;align-items:center;justify-content:center;
+    margin-bottom:20px;
+    animation:pop .5s cubic-bezier(.4,0,.2,1);
+  }
+  .success-icon svg{width:40px;height:40px;color:#3ed598}
+  @keyframes pop{from{transform:scale(0.6);opacity:0}to{transform:scale(1);opacity:1}}
+
+  .success-lede{
+    font-size:11px;font-weight:700;color:#3ed598;
+    letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;
+  }
+  h1{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:400;font-size:30px;color:#fff;
+    letter-spacing:-0.6px;line-height:1.15;margin-bottom:10px;
+  }
+  .h1-name{font-weight:600}
+  .subtitle{
+    color:#a8b2c1;font-size:14px;line-height:1.55;
+    max-width:420px;margin:0 auto;
+  }
+
+  /* RECEIPT CARD */
+  .receipt{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:16px;padding:0;margin-bottom:14px;
+    overflow:hidden;
+  }
+  .receipt-head{
+    background:rgba(255,255,255,0.02);
+    padding:16px 20px;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .receipt-head .lbl{
+    font-size:10px;color:#6a7585;letter-spacing:0.6px;
+    text-transform:uppercase;font-weight:600;
+  }
+  .receipt-head .ref{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;color:#cfd8e8;letter-spacing:0.5px;margin-top:2px;
+  }
+  .status-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:10px;font-weight:700;
+    background:rgba(255,184,0,0.12);color:#ffb800;
+    padding:5px 10px;border-radius:6px;
+    text-transform:uppercase;letter-spacing:0.5px;
+  }
+  .status-pill .dot{
+    width:6px;height:6px;border-radius:50%;background:#ffb800;
+    animation:pulse 2s infinite;
+  }
+  @keyframes pulse{50%{opacity:0.4}}
+
+  /* Company row in receipt */
+  .co-row{
+    display:flex;align-items:center;gap:14px;
+    padding:16px 20px;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .co-row .logo{
+    width:50px;height:50px;border-radius:12px;
+    background:#fff;flex-shrink:0;overflow:hidden;padding:6px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .co-row .logo img{width:100%;height:100%;object-fit:contain}
+  .co-row .name{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:17px;color:#fff;
+  }
+  .co-row .meta{font-size:12px;color:#8a94a3;margin-top:2px}
+
+  /* Line items */
+  .lines{padding:6px 20px}
+  .line{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:10px 0;font-size:13px;color:#a8b2c1;
+    border-bottom:1px solid rgba(255,255,255,0.04);
+  }
+  .line:last-child{border-bottom:none}
+  .line .v{color:#fff;font-weight:500;font-feature-settings:"tnum"}
+  .line.total{padding-top:14px;margin-top:4px;border-top:1px solid rgba(255,255,255,0.1)}
+  .line.total .lbl{font-weight:600;color:#fff;font-size:15px}
+  .line.total .v{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:700;font-size:22px;color:#4a9eff;
+  }
+
+  /* Bonus awarded */
+  .bonus-awarded{
+    background:linear-gradient(135deg,rgba(62,213,152,0.12),rgba(62,213,152,0.03));
+    border:1px solid rgba(62,213,152,0.3);
+    border-radius:14px;padding:18px;margin-bottom:14px;
+    display:flex;align-items:center;gap:14px;
+  }
+  .bonus-awarded .ic{
+    width:48px;height:48px;border-radius:50%;
+    background:rgba(62,213,152,0.2);
+    display:flex;align-items:center;justify-content:center;
+    color:#3ed598;flex-shrink:0;
+  }
+  .bonus-awarded .ic svg{width:22px;height:22px}
+  .bonus-awarded .body{flex:1}
+  .bonus-awarded .t{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;color:#fff;font-size:15px}
+  .bonus-awarded .d{font-size:12px;color:#a8b2c1;margin-top:3px;line-height:1.4}
+  .bonus-awarded .amt{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:700;font-size:20px;color:#3ed598;flex-shrink:0;
+  }
+
+  /* Investment outlook */
+  .outlook{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px;padding:16px 18px;margin-bottom:14px;
+  }
+  .out-h{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:13px;color:#cfd8e8;
+    letter-spacing:0.3px;text-transform:uppercase;margin-bottom:14px;
+  }
+  .out-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  }
+  .out-tile{
+    background:rgba(255,255,255,0.03);
+    border-radius:10px;padding:12px;
+  }
+  .out-tile .l{font-size:10px;color:#6a7585;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:5px}
+  .out-tile .v{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:14px;color:#fff;line-height:1.3;
+  }
+
+  /* Next steps */
+  .next-steps{
+    background:rgba(74,158,255,0.05);
+    border:1px solid rgba(74,158,255,0.18);
+    border-radius:14px;padding:16px 18px;margin-bottom:14px;
+  }
+  .ns-h{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:13px;color:#4a9eff;
+    letter-spacing:0.3px;text-transform:uppercase;margin-bottom:12px;
+  }
+  .ns-item{
+    display:flex;align-items:flex-start;gap:12px;
+    padding:8px 0;font-size:13px;color:#cfd8e8;
+  }
+  .ns-num{
+    width:22px;height:22px;border-radius:50%;
+    background:rgba(74,158,255,0.15);color:#4a9eff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:700;flex-shrink:0;
+  }
+
+  /* Bottom CTAs */
+  .cta-bar{
+    position:fixed;bottom:0;left:0;right:0;
+    background:rgba(0,0,0,0.95);backdrop-filter:blur(20px);
+    padding:18px 20px 28px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    z-index:50;
+    display:flex;gap:10px;max-width:560px;margin:0 auto;
+  }
+  .btn{
+    flex:1;padding:15px;text-align:center;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:14px;font-weight:600;
+    border:none;cursor:pointer;border-radius:12px;
+    text-decoration:none;
+  }
+  .btn-primary{background:#4a9eff;color:#000}
+  .btn-primary:hover{background:#6db1ff}
+  .btn-secondary{
+    background:transparent;color:#4a9eff;
+    border:1px solid rgba(74,158,255,0.35);
+  }
+  .btn-secondary:hover{background:rgba(74,158,255,0.08)}
+
+  @media (max-width:380px){
+    .out-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<header class="top-bar">
+  <div class="top-title">Order Confirmation</div>
+</header>
+
+<div class="step-bar">
+  <div class="step-dot done"></div>
+  <div class="step-dot done"></div>
+  <div class="step-dot done"></div>
+</div>
+
+<div class="page" id="page">
+  <div id="content"></div>
+</div>
+
+<div class="cta-bar">
+  <a href="dashboard.html" class="btn btn-secondary">View Dashboard</a>
+  <a href="buy-shares.html?ticker=SPCX" class="btn btn-primary">Make Another Order</a>
+</div>
+
+<script>
+(function(){
+  const order = JSON.parse(sessionStorage.getItem('apex_last_allocation') || 'null');
+  if(!order){
+    document.getElementById('content').innerHTML = '<p style="text-align:center;color:#8a94a3;padding:60px 0">No recent order found. <a href="dashboard.html" style="color:#4a9eff">Return to dashboard</a></p>';
+    return;
+  }
+
+  const fmt    = n => '$' + Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmtInt = n => Number(n).toLocaleString('en-US');
+
+  const tierName = { 1:'Institutional', 2:'Priority', 3:'Standard' }[order.tier];
+  const settlement = { 1:'T+1', 2:'T+3', 3:'T+5' }[order.tier];
+
+  // Reference number: short uppercase
+  const ref = 'APX-' + String(order.allocation_id || '').replace(/-/g,'').toUpperCase().slice(0,10);
+
+  // Format date
+  const dt = order.created_at ? new Date(order.created_at) : new Date();
+  const dateStr = dt.toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit', hour12:true });
+
+  document.getElementById('content').innerHTML = `
+    <div class="success-wrap">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="success-lede">Order Confirmed</div>
+      <h1>Your <span class="h1-name">${order.company_name}</span><br>allocation is reserved</h1>
+      <p class="subtitle">A confirmation has been sent to your email. Your position will settle automatically once the funding process completes.</p>
+    </div>
+
+    <!-- Main receipt -->
+    <div class="receipt">
+      <div class="receipt-head">
+        <div>
+          <div class="lbl">Confirmation</div>
+          <div class="ref">${ref}</div>
+        </div>
+        <div class="status-pill"><span class="dot"></span>Pending Funding</div>
+      </div>
+
+      <div class="co-row">
+        <div class="logo"><img src="${order.company_logo || ''}" alt="${order.company_name}" onerror="this.parentElement.innerHTML='<div style=&quot;color:#000;font-weight:700;font-size:20px&quot;>${order.company_name[0]}</div>'"></div>
+        <div>
+          <div class="name">${order.company_name}</div>
+          <div class="meta">${order.sector || ''} · ${order.stage || ''}</div>
+        </div>
+      </div>
+
+      <div class="lines">
+        <div class="line"><span>Shares reserved</span><span class="v">${fmtInt(order.shares)}</span></div>
+        <div class="line"><span>Price per share</span><span class="v">${fmt(order.price_per_share)}</span></div>
+        <div class="line"><span>Allocation tier</span><span class="v">${tierName} · Tier ${order.tier}</span></div>
+        <div class="line"><span>Settlement</span><span class="v">${settlement} after IPO</span></div>
+        <div class="line"><span>Holding period</span><span class="v">${order.hold_period_label || 'Standard'}${order.hold_perk_pct ? ' · +' + order.hold_perk_pct + '%' : ''}</span></div>
+        <div class="line"><span>Order date</span><span class="v">${dateStr}</span></div>
+        <div class="line total"><span class="lbl">Total commitment</span><span class="v">${fmt(order.total_value)}</span></div>
+      </div>
+    </div>
+
+    ${order.bonus_awarded && order.bonus_awarded > 0 ? `
+    <!-- Bonus awarded -->
+    <div class="bonus-awarded">
+      <div class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="body">
+        <div class="t">Founding Investor Bonus Credited</div>
+        <div class="d">4% cash rebate added to your buying power</div>
+      </div>
+      <div class="amt">+${fmt(order.bonus_awarded)}</div>
+    </div>
+    ` : ''}
+
+    <!-- Investment outlook recap -->
+    <div class="outlook">
+      <div class="out-h">Investment Outlook</div>
+      <div class="out-grid">
+        <div class="out-tile">
+          <div class="l">Success Rate</div>
+          <div class="v">${order.success_rate || 'N/A'}%</div>
+        </div>
+        <div class="out-tile">
+          <div class="l">YoY Growth</div>
+          <div class="v">${order.growth_yoy || '—'}</div>
+        </div>
+        <div class="out-tile">
+          <div class="l">Valuation</div>
+          <div class="v">${order.valuation || '—'}</div>
+        </div>
+        <div class="out-tile">
+          <div class="l">IPO Window</div>
+          <div class="v">${order.ipo_window || 'TBD'}</div>
+        </div>
+        <div class="out-tile" style="grid-column:1/-1">
+          <div class="l">Expected Return Range</div>
+          <div class="v">${order.expected_return || 'Performance data pending'}</div>
+        </div>
+        ${(() => {
+          const m = (order.expected_return || '').match(/\+(\d+)%\s*to\s*\+(\d+)%/);
+          if(!m) return '';
+          const perk = (order.hold_perk_pct || 0) / 100;
+          const low  = (parseInt(m[1]) / 100) * (1 + perk);
+          const high = (parseInt(m[2]) / 100) * (1 + perk);
+          const lowVal  = order.total_value * (1 + low);
+          const highVal = order.total_value * (1 + high);
+          const lowGain  = order.total_value * low;
+          const highGain = order.total_value * high;
+          return `
+        <div class="out-tile estimated" style="grid-column:1/-1">
+          <div class="l">Projected Value of Your Position</div>
+          <div class="v" style="font-size:18px;color:#3ed598">${fmt(lowVal)} – ${fmt(highVal)}</div>
+          <div style="font-size:11px;color:#8a94a3;margin-top:6px;letter-spacing:0.2px">
+            Estimated profit: <strong style="color:#3ed598">+${fmt(lowGain)}</strong> to <strong style="color:#3ed598">+${fmt(highGain)}</strong> on your ${fmt(order.total_value)} commitment
+          </div>
+        </div>`;
+        })()}
+        <div class="out-tile" style="grid-column:1/-1">
+          <div class="l">Lock-up Period</div>
+          <div class="v">${(() => { const d = order.lockup_days || 60; return d % 30 === 0 ? `${d/30} month${d/30>1?'s':''} post-IPO` : `${d} days post-IPO`; })()}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Next steps -->
+    <div class="next-steps">
+      <div class="ns-h">What happens next</div>
+      <div class="ns-item">
+        <div class="ns-num">1</div>
+        <div>Fund your account to complete the allocation. Your reservation is held for 24 hours before requiring funding.</div>
+      </div>
+      <div class="ns-item">
+        <div class="ns-num">2</div>
+        <div>Your position will be priced at IPO and shares will be allocated based on your tier priority.</div>
+      </div>
+      <div class="ns-item">
+        <div class="ns-num">3</div>
+        <div>Shares settle ${settlement} after IPO date and become tradeable after the ${order.lockup_days || 180}-day lock-up period.</div>
+      </div>
+    </div>
+  `;
+})();
+</script>
+
+<script src="js/bottom-nav.js?v=1"></script>
+<script src="js/floating-widget.js?v=1781343118" defer></script>
+  <script src="js/user-bell.js?v=1"></script>
+</body>
+</html>

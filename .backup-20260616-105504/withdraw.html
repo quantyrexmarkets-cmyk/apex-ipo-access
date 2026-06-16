@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Withdraw Funds | APEX IPO ACCESS</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js?v=100"></script>
+<script src="js/notify.js?v=1"></script>
+<script src="js/sidebar.js?v=1781345031" defer></script>
+<script>
+  document.addEventListener('sb-ready', async () => {
+    const { data } = await sb.auth.getUser();
+    if(!data.user) window.location.href = 'login.html';
+  });
+</script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+  a{color:inherit;text-decoration:none}
+
+  .dash-header{
+    position:sticky;top:0;z-index:100;
+    background:rgba(0,0,0,0.92);backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding:16px 20px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .menu-btn{width:38px;height:38px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;cursor:pointer}
+  .menu-btn span{width:22px;height:2px;background:#4a9eff;display:block;border-radius:2px}
+  .header-icons{display:flex;gap:10px;align-items:center}
+  .icon-btn{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;color:#4a9eff;background:none;cursor:pointer}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo-x{height:32px}
+  .logo-text-stack{display:flex;flex-direction:column;line-height:1}
+  .logo-line1{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#fff;letter-spacing:2px}
+  .logo-line2{font-size:7px;color:#4a9eff;letter-spacing:3px;font-weight:600}
+  .logo-tagline{font-size:5.5px;color:#6a7585;letter-spacing:2.5px;margin-top:1px}
+
+  .page{max-width:560px;margin:0 auto;padding:28px 20px 100px}
+  .lede{text-align:center;color:#6a7585;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+  h1{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:500;font-size:32px;color:#fff;
+    text-align:center;letter-spacing:-0.5px;margin-bottom:10px;
+  }
+  .sub{text-align:center;color:#8a94a3;font-size:13px;margin-bottom:28px;line-height:1.5}
+
+  .bal-card{
+    background:linear-gradient(135deg,rgba(74,158,255,0.1),rgba(74,158,255,0.02));
+    border:1px solid rgba(74,158,255,0.2);
+    border-radius:16px;padding:22px;text-align:center;margin-bottom:24px;
+  }
+  .bal-lbl{
+    text-transform:uppercase;letter-spacing:1.5px;
+    font-size:10px;font-weight:600;color:#a8b2c1;
+    margin-bottom:8px;
+  }
+  .bal-val{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:44px;font-weight:200;color:#fff;
+    letter-spacing:-1.5px;line-height:1.1;
+    font-feature-settings:"tnum";
+  }
+  .bal-meta{font-size:11px;color:#6a7585;margin-top:8px}
+
+  .section-h{
+    font-size:12px;color:#a8b2c1;font-weight:600;
+    letter-spacing:0.3px;margin:24px 0 12px;
+  }
+
+  .amount-box{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:14px;padding:18px;
+  }
+  .amount-row{display:flex;align-items:center;gap:14px}
+  .amount-prefix{font-size:24px;color:#8a94a3;font-weight:500}
+  .amount-input{
+    flex:1;background:transparent;border:none;color:#fff;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:500;font-size:28px;letter-spacing:-0.5px;
+    outline:none;font-feature-settings:"tnum";
+    -moz-appearance:textfield;
+  }
+  .amount-input::-webkit-outer-spin-button,
+  .amount-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .amount-meta{font-size:11px;color:#6a7585;margin-top:10px}
+
+  .quick-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+  .quick-btn{
+    background:rgba(74,158,255,0.06);
+    border:1px solid rgba(74,158,255,0.18);
+    color:#4a9eff;font-size:12px;font-weight:600;
+    padding:9px;border-radius:8px;cursor:pointer;font-family:inherit;
+    transition:all .15s;
+  }
+  .quick-btn:hover{background:rgba(74,158,255,0.12)}
+
+  .methods{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+  .method{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:14px;padding:16px;
+    display:flex;align-items:center;gap:14px;
+    cursor:pointer;transition:all .15s;position:relative;
+  }
+  .method:hover{border-color:rgba(74,158,255,0.4)}
+  .method.selected{
+    border-color:#4a9eff;
+    background:linear-gradient(135deg,rgba(74,158,255,0.08),rgba(74,158,255,0.02));
+  }
+  .method.recommended{
+    border-color:rgba(62,213,152,0.4);
+    background:linear-gradient(135deg,rgba(62,213,152,0.06),rgba(62,213,152,0.01));
+  }
+  .method.recommended.selected{
+    border-color:#3ed598;
+    background:linear-gradient(135deg,rgba(62,213,152,0.12),rgba(62,213,152,0.03));
+  }
+  .rec-badge{
+    position:absolute;top:-9px;right:14px;
+    background:linear-gradient(135deg,#3ed598,#2eb87a);
+    color:#0a0a0a;font-size:9px;font-weight:800;
+    padding:3px 9px;border-radius:6px;letter-spacing:0.8px;
+    box-shadow:0 4px 12px rgba(62,213,152,0.35);
+  }
+  .method-ic{
+    width:42px;height:42px;border-radius:11px;
+    background:rgba(74,158,255,0.12);color:#4a9eff;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .method.recommended .method-ic{background:rgba(62,213,152,0.12);color:#3ed598}
+  .method-ic svg{width:22px;height:22px}
+  .method-body{flex:1;min-width:0}
+  .method-name{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:14px;color:#fff;
+  }
+  .method-desc{font-size:11px;color:#8a94a3;margin-top:3px;line-height:1.4}
+  .method-meta{text-align:right;flex-shrink:0}
+  .method-time{font-size:11px;color:#cfd8e8;font-weight:500}
+  .method-fee{font-size:10px;color:#6a7585;margin-top:2px}
+  .method-check{
+    width:22px;height:22px;border-radius:50%;
+    border:2px solid rgba(255,255,255,0.2);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .method.selected .method-check{background:#4a9eff;border-color:#4a9eff}
+  .method.recommended.selected .method-check{background:#3ed598;border-color:#3ed598}
+  .method.selected .method-check::after{
+    content:"";width:8px;height:5px;
+    border-left:2px solid #000;border-bottom:2px solid #000;
+    transform:rotate(-45deg) translate(0,-1px);
+  }
+
+  .warn-line{
+    background:rgba(255,184,0,0.06);
+    border:1px solid rgba(255,184,0,0.15);
+    border-radius:10px;padding:12px 14px;
+    margin-top:18px;
+    display:flex;gap:10px;align-items:flex-start;
+    font-size:11px;color:#cfd8e8;line-height:1.5;
+  }
+  .warn-line svg{width:14px;height:14px;color:#ffb800;flex-shrink:0;margin-top:1px}
+
+  .continue-btn{
+    display:block;width:100%;
+    background:#4a9eff;color:#000;
+    padding:18px;text-align:center;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:16px;font-weight:600;
+    border:none;cursor:pointer;border-radius:14px;
+    transition:all .15s;margin-top:24px;
+    box-shadow:0 8px 24px rgba(74,158,255,0.25);
+  }
+  .continue-btn:hover{background:#6db1ff}
+  .continue-btn:disabled{background:#2a2f38;color:#5a6473;cursor:not-allowed}
+
+  .skel{
+    background:linear-gradient(90deg,rgba(255,255,255,0.04),rgba(255,255,255,0.08),rgba(255,255,255,0.04));
+    background-size:200% 100%;animation:sk 1.4s infinite;
+    border-radius:6px;color:transparent;display:inline-block;min-width:60px;
+  }
+  @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+</style>
+</head>
+<body>
+
+<header class="dash-header">
+  <button class="menu-btn" aria-label="Menu" >
+    <span></span><span></span><span></span>
+  </button>
+  <a href="dashboard.html" class="logo">
+    <img src="assets/spacex-logo.png" class="logo-x" alt="X" />
+    <div class="logo-text-stack">
+      <span class="logo-line1">APEX</span>
+      <span class="logo-line2">IPO ACCESS</span>
+      <span class="logo-tagline">WITHDRAW FUNDS</span>
+    </div>
+  </a>
+  <div class="header-icons">
+    <button class="icon-btn" aria-label="Notifications">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<div class="page">
+  <div class="lede">Move funds out of your account</div>
+  <h1>Withdraw funds</h1>
+  <p class="sub">Move funds from your APEX account to your bank or crypto wallet. All requests are reviewed for security.</p>
+
+  <!-- Available balance -->
+  <div class="bal-card">
+    <div class="bal-lbl">Available to withdraw</div>
+    <div class="bal-val" id="availableBal"><span class="skel">$0.00</span></div>
+    <div class="bal-meta" id="pendingBal"></div>
+  </div>
+
+  <!-- Amount -->
+  <div class="section-h">Amount to withdraw</div>
+  <div class="amount-box">
+    <div class="amount-row">
+      <span class="amount-prefix">$</span>
+      <input type="number" class="amount-input" id="amount" placeholder="0" min="50" step="10" inputmode="decimal">
+    </div>
+    <div class="amount-meta" id="amountMeta">Crypto min $50 · ACH min $100 · Wire min $500</div>
+    <div class="quick-row">
+      <button class="quick-btn" data-pct="25">25%</button>
+      <button class="quick-btn" data-pct="50">50%</button>
+      <button class="quick-btn" data-pct="75">75%</button>
+      <button class="quick-btn" data-pct="100">Max</button>
+    </div>
+  </div>
+
+  <!-- Method -->
+  <div class="section-h">Choose withdrawal method</div>
+
+  <div class="methods">
+    <div class="method recommended selected" data-method="crypto">
+      <span class="rec-badge">RECOMMENDED</span>
+      <div class="method-ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M9.5 8h4a2.5 2.5 0 0 1 0 5h-4M9.5 13h4.5a2.5 2.5 0 0 1 0 5H9.5M9.5 6v12"/>
+        </svg>
+      </div>
+      <div class="method-body">
+        <div class="method-name">Cryptocurrency</div>
+        <div class="method-desc">Withdraw to your BTC, ETH, USDT, USDC, or DOGE wallet</div>
+      </div>
+      <div class="method-meta">
+        <div class="method-time">~1 hour</div>
+        <div class="method-fee">Network fee only</div>
+      </div>
+      <div class="method-check"></div>
+    </div>
+
+    <div class="method" data-method="ach">
+      <div class="method-ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="6" width="20" height="12" rx="2"/>
+          <line x1="2" y1="10" x2="22" y2="10"/>
+          <line x1="6" y1="14" x2="10" y2="14"/>
+        </svg>
+      </div>
+      <div class="method-body">
+        <div class="method-name">Bank Transfer (ACH)</div>
+        <div class="method-desc">Standard transfer to your verified bank account</div>
+      </div>
+      <div class="method-meta">
+        <div class="method-time">3–5 days</div>
+        <div class="method-fee" style="color:#3ed598">No fee</div>
+      </div>
+      <div class="method-check"></div>
+    </div>
+
+    <div class="method" data-method="bank">
+      <div class="method-ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="13 17 18 12 13 7"/>
+          <polyline points="6 17 11 12 6 7"/>
+        </svg>
+      </div>
+      <div class="method-body">
+        <div class="method-name">Bank Wire</div>
+        <div class="method-desc">Expedited transfer to your verified bank account</div>
+      </div>
+      <div class="method-meta">
+        <div class="method-time">1–3 days</div>
+        <div class="method-fee">$25 fee</div>
+      </div>
+      <div class="method-check"></div>
+    </div>
+  </div>
+
+  <!-- Notice -->
+  <div class="warn-line">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <div>For your security, all withdrawals undergo compliance review. Approved requests are typically processed within one business day.</div>
+  </div>
+
+
+  <button class="continue-btn" id="continueBtn">Continue</button>
+
+</div>
+
+<!-- Sidebar mounts -->
+<div class="sidebar-overlay" id="sidebarOverlay" ></div>
+<div class="sidebar" id="sidebar"></div>
+
+<script>
+(function(){
+  var state = {
+    balance: 0,
+    pendingWithdraw: 0,
+    available: 0,
+    selectedMethod: 'crypto'
+  };
+
+  var amountInput = document.getElementById('amount');
+  var continueBtn = document.getElementById('continueBtn');
+  var availableEl = document.getElementById('availableBal');
+  var pendingEl   = document.getElementById('pendingBal');
+  var amountMeta  = document.getElementById('amountMeta');
+
+  function fmt(n){
+    return '$' + (parseFloat(n) || 0).toLocaleString('en-US', {
+      minimumFractionDigits: 2, maximumFractionDigits: 2
+    });
+  }
+
+  function getMinMax(){
+    if(state.selectedMethod === 'bank')
+      return { min: 500, fee: 25, label: 'Wire min $500 · $25 fee' };
+    if(state.selectedMethod === 'ach')
+      return { min: 100, fee: 0,  label: 'ACH min $100 · No fee · 3–5 business days' };
+    return { min: 50, fee: 0, label: 'Crypto min $50 · Network fee only' };
+  }
+
+  function updateMeta(){
+    var info = getMinMax();
+    amountMeta.textContent = info.label;
+  }
+
+  function validate(){
+    var amt = parseFloat(amountInput.value) || 0;
+    var info = getMinMax();
+
+    if(amt <= 0){
+      continueBtn.disabled = true;
+      return null;
+    }
+    if(amt < info.min){
+      continueBtn.disabled = true;
+      return null;
+    }
+    if(amt > state.available){
+      continueBtn.disabled = true;
+      return null;
+    }
+    continueBtn.disabled = false;
+    return amt;
+  }
+
+  // ── Method click ─────────────────────────────
+  document.querySelectorAll('.method').forEach(function(m){
+    m.addEventListener('click', function(){
+      document.querySelectorAll('.method').forEach(function(x){ x.classList.remove('selected'); });
+      m.classList.add('selected');
+      state.selectedMethod = m.getAttribute('data-method');
+      updateMeta();
+      validate();
+    });
+  });
+
+  // ── Quick amount buttons ─────────────────────
+  document.querySelectorAll('.quick-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var pct = parseInt(b.getAttribute('data-pct')) / 100;
+      var amt = Math.floor(state.available * pct * 100) / 100;
+      amountInput.value = amt > 0 ? amt : '';
+      validate();
+    });
+  });
+
+  amountInput.addEventListener('input', validate);
+
+  // ── Continue ─────────────────────────────────
+  continueBtn.addEventListener('click', function(){
+    var amt = parseFloat(amountInput.value) || 0;
+    var info = getMinMax();
+
+    if(amt <= 0){ apexError('Please enter an amount'); return; }
+    if(amt < info.min){
+      var methodName = state.selectedMethod === 'bank' ? 'Bank wire' : state.selectedMethod === 'ach' ? 'ACH transfer' : 'Crypto';
+      apexError(methodName + ' minimum is ' + fmt(info.min));
+      return;
+    }
+    if(amt > state.available){
+      apexError('Amount exceeds available balance (' + fmt(state.available) + ')');
+      return;
+    }
+
+    // Persist & route
+    sessionStorage.setItem('withdraw_method', state.selectedMethod);
+    sessionStorage.setItem('withdraw_amount', String(amt));
+    sessionStorage.removeItem('withdraw_ref_code'); // start fresh
+
+    if(state.selectedMethod === 'crypto'){
+      window.location.href = 'withdraw-crypto.html';
+    } else if(state.selectedMethod === 'ach'){
+      window.location.href = 'withdraw-ach.html';
+    } else {
+      window.location.href = 'withdraw-bank.html';
+    }
+  });
+
+  // ── Load user balance + pending withdrawals ──
+  async function loadBalance(){
+    try {
+      var { data: userData } = await sb.auth.getUser();
+      if(!userData || !userData.user){ window.location.href='login.html'; return; }
+      var uid = userData.user.id;
+
+      // Get cash balance
+      var { data: profile, error: pErr } = await sb.from('profiles')
+        .select('cash_balance')
+        .eq('id', uid)
+        .single();
+      if(pErr){ apexError('Could not load balance: ' + pErr.message); return; }
+      state.balance = parseFloat(profile.cash_balance || 0);
+
+      // Get pending withdrawals (subtract from available)
+      try {
+        var { data: pending } = await sb.from('withdrawals')
+          .select('amount')
+          .eq('user_id', uid)
+          .in('status', ['pending','approved']);
+        state.pendingWithdraw = (pending || []).reduce(function(s,w){ return s + parseFloat(w.amount || 0); }, 0);
+      } catch(e){ /* table might not exist yet */ }
+
+      state.available = Math.max(0, state.balance - state.pendingWithdraw);
+
+      availableEl.textContent = fmt(state.available);
+      availableEl.classList.remove('skel');
+
+      if(state.pendingWithdraw > 0){
+        pendingEl.textContent = fmt(state.pendingWithdraw) + ' in pending withdrawals';
+      }
+
+      updateMeta();
+      validate();
+    } catch(e){
+      apexError('Could not load account: ' + (e.message || 'network error'));
+    }
+  }
+
+  if(window.sb) loadBalance();
+  else document.addEventListener('sb-ready', loadBalance, { once: true });
+
+  validate(); // start disabled
+})();
+</script>
+
+<script src="js/floating-widget.js?v=1781343118" defer></script>
+<script src="js/bottom-nav.js?v=1"></script>
+
+  <script src="js/user-bell.js?v=1"></script>
+</body>
+</html>

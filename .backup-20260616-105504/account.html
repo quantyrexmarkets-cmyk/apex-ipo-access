@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account | APEX IPO ACCESS</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js?v=1781218671"></script>
+<script src="js/notify.js?v=1"></script>
+<script src="js/sidebar.js?v=1781345031" defer></script>
+<script>
+  document.addEventListener('sb-ready', async () => {
+    const { data } = await sb.auth.getUser();
+    if(!data.user) window.location.href = 'login.html';
+  });
+</script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+
+  .dash-header{
+    position:sticky;top:0;z-index:100;
+    background:rgba(0,0,0,0.92);backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding:16px 20px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .menu-btn{
+    width:38px;height:38px;
+    display:flex;flex-direction:column;justify-content:center;align-items:center;
+    gap:5px;background:none;border:none;cursor:pointer;
+  }
+  .menu-btn span{width:22px;height:2px;background:#4a9eff;display:block;border-radius:2px}
+  .header-icons{display:flex;gap:10px;align-items:center}
+  .icon-btn{
+    width:38px;height:38px;border-radius:50%;
+    border:1px solid rgba(255,255,255,0.15);
+    display:flex;align-items:center;justify-content:center;
+    color:#4a9eff;background:none;cursor:pointer;position:relative;
+  }
+
+  .page-title{padding:24px 20px 8px;text-align:center}
+  .page-title .lede{
+    font-size:11px;color:#6a7585;font-weight:600;
+    letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;
+  }
+  .page-title h1{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:400;font-size:30px;color:#fff;letter-spacing:-0.6px;
+  }
+
+  .wrap{max-width:680px;margin:0 auto;padding:8px 20px 120px}
+
+  .profile-hero{
+    background:linear-gradient(135deg,rgba(74,158,255,0.1),rgba(74,158,255,0.02));
+    border:1px solid rgba(74,158,255,0.2);
+    border-radius:18px;padding:24px;margin-bottom:18px;
+    display:flex;align-items:center;gap:18px;
+  }
+  .ph-avatar{
+    width:72px;height:72px;border-radius:50%;
+    background:linear-gradient(135deg,#4a9eff,#1a5bbf);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:700;font-size:28px;color:#fff;
+    letter-spacing:-0.5px;flex-shrink:0;
+  }
+  .ph-body{flex:1;min-width:0}
+  .ph-name{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:20px;color:#fff;letter-spacing:-0.3px;
+  }
+  .ph-email{
+    font-size:13px;color:#a8b2c1;margin-top:3px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .ph-badges{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+  .badge{
+    font-size:10px;font-weight:700;padding:4px 9px;border-radius:6px;
+    text-transform:uppercase;letter-spacing:0.4px;
+    display:inline-flex;align-items:center;gap:5px;
+  }
+  .badge.verified{background:rgba(62,213,152,0.12);color:#3ed598}
+  .badge.tier{background:rgba(255,184,0,0.12);color:#ffb800}
+  .badge svg{width:11px;height:11px}
+
+  .section{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px;margin-bottom:14px;overflow:hidden;
+  }
+  .section-h{
+    padding:14px 18px 6px;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:12px;color:#8a94a3;
+    letter-spacing:0.5px;text-transform:uppercase;
+  }
+
+  .row{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 18px;
+    border-top:1px solid rgba(255,255,255,0.05);
+    cursor:pointer;transition:background .12s;
+  }
+  .row:first-of-type{border-top:none}
+  .row:hover{background:rgba(255,255,255,0.02)}
+  .row.no-hover{cursor:default}
+  .row.no-hover:hover{background:transparent}
+
+  .row-lbl{
+    display:flex;align-items:center;gap:12px;
+    color:#cfd8e8;font-size:14px;font-weight:500;
+  }
+  .row-lbl .ic{
+    width:34px;height:34px;border-radius:9px;
+    background:rgba(74,158,255,0.1);color:#4a9eff;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .row-lbl .ic svg{width:16px;height:16px}
+  .row-lbl .ic.green{background:rgba(62,213,152,0.1);color:#3ed598}
+  .row-lbl .ic.amber{background:rgba(255,184,0,0.1);color:#ffb800}
+  .row-lbl .ic.red{background:rgba(255,106,106,0.1);color:#ff6a6a}
+
+  .row-val{
+    display:flex;align-items:center;gap:8px;
+    font-size:13px;color:#fff;font-weight:500;text-align:right;
+    max-width:55%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .row-val .sub{color:#8a94a3;font-weight:400;font-size:12px}
+  .row-val .chev{color:#5a6473;flex-shrink:0}
+  .row-val .chev svg{width:14px;height:14px}
+
+  .row-val .pill{
+    font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;
+    text-transform:uppercase;letter-spacing:0.4px;
+  }
+  .pill.ok{background:rgba(62,213,152,0.12);color:#3ed598}
+  .pill.warn{background:rgba(255,184,0,0.12);color:#ffb800}
+
+  .logout-row{
+    color:#ff6a6a;justify-content:center;font-weight:600;
+    text-transform:uppercase;letter-spacing:0.5px;font-size:13px;
+  }
+  .logout-row:hover{background:rgba(255,106,106,0.05)}
+
+  .tab-nav{
+    position:fixed;bottom:0;left:0;right:0;
+    background:rgba(0,0,0,0.95);backdrop-filter:blur(20px);
+    border-top:1px solid rgba(255,255,255,0.08);
+    display:grid;grid-template-columns:repeat(5,1fr);
+    padding:8px 0 14px;z-index:50;
+  }
+  .tab{
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    padding:8px 4px;color:#5a6473;cursor:pointer;transition:color .15s;
+  }
+  .tab.active{color:#4a9eff}
+  .tab svg{width:20px;height:20px}
+  .tab .lbl{font-size:10px;font-weight:500;letter-spacing:0.3px}
+
+  .skel{
+    display:inline-block;
+    background:linear-gradient(90deg,rgba(255,255,255,0.04),rgba(255,255,255,0.1),rgba(255,255,255,0.04));
+    background-size:200% 100%;animation:sk 1.4s infinite;
+    border-radius:4px;color:transparent;min-width:80px;
+  }
+  @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+  .ph-avatar:hover .avatar-edit-overlay{opacity:1 !important}
+  .ph-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+  .kyc-cta-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:linear-gradient(135deg,#4a9eff,#3a86d6);color:#000;border:none;border-radius:11px;font-weight:700;font-size:13px;letter-spacing:0.4px;cursor:pointer;margin-top:12px;text-decoration:none;font-family:inherit}
+  .kyc-cta-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(74,158,255,0.3)}
+  .kyc-cta-btn.danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
+  .kyc-cta-btn.success{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff}
+  .kyc-cta-btn svg{width:15px;height:15px}
+
+  </style>
+
+<style>
+  /* ============ ACCOUNT SETTINGS MODALS ============ */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:9000;
+    background:rgba(0,0,0,0.78);
+    backdrop-filter:blur(8px);
+    display:none; align-items:center; justify-content:center;
+    padding:20px; opacity:0;
+    transition:opacity .2s;
+  }
+  .modal-overlay.open{ display:flex; opacity:1; }
+  .modal-box{
+    background:rgba(18,18,22,0.99);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:16px; padding:24px;
+    max-width:420px; width:100%;
+    max-height:90vh; overflow-y:auto;
+    transform:scale(0.94); transition:transform .2s;
+    font-family:'Inter',sans-serif;
+  }
+  .modal-overlay.open .modal-box{ transform:scale(1); }
+  .modal-box.modal-wide{ max-width:480px; }
+  .modal-box h3{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600; font-size:19px; color:#fff;
+    margin:0 0 6px;
+  }
+  .modal-sub{ font-size:13px; color:#a8b2c1; line-height:1.5; margin-bottom:18px; }
+  .modal-field{ margin-bottom:14px; }
+  .modal-field label{
+    display:block; font-size:11px; color:#8a94a3;
+    font-weight:600; text-transform:uppercase;
+    letter-spacing:0.5px; margin-bottom:6px;
+  }
+  .modal-field input{
+    width:100%; padding:11px 14px;
+    background:rgba(0,0,0,0.4);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:9px; color:#fff;
+    font-family:inherit; font-size:14px;
+    outline:none; transition:border-color .15s;
+  }
+  .modal-field input:focus{ border-color:#4a9eff; }
+  .modal-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .modal-grid-3{ display:grid; grid-template-columns:2fr 1fr 1fr; gap:12px; }
+  .modal-actions{
+    display:flex; gap:10px; justify-content:flex-end;
+    margin-top:20px; padding-top:18px;
+    border-top:1px solid rgba(255,255,255,0.06);
+  }
+  .m-btn{
+    padding:11px 18px; border:none; border-radius:9px;
+    font-size:13px; font-weight:600;
+    cursor:pointer; font-family:inherit;
+    transition:all .15s;
+  }
+  .m-btn.ghost{ background:rgba(255,255,255,0.06); color:#a8b2c1; }
+  .m-btn.ghost:hover{ background:rgba(255,255,255,0.1); color:#fff; }
+  .m-btn.primary{
+    background:linear-gradient(135deg,#4a9eff,#357abd); color:#fff;
+  }
+  .m-btn.primary:hover{ filter:brightness(1.1); }
+  .m-btn.primary:disabled{ opacity:0.4; cursor:not-allowed; }
+  .m-btn.danger{
+    background:linear-gradient(135deg,#ff6a6a,#c44545); color:#fff;
+  }
+
+  /* 2FA status box */
+  .tf-status{
+    background:rgba(74,158,255,0.06);
+    border:1px solid rgba(74,158,255,0.18);
+    border-radius:10px; padding:14px;
+    margin-bottom:16px;
+  }
+  .tf-status.on{
+    background:rgba(62,213,152,0.06);
+    border-color:rgba(62,213,152,0.25);
+  }
+  .tf-status-text strong{
+    display:block; font-size:14px; color:#fff;
+    margin-bottom:4px;
+  }
+  .tf-status-text span{
+    font-size:12px; color:#8a94a3; line-height:1.4;
+  }
+
+  /* Login activity list */
+  .la-list{ max-height:340px; overflow-y:auto; }
+  .la-item{
+    display:flex; align-items:center; gap:12px;
+    padding:12px 0;
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    font-size:13px;
+  }
+  .la-item:last-child{ border-bottom:none; }
+  .la-ic{
+    width:32px; height:32px; border-radius:50%;
+    background:rgba(62,213,152,0.12); color:#3ed598;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .la-ic svg{ width:14px; height:14px; }
+  .la-body{ flex:1; min-width:0; }
+  .la-time{ color:#fff; font-weight:500; }
+  .la-meta{ color:#6a7585; font-size:11px; margin-top:2px; }
+  .la-empty{ text-align:center; padding:20px; color:#6a7585; font-size:13px; }
+
+  /* Terms links */
+  .terms-links{ display:flex; flex-direction:column; gap:8px; margin-bottom:8px; }
+  .t-link{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 16px; border-radius:11px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    transition:all .15s; cursor:pointer; text-decoration:none;
+  }
+  .t-link:hover{
+    border-color:rgba(74,158,255,0.3);
+    background:rgba(74,158,255,0.04);
+  }
+  .t-link strong{ display:block; color:#fff; font-size:14px; font-weight:600; margin-bottom:2px; }
+  .t-link span{ color:#8a94a3; font-size:11px; }
+  .t-link svg{ width:16px; height:16px; color:#5a6473; }
+</style>
+</head>
+<body>
+
+<header class="dash-header">
+  <button class="menu-btn" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <a href="dashboard.html" class="logo">
+    <img src="assets/spacex-logo.png" class="logo-x" alt="X" />
+    <div class="logo-text-stack">
+      <span class="logo-line1">APEX</span>
+      <span class="logo-line2">IPO ACCESS</span>
+      <span class="logo-tagline">INVESTMENT INTELLIGENCE</span>
+    </div>
+  </a>
+  <div class="header-icons">
+    <button class="icon-btn" aria-label="Notifications">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<div class="page-title">
+  <div class="lede">Account Overview</div>
+  <h1>Investor Profile</h1>
+</div>
+
+<div class="wrap">
+
+  <!-- PROFILE HERO -->
+  <div class="profile-hero">
+    <div class="ph-avatar-wrap" style="position:relative;display:inline-block">
+      <label class="ph-avatar" id="phAvatar" for="avatarUpload" style="cursor:pointer;position:relative;overflow:hidden">·</label>
+      <input type="file" id="avatarUpload" accept="image/*" style="display:none">
+      <label for="avatarUpload" class="avatar-camera-badge" style="position:absolute;bottom:-2px;right:-2px;width:32px;height:32px;border-radius:50%;background:#4a9eff;border:3px solid #0a0d11;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(74,158,255,0.4);z-index:5">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#000" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </label>
+    </div>
+    <div class="ph-body">
+      <div class="ph-name" id="phName"><span class="skel">·········</span></div>
+      <div class="ph-email" id="phEmail"><span class="skel">·············</span></div>
+      <div class="ph-badges">
+        <span class="badge verified" id="phKycBadge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          KYC Verified
+        </span>
+        <span class="badge tier">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8 12 2"/></svg>
+          Founding Investor
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERSONAL INFO -->
+  <div class="section">
+    <div class="section-h">Personal Information</div>
+    <div class="row no-hover">
+      <div class="row-lbl">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        Full name
+      </div>
+      <div class="row-val"><span id="vName"><span class="skel">·········</span></span></div>
+    </div>
+    <div class="row no-hover">
+      <div class="row-lbl">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        Email
+      </div>
+      <div class="row-val"><span id="vEmail"><span class="skel">···········</span></span></div>
+    </div>
+    <div class="row no-hover">
+      <div class="row-lbl">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+        Phone
+      </div>
+      <div class="row-val"><span id="vPhone">—</span></div>
+    </div>
+    <div class="row no-hover">
+      <div class="row-lbl">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        Address
+      </div>
+      <div class="row-val"><span id="vAddress">—</span></div>
+    </div>
+    <a href="kyc.html" id="kycCtaBtn" class="kyc-cta-btn" style="display:flex">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M15 8h2M15 12h2M7 16h10"/></svg>
+    <span id="kycCtaLabel">Verify Your Identity</span>
+  </a>
+  <div class="row" onclick="window.openEditProfile()">
+      <div class="row-lbl">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+        Edit personal details
+      </div>
+      <div class="row-val"><span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
+    </div>
+  </div>
+
+  <!-- ACCOUNT STATUS -->
+  <div class="section">
+    <div class="section-h">Account Status</div>
+    <div class="row no-hover">
+      <div class="row-lbl">
+        <div class="ic green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></div>
+        Identity verification
+      </div>
+      <div class="row-val"><span class="pill ok" id="vKyc">Verified</span></div>
+    </div>
+    <div class="row no-hover">
+      <div class="row-lbl">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+        Account types
+      </div>
+      <div class="row-val"><span id="vAcctTypes">—</span></div>
+    </div>
+    <div class="row no-hover">
+      <div class="row-lbl">
+        <div class="ic amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+        Investor tier
+      </div>
+      <div class="row-val"><span class="pill warn">Founding</span></div>
+    </div>
+    <div class="row no-hover">
+      <div class="row-lbl">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        Member since
+      </div>
+      <div class="row-val"><span id="vSince">—</span></div>
+    </div>
+  </div>
+
+  <!-- BALANCES -->
+  <div class="section">
+    <div class="section-h">Balances</div>
+    <div class="row no-hover">
+      <div class="row-lbl">
+        <div class="ic green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        Cash balance
+      </div>
+      <div class="row-val"><span id="vCash">$0.00</span></div>
+    </div>
+    <div class="row no-hover">
+      <div class="row-lbl">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+        Total committed
+      </div>
+      <div class="row-val"><span id="vCommitted">$0.00</span></div>
+    </div>
+    <div class="row" onclick="location.href='fund-account.html'">
+      <div class="row-lbl">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></div>
+        Fund account
+      </div>
+      <div class="row-val"><span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
+    </div>
+  </div>
+
+  <!-- SECURITY -->
+  <div class="section">
+    <div class="section-h">Security &amp; Privacy</div>
+    <div class="row" onclick="window.openChangePassword()">
+      <div class="row-lbl">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        Change password
+      </div>
+      <div class="row-val"><span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
+    </div>
+    <div class="row" onclick="window.openTwoFactor()">
+      <div class="row-lbl">
+        <div class="ic green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        Two-factor authentication
+      </div>
+      <div class="row-val"><span class="pill warn">Off</span><span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
+    </div>
+    <div class="row" onclick="window.openLoginActivity()">
+      <div class="row-lbl">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        Login activity
+      </div>
+      <div class="row-val"><span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
+    </div>
+  </div>
+
+  <!-- PREFERENCES -->
+  <div class="section">
+    <div class="section-h">Preferences</div>
+    <div class="row" onclick="apexAlert({title:'Email Notifications',body:'You receive emails for: account updates, deposits, withdrawals, KYC reviews, login alerts, IPO allocations, and share purchases. Reply to any email to manage preferences.'})">
+      <div class="row-lbl">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+        Email notifications
+      </div>
+      <div class="row-val"><span class="pill ok">On</span><span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
+    </div>
+    <div class="row" onclick="apexAlert('Additional language support is in development. APEX is currently available in English (US).')">
+      <div class="row-lbl">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+        Language
+      </div>
+      <div class="row-val"><span class="sub">English (US)</span><span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
+    </div>
+  </div>
+
+  <!-- SUPPORT -->
+  <div class="section">
+    <div class="section-h">Support</div>
+    <div class="row" onclick="location.href='contact.html'">
+      <div class="row-lbl">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+        Help &amp; Support
+      </div>
+      <div class="row-val"><span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
+    </div>
+    <div class="row" onclick="window.openTerms()">
+      <div class="row-lbl">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        Terms &amp; Privacy
+      </div>
+      <div class="row-val"><span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
+    </div>
+  </div>
+
+  <!-- LOGOUT -->
+  <div class="section">
+    <div class="row logout-row" id="logoutRow">
+      Sign Out
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM TAB NAV -->
+<nav class="tab-nav">
+  <div onclick="location.href='dashboard.html'" class="tab">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span class="lbl">Home</span>
+  </div>
+  <div onclick="location.href='portfolio.html'" class="tab">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span class="lbl">Portfolio</span>
+  </div>
+  <div onclick="location.href='ipos.html'" class="tab">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+    <span class="lbl">IPOs</span>
+  </div>
+  <div onclick="location.href='docs.html'" class="tab">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    <span class="lbl">Docs</span>
+  </div>
+  <div onclick="location.href='account.html'" class="tab">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>
+    <span class="lbl">Account</span>
+  </div>
+</nav>
+
+  <!-- SECURITY -->
+<script>
+(async function(){
+  if(!window.sb) await new Promise(r => document.addEventListener('sb-ready', r, { once:true }));
+  const { data: { user } } = await sb.auth.getUser();
+  if(!user) return;
+
+  const profile = await window.apex.getProfile();
+  const fmt = n => '$' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  // Profile hero
+  const fullName = (profile?.first_name && profile?.last_name)
+    ? `${profile.prefix ? profile.prefix + ' ' : ''}${profile.first_name} ${profile.last_name}${profile.suffix ? ' ' + profile.suffix : ''}`
+    : (profile?.first_name || (user.email || '').split('@')[0] || 'Investor');
+  const initial = (profile?.first_name || user.email || 'A').charAt(0).toUpperCase();
+
+  document.getElementById('phAvatar').textContent = initial;
+  document.getElementById('phName').textContent = fullName;
+  document.getElementById('phEmail').textContent = user.email || '';
+
+  // Personal info
+  document.getElementById('vName').textContent = fullName;
+  document.getElementById('vEmail').textContent = user.email || '—';
+  document.getElementById('vPhone').textContent = profile?.phone || '—';
+
+  const addr = profile && (profile.address_line1 || profile.city)
+    ? [profile.address_line1, profile.city, profile.state, profile.zip].filter(Boolean).join(', ')
+    : '—';
+  document.getElementById('vAddress').textContent = addr;
+
+  // Account status
+  const kycEl = document.getElementById('vKyc');
+  const kyc = profile?.kyc_status || 'pending';
+  if(kyc === 'verified'){
+    kycEl.textContent = 'Verified';
+    kycEl.className = 'pill ok';
+  } else if(kyc === 'pending'){
+    kycEl.textContent = 'Pending';
+    kycEl.className = 'pill warn';
+  } else {
+    kycEl.textContent = 'Rejected';
+    kycEl.className = 'pill warn';
+  }
+
+  document.getElementById('vAcctTypes').textContent = (profile?.account_types || []).join(', ') || 'Individual';
+
+  if(profile?.created_at){
+    const d = new Date(profile.created_at);
+    document.getElementById('vSince').textContent = d.toLocaleDateString('en-US',{month:'short',year:'numeric'});
+  }
+
+  // Balances
+  document.getElementById('vCash').textContent = fmt(profile?.cash_balance);
+
+  const { data: allocs } = await sb.from('allocations').select('total_value').eq('user_id', user.id);
+  const committed = (allocs || []).reduce((s,a) => s + parseFloat(a.total_value || 0), 0);
+  document.getElementById('vCommitted').textContent = fmt(committed);
+
+  // Logout
+  document.getElementById('logoutRow').addEventListener('click', async () => {
+    if(!confirm('Sign out of your APEX account?')) return;
+    await sb.auth.signOut();
+    sessionStorage.clear();
+    window.location.href = 'login.html';
+  });
+})();
+</script>
+
+<script src="js/bottom-nav.js?v=1"></script>
+
+<!-- ============ ACCOUNT SETTINGS MODALS ============ -->
+
+<div class="modal-overlay" id="editProfileModal">
+  <div class="modal-box">
+    <h3>Edit Profile</h3>
+    <div class="modal-grid">
+      <div class="modal-field">
+        <label>First name</label>
+        <input type="text" id="epFirst" autocomplete="given-name">
+      </div>
+      <div class="modal-field">
+        <label>Last name</label>
+        <input type="text" id="epLast" autocomplete="family-name">
+      </div>
+    </div>
+    <div class="modal-field">
+      <label>Phone</label>
+      <input type="tel" id="epPhone" autocomplete="tel" placeholder="+1 555 123 4567">
+    </div>
+    <div class="modal-field">
+      <label>Address line 1</label>
+      <input type="text" id="epAddr1" autocomplete="address-line1">
+    </div>
+    <div class="modal-grid-3">
+      <div class="modal-field">
+        <label>City</label>
+        <input type="text" id="epCity" autocomplete="address-level2">
+      </div>
+      <div class="modal-field">
+        <label>State</label>
+        <input type="text" id="epState" autocomplete="address-level1">
+      </div>
+      <div class="modal-field">
+        <label>ZIP</label>
+        <input type="text" id="epZip" autocomplete="postal-code">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="m-btn ghost" onclick="closeAcctModal('editProfileModal')">Cancel</button>
+      <button class="m-btn primary" id="epSaveBtn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="changePwdModal">
+  <div class="modal-box">
+    <h3>Change Password</h3>
+    <p class="modal-sub">Choose a strong password with at least 8 characters.</p>
+    <div class="modal-field">
+      <label>New password</label>
+      <input type="password" id="cpNew" autocomplete="new-password" placeholder="Minimum 8 characters">
+    </div>
+    <div class="modal-field">
+      <label>Confirm new password</label>
+      <input type="password" id="cpConfirm" autocomplete="new-password" placeholder="Re-enter password">
+    </div>
+    <div class="modal-actions">
+      <button class="m-btn ghost" onclick="closeAcctModal('changePwdModal')">Cancel</button>
+      <button class="m-btn primary" id="cpSaveBtn">Update Password</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="twoFactorModal">
+  <div class="modal-box">
+    <h3>Two-Factor Authentication</h3>
+    <p class="modal-sub" id="tfDesc">When enabled, you'll receive a 5-digit verification code by email each time you sign in.</p>
+    <div class="tf-status" id="tfStatusBox">
+      <div class="tf-status-text">
+        <strong id="tfStatusLbl">Loading…</strong>
+        <span id="tfStatusSub">Checking current status</span>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="m-btn ghost" onclick="closeAcctModal('twoFactorModal')">Close</button>
+      <button class="m-btn primary" id="tfToggleBtn">Loading…</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="loginActivityModal">
+  <div class="modal-box">
+    <h3>Login Activity</h3>
+    <p class="modal-sub">Your last sign-in events. If you don't recognize any of these, change your password immediately.</p>
+    <div id="laList" class="la-list">
+      <div class="la-empty">Loading…</div>
+    </div>
+    <div class="modal-actions">
+      <button class="m-btn ghost" onclick="closeAcctModal('loginActivityModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="termsModal">
+  <div class="modal-box modal-wide">
+    <h3>Terms &amp; Privacy</h3>
+    <div class="terms-links">
+      <a class="t-link" href="terms.html" target="_blank">
+        <div>
+          <strong>Terms of Service</strong>
+          <span>Read our user agreement</span>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+      <a class="t-link" href="privacy.html" target="_blank">
+        <div>
+          <strong>Privacy Policy</strong>
+          <span>How we collect and protect your data</span>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+      <a class="t-link" href="risk.html" target="_blank">
+        <div>
+          <strong>Risk Disclosure</strong>
+          <span>Investment risks &amp; suitability</span>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+      <a class="t-link" href="form-crs.html" target="_blank">
+        <div>
+          <strong>Form CRS</strong>
+          <span>Client Relationship Summary</span>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    </div>
+    <div class="modal-actions">
+      <button class="m-btn ghost" onclick="closeAcctModal('termsModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ============ ACCOUNT SETTINGS LOGIC ============
+(function(){
+  function openAcctModal(id){
+    var m = document.getElementById(id);
+    if(m) m.classList.add('open');
+  }
+  function closeAcctModal(id){
+    var m = document.getElementById(id);
+    if(m) m.classList.remove('open');
+  }
+  window.closeAcctModal = closeAcctModal;
+
+  // Close on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(function(o){
+    o.addEventListener('click', function(e){
+      if(e.target === o) o.classList.remove('open');
+    });
+  });
+
+  // ── 1. EDIT PROFILE ─────────────────────────
+  window.openEditProfile = async function(){
+    try {
+      var { data: userData } = await sb.auth.getUser();
+      if(!userData || !userData.user) return apexError('Not signed in');
+      var { data: profile, error } = await sb.from('profiles').select('*').eq('id', userData.user.id).single();
+      if(error){ apexError('Could not load profile: ' + error.message); return; }
+      document.getElementById('epFirst').value = profile.first_name || '';
+      document.getElementById('epLast').value  = profile.last_name  || '';
+      document.getElementById('epPhone').value = profile.phone      || '';
+      document.getElementById('epAddr1').value = profile.address_line1 || '';
+      document.getElementById('epCity').value  = profile.city  || '';
+      document.getElementById('epState').value = profile.state || '';
+      document.getElementById('epZip').value   = profile.zip   || '';
+      openAcctModal('editProfileModal');
+    } catch(e){ apexError('Failed to open profile editor: ' + e.message); }
+  };
+
+  var epSaveBtn = document.getElementById('epSaveBtn');
+  if(epSaveBtn) epSaveBtn.addEventListener('click', async function(){
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    try {
+      var { data: userData } = await sb.auth.getUser();
+      var updates = {
+        first_name:    document.getElementById('epFirst').value.trim(),
+        last_name:     document.getElementById('epLast').value.trim(),
+        phone:         document.getElementById('epPhone').value.trim(),
+        address_line1: document.getElementById('epAddr1').value.trim(),
+        city:          document.getElementById('epCity').value.trim(),
+        state:         document.getElementById('epState').value.trim(),
+        zip:           document.getElementById('epZip').value.trim()
+      };
+      var { error } = await sb.from('profiles').update(updates).eq('id', userData.user.id);
+      if(error){ apexError('Save failed: ' + error.message); return; }
+      apexSuccess('Profile updated');
+      closeAcctModal('editProfileModal');
+      var fullName = [updates.first_name, updates.last_name].filter(Boolean).join(' ') || '—';
+      var addr = [updates.address_line1, updates.city, updates.state, updates.zip].filter(Boolean).join(', ') || '—';
+      var elN = document.getElementById('vName');  if(elN) elN.textContent = fullName;
+      var elP = document.getElementById('vPhone'); if(elP) elP.textContent = updates.phone || '—';
+      var elA = document.getElementById('vAddress'); if(elA) elA.textContent = addr;
+      var elH = document.getElementById('phName'); if(elH) elH.textContent = fullName;
+    } catch(e){ apexError('Save failed: ' + e.message); }
+    finally { btn.disabled = false; btn.textContent = 'Save Changes'; }
+  });
+
+  // ── 2. CHANGE PASSWORD ─────────────────────
+  window.openChangePassword = function(){
+    document.getElementById('cpNew').value = '';
+    document.getElementById('cpConfirm').value = '';
+    openAcctModal('changePwdModal');
+  };
+
+  var cpSaveBtn = document.getElementById('cpSaveBtn');
+  if(cpSaveBtn) cpSaveBtn.addEventListener('click', async function(){
+    var btn = this;
+    var newPw = document.getElementById('cpNew').value;
+    var confirm = document.getElementById('cpConfirm').value;
+    if(newPw.length < 8){ apexError('Password must be at least 8 characters'); return; }
+    if(newPw !== confirm){ apexError('Passwords do not match'); return; }
+    btn.disabled = true;
+    btn.textContent = 'Updating…';
+    try {
+      var { error } = await sb.auth.updateUser({ password: newPw });
+      if(error){ apexError('Update failed: ' + error.message); return; }
+      apexSuccess('Password updated successfully');
+      closeAcctModal('changePwdModal');
+    } catch(e){ apexError('Update failed: ' + e.message); }
+    finally { btn.disabled = false; btn.textContent = 'Update Password'; }
+  });
+
+  // ── 3. TWO-FACTOR AUTH ─────────────────────
+  var tfState = { enabled: false, userId: null };
+
+  window.openTwoFactor = async function(){
+    try {
+      var { data: userData } = await sb.auth.getUser();
+      if(!userData || !userData.user) return apexError('Not signed in');
+      tfState.userId = userData.user.id;
+      var { data: profile, error } = await sb.from('profiles').select('two_factor_enabled').eq('id', tfState.userId).single();
+      if(error){ apexError('Could not load 2FA status: ' + error.message); return; }
+      tfState.enabled = !!profile.two_factor_enabled;
+      renderTfState();
+      openAcctModal('twoFactorModal');
+    } catch(e){ apexError('Failed: ' + e.message); }
+  };
+
+  function renderTfState(){
+    var box = document.getElementById('tfStatusBox');
+    var lbl = document.getElementById('tfStatusLbl');
+    var sub = document.getElementById('tfStatusSub');
+    var btn = document.getElementById('tfToggleBtn');
+    if(!box || !lbl || !sub || !btn) return;
+    if(tfState.enabled){
+      box.classList.add('on');
+      lbl.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> Two-factor authentication is ON';
+      sub.textContent = "You'll receive a 5-digit code by email each time you sign in.";
+      btn.textContent = 'Disable 2FA';
+      btn.className = 'm-btn danger';
+    } else {
+      box.classList.remove('on');
+      lbl.textContent = 'Two-factor authentication is OFF';
+      sub.textContent = 'Add an extra layer of security to your account.';
+      btn.textContent = 'Enable 2FA';
+      btn.className = 'm-btn primary';
+    }
+  }
+
+  var tfToggleBtn = document.getElementById('tfToggleBtn');
+  if(tfToggleBtn) tfToggleBtn.addEventListener('click', async function(){
+    var btn = this;
+    var newState = !tfState.enabled;
+    if(!newState){
+      var ok = await apexConfirm({
+        title: 'Disable 2FA?',
+        body: 'Your account will be less secure. We recommend keeping 2FA enabled.',
+        okLabel: 'Disable',
+        danger: true
+      });
+      if(!ok) return;
+    }
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    try {
+      var { error } = await sb.from('profiles').update({ two_factor_enabled: newState }).eq('id', tfState.userId);
+      if(error){ apexError('Could not update: ' + error.message); return; }
+      tfState.enabled = newState;
+      renderTfState();
+      apexSuccess(newState ? '2FA enabled' : '2FA disabled');
+      var pills = document.querySelectorAll('.row .pill');
+      pills.forEach(function(p){
+        if(p.textContent === 'Off' || p.textContent === 'On'){
+          p.textContent = newState ? 'On' : 'Off';
+          p.className = newState ? 'pill ok' : 'pill warn';
+        }
+      });
+    } catch(e){ apexError('Failed: ' + e.message); }
+    finally { btn.disabled = false; }
+  });
+
+  // ── 4. LOGIN ACTIVITY ──────────────────────
+  window.openLoginActivity = async function(){
+    openAcctModal('loginActivityModal');
+    var list = document.getElementById('laList');
+    list.innerHTML = '<div class="la-empty">Loading…</div>';
+    try {
+      var { data: userData } = await sb.auth.getUser();
+      if(!userData || !userData.user) return;
+      var user = userData.user;
+      var items = [];
+      if(user.last_sign_in_at){
+        items.push({ time: user.last_sign_in_at, label: 'Most recent sign-in' });
+      }
+      if(user.confirmed_at && user.confirmed_at !== user.last_sign_in_at){
+        items.push({ time: user.confirmed_at, label: 'Email verified' });
+      }
+      if(user.created_at){
+        items.push({ time: user.created_at, label: 'Account created' });
+      }
+      try {
+        var { data: logs } = await sb.from('login_history').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(10);
+        if(logs && logs.length){
+          items = logs.map(function(l){ return { time: l.created_at, label: 'Sign-in', meta: l.ip_address || l.user_agent }; });
+        }
+      } catch(e){ /* optional table */ }
+
+      if(!items.length){ list.innerHTML = '<div class="la-empty">No activity yet</div>'; return; }
+
+      list.innerHTML = items.map(function(it){
+        var d = new Date(it.time);
+        var when = d.toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit' });
+        return '<div class="la-item"><div class="la-ic"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="la-body"><div class="la-time">' + when + '</div><div class="la-meta">' + (it.label || '') + (it.meta ? ' · ' + it.meta : '') + '</div></div></div>';
+      }).join('');
+    } catch(e){
+      list.innerHTML = '<div class="la-empty">Could not load: ' + e.message + '</div>';
+    }
+  };
+
+  // ── 5. TERMS & PRIVACY ─────────────────────
+  window.openTerms = function(){ openAcctModal('termsModal'); };
+
+  console.log('<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> Account settings ready');
+})();
+</script>
+
+<script src="js/floating-widget.js?v=1781343118" defer></script>
+  <script src="js/user-bell.js?v=1"></script>
+
+<!-- Avatar upload + KYC CTA wiring -->
+<script>
+(async function(){
+  function waitForUser(){
+    return new Promise(function(res){
+      var tries = 0;
+      var iv = setInterval(async function(){
+        tries++;
+        if(typeof sb !== 'undefined' && window.apex){
+          var u = await window.apex.getUser();
+          if(u){ clearInterval(iv); res(u); }
+        }
+        if(tries > 30){ clearInterval(iv); res(null); }
+      }, 200);
+    });
+  }
+
+  var user = await waitForUser();
+  if(!user) return;
+  var profile = await window.apex.getProfile();
+
+  // Show existing avatar if set
+  if(profile?.avatar_url){
+    var av = document.getElementById('phAvatar');
+    if(av){
+      // Clear text and insert img
+      var existing = av.querySelector('img');
+      if(!existing){
+        var img = document.createElement('img');
+        img.src = profile.avatar_url + '?t=' + Date.now();
+        img.alt = 'Avatar';
+        av.insertBefore(img, av.firstChild);
+      }
+      av.style.color = 'transparent';
+    }
+  }
+
+  // Configure KYC CTA based on status
+  var btn = document.getElementById('kycCtaBtn');
+  var lbl = document.getElementById('kycCtaLabel');
+  if(btn && lbl){
+    var accSt = (profile?.account_status || 'pending').toLowerCase();
+    var st = (profile?.kyc_status || 'not_submitted').toLowerCase();
+    // Only show KYC button if account is approved
+    if(accSt !== 'approved'){
+      btn.style.display = 'none';
+    } else if(st === 'verified'){
+      lbl.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> Identity Verified';
+      btn.classList.add('success');
+    } else if(st === 'rejected'){
+      btn.style.display = 'flex';
+      btn.classList.add('danger');
+      lbl.textContent = 'Re-submit Documents';
+    } else if(profile?.kyc_submitted_at){
+      btn.style.display = 'flex';
+      btn.classList.add('success');
+      lbl.textContent = 'View Submitted Documents';
+    } else {
+      btn.style.display = 'flex';
+      lbl.textContent = 'Verify Your Identity';
+    }
+  }
+
+  // Wire avatar upload
+  var input = document.getElementById('avatarUpload');
+  if(input){
+    input.addEventListener('change', async function(e){
+      var f = e.target.files[0];
+      if(!f) return;
+      if(f.size > 3*1024*1024){ alert('Image too large (max 3MB)'); return; }
+      if(!f.type.startsWith('image/')){ alert('Please select an image'); return; }
+      try {
+        var ext = (f.name.split('.').pop()||'jpg').toLowerCase();
+        var path = user.id + '/avatar.' + ext;
+        var up = await sb.storage.from('avatars').upload(path, f, { upsert:true, cacheControl:'3600' });
+        if(up.error) throw up.error;
+        var pub = sb.storage.from('avatars').getPublicUrl(path);
+        var url = pub.data?.publicUrl;
+        if(!url) throw new Error('Could not get public URL');
+        var r = await sb.from('profiles').update({ avatar_url: url }).eq('id', user.id);
+        if(r.error) throw r.error;
+        // Update display
+        var av = document.getElementById('phAvatar');
+        var existing = av.querySelector('img');
+        if(existing){ existing.src = url + '?t=' + Date.now(); }
+        else {
+          var img = document.createElement('img');
+          img.src = url + '?t=' + Date.now();
+          av.insertBefore(img, av.firstChild);
+          av.style.color = 'transparent';
+        }
+        if(window.apexToast) window.apexToast('Profile photo updated');
+        else alert('Profile photo updated');
+      } catch(err){
+        alert('Upload failed: ' + (err.message || err));
+      }
+    });
+  }
+})();
+</script>
+
+
+<!-- Smartsupp Live Chat -->
+<script>
+(function(d) {
+  var s, c, o = window.smartsupp = function(){ o._.push(arguments); };
+  o._ = [];
+  window._smartsupp = window._smartsupp || {};
+  window._smartsupp.key = '7d6445f6308e329b33468a584f675c298bd2c871';
+  s = d.getElementsByTagName('script')[0];
+  c = d.createElement('script');
+  c.type = 'text/javascript';
+  c.charset = 'utf-8';
+  c.async = true;
+  c.src = 'https://www.smartsuppchat.com/loader.js?';
+  s.parentNode.insertBefore(c, s);
+})(document);
+</script>
+<!-- End Smartsupp -->
+
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SmartSupp Test</title>
+<style>
+  body{background:#000;color:#fff;font-family:sans-serif;padding:24px}
+  button{
+    display:block;width:100%;margin:8px 0;padding:14px;
+    background:#1a1a22;border:1px solid #4a9eff;
+    color:#fff;border-radius:10px;cursor:pointer;font-size:14px;
+  }
+  pre{background:#111;padding:12px;border-radius:8px;font-size:11px;
+      max-height:200px;overflow:auto;border:1px solid #333}
+  .log{color:#3ed598;margin:4px 0}
+  .err{color:#ff6a6a;margin:4px 0}
+</style>
+</head>
+<body>
+
+<h2>🧪 SmartSupp Diagnostic</h2>
+
+<button onclick="checkLoaded()">1. Check if SmartSupp loaded</button>
+<button onclick="openChat()">2. Open Chat</button>
+<button onclick="loadManually()">3. Force Reload SmartSupp</button>
+<button onclick="document.getElementById('log').innerHTML=''">Clear log</button>
+
+<h3>Status</h3>
+<pre id="log"></pre>
+
+<script>
+  var log = document.getElementById('log');
+  function logIt(msg, isErr){
+    var el = document.createElement('div');
+    el.className = isErr ? 'err' : 'log';
+    el.textContent = (new Date()).toLocaleTimeString() + ' — ' + msg;
+    log.appendChild(el);
+  }
+
+  function checkLoaded(){
+    logIt('typeof window.smartsupp = ' + typeof window.smartsupp);
+    logIt('typeof window._smartsupp = ' + typeof window._smartsupp);
+    if (window._smartsupp) logIt('_smartsupp.key = ' + window._smartsupp.key);
+    var sb = document.querySelector('script[src*="smartsuppchat"]');
+    logIt('Script tag in DOM? ' + (sb ? 'YES — ' + sb.src : 'NO'), !sb);
+    var ssEls = document.querySelectorAll('[id*="smartsupp"],[class*="smartsupp"]');
+    logIt('SmartSupp DOM elements: ' + ssEls.length);
+    ssEls.forEach(function(e,i){
+      logIt('  [' + i + '] ' + e.tagName + '#' + (e.id||'(no-id)') + ' .' + (e.className||'(no-class)'));
+    });
+  }
+
+  function openChat(){
+    if (typeof window.smartsupp !== 'function') {
+      logIt('❌ window.smartsupp is not a function yet', true);
+      return;
+    }
+    try {
+      window.smartsupp('chat:open');
+      logIt('✅ smartsupp("chat:open") called');
+    } catch(e){
+      logIt('❌ Error: ' + e.message, true);
+    }
+  }
+
+  function loadManually(){
+    logIt('Loading SmartSupp manually…');
+    window._smartsupp = window._smartsupp || {};
+    window._smartsupp.key = '7d6445f6308e329b33468a584f675c298bd2c871';
+    // NO hideWidget — let it show its bubble so we KNOW it loaded
+    (function(d){
+      var s, c, o = window.smartsupp = function(){ o._.push(arguments); };
+      o._ = [];
+      s = d.getElementsByTagName('script')[0];
+      c = d.createElement('script');
+      c.type = 'text/javascript';
+      c.charset = 'utf-8';
+      c.async = true;
+      c.src = 'https://www.smartsuppchat.com/loader.js?';
+      c.onload = function(){ logIt('✅ loader.js loaded'); };
+      c.onerror = function(){ logIt('❌ loader.js FAILED to load — check network/adblock', true); };
+      s.parentNode.insertBefore(c, s);
+    })(document);
+    logIt('Script tag injected — wait 3-5 seconds, then click "Check if loaded"');
+  }
+</script>
+
+</body>
+</html>

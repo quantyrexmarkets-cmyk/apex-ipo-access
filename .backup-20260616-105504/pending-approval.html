@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account Pending | APEX IPO ACCESS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js?v=100"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{
+    background:#000;color:#fff;
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .wrap{
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;
+  }
+  .card{
+    width:100%;max-width:440px;
+    background:#0a0d12;
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:16px;
+    padding:40px 32px;
+    text-align:center;
+  }
+  .brand{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:700;font-size:14px;letter-spacing:3px;
+    color:#fff;margin-bottom:48px;
+  }
+  .brand span{color:#4a9eff}
+
+  .icon{
+    width:64px;height:64px;border-radius:50%;
+    background:rgba(255,184,0,0.08);
+    border:1px solid rgba(255,184,0,0.25);
+    display:inline-flex;align-items:center;justify-content:center;
+    margin-bottom:24px;
+  }
+  .icon svg{width:28px;height:28px;color:#ffb800}
+
+  h1{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600;font-size:22px;letter-spacing:-0.3px;
+    margin-bottom:10px;color:#fff;
+  }
+  .sub{
+    color:#8b95a8;font-size:14px;line-height:1.6;
+    margin-bottom:32px;
+  }
+  .sub b{color:#fff;font-weight:600}
+
+  .meta{
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.05);
+    border-radius:10px;
+    padding:16px;margin-bottom:24px;
+    text-align:left;
+  }
+  .meta-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:8px 0;font-size:13px;
+  }
+  .meta-row + .meta-row{border-top:1px solid rgba(255,255,255,0.04)}
+  .meta-row .l{color:#6a7585;font-weight:500}
+  .meta-row .v{color:#fff;font-weight:600;font-family:'Manrope',sans-serif}
+  .meta-row .status{color:#ffb800;display:flex;align-items:center;gap:6px}
+  .meta-row .status::before{
+    content:'';width:6px;height:6px;border-radius:50%;
+    background:#ffb800;
+    animation:pulse 1.6s infinite;
+  }
+  @keyframes pulse{50%{opacity:0.3}}
+
+  .notice{
+    font-size:13px;color:#a8b2c1;line-height:1.6;
+    margin-bottom:28px;
+    padding:14px 16px;
+    background:rgba(74,158,255,0.06);
+    border:1px solid rgba(74,158,255,0.15);
+    border-radius:10px;
+    text-align:left;
+  }
+  .notice b{color:#fff;font-weight:600;display:block;margin-bottom:4px;font-size:13px}
+
+  .btn-row{display:flex;gap:10px;margin-bottom:24px}
+  .btn{
+    flex:1;padding:13px;border-radius:10px;
+    font-family:'Inter',sans-serif;
+    font-weight:600;font-size:13px;
+    cursor:pointer;border:none;transition:all .2s;
+    text-decoration:none;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .btn-primary{background:#4a9eff;color:#000}
+  .btn-primary:hover{background:#5cacff}
+  .btn-outline{
+    background:transparent;color:#fff;
+    border:1px solid rgba(255,255,255,0.12);
+  }
+  .btn-outline:hover{background:rgba(255,255,255,0.04)}
+
+  .foot{
+    font-size:12px;color:#6a7585;
+    padding-top:20px;
+    border-top:1px solid rgba(255,255,255,0.05);
+  }
+  .foot a{color:#4a9eff;font-weight:500;text-decoration:none}
+  .foot a:hover{text-decoration:underline}
+  .foot .sep{margin:0 8px;color:#3a4250}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="card">
+
+    <div class="brand">APEX <span>·</span> IPO ACCESS</div>
+
+    <div id="pendingState">
+    <div class="icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+    </div>
+
+    <h1>Application under review</h1>
+    <div class="sub">
+      Thanks, <b id="userName">Investor</b>. Our compliance team is verifying your information. This typically takes up to 24 hours.
+    </div>
+
+    <div class="meta">
+      <div class="meta-row">
+        <span class="l">Email</span>
+        <span class="v" id="userEmail">—</span>
+      </div>
+      <div class="meta-row">
+        <span class="l">Submitted</span>
+        <span class="v" id="submitDate">—</span>
+      </div>
+      <div class="meta-row">
+        <span class="l">Status</span>
+        <span class="v status">Pending review</span>
+      </div>
+    </div>
+
+    <div class="notice">
+      <b>What happens next?</b>
+      You'll receive an email at the address above once your account is approved. No further action is required from you right now.
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="window.location.reload()">Refresh status</button>
+      <a class="btn btn-primary" href="mailto:support@apexipoaccess.com?subject=Account Review">Contact support</a>
+    </div>
+
+    <div class="foot">
+      <a href="#" onclick="window._logout();return false;">Sign out</a>
+      <span class="sep">·</span>
+      <a href="mailto:support@apexipoaccess.com">support@apexipoaccess.com</a>
+    </div>
+    </div>
+
+    <div id="approvedState" style="display:none">
+      <div class="icon" style="background:rgba(62,213,152,0.08);border-color:rgba(62,213,152,0.3)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#3ed598" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+
+      <h1>Account approved</h1>
+      <div class="sub">
+        Welcome aboard, <b id="userName2">Investor</b>. Your account has been verified by our compliance team and is now active.
+      </div>
+
+      <div class="notice" style="background:rgba(62,213,152,0.06);border-color:rgba(62,213,152,0.18)">
+        <b style="color:#3ed598"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> Verification complete</b>
+        You now have full access to APEX IPO ACCESS — including pre-IPO opportunities, deposits, and your investor dashboard.
+      </div>
+
+      <div class="btn-row">
+        <a class="btn btn-primary" href="#" onclick="window._goToLogin();return false;" style="flex:1">Login to dashboard →</a>
+      </div>
+
+      <div class="foot">
+        Need help? <a href="mailto:support@apexipoaccess.com">support@apexipoaccess.com</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  window._logout = async function(){
+    try { await sb.auth.signOut(); } catch(e){}
+    window.location.href = 'login.html';
+  };
+
+  document.addEventListener('sb-ready', async function(){
+    var { data } = await sb.auth.getUser();
+    if(!data.user){ window.location.href = 'login.html'; return; }
+
+    var { data: profile } = await sb.from('profiles').select('*').eq('id', data.user.id).single();
+    if(profile){
+      if(profile.banned){
+        await sb.auth.signOut();
+        alert('Your account has been suspended.\n\n' + (profile.banned_reason || ''));
+        window.location.href = 'login.html';
+        return;
+      }
+
+      var name = ((profile.first_name||'') + ' ' + (profile.last_name||'')).trim() || 'Investor';
+      document.getElementById('userName').textContent = name;
+      var un2 = document.getElementById('userName2'); if(un2) un2.textContent = name;
+      document.getElementById('userEmail').textContent = profile.email || data.user.email || '—';
+      if(profile.created_at){
+        document.getElementById('submitDate').textContent = new Date(profile.created_at).toLocaleDateString('en-US',{month:'short', day:'numeric', year:'numeric'});
+      }
+
+      // <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> Approved — switch to success state
+      if(profile.kyc_status === 'verified' || profile.is_admin){
+        showApprovedState();
+      }
+    }
+  });
+
+  function showApprovedState(){
+    document.getElementById('pendingState').style.display = 'none';
+    document.getElementById('approvedState').style.display = 'block';
+  }
+
+  window._goToLogin = async function(){
+    try { await sb.auth.signOut(); } catch(e){}
+    window.location.href = 'login.html';
+  };
+</script>
+
+</body>
+</html>

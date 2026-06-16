@@ -239,7 +239,7 @@
     </nav>
 
     <div class="ax-sb-foot">
-      <span>APEX IPO ACCESS</span>
+      <span>Apex IPO Access</span>
       <span class="ver">v1.0</span>
     </div>
   `;
