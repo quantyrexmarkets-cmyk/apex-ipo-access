@@ -1394,8 +1394,8 @@
     const { data: { user } } = await sb.auth.getUser();
     if(!user) return; // auth guard handles redirect
 
-    // 1. Profile → greeting
-    const profile = await window.apex.getProfile();
+    // 1. Profile → greeting (fetch full row including cash_balance)
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
     console.log('Profile loaded:', profile);
     if(profile){
       const name = profile.first_name || (user.email || '').split('@')[0] || 'Investor';
