@@ -318,7 +318,7 @@
     }
   }
 
-  document.addEventListener('sb-ready', function(){
+  function initLogin(){
     // Don't auto-redirect logged-in users to dashboard;
     // just let them re-enter credentials if they want.
     // Do NOT call signOut() here — it creates a race condition with sign-in
@@ -409,7 +409,8 @@
         });
     });
   });
-});
+  }
+  if (window.__sbReady) { initLogin(); } else { document.addEventListener("sb-ready", initLogin); }
 </script>
 <!-- /2fa-login-hook -->
 
