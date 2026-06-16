@@ -9,8 +9,8 @@
 <title>Admin Panel | Apex IPO Access</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js?v=1781643381"></script>
-<script src="js/notify.js?v=1781643381"></script>
+<script src="js/supabase.js?v=1781545021"></script>
+<script src="js/notify.js?v=1"></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
@@ -1469,7 +1469,6 @@
               <option value="BTC">Bitcoin (BTC)</option>
               <option value="ETH">Ethereum (ETH)</option>
               <option value="USDT">Tether (USDT)</option>
-              <option value="DOGE">Dogecoin (DOGE)</option>
               <option value="USDC">USD Coin (USDC)</option>
               <option value="SOL">Solana (SOL)</option>
               <option value="XRP">XRP</option>
@@ -2942,26 +2941,6 @@
     document.getElementById('wsUpdated').value = new Date().toLocaleString();
   };
 
-
-  // Coin logos from CoinGecko CDN
-  var COIN_LOGOS = {
-    'BTC':   'https://assets.coingecko.com/coins/images/1/small/bitcoin.png',
-    'ETH':   'https://assets.coingecko.com/coins/images/279/small/ethereum.png',
-    'USDT':  'https://assets.coingecko.com/coins/images/325/small/Tether.png',
-    'USDC':  'https://assets.coingecko.com/coins/images/6319/small/usdc.png',
-    'BNB':   'https://assets.coingecko.com/coins/images/825/small/bnb-icon2_2x.png',
-    'SOL':   'https://assets.coingecko.com/coins/images/4128/small/solana.png',
-    'XRP':   'https://assets.coingecko.com/coins/images/44/small/xrp-symbol-white-128.png',
-    'TRX':   'https://assets.coingecko.com/coins/images/1094/small/tron-logo.png',
-    'DOGE':  'https://assets.coingecko.com/coins/images/5/small/dogecoin.png',
-    'ADA':   'https://assets.coingecko.com/coins/images/975/small/cardano.png',
-    'MATIC': 'https://assets.coingecko.com/coins/images/4713/small/polygon.png',
-    'LTC':   'https://assets.coingecko.com/coins/images/2/small/litecoin.png',
-    'AVAX':  'https://assets.coingecko.com/coins/images/12559/small/Avalanche_Circle_RedWhite_Trans.png',
-    'DOT':   'https://assets.coingecko.com/coins/images/12171/small/polkadot.png',
-    'SHIB':  'https://assets.coingecko.com/coins/images/11939/small/shiba.png'
-  };
-
   async function loadWallets(){
     try {
       var { data } = await sb.from('crypto_wallets').select('*').order('created_at',{ascending:false});
@@ -2986,7 +2965,7 @@
                   '<span>' + (w.active?'Active':'Inactive') + '</span>' +
                 '</div>' +
               '</div>' +
-              '<div class="wcard-icon ' + coinCls + '">' + (COIN_LOGOS[coinName.toUpperCase()] ? '<img src="'+COIN_LOGOS[coinName.toUpperCase()]+'" alt="'+escapeHtml(coinName)+'" style="width:100%;height:100%;object-fit:contain;" onerror="this.outerHTML=\''+escapeHtml(coinName.charAt(0).toUpperCase())+'\'">' : escapeHtml(coinName.charAt(0).toUpperCase())) + '</div>' +
+              '<div class="wcard-icon ' + coinCls + '">' + escapeHtml(coinName.charAt(0).toUpperCase()) + '</div>' +
             '</div>' +
             // Address field
             '<div class="wcard-section">' +
@@ -3046,7 +3025,11 @@
     document.getElementById('walletMemo').value = '';
     document.getElementById('walletLabel').value = '';
     await loadWallets();
-    
+    initCompaniesUI();
+    await loadCompanies();
+    await loadNotifications();
+    await loadPlatformSettings();
+    await loadAdminLog();
   };
 
   window._toggleWallet = async function(id, currentActive){
@@ -3055,7 +3038,11 @@
     if(error){ apexError(error.message); return; }
     apexSuccess(newActive?'Wallet activated':'Wallet deactivated');
     await loadWallets();
-    
+    initCompaniesUI();
+    await loadCompanies();
+    await loadNotifications();
+    await loadPlatformSettings();
+    await loadAdminLog();
   };
 
   window._deleteWallet = async function(id){
@@ -3065,7 +3052,11 @@
     if(error){ apexError(error.message); return; }
     apexSuccess('Wallet deleted');
     await loadWallets();
-    
+    initCompaniesUI();
+    await loadCompanies();
+    await loadNotifications();
+    await loadPlatformSettings();
+    await loadAdminLog();
   };
 
   window._copyWallet = function(addr){
@@ -3520,7 +3511,7 @@
   }
 
   // ========== AUTH GATE ==========
-  var __adminGate = async function(){
+  document.addEventListener('sb-ready', async function(){
     var { data: userData } = await sb.auth.getUser();
     if(!userData || !userData.user){ window.location.href='admin-login.html'; return; }
     state.user = userData.user;
@@ -3571,12 +3562,7 @@
         loadAdminLog().then(()=>window._loadedTabs.adminlog=true).catch(e=>console.warn(e))
       ]);
     }, 100);
-  };
-
-  // Safe init: handle sb-ready race condition
-  if (window.__sbReady) { __adminGate(); }
-  else { document.addEventListener('sb-ready', __adminGate, { once: true }); }
-
+  });
 
   // ═══════════════════════════════════════════════════════════
   // ADMIN NOTIFICATION BELL — realtime
