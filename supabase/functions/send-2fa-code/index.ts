@@ -31,13 +31,13 @@ serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "APEX IPO Access <security@yourdomain.com>",
+        from: "Apex IPO Access <security@yourdomain.com>",
         to: [email],
         subject: `${code} is your APEX verification code`,
         html: `
           <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:40px 20px">
             <div style="text-align:center;margin-bottom:30px">
-              <h1 style="color:#000;font-size:24px;margin:0">APEX IPO ACCESS</h1>
+              <h1 style="color:#000;font-size:24px;margin:0">Apex IPO Access</h1>
               <p style="color:#666;font-size:13px;margin:4px 0 0">Investment Intelligence</p>
             </div>
             <div style="background:#f8f9fa;border-radius:12px;padding:30px;text-align:center">

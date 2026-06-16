@@ -36,3 +36,4 @@ nohup.out
 *.off
 js/_*
 *.bak.*
+.backup-*/

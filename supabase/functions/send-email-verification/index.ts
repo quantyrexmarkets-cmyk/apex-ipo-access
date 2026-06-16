@@ -137,7 +137,7 @@ Deno.serve(async (req) => {
 
           <p class="body-text" style="margin:0 0 16px;font-size:14px;line-height:1.7">Dear ${name},</p>
 
-          <p class="body-text" style="margin:0 0 16px;font-size:14px;line-height:1.7">Thank you for registering with APEX IPO Access. To complete your account setup and activate your access to our investment intelligence platform, please confirm your email address by clicking the button below.</p>
+          <p class="body-text" style="margin:0 0 16px;font-size:14px;line-height:1.7">Thank you for registering with Apex IPO Access. To complete your account setup and activate your access to our investment intelligence platform, please confirm your email address by clicking the button below.</p>
 
           <!-- Verify Button -->
           <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:32px auto">
@@ -156,7 +156,7 @@ Deno.serve(async (req) => {
 
           <!-- Security tip -->
           <p class="security" style="margin:32px 0 0;padding:14px 16px;border-radius:8px;font-size:12px;line-height:1.6">
-            <strong>Security Notice:</strong> APEX IPO Access will never ask you to share this link or your login credentials. If you did not create an account with us, you may safely disregard this email — no action is required.
+            <strong>Security Notice:</strong> Apex IPO Access will never ask you to share this link or your login credentials. If you did not create an account with us, you may safely disregard this email — no action is required.
           </p>
 
         </td></tr>
@@ -165,7 +165,7 @@ Deno.serve(async (req) => {
         <tr><td align="center" style="padding:24px 8px 8px">
           <p class="footer" style="margin:0 0 6px;font-size:11px;line-height:1.6">You are receiving this email because you signed up at <a class="link" href="https://apexipoaccess.com" style="text-decoration:none">apexipoaccess.com</a></p>
           <p class="footer" style="margin:0 0 6px;font-size:11px;line-height:1.6">For assistance, contact <a class="link" href="mailto:support@apexipoaccess.com" style="text-decoration:none">support@apexipoaccess.com</a></p>
-          <p class="footer-small" style="margin:14px 0 0;font-size:10px;line-height:1.6">© ${new Date().getFullYear()} APEX IPO Access · Investment Intelligence Platform</p>
+          <p class="footer-small" style="margin:14px 0 0;font-size:10px;line-height:1.6">© ${new Date().getFullYear()} Apex IPO Access · Investment Intelligence Platform</p>
         </td></tr>
 
       </table>
@@ -181,9 +181,9 @@ Deno.serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "APEX IPO Access <noreply@apexipoaccess.com>",
+        from: "Apex IPO Access <noreply@apexipoaccess.com>",
         to: [email],
-        subject: `Confirm your email address - APEX IPO Access`,
+        subject: `Confirm your email address - Apex IPO Access`,
         html,
       }),
     });
