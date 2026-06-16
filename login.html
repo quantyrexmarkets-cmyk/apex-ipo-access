@@ -244,7 +244,6 @@
 
 <!-- 2fa-login-hook -->
 <script>
-(function() {
   function check2FA(session, email) {
     return sb.from('profiles')
       .select('two_factor_enabled')
