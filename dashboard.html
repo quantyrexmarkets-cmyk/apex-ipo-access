@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script>
+
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -1432,7 +1435,11 @@
 
     const fmtMoney = (n) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    const cash = 0;          // No cash funded yet
+    // Fetch real cash + committed via RPC (bulletproof — defaults to 0 on any error)
+    const { data: __fin } = await sb.rpc('get_user_finances', { p_user_id: user.id });
+    const __row = (__fin && __fin[0]) || {};
+    const cash = parseFloat(__row.cash || 0);
+    totalReserved = parseFloat(__row.committed || totalReserved);
     const total = cash + totalReserved;
 
     const pv = document.getElementById('portfolioValue');
