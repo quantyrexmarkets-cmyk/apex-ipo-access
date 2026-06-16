@@ -248,11 +248,10 @@
   var amount = parseFloat(sessionStorage.getItem('fund_amount') || '0');
   var refCode = sessionStorage.getItem('fund_ref_code') || '—';
 
-  // Safety: if user lands here with no deposit data
+  // Safety: if user lands here with no deposit data, redirect silently
   if(!amount || amount <= 0){
-    if(window.apexWarn) apexWarn('No active deposit — redirecting to dashboard');
-    setTimeout(function(){ window.location.href = 'dashboard.html'; }, 1800);
-    throw new Error('no deposit');
+    window.location.replace('dashboard.html');
+    throw 'redirect';
   }
 
   var spinner = document.getElementById('spinnerWrap');
