@@ -242,176 +242,133 @@
   </div>
 </main>
 
-<!-- 2fa-login-hook -->
 <script>
-(function() {
-  function check2FA(session, email) {
-    return sb.from('profiles')
-      .select('two_factor_enabled')
-      .eq('id', session.user.id)
-      .single()
-      .then(function(res){
-        var profile = res.data;
-        if(!profile || !profile.two_factor_enabled) return false;
+// =====================================================
+// APEX IPO ACCESS — LOGIN SCRIPT (rebuilt clean)
+// =====================================================
 
-        sessionStorage.setItem('pending_2fa_session', JSON.stringify({
-          access_token: session.access_token,
-          refresh_token: session.refresh_token
-        }));
+function initLogin() {
+  var form        = document.getElementById('loginForm');
+  var btn         = document.getElementById('loginBtn');
+  var errBox      = document.getElementById('formError');
+  var emailInput  = document.getElementById('email');
+  var passInput   = document.getElementById('password');
+  var showToggle  = document.getElementById('showToggle');
+  var showText    = document.getElementById('showText');
+  var rememberRow = document.getElementById('rememberRow');
 
-        return sb.rpc('generate_2fa_code', {
-          p_user_id: session.user.id,
-          p_email: email
-        }).then(function(r){
-          if(r.error){
-            console.error('2FA code error:', r.error);
-            return false;
-          }
-          var code = r.data;
-
-          return fetch(sb.supabaseUrl + '/functions/v1/send-2fa-code', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + sb.supabaseKey
-            },
-            body: JSON.stringify({ email: email, code: code })
-          }).catch(function(e){
-            console.warn('Edge function not set up — code stored in DB:', code);
-          }).then(function(){
-            return sb.auth.signOut();
-          }).then(function(){
-            var params = new URLSearchParams();
-            params.set('uid', session.user.id);
-            params.set('email', email);
-            window.location.href = 'verify-2fa.html?' + params.toString();
-            return true;
-          });
-        });
-      })
-      .catch(function(e){
-        console.error('2FA check error:', e);
-        return false;
-      });
+  if (!form || !btn) {
+    console.error('Login form elements not found');
+    return;
   }
 
-  // Smart redirect: pending-approval → verify-email → dashboard
-  async function smartRedirect(userId){
-    try {
-      var { data: prof } = await sb.from('profiles').select('account_status,kyc_status,is_admin,banned,banned_reason,email_verified_at').eq('id', userId).single();
-      if(prof && prof.banned){
-        await sb.auth.signOut();
-        alert('Your account has been suspended.' + (prof.banned_reason ? '\n\nReason: ' + prof.banned_reason : ''));
-        return;
-      }
-      if(prof && !prof.is_admin && prof.account_status !== 'approved'){
-        window.location.href = 'pending-approval.html';
-        return;
-      }
-      if(prof && !prof.is_admin && !prof.email_verified_at){
-        window.location.href = 'verify-email.html';
-        return;
-      }
-      window.location.href = 'dashboard.html';
-    } catch(e){
-      window.location.href = 'dashboard.html';
-    }
-  }
-
-  function initLogin(){
-    // Don't auto-redirect logged-in users to dashboard;
-    // just let them re-enter credentials if they want.
-    // Do NOT call signOut() here — it creates a race condition with sign-in
-    // that can wipe the new session before smartRedirect runs.
-
-    var form = document.getElementById('loginForm');
-    var btn = document.getElementById('loginBtn');
-    var errBox = document.getElementById('formError');
-    var emailInput = document.getElementById('email');
-    var passInput = document.getElementById('password');
-    var showToggle = document.getElementById('showToggle');
-    var showText = document.getElementById('showText');
-    var rememberRow = document.getElementById('rememberRow');
-
-    // Show/hide password
-    showToggle.addEventListener('click', function(){
-      if(passInput.type === 'password'){
+  // Show/hide password
+  if (showToggle) {
+    showToggle.addEventListener('click', function() {
+      if (passInput.type === 'password') {
         passInput.type = 'text';
-        showText.textContent = 'Hide';
+        if (showText) showText.textContent = 'Hide';
       } else {
         passInput.type = 'password';
-        showText.textContent = 'Show';
+        if (showText) showText.textContent = 'Show';
       }
     });
+  }
 
-    // Remember me toggle
-    rememberRow.addEventListener('click', function(){
+  // Remember-me toggle
+  if (rememberRow) {
+    rememberRow.addEventListener('click', function() {
       rememberRow.classList.toggle('checked');
     });
-
-    // Restore saved email
     var saved = localStorage.getItem('apex_remember_email');
-    if(saved){
+    if (saved) {
       emailInput.value = saved;
       rememberRow.classList.add('checked');
     }
+  }
 
-    form.addEventListener('submit', function(e){
-      e.preventDefault();
-      errBox.classList.remove('show');
-      errBox.textContent = '';
-
-      var email = emailInput.value.trim();
-      var password = passInput.value;
-
-      if(!email || !password){
-        errBox.textContent = 'Please enter your email and password';
-        errBox.classList.add('show');
-        return;
-      }
-
-      btn.disabled = true;
-      btn.textContent = 'Signing in...';
-
-      sb.auth.signInWithPassword({ email: email, password: password })
-        .then(function(res){
-          if(res.error){
-            errBox.textContent = res.error.message || 'Invalid email or password';
-            errBox.classList.add('show');
-            btn.disabled = false;
-            btn.textContent = 'Log in';
-            return;
-          }
-
-          if(rememberRow.classList.contains('checked')){
-            localStorage.setItem('apex_remember_email', email);
-          } else {
-            localStorage.removeItem('apex_remember_email');
-          }
-
-          // Check 2FA
-          check2FA(res.data.session, email)
-          .then(function(needs2FA){
-            if(!needs2FA){
-              smartRedirect(res.data.user.id);
-            }
-          })
-          .catch(function(e){
-            console.warn('2FA check failed, proceeding to dashboard:', e);
-            smartRedirect(res.data.user.id);
+  // Smart redirect based on profile state
+  function smartRedirect(userId) {
+    sb.from('profiles')
+      .select('account_status,kyc_status,is_admin,banned,banned_reason,email_verified_at')
+      .eq('id', userId)
+      .single()
+      .then(function(res) {
+        var prof = res.data;
+        if (prof && prof.banned) {
+          sb.auth.signOut().then(function() {
+            alert('Your account has been suspended.' + (prof.banned_reason ? '\n\nReason: ' + prof.banned_reason : ''));
           });
+          return;
+        }
+        if (prof && !prof.is_admin && prof.account_status !== 'approved') {
+          window.location.href = 'pending-approval.html';
+          return;
+        }
+        if (prof && !prof.is_admin && !prof.email_verified_at) {
+          window.location.href = 'verify-email.html';
+          return;
+        }
+        window.location.href = 'dashboard.html';
       })
-        .catch(function(err){
-          errBox.textContent = err.message || 'Sign-in failed. Please try again.';
+      .catch(function() {
+        window.location.href = 'dashboard.html';
+      });
+  }
+
+  // Form submit
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    errBox.classList.remove('show');
+    errBox.textContent = '';
+
+    var email = emailInput.value.trim();
+    var password = passInput.value;
+
+    if (!email || !password) {
+      errBox.textContent = 'Please enter your email and password';
+      errBox.classList.add('show');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Signing in...';
+
+    sb.auth.signInWithPassword({ email: email, password: password })
+      .then(function(res) {
+        if (res.error) {
+          errBox.textContent = res.error.message || 'Invalid email or password';
           errBox.classList.add('show');
           btn.disabled = false;
           btn.textContent = 'Log in';
-        });
-    });
-  }
-  if (window.__sbReady) { initLogin(); } else { document.addEventListener("sb-ready", initLogin); }
+          return;
+        }
+
+        if (rememberRow && rememberRow.classList.contains('checked')) {
+          localStorage.setItem('apex_remember_email', email);
+        } else {
+          localStorage.removeItem('apex_remember_email');
+        }
+
+        smartRedirect(res.data.user.id);
+      })
+      .catch(function(err) {
+        errBox.textContent = err.message || 'Sign-in failed. Please try again.';
+        errBox.classList.add('show');
+        btn.disabled = false;
+        btn.textContent = 'Log in';
+      });
+  });
+}
+
+// Run immediately if Supabase already loaded, else wait for sb-ready
+if (window.__sbReady) {
+  initLogin();
+} else {
+  document.addEventListener('sb-ready', initLogin);
+}
 </script>
-<!-- /2fa-login-hook -->
+<!-- 2fa-login-hook -->
 
 
 <!-- Smartsupp Live Chat -->
