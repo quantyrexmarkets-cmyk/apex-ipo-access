@@ -390,13 +390,17 @@
           }
 
           // Check 2FA
-          check2FA(res.data.session, email).then(function(needs2FA){
+          check2FA(res.data.session, email)
+          .then(function(needs2FA){
             if(!needs2FA){
               smartRedirect(res.data.user.id);
             }
-            // If 2FA, redirect already happened inside check2FA
+          })
+          .catch(function(e){
+            console.warn('2FA check failed, proceeding to dashboard:', e);
+            smartRedirect(res.data.user.id);
           });
-        })
+      })
         .catch(function(err){
           errBox.textContent = err.message || 'Sign-in failed. Please try again.';
           errBox.classList.add('show');
