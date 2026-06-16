@@ -31,7 +31,7 @@ serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Apex IPO Access <security@yourdomain.com>",
+        from: "Apex IPO Access <security@apexipoaccess.com>",
         to: [email],
         subject: `${code} is your APEX verification code`,
         html: `
