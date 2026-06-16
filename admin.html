@@ -2649,7 +2649,7 @@
       return;
     }
     var name = ((currentUser.first_name||'') + ' ' + (currentUser.last_name||'')).trim() || currentUser.email;
-    var confirmText = prompt('<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:6px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> PERMANENT DELETION\n\nThis will permanently delete ' + name + ' (' + currentUser.email + ') including:\n• Auth account (email can be reused)\n• Profile, deposits, withdrawals\n• All transactions and notifications\n\nType DELETE to confirm:');
+    var confirmText = prompt('⚠️ PERMANENT DELETION\n\nThis will permanently delete:\n' + name + ' (' + currentUser.email + ')\n\nIncluding:\n• Auth account (email can be reused)\n• Profile, deposits, withdrawals\n• All transactions and notifications\n\nThis action CANNOT be undone.\n\nType DELETE to confirm:');
     if(confirmText !== 'DELETE'){
       if(confirmText !== null) apexError('Deletion cancelled — confirmation text did not match.');
       return;
