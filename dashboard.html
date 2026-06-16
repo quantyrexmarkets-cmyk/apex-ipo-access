@@ -1391,12 +1391,16 @@
   // Welcome bonus banner logic added below
   // ============================================
   document.addEventListener('sb-ready', async () => {
+    console.log('[DASH] sb-ready fired');
     const { data: { user } } = await sb.auth.getUser();
-    if(!user) return; // auth guard handles redirect
+    console.log('[DASH] user:', user && user.email, user && user.id);
+    if(!user) { console.warn('[DASH] No user — aborting'); return; }
 
     // 1. Profile → greeting (fetch full row including cash_balance)
-    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
-    console.log('Profile loaded:', profile);
+    const profRes = await sb.from('profiles').select('*').eq('id', user.id).single();
+    console.log('[DASH] Profile query result:', profRes);
+    const profile = profRes.data;
+    if(profRes.error) console.error('[DASH] Profile error:', profRes.error);
     if(profile){
       const name = profile.first_name || (user.email || '').split('@')[0] || 'Investor';
       const nameEl = document.getElementById('userName');
