@@ -588,7 +588,7 @@
       return;
     }
     // Check account status — banned or pending KYC
-    const { data: profile } = await sb.from('profiles').select('account_status,kyc_status,is_admin,banned,banned_reason').eq('id', data.user.id).single();
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', data.user.id).single();
     if(profile){
       if(profile.banned){
         await sb.auth.signOut();
