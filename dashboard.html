@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+  // Global error visibility (for Eruda debugging)
+  window.addEventListener('error', function(e){
+    console.error('[GLOBAL ERROR]', e.message, '@', e.filename, ':', e.lineno);
+  });
+  window.addEventListener('unhandledrejection', function(e){
+    console.error('[UNHANDLED PROMISE]', e.reason);
+  });
+  console.log('[BOOT] dashboard.html script start, time:', new Date().toISOString());
+</script>
+
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
