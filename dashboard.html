@@ -1398,7 +1398,7 @@
     const profile = await window.apex.getProfile();
     console.log('Profile loaded:', profile);
     if(profile){
-      const name = profile.first_name || (user.email || '').split('@')[0] || 'Investor';
+      const name = (profile && profile.first_name) || (user.email || '').split('@')[0] || 'Investor';
       const nameEl = document.getElementById('userName');
       if(nameEl) nameEl.textContent = name;
 
