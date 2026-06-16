@@ -3519,7 +3519,7 @@
   }
 
   // ========== AUTH GATE ==========
-  document.addEventListener('sb-ready', async function(){
+  var __adminGate = async function(){
     var { data: userData } = await sb.auth.getUser();
     if(!userData || !userData.user){ window.location.href='admin-login.html'; return; }
     state.user = userData.user;
@@ -3570,7 +3570,12 @@
         loadAdminLog().then(()=>window._loadedTabs.adminlog=true).catch(e=>console.warn(e))
       ]);
     }, 100);
-  });
+  };
+
+  // Safe init: handle sb-ready race condition
+  if (window.__sbReady) { __adminGate(); }
+  else { document.addEventListener('sb-ready', __adminGate, { once: true }); }
+
 
   // ═══════════════════════════════════════════════════════════
   // ADMIN NOTIFICATION BELL — realtime
