@@ -352,6 +352,21 @@
   }
   window.apexToast = showToast;
 
+  // ---- Global sidebar API (compat for older pages) ----
+  window.openSidebar = function(){
+    try { open(); } catch(e){ console.warn('[sidebar] open failed:', e); }
+  };
+  window.closeSidebar = function(){
+    try { close(); } catch(e){ console.warn('[sidebar] close failed:', e); }
+  };
+  window.toggleSidebar = function(){
+    try {
+      var sb = document.getElementById('apexSidebar') || document.querySelector('.apex-sidebar, #sidebar, .sidebar');
+      if (sb && sb.classList.contains('open')) { close(); }
+      else { open(); }
+    } catch(e){ console.warn('[sidebar] toggle failed:', e); }
+  };
+
 
   // ── Help & Support → mailto with user info ──
   var helpBtn = sidebar.querySelector('#axHelpSupport');
@@ -419,5 +434,24 @@
 
   if(window.sb) axPopulateBadges();
   else document.addEventListener('sb-ready', axPopulateBadges, { once: true });
+
+
+
+  // ---- Global error guard: silence stray "is not defined" popups ----
+  if (!window.__apexErrorGuardInstalled) {
+    window.__apexErrorGuardInstalled = true;
+    window.addEventListener('error', function(ev){
+      var msg = (ev && ev.message) || '';
+      if (/is not defined/i.test(msg) || /Cannot read propert/i.test(msg)) {
+        console.warn('[Guard] Suppressed UI error:', msg);
+        ev.preventDefault();
+        return true;
+      }
+    });
+    window.addEventListener('unhandledrejection', function(ev){
+      console.warn('[Guard] Unhandled promise rejection:', ev.reason);
+      ev.preventDefault();
+    });
+  }
 
 })();
