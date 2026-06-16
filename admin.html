@@ -1008,6 +1008,39 @@
 .wcard-field .lbl { font-size:10px; color:#6b7280; text-transform:uppercase; letter-spacing:0.6px; font-weight:600; margin-bottom:5px; }
 .wcard-field .val { font-size:13px; color:#e5e7eb; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; word-break:break-all; line-height:1.4; }
 .wcard-field.row { display:flex; align-items:center; gap:10px; }
+
+/* Modern field with label + asterisk */
+.wcard-section { margin-bottom:14px; }
+.wcard-section-label { display:block; font-size:12px; font-weight:600; color:#9ca3af; margin-bottom:6px; }
+.wcard-section-label .req { color:#ef4444; margin-left:2px; }
+
+.wcard-input-wrap { position:relative; }
+.wcard-input-wrap .input-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:#6b7280; pointer-events:none; }
+.wcard-input { width:100%; padding:11px 12px 11px 36px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); border-radius:10px; color:#e5e7eb; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:13px; word-break:break-all; }
+.wcard-input:focus { outline:none; border-color:#4a9eff; }
+.wcard-input[readonly] { cursor:default; }
+
+/* QR upload box - dashed border style */
+.wcard-qr-box { display:flex; align-items:center; gap:12px; padding:12px; background:rgba(0,0,0,0.2); border:2px dashed rgba(255,255,255,0.15); border-radius:12px; transition:all 0.2s; }
+.wcard-qr-box:hover { border-color:rgba(74,158,255,0.4); background:rgba(74,158,255,0.04); }
+.wcard-qr-thumb { width:54px; height:54px; border-radius:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; color:#6b7280; flex-shrink:0; overflow:hidden; cursor:pointer; }
+.wcard-qr-thumb img { width:100%; height:100%; object-fit:cover; }
+.wcard-qr-thumb svg { width:24px; height:24px; }
+.wcard-qr-upload { flex:1; text-align:center; color:#4a9eff; font-weight:600; font-size:14px; cursor:pointer; position:relative; }
+.wcard-qr-upload input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+.wcard-qr-del { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); color:#ef4444; width:38px; height:38px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; flex-shrink:0; }
+.wcard-qr-del:hover { background:rgba(239,68,68,0.2); border-color:rgba(239,68,68,0.4); }
+.wcard-qr-del svg { width:16px; height:16px; }
+
+/* Footer actions */
+.wcard-foot { display:flex; gap:8px; margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); }
+.wcard-foot button { flex:1; padding:9px 12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#9ca3af; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:6px; }
+.wcard-foot button:hover { background:rgba(255,255,255,0.08); color:#fff; border-color:rgba(255,255,255,0.16); }
+.wcard-foot button.del:hover { background:rgba(239,68,68,0.12); border-color:rgba(239,68,68,0.3); color:#ef4444; }
+.wcard-foot button.tog.on:hover { background:rgba(245,158,11,0.12); border-color:rgba(245,158,11,0.3); color:#f59e0b; }
+.wcard-foot button.tog.off:hover { background:rgba(16,185,129,0.12); border-color:rgba(16,185,129,0.3); color:#10b981; }
+.wcard-foot button svg { width:14px; height:14px; }
+
 .wcard-field.row .val { flex:1; }
 .wcard-field.row button { background:rgba(74,158,255,0.12); border:1px solid rgba(74,158,255,0.3); color:#4a9eff; padding:7px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:5px; font-size:11px; font-weight:600; transition:all 0.2s; flex-shrink:0; }
 .wcard-field.row button:hover { background:rgba(74,158,255,0.22); }
@@ -2917,25 +2950,53 @@
         return;
       }
       listEl.innerHTML = data.map(function(w){
-        var coinCls = (w.coin||'').toLowerCase();
-        return '<div class="wallet-item' + (w.active?'':' inactive') + '">' +
-          '<div class="wallet-coin '+coinCls+'">'+escapeHtml(w.coin||'?')+'</div>' +
-          '<div class="wallet-info">' +
-            '<div class="wallet-top">'+escapeHtml(w.coin||'')+(w.network?' <span class="wallet-net">'+escapeHtml(w.network)+'</span>':'')+(w.label?' · '+escapeHtml(w.label):'')+'</div>' +
-            '<div class="wallet-addr">'+escapeHtml(w.address||'')+'</div>' +
-            (w.memo?'<div class="wallet-meta">Memo: '+escapeHtml(w.memo)+'</div>':'') +
-          '</div>' +
-          (w.qr_code_url?'<div class="wallet-meta" style="margin-top:6px"><img src="'+w.qr_code_url+'?t='+Date.now()+'" alt="QR" style="width:60px;height:60px;border-radius:6px;border:1px solid #2a2d31;cursor:pointer" onclick="window.open(this.src,\'_blank\')"></div>':'') +
-        '</div><div class="wallet-actions">' +
-          '<label class="qr-up-btn" title="Upload QR" style="cursor:pointer;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:6px;color:#a8b2c1;position:relative">' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>' +
-            '<input type="file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer" onchange="window._uploadWalletQR(\''+w.id+'\', this)">' +
-          '</label>' +
-            '<button onclick="window._copyWallet(\''+escapeHtml(w.address)+'\')" title="Copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>' +
-            '<button onclick="window._toggleWallet(\''+w.id+'\','+w.active+')" title="'+(w.active?'Deactivate':'Activate')+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+(w.active?'<circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>':'<polyline points="20 6 9 17 4 12"/>')+'</svg></button>' +
-            '<button class="del" onclick="window._deleteWallet(\''+w.id+'\')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>' +
-          '</div>' +
-        '</div>';
+        var coinCls = (w.coin||'default').toLowerCase();
+        var coinName = (w.coin||'Unknown');
+        var hasQr = !!w.qr_code_url;
+        var qrUrl = hasQr ? (w.qr_code_url + '?t=' + Date.now()) : '';
+        return '<div class="wcard' + (w.active?'':' inactive') + '">' +
+            // Header
+            '<div class="wcard-head">' +
+              '<div class="wcard-title">' +
+                '<div class="nm">' + escapeHtml(coinName) + (w.label?' <span style="color:#9ca3af;font-weight:400">· '+escapeHtml(w.label)+'</span>':'') + '</div>' +
+                '<div class="sub">' +
+                  (w.network?'<span class="net-badge">'+escapeHtml(w.network)+'</span>':'') +
+                  '<span class="status-dot ' + (w.active?'on':'off') + '"></span>' +
+                  '<span>' + (w.active?'Active':'Inactive') + '</span>' +
+                '</div>' +
+              '</div>' +
+              '<div class="wcard-icon ' + coinCls + '">' + escapeHtml(coinName.charAt(0).toUpperCase()) + '</div>' +
+            '</div>' +
+            // Address field
+            '<div class="wcard-section">' +
+              '<label class="wcard-section-label">' + escapeHtml(coinName) + ' Address<span class="req">*</span></label>' +
+              '<div class="wcard-input-wrap">' +
+                '<svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>' +
+                '<input type="text" class="wcard-input" value="' + escapeHtml(w.address||'') + '" readonly onclick="this.select();window._copyWallet(this.value)"/>' +
+              '</div>' +
+            '</div>' +
+            // Memo (if any)
+            (w.memo?'<div class="wcard-section"><label class="wcard-section-label">Memo / Tag</label><div class="wcard-input-wrap" style="padding-left:0"><input type="text" class="wcard-input" value="'+escapeHtml(w.memo)+'" readonly style="padding-left:12px"/></div></div>':'') +
+            // QR code section
+            '<div class="wcard-section">' +
+              '<label class="wcard-section-label">' + escapeHtml(coinName) + ' Barcode<span class="req">*</span></label>' +
+              '<div class="wcard-qr-box">' +
+                '<div class="wcard-qr-thumb" ' + (hasQr?'onclick="window.open(\''+qrUrl+'\',\'_blank\')"':'') + '>' +
+                  (hasQr ? '<img src="'+qrUrl+'" alt="QR"/>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>') +
+                '</div>' +
+                '<label class="wcard-qr-upload">' + (hasQr?'Replace Barcode':'Upload Barcode') +
+                  '<input type="file" accept="image/*" onchange="window._uploadWalletQR(\''+w.id+'\', this)"/>' +
+                '</label>' +
+                (hasQr ? '<button class="wcard-qr-del" onclick="window._removeWalletQR(\''+w.id+'\')" title="Remove QR"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>' : '') +
+              '</div>' +
+            '</div>' +
+            // Footer actions
+            '<div class="wcard-foot">' +
+              '<button onclick="window._copyWallet(\''+escapeHtml(w.address)+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copy</button>' +
+              '<button class="tog ' + (w.active?'on':'off') + '" onclick="window._toggleWallet(\''+w.id+'\','+w.active+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' + (w.active?'<circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>':'<polyline points="20 6 9 17 4 12"/>') + '</svg>' + (w.active?'Deactivate':'Activate') + '</button>' +
+              '<button class="del" onclick="window._deleteWallet(\''+w.id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>Delete</button>' +
+            '</div>' +
+          '</div>';
       }).join('');
     } catch(e){ console.warn('Wallets load:', e); }
   }
