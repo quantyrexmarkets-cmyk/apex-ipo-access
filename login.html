@@ -244,6 +244,7 @@
 
 <!-- 2fa-login-hook -->
 <script>
+(function() {
   function check2FA(session, email) {
     return sb.from('profiles')
       .select('two_factor_enabled')
@@ -408,7 +409,7 @@
         });
     });
   });
-  }
+}
   if (window.__sbReady) { initLogin(); } else { document.addEventListener("sb-ready", initLogin); }
 </script>
 <!-- /2fa-login-hook -->
