@@ -80,14 +80,14 @@ Deno.serve(async (req) => {
   .meta { color:#5f6368 !important; }
   .step-title { color:#202124 !important; }
   .step-desc { color:#5f6368 !important; }
-  .verify-btn { background:#1a73e8 !important; color:#ffffff !important; }
+  .verify-btn { background:#4a9eff !important; color:#ffffff !important; }
   .fallback-box { background:#ffffff !important; border:1px solid #dadce0 !important; color:#5f6368 !important; }
-  .fallback-url { color:#1a73e8 !important; }
+  .fallback-url { color:#4a9eff !important; }
   .security { background:#f1f3f4 !important; color:#5f6368 !important; }
   .security strong { color:#202124 !important; }
   .footer { color:#5f6368 !important; }
   .footer-small { color:#80868b !important; }
-  a.link { color:#1a73e8 !important; }
+  a.link { color:#4a9eff !important; }
 
   @media (prefers-color-scheme: dark) {
     body, .bg { background:#1f2123 !important; color:#e3e3e3 !important; }
@@ -99,14 +99,14 @@ Deno.serve(async (req) => {
     .meta { color:#a0a4a8 !important; }
     .step-title { color:#ffffff !important; }
     .step-desc { color:#a0a4a8 !important; }
-    .verify-btn { background:#5fb0ff !important; color:#0d1117 !important; }
+    .verify-btn { background:#4a9eff !important; color:#0d1117 !important; }
     .fallback-box { background:#1f2123 !important; border:1px solid #3c3f43 !important; color:#a0a4a8 !important; }
-    .fallback-url { color:#5fb0ff !important; }
+    .fallback-url { color:#4a9eff !important; }
     .security { background:#1f2123 !important; color:#a0a4a8 !important; }
     .security strong { color:#e3e3e3 !important; }
     .footer { color:#a0a4a8 !important; }
     .footer-small { color:#6b6f74 !important; }
-    a.link { color:#5fb0ff !important; }
+    a.link { color:#4a9eff !important; }
   }
 </style>
 </head>
@@ -119,8 +119,8 @@ Deno.serve(async (req) => {
         <tr><td style="padding:0 8px 28px">
           <table role="presentation" cellpadding="0" cellspacing="0">
             <tr>
-              <td style="padding-right:14px;vertical-align:middle">
-                <img src="https://apexipoaccess.com/assets/spacex-logo.png" alt="" width="52" height="52" style="display:block;width:52px;height:52px">
+              <td align="center" style="vertical-align:middle">
+                <img src="https://apexipoaccess.com/assets/apex-logo-dark.png?v=2" alt="" width="180" style="display:block;max-width:180px;height:auto">
               </td>
               <td style="vertical-align:middle">
                 <span class="brand-text" style="font-family:'Oswald','Impact','Helvetica Neue',Arial,sans-serif;font-size:26px;font-weight:600;letter-spacing:2px;text-transform:uppercase">APEX</span>
@@ -135,7 +135,7 @@ Deno.serve(async (req) => {
 
           <h1 class="heading" style="margin:0 0 24px;font-family:'Inter','Roboto',Arial,sans-serif;font-size:22px;font-weight:500;letter-spacing:-0.3px;line-height:1.3">Confirm your email address</h1>
 
-          <p class="body-text" style="margin:0 0 16px;font-size:14px;line-height:1.7">Dear ${name},</p>
+          <p class="body-text" style="margin:0 0 16px;font-size:14px;line-height:1.7">Hi ${name},</p>
 
           <p class="body-text" style="margin:0 0 16px;font-size:14px;line-height:1.7">Thank you for registering with Apex IPO Access. To complete your account setup and activate your access to our investment intelligence platform, please confirm your email address by clicking the button below.</p>
 
