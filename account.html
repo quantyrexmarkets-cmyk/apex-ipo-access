@@ -466,31 +466,17 @@
   <!-- SECURITY -->
   <div class="section">
     <div class="section-h">Security &amp; Privacy</div>
-    <div class="row" onclick="window.openChangePassword()">
-      <div class="row-lbl">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-        Change password
+    <div class="row" onclick="location.href='security.html'">
+      <div class="row-ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       </div>
-      <div class="row-val"><span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
-    </div>
-    <div class="row" onclick="window.openTwoFactor()">
-      <div class="row-lbl">
-        <div class="ic green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-        Two-factor authentication
+      <div class="row-text">
+        <div class="row-title">Security Settings</div>
+        <div class="row-sub">Password, 2FA, sessions, login history</div>
       </div>
-      <div class="row-val"><span class="pill warn">Off</span><span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
+      <div class="row-chev">›</div>
     </div>
-    <div class="row" onclick="window.openLoginActivity()">
-      <div class="row-lbl">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-        Login activity
-      </div>
-      <div class="row-val"><span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
-    </div>
-  </div>
 
-  <!-- PREFERENCES -->
-  <div class="section">
     <div class="section-h">Preferences</div>
     <div class="row" onclick="apexAlert({title:'Email Notifications',body:'You receive emails for: account updates, deposits, withdrawals, KYC reviews, login alerts, IPO allocations, and share purchases. Reply to any email to manage preferences.'})">
       <div class="row-lbl">
