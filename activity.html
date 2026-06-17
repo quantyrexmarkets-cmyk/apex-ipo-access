@@ -52,6 +52,21 @@
   .row-status.completed{background:rgba(62,213,152,0.15);color:#3ed598}
   .row-status.rejected{background:rgba(239,68,68,0.15);color:#ef4444}
   .row-status.cancelled{background:rgba(138,148,163,0.15);color:#8a94a3}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:9999;display:none;align-items:flex-end;justify-content:center}
+  .modal-overlay.open{display:flex}
+  .modal{background:#0a0e14;border:1px solid rgba(255,255,255,0.08);border-radius:18px 18px 0 0;width:100%;max-width:680px;max-height:85vh;overflow-y:auto;padding:24px 20px;animation:slideUp 0.25s ease-out}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .modal-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+  .modal-h h2{font-size:18px;font-weight:600}
+  .modal-close{background:rgba(255,255,255,0.08);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer}
+  .receipt-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);gap:12px}
+  .receipt-row:last-child{border:none}
+  .receipt-row .lbl{font-size:13px;color:#8a94a3}
+  .receipt-row .val{font-size:13px;color:#fff;font-weight:500;text-align:right;word-break:break-all;max-width:60%}
+  .receipt-amt{text-align:center;margin:8px 0 20px;padding:18px;background:rgba(255,255,255,0.03);border-radius:12px}
+  .receipt-amt .num{font-size:32px;font-weight:700;letter-spacing:-1px}
+  .receipt-amt .lbl{font-size:12px;color:#8a94a3;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
 </style>
 </head>
 <body>
@@ -155,7 +170,7 @@ function render(){
       const svg = ICONS[it.kind] || ICONS.deposit;
       const amtCls = it.kind === 'withdrawal' ? 'neg' : (it.kind === 'deposit' ? 'pos' : '');
       const sign = it.kind === 'withdrawal' ? '-' : (it.kind === 'deposit' ? '+' : '');
-      html += '<div class="row">' +
+      html += '<div class="row" onclick="openReceipt(\'+JSON.stringify(it).replace(/'/g,"&#39;").replace(/"/g,'&quot;')+'\')" style="cursor:pointer">' +
         '<div class="row-ic ' + ic + '">' + svg + '</div>' +
         '<div class="row-body">' +
           '<div class="row-title">' + it.title + '</div>' +
@@ -238,10 +253,49 @@ document.querySelectorAll('.chip').forEach(c => {
   });
 });
 
+
+function openReceipt(itJson){
+  try {
+    const it = typeof itJson === 'string' ? JSON.parse(itJson.replace(/&quot;/g,'"').replace(/&#39;/g,"'")) : itJson;
+    const sign = it.kind === 'withdrawal' ? '-' : (it.kind === 'deposit' ? '+' : '');
+    document.getElementById('recTitle').textContent = it.title;
+    document.getElementById('recAmt').textContent = sign + fmtMoney(it.amount);
+    document.getElementById('recAmt').style.color = it.kind === 'withdrawal' ? '#ff6b6b' : '#3ed598';
+    document.getElementById('recAmtLbl').textContent = it.kind === 'withdrawal' ? 'Amount sent' : (it.kind === 'deposit' ? 'Amount received' : 'Total');
+    let details = '';
+    details += '<div class="receipt-row"><span class="lbl">Type</span><span class="val">' + (it.kind || '').toUpperCase() + '</span></div>';
+    details += '<div class="receipt-row"><span class="lbl">Status</span><span class="val" style="color:' + (statusClass(it.status)==='approved'?'#3ed598':statusClass(it.status)==='rejected'?'#ef4444':'#ffbd4a') + '">' + (it.status || 'pending').toUpperCase() + '</span></div>';
+    details += '<div class="receipt-row"><span class="lbl">Date</span><span class="val">' + fmtDate(it.created_at) + '</span></div>';
+    if(it.ref) details += '<div class="receipt-row"><span class="lbl">Reference</span><span class="val">' + it.ref + '</span></div>';
+    document.getElementById('recDetails').innerHTML = details;
+    document.getElementById('receiptModal').classList.add('open');
+  } catch(e){ console.error(e); }
+}
+function closeReceipt(){
+  document.getElementById('receiptModal').classList.remove('open');
+}
+window.openReceipt = openReceipt;
+window.closeReceipt = closeReceipt;
+
 window.__loadActivity = loadActivity;
 if(window.__sbReady){ loadActivity(); }
 else { document.addEventListener('sb-ready', loadActivity, { once: true }); }
 </script>
+
+
+<div id="receiptModal" class="modal-overlay" onclick="if(event.target===this)closeReceipt()">
+  <div class="modal">
+    <div class="modal-h">
+      <h2 id="recTitle">Transaction Receipt</h2>
+      <button class="modal-close" onclick="closeReceipt()">×</button>
+    </div>
+    <div class="receipt-amt">
+      <div class="lbl" id="recAmtLbl">Amount</div>
+      <div class="num" id="recAmt">—</div>
+    </div>
+    <div id="recDetails"></div>
+  </div>
+</div>
 
 </body>
 </html>
