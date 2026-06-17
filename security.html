@@ -12,24 +12,28 @@
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{background:#000;color:#fff;font-family:'Plus Jakarta Sans',sans-serif}
-  .wrap{max-width:680px;margin:0 auto;padding:20px}
+  .wrap{max-width:680px;margin:0 auto;padding:20px;padding-bottom:100px}
   .back-btn{background:none;border:none;color:#4a9eff;font-size:14px;margin-bottom:16px;cursor:pointer;display:flex;align-items:center;gap:6px}
   h1{font-size:28px;font-weight:600;letter-spacing:-0.5px;margin-bottom:6px}
   .sub{color:#8a94a3;font-size:14px;margin-bottom:24px}
   .card{background:#0a0e14;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:20px;margin-bottom:14px}
-  .card h3{font-size:15px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .card h3{font-size:15px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+  .card h3 svg{width:18px;height:18px;color:#4a9eff;flex-shrink:0}
   .card .desc{color:#8a94a3;font-size:13px;margin-bottom:14px;line-height:1.5}
-  .row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
-  .row:last-child{border:none}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);gap:12px}
+  .row:last-child{border:none;padding-bottom:0}
   .row .lbl{font-size:13px;color:#c4cdd9}
-  .row .val{font-size:13px;color:#fff;font-weight:500}
-  .btn{background:#4a9eff;color:#000;border:none;border-radius:10px;padding:12px 18px;font-size:14px;font-weight:600;cursor:pointer;width:100%}
+  .row .val{font-size:13px;color:#fff;font-weight:500;text-align:right}
+  .btn{background:#4a9eff;color:#000;border:none;border-radius:10px;padding:12px 18px;font-size:14px;font-weight:600;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px}
   .btn:hover{background:#6db1ff}
   .btn.danger{background:#ff4a4a;color:#fff}
   .btn.ghost{background:none;border:1px solid rgba(255,255,255,0.15);color:#fff}
-  .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:8px;font-size:11px;font-weight:600}
+  .btn.ghost:hover{background:rgba(255,255,255,0.05)}
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600}
+  .badge svg{width:12px;height:12px}
   .badge.ok{background:rgba(62,213,152,0.15);color:#3ed598}
   .badge.warn{background:rgba(255,189,74,0.15);color:#ffbd4a}
+  .badge.muted{background:rgba(138,148,163,0.15);color:#8a94a3}
 </style>
 </head>
 <body>
@@ -49,32 +53,45 @@
   <div class="sub">Manage your account security and sessions</div>
 
   <div class="card">
-    <h3>🔒 Account Status</h3>
+    <h3>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Account Status
+    </h3>
     <div class="desc">Your account verification and security state.</div>
-    <div class="row"><span class="lbl">Email verified</span><span class="badge ok">✓ Verified</span></div>
-    <div class="row"><span class="lbl">KYC status</span><span id="kycStatus" class="badge ok">—</span></div>
+    <div class="row"><span class="lbl">Email verified</span><span class="badge ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Verified</span></div>
+    <div class="row"><span class="lbl">KYC status</span><span id="kycStatus" class="badge muted">—</span></div>
     <div class="row"><span class="lbl">Account tier</span><span id="accountTier" class="val">—</span></div>
+    <div class="row"><span class="lbl">Member since</span><span id="memberSince" class="val">—</span></div>
     <div class="row"><span class="lbl">Last login</span><span id="lastLogin" class="val">—</span></div>
   </div>
 
   <div class="card">
-    <h3>🔑 Password</h3>
+    <h3>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+      Password
+    </h3>
     <div class="desc">Change your password regularly to keep your account safe.</div>
     <button class="btn ghost" onclick="changePassword()">Change Password</button>
   </div>
 
   <div class="card">
-    <h3>📱 Active Session</h3>
+    <h3>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+      Active Session
+    </h3>
     <div class="desc">You're currently signed in on this device.</div>
     <div class="row"><span class="lbl">Device</span><span id="deviceInfo" class="val">—</span></div>
-    <div class="row"><span class="lbl">Signed in</span><span id="sessionStart" class="val">Now</span></div>
-    <button class="btn danger" style="margin-top:12px" onclick="signOutAll()">Sign Out All Devices</button>
+    <div class="row"><span class="lbl">IP address</span><span id="ipAddr" class="val">—</span></div>
+    <button class="btn danger" style="margin-top:14px" onclick="signOutAll()">Sign Out All Devices</button>
   </div>
 
   <div class="card">
-    <h3>💬 Need Help?</h3>
+    <h3>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      Need Help?
+    </h3>
     <div class="desc">If you suspect unauthorized access, contact support immediately.</div>
-    <a href="mailto:support@apexipoaccess.com" class="btn" style="display:block;text-align:center;text-decoration:none">Contact Support</a>
+    <a href="mailto:support@apexipoaccess.com" class="btn" style="display:flex;text-decoration:none">Contact Support</a>
   </div>
 </div>
 
@@ -86,42 +103,77 @@ document.addEventListener('sb-ready', async () => {
   if(!user){ window.location.href = 'login.html'; return; }
 
   // Device info
-  document.getElementById('deviceInfo').textContent = navigator.userAgent.includes('Mobile') ? 'Mobile Browser' : 'Desktop Browser';
+  const ua = navigator.userAgent;
+  let device = 'Unknown';
+  if(/iPhone|iPad/.test(ua)) device = 'iOS Device';
+  else if(/Android/.test(ua)) device = 'Android Device';
+  else if(/Mobile/.test(ua)) device = 'Mobile Browser';
+  else device = 'Desktop Browser';
+  document.getElementById('deviceInfo').textContent = device;
 
-  // Profile info
-  const { data: profile } = await sb.from('profiles')
-    .select('kyc_status,account_status,created_at')
-    .eq('id', user.id).single();
+  // IP (best-effort)
+  try {
+    const ip = await fetch('https://api.ipify.org?format=json').then(r=>r.json());
+    document.getElementById('ipAddr').textContent = ip.ip || '—';
+  } catch(e){ document.getElementById('ipAddr').textContent = 'Hidden'; }
 
-  if(profile){
-    const kyc = document.getElementById('kycStatus');
-    kyc.textContent = profile.kyc_status === 'approved' ? '✓ Approved' : (profile.kyc_status || 'pending');
-    kyc.className = 'badge ' + (profile.kyc_status === 'approved' ? 'ok' : 'warn');
-
-    document.getElementById('accountTier').textContent = profile.account_status === 'approved' ? 'Founding Investor' : 'Pending';
+  // Member since
+  if(user.created_at){
+    document.getElementById('memberSince').textContent = new Date(user.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
   }
 
   // Last login
   if(user.last_sign_in_at){
     document.getElementById('lastLogin').textContent = new Date(user.last_sign_in_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
   }
+
+  // Profile info
+  const { data: profile } = await sb.from('profiles')
+    .select('*')
+    .eq('id', user.id).single();
+
+  if(profile){
+    const kycEl = document.getElementById('kycStatus');
+    const kyc = (profile.kyc_status || 'pending').toLowerCase();
+    if(kyc === 'approved' || kyc === 'verified'){
+      kycEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Approved';
+      kycEl.className = 'badge ok';
+    } else if(kyc === 'pending' || kyc === 'submitted'){
+      kycEl.textContent = 'Pending Review';
+      kycEl.className = 'badge warn';
+    } else {
+      kycEl.textContent = kyc.charAt(0).toUpperCase() + kyc.slice(1);
+      kycEl.className = 'badge muted';
+    }
+
+    const status = (profile.account_status || '').toLowerCase();
+    let tier = 'Standard';
+    if(status === 'approved') tier = 'Founding Investor';
+    else if(status === 'pending') tier = 'Pending Approval';
+    document.getElementById('accountTier').textContent = tier;
+  }
 });
 
 async function changePassword(){
   const { data:{ user } } = await sb.auth.getUser();
   if(!user) return;
+  if(!confirm('Send a password reset link to ' + user.email + '?')) return;
   const { error } = await sb.auth.resetPasswordForEmail(user.email, {
     redirectTo: window.location.origin + '/reset-password.html'
   });
-  if(error){ toast(error.message, 'error'); }
-  else { toast('Password reset link sent to ' + user.email, 'success'); }
+  if(error){
+    if(typeof toast === 'function') toast(error.message, 'error');
+    else alert(error.message);
+  } else {
+    if(typeof toast === 'function') toast('Reset link sent to ' + user.email, 'success');
+    else alert('Reset link sent to ' + user.email);
+  }
 }
 
 async function signOutAll(){
   if(!confirm('Sign out of all devices? You will need to log in again.')) return;
-  const { error } = await sb.auth.signOut({ scope: 'global' });
-  if(error){ toast(error.message, 'error'); }
-  else { window.location.href = 'login.html'; }
+  await sb.auth.signOut({ scope: 'global' });
+  window.location.href = 'login.html';
 }
 </script>
 
