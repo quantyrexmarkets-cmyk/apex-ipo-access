@@ -218,6 +218,7 @@
   window.addEventListener('error', function(e){
     var msg = e && e.message ? e.message : 'An unexpected error occurred';
     if(/Script error/i.test(msg)) return; // ignore cross-origin
+    if(/redirect|navigation|abort/i.test(msg)) return; // ignore expected throws
     console.error('[Global error]', e);
     toast(msg, 'error');
   });
@@ -225,6 +226,8 @@
   window.addEventListener('unhandledrejection', function(e){
     var r = e.reason;
     var msg = (r && r.message) || (typeof r === 'string' ? r : 'Unhandled promise rejection');
+    if(/redirect|navigation|abort/i.test(msg)) return;
+
     console.error('[Unhandled rejection]', r);
     toast(msg, 'error');
   });
