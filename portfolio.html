@@ -595,6 +595,30 @@
   }
 
 })();
+
+  // ───── Filter tab clicks ─────
+  document.querySelectorAll('#hTabs .h-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#hTabs .h-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+      const now = new Date();
+      let visible = 0;
+      document.querySelectorAll('.holding').forEach(card => {
+        const status = (card.querySelector('.h-status')?.textContent || '').toLowerCase().trim();
+        const matAttr = card.querySelector('.h-mature')?.textContent || '';
+        const isMatured = matAttr.includes('Matured');
+        let show = true;
+        if (f === 'reserved') show = status === 'reserved' || status === 'pending' || status === 'funded';
+        else if (f === 'matured') show = isMatured;
+        else if (f === 'all') show = true;
+        card.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+      const c = document.getElementById('holdCount');
+      if (c) c.textContent = visible;
+    });
+  });
 </script>
 
 
