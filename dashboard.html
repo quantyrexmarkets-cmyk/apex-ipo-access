@@ -603,10 +603,9 @@
       if(!profile.is_admin && profile.account_status !== 'approved'){
         window.location.href = 'pending-approval.html';
         return;
-      }
     }
   }
-
+ });
   // ✅ Safe-init wrapper (prevents sb-ready race)
   if (window.__sbReady) {
     __loadDashData();
