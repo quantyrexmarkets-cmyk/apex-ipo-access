@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Activity · APEX IPO ACCESS</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js?v=1"></script>
+<script src="js/notify.js?v=1"></script>
+<script src="js/sidebar.js?v=1"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Plus Jakarta Sans',sans-serif}
+  .wrap{max-width:680px;margin:0 auto;padding:20px;padding-bottom:100px}
+  .back-btn{background:none;border:none;color:#4a9eff;font-size:14px;margin-bottom:16px;cursor:pointer;display:flex;align-items:center;gap:6px}
+  h1{font-size:28px;font-weight:600;letter-spacing:-0.5px;margin-bottom:6px}
+  .sub{color:#8a94a3;font-size:14px;margin-bottom:20px}
+
+  .filters{display:flex;gap:8px;margin-bottom:18px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+  .filters::-webkit-scrollbar{display:none}
+  .chip{background:#0a0e14;border:1px solid rgba(255,255,255,0.08);color:#c4cdd9;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all 0.15s}
+  .chip:hover{background:rgba(74,158,255,0.08)}
+  .chip.active{background:#4a9eff;color:#000;border-color:#4a9eff}
+
+  .empty{padding:60px 20px;text-align:center;color:#6b7280;font-size:14px;background:#0a0e14;border:1px solid rgba(255,255,255,0.06);border-radius:14px}
+  .empty svg{width:40px;height:40px;color:#3a4252;margin-bottom:12px}
+  .empty .lbl{display:block;margin-bottom:4px;color:#8a94a3}
+  .empty .hint{font-size:12px;color:#5a6473}
+
+  .loading{padding:40px 20px;text-align:center;color:#6b7280;font-size:14px}
+
+  .group-h{font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.6px;margin:18px 4px 8px}
+
+  .row{background:#0a0e14;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+  .row-ic{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#1a1d21}
+  .row-ic svg{width:18px;height:18px}
+  .row-ic.green{background:rgba(62,213,152,0.12);color:#3ed598}
+  .row-ic.blue{background:rgba(95,176,255,0.12);color:#5fb0ff}
+  .row-ic.amber{background:rgba(255,189,74,0.12);color:#ffbd4a}
+  .row-ic.red{background:rgba(239,68,68,0.12);color:#ef4444}
+  .row-body{flex:1;min-width:0}
+  .row-title{font-size:14px;font-weight:600;color:#fff;margin-bottom:2px;display:flex;align-items:center;gap:8px}
+  .row-sub{font-size:12px;color:#8a94a3}
+  .row-right{text-align:right;flex-shrink:0}
+  .row-amt{font-size:14px;font-weight:600;color:#fff}
+  .row-amt.neg{color:#ff6b6b}
+  .row-amt.pos{color:#3ed598}
+  .row-status{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;margin-top:4px;text-transform:uppercase;letter-spacing:0.3px}
+  .row-status.pending{background:rgba(255,189,74,0.15);color:#ffbd4a}
+  .row-status.approved{background:rgba(62,213,152,0.15);color:#3ed598}
+  .row-status.completed{background:rgba(62,213,152,0.15);color:#3ed598}
+  .row-status.rejected{background:rgba(239,68,68,0.15);color:#ef4444}
+  .row-status.cancelled{background:rgba(138,148,163,0.15);color:#8a94a3}
+</style>
+</head>
+<body>
+<header class="dash-header" style="position:sticky;top:0;z-index:100;background:rgba(0,0,0,0.92);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.08);padding:16px 20px;display:flex;justify-content:space-between;align-items:center">
+  <button class="menu-btn" aria-label="Menu" style="width:38px;height:38px;display:flex;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer">
+    <span style="width:22px;height:2px;background:#4a9eff"></span>
+    <span style="width:22px;height:2px;background:#4a9eff"></span>
+    <span style="width:22px;height:2px;background:#4a9eff"></span>
+  </button>
+  <div style="font-weight:600;font-size:14px;letter-spacing:0.5px">ACTIVITY</div>
+  <div style="width:38px"></div>
+</header>
+
+<div class="wrap">
+  <button class="back-btn" onclick="history.back()">← Back</button>
+  <h1>Activity</h1>
+  <div class="sub">All your transactions in one place</div>
+
+  <div class="filters">
+    <button class="chip active" data-filter="all">All</button>
+    <button class="chip" data-filter="deposit">Deposits</button>
+    <button class="chip" data-filter="withdrawal">Withdrawals</button>
+    <button class="chip" data-filter="purchase">Purchases</button>
+    <button class="chip" data-filter="pending">Pending</button>
+  </div>
+
+  <div id="activityList">
+    <div class="loading">Loading your activity…</div>
+  </div>
+</div>
+
+<script src="js/bottom-nav.js?v=1"></script>
+
+<script>
+let allItems = [];
+let currentFilter = 'all';
+
+const ICONS = {
+  deposit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>',
+  withdrawal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>',
+  purchase: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+  emptyBox: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>'
+};
+
+function fmtMoney(n){
+  return '$' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function fmtDate(d){
+  if(!d) return '';
+  const dt = new Date(d);
+  return dt.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+}
+
+function dateGroup(d){
+  if(!d) return 'Earlier';
+  const dt = new Date(d);
+  const now = new Date();
+  const diff = (now - dt) / 86400000;
+  if(diff < 1) return 'Today';
+  if(diff < 2) return 'Yesterday';
+  if(diff < 7) return 'This Week';
+  if(diff < 30) return 'This Month';
+  return 'Earlier';
+}
+
+function statusClass(s){
+  s = (s||'').toLowerCase();
+  if(s.includes('approve') || s.includes('complete') || s.includes('credit')) return 'approved';
+  if(s.includes('reject') || s.includes('fail') || s.includes('denied')) return 'rejected';
+  if(s.includes('cancel')) return 'cancelled';
+  return 'pending';
+}
+
+function render(){
+  const listEl = document.getElementById('activityList');
+  let items = allItems;
+  if(currentFilter === 'pending') items = items.filter(i => statusClass(i.status) === 'pending');
+  else if(currentFilter !== 'all') items = items.filter(i => i.kind === currentFilter);
+
+  if(!items.length){
+    listEl.innerHTML = '<div class="empty">' + ICONS.emptyBox + '<span class="lbl">No activity yet</span><span class="hint">Your transactions will appear here</span></div>';
+    return;
+  }
+
+  // Group by date
+  const groups = {};
+  items.forEach(it => {
+    const g = dateGroup(it.created_at);
+    if(!groups[g]) groups[g] = [];
+    groups[g].push(it);
+  });
+
+  const order = ['Today','Yesterday','This Week','This Month','Earlier'];
+  let html = '';
+  order.forEach(g => {
+    if(!groups[g]) return;
+    html += '<div class="group-h">' + g + '</div>';
+    groups[g].forEach(it => {
+      const ic = it.kind === 'deposit' ? 'green' : (it.kind === 'withdrawal' ? 'blue' : 'amber');
+      const svg = ICONS[it.kind] || ICONS.deposit;
+      const amtCls = it.kind === 'withdrawal' ? 'neg' : (it.kind === 'deposit' ? 'pos' : '');
+      const sign = it.kind === 'withdrawal' ? '-' : (it.kind === 'deposit' ? '+' : '');
+      html += '<div class="row">' +
+        '<div class="row-ic ' + ic + '">' + svg + '</div>' +
+        '<div class="row-body">' +
+          '<div class="row-title">' + it.title + '</div>' +
+          '<div class="row-sub">' + fmtDate(it.created_at) + (it.ref ? ' · ' + it.ref : '') + '</div>' +
+        '</div>' +
+        '<div class="row-right">' +
+          '<div class="row-amt ' + amtCls + '">' + sign + fmtMoney(it.amount) + '</div>' +
+          '<div class="row-status ' + statusClass(it.status) + '">' + (it.status || 'pending') + '</div>' +
+        '</div>' +
+      '</div>';
+    });
+  });
+
+  listEl.innerHTML = html;
+}
+
+async function loadActivity(){
+  const { data:{ user } } = await sb.auth.getUser();
+  if(!user){ window.location.href = 'login.html'; return; }
+
+  const items = [];
+
+  // Deposits
+  try {
+    const { data: deposits } = await sb.from('deposits').select('*').eq('user_id', user.id).order('created_at',{ascending:false});
+    (deposits || []).forEach(d => {
+      items.push({
+        kind: 'deposit',
+        title: 'Deposit · ' + (d.method ? d.method.toUpperCase() : 'CRYPTO') + (d.crypto_asset ? ' (' + d.crypto_asset.toUpperCase() + ')' : ''),
+        amount: d.amount,
+        status: d.status || 'pending',
+        ref: d.reference_code,
+        created_at: d.created_at
+      });
+    });
+  } catch(e){ console.warn('deposits:', e); }
+
+  // Withdrawals
+  try {
+    const { data: withdrawals } = await sb.from('withdrawals').select('*').eq('user_id', user.id).order('created_at',{ascending:false});
+    (withdrawals || []).forEach(w => {
+      items.push({
+        kind: 'withdrawal',
+        title: 'Withdrawal · ' + (w.method ? w.method.toUpperCase() : 'CRYPTO') + (w.asset ? ' (' + w.asset.toUpperCase() + ')' : ''),
+        amount: w.amount,
+        status: w.status || 'pending',
+        ref: w.reference_code,
+        created_at: w.created_at
+      });
+    });
+  } catch(e){ console.warn('withdrawals:', e); }
+
+  // Purchases / share orders (try common table names)
+  try {
+    const { data: purchases } = await sb.from('share_orders').select('*').eq('user_id', user.id).order('created_at',{ascending:false});
+    (purchases || []).forEach(p => {
+      items.push({
+        kind: 'purchase',
+        title: 'Purchase · ' + (p.ticker || p.symbol || 'Shares') + (p.shares ? ' (' + p.shares + ' sh)' : ''),
+        amount: p.total || p.amount,
+        status: p.status || 'pending',
+        ref: p.order_ref,
+        created_at: p.created_at
+      });
+    });
+  } catch(e){ /* table might not exist */ }
+
+  // Sort all by date desc
+  items.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+  allItems = items;
+  render();
+}
+
+document.querySelectorAll('.chip').forEach(c => {
+  c.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
+    c.classList.add('active');
+    currentFilter = c.dataset.filter;
+    render();
+  });
+});
+
+window.__loadActivity = loadActivity;
+if(window.__sbReady){ loadActivity(); }
+else { document.addEventListener('sb-ready', loadActivity, { once: true }); }
+</script>
+
+</body>
+</html>
