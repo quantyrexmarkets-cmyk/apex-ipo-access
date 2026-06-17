@@ -655,7 +655,13 @@
           price_per_share: state.price,
           hold_period_label: state.periodLabel || '',
           hold_perk_pct: state.perkPct || 0,
-          status: (newAlloc && newAlloc.status) || 'reserved'
+          status: (newAlloc && newAlloc.status) || 'reserved',
+          success_rate: (state.company && state.company.success_rate) || null,
+          valuation: (state.company && state.company.valuation) || null,
+          ipo_window: (state.company && state.company.ipo_window) || null,
+          growth_yoy: (state.company && state.company.growth_yoy) || null,
+          expected_return: (state.company && state.company.expected_return) || null,
+          lockup_days: (state.company && state.company.lockup_days) || null
         }));
 
       apexSuccess('Reservation confirmed!');
