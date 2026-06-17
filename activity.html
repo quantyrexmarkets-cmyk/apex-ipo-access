@@ -254,9 +254,8 @@ document.querySelectorAll('.chip').forEach(c => {
 });
 
 
-function openReceipt(itJson){
-  try {
-    const it = typeof itJson === 'string' ? JSON.parse(itJson.replace(/&quot;/g,'"').replace(/&#39;/g,"'")) : itJson;
+function openReceipt(it){
+  try {/g,'"').replace(/&#39;/g,"'")) : itJson;
     const sign = it.kind === 'withdrawal' ? '-' : (it.kind === 'deposit' ? '+' : '');
     document.getElementById('recTitle').textContent = it.title;
     document.getElementById('recAmt').textContent = sign + fmtMoney(it.amount);
@@ -276,6 +275,15 @@ function closeReceipt(){
 }
 window.openReceipt = openReceipt;
 window.closeReceipt = closeReceipt;
+
+
+document.addEventListener('click', function(e){
+  const row = e.target.closest('.row[data-idx]');
+  if(!row) return;
+  const idx = parseInt(row.dataset.idx);
+  if(isNaN(idx) || !allItems[idx]) return;
+  openReceipt(allItems[idx]);
+});
 
 window.__loadActivity = loadActivity;
 if(window.__sbReady){ loadActivity(); }
