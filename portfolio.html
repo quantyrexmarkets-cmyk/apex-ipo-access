@@ -377,7 +377,7 @@
   const [profile, { data: allocs }, { data: companies }] = await Promise.all([
     window.apex.getProfile(),
     sb.from('allocations').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-    sb.from('companies').select('ticker,name,domain,sector,price_per_share,expected_return')
+    sb.from('companies').select('ticker,name,domain,sector,price_per_share,expected_return,success_rate')
   ]);
 
   const companyMap = {};
