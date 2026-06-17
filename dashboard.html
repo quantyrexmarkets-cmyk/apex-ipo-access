@@ -605,14 +605,7 @@
         return;
     }
   }
- });
-  // ✅ Safe-init wrapper (prevents sb-ready race)
-  if (window.__sbReady) {
-    __loadDashData();
-  } else {
-    document.addEventListener("sb-ready", __loadDashData, { once: true });
-  }
-</script>
+ });</script>
 <script src="js/sidebar.js?v=1781345031" defer></script>
 </head>
 <body>
@@ -1637,6 +1630,14 @@ document.addEventListener('DOMContentLoaded', function () {
     setTimeout(updateNotifBadge, 800);
     setInterval(updateNotifBadge, 30000);
   });
+
+  // ✅ Safe-init wrapper (prevents sb-ready race)
+  if (window.__sbReady) {
+    window.__loadDashData();
+  } else {
+    document.addEventListener("sb-ready", __loadDashData, { once: true });
+  }
+  window.__loadDashData = __loadDashData;
 </script>
 
   <script src="js/user-bell.js?v=1"></script>
