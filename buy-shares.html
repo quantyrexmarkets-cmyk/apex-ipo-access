@@ -612,6 +612,7 @@
         projected_return_min: state.returnMin,
         projected_return_max: state.returnMax,
         status: 'reserved',
+        tier: (state.amount >= 10000 ? 1 : state.amount >= 2500 ? 2 : 3),
         matures_at: maturesAt.toISOString()
       }).select().single();
 
