@@ -316,8 +316,14 @@
       crypto_asset: selectedMethod === 'crypto' ? cryptoAsset : null,
       _ts: Date.now()
     };
-    sessionStorage.setItem('apex_deposit', JSON.stringify(deposit));
-    window.location.href = 'fund-process.html';
+    sessionStorage.setItem('fund_method', selectedMethod);
+    sessionStorage.setItem('fund_amount', String(amount));
+    if(selectedMethod === 'crypto'){
+      sessionStorage.setItem('fund_asset', selectedMethod);
+      window.location.href = 'fund-crypto.html';
+    } else {
+      window.location.href = 'fund-wire.html?amount=' + amount;
+    }
   });
 })();
 </script>
