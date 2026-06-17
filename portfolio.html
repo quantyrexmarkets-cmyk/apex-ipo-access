@@ -125,6 +125,7 @@
     cursor:pointer;transition:all .15s;
   }
   .holding:hover{border-color:rgba(74,158,255,0.35)}
+  .h-success{font-size:11px;font-weight:600;color:#3ed598;margin-top:4px;letter-spacing:0.3px}
   .h-logo{
     width:46px;height:46px;border-radius:11px;
     background:#fff;flex-shrink:0;overflow:hidden;padding:6px;
@@ -504,6 +505,7 @@
           <div class="h-right">
             <div class="h-value">${fmt(a.total_value)}</div>
             ${midPct ? `<div class="h-pct">+${midPct.toFixed(0)}% proj.</div>` : ''}
+              ${comp.success_rate ? `<div class="h-success">${comp.success_rate}% success</div>` : ''}
           </div>
         </div>
       `;
