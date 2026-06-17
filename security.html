@@ -23,16 +23,17 @@
   .row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);gap:12px}
   .row:last-child{border:none;padding-bottom:0}
   .row .lbl{font-size:13px;color:#c4cdd9}
-  .row .val{font-size:13px;color:#fff;font-weight:500;text-align:right}
+  .row .val{font-size:13px;color:#fff;font-weight:500;text-align:right;word-break:break-word}
   .btn{background:#4a9eff;color:#000;border:none;border-radius:10px;padding:12px 18px;font-size:14px;font-weight:600;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px}
   .btn:hover{background:#6db1ff}
   .btn.danger{background:#ff4a4a;color:#fff}
   .btn.ghost{background:none;border:1px solid rgba(255,255,255,0.15);color:#fff}
   .btn.ghost:hover{background:rgba(255,255,255,0.05)}
-  .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600}
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600;white-space:nowrap}
   .badge svg{width:12px;height:12px}
   .badge.ok{background:rgba(62,213,152,0.15);color:#3ed598}
   .badge.warn{background:rgba(255,189,74,0.15);color:#ffbd4a}
+  .badge.danger{background:rgba(255,74,74,0.15);color:#ff4a4a}
   .badge.muted{background:rgba(138,148,163,0.15);color:#8a94a3}
 </style>
 </head>
@@ -58,11 +59,23 @@
       Account Status
     </h3>
     <div class="desc">Your account verification and security state.</div>
-    <div class="row"><span class="lbl">Email verified</span><span class="badge ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Verified</span></div>
+    <div class="row"><span class="lbl">Email verified</span><span id="emailStatus" class="badge muted">—</span></div>
     <div class="row"><span class="lbl">KYC status</span><span id="kycStatus" class="badge muted">—</span></div>
     <div class="row"><span class="lbl">Account tier</span><span id="accountTier" class="val">—</span></div>
     <div class="row"><span class="lbl">Member since</span><span id="memberSince" class="val">—</span></div>
-    <div class="row"><span class="lbl">Last login</span><span id="lastLogin" class="val">—</span></div>
+    <div class="row"><span class="lbl">Withdrawals</span><span id="canWithdraw" class="badge muted">—</span></div>
+    <div class="row"><span class="lbl">Deposits</span><span id="canDeposit" class="badge muted">—</span></div>
+  </div>
+
+  <div class="card">
+    <h3>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      Two-Factor Authentication
+    </h3>
+    <div class="desc">Add an extra layer of protection to your account.</div>
+    <div class="row"><span class="lbl">2FA status</span><span id="twoFaStatus" class="badge muted">—</span></div>
+    <div class="row" id="twoFaMethodRow" style="display:none"><span class="lbl">Method</span><span id="twoFaMethod" class="val">—</span></div>
+    <button class="btn ghost" style="margin-top:12px" onclick="setupTwoFa()">Manage 2FA</button>
   </div>
 
   <div class="card">
@@ -81,7 +94,9 @@
     </h3>
     <div class="desc">You're currently signed in on this device.</div>
     <div class="row"><span class="lbl">Device</span><span id="deviceInfo" class="val">—</span></div>
-    <div class="row"><span class="lbl">IP address</span><span id="ipAddr" class="val">—</span></div>
+    <div class="row"><span class="lbl">Current IP</span><span id="ipAddr" class="val">—</span></div>
+    <div class="row"><span class="lbl">Last login</span><span id="lastLogin" class="val">—</span></div>
+    <div class="row"><span class="lbl">Last login IP</span><span id="lastLoginIp" class="val">—</span></div>
     <button class="btn danger" style="margin-top:14px" onclick="signOutAll()">Sign Out All Devices</button>
   </div>
 
@@ -98,23 +113,25 @@
 <script src="js/bottom-nav.js?v=1"></script>
 
 <script>
+const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+const X_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+
 document.addEventListener('sb-ready', async () => {
   const { data:{ user } } = await sb.auth.getUser();
   if(!user){ window.location.href = 'login.html'; return; }
 
   // Device info
   const ua = navigator.userAgent;
-  let device = 'Unknown';
+  let device = 'Desktop Browser';
   if(/iPhone|iPad/.test(ua)) device = 'iOS Device';
   else if(/Android/.test(ua)) device = 'Android Device';
   else if(/Mobile/.test(ua)) device = 'Mobile Browser';
-  else device = 'Desktop Browser';
   document.getElementById('deviceInfo').textContent = device;
 
-  // IP (best-effort)
+  // Current IP
   try {
     const ip = await fetch('https://api.ipify.org?format=json').then(r=>r.json());
-    document.getElementById('ipAddr').textContent = ip.ip || '—';
+    document.getElementById('ipAddr').textContent = ip.ip || 'Hidden';
   } catch(e){ document.getElementById('ipAddr').textContent = 'Hidden'; }
 
   // Member since
@@ -122,35 +139,88 @@ document.addEventListener('sb-ready', async () => {
     document.getElementById('memberSince').textContent = new Date(user.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
   }
 
-  // Last login
-  if(user.last_sign_in_at){
-    document.getElementById('lastLogin').textContent = new Date(user.last_sign_in_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
-  }
-
   // Profile info
   const { data: profile } = await sb.from('profiles')
-    .select('*')
+    .select('kyc_status,account_status,is_admin,is_suspended,banned,email_verified_at,two_factor_enabled,two_factor_method,last_login_at,last_login_ip,can_withdraw,can_deposit')
     .eq('id', user.id).single();
 
-  if(profile){
-    const kycEl = document.getElementById('kycStatus');
-    const kyc = (profile.kyc_status || 'pending').toLowerCase();
-    if(kyc === 'approved' || kyc === 'verified'){
-      kycEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Approved';
-      kycEl.className = 'badge ok';
-    } else if(kyc === 'pending' || kyc === 'submitted'){
-      kycEl.textContent = 'Pending Review';
-      kycEl.className = 'badge warn';
-    } else {
-      kycEl.textContent = kyc.charAt(0).toUpperCase() + kyc.slice(1);
-      kycEl.className = 'badge muted';
-    }
+  if(!profile) return;
 
-    const status = (profile.account_status || '').toLowerCase();
-    let tier = 'Standard';
-    if(status === 'approved') tier = 'Founding Investor';
-    else if(status === 'pending') tier = 'Pending Approval';
-    document.getElementById('accountTier').textContent = tier;
+  // Email verified
+  const emailEl = document.getElementById('emailStatus');
+  if(profile.email_verified_at || user.email_confirmed_at){
+    emailEl.innerHTML = CHECK_SVG + 'Verified';
+    emailEl.className = 'badge ok';
+  } else {
+    emailEl.innerHTML = X_SVG + 'Not Verified';
+    emailEl.className = 'badge warn';
+  }
+
+  // KYC
+  const kycEl = document.getElementById('kycStatus');
+  const kyc = (profile.kyc_status || 'pending').toLowerCase();
+  if(kyc === 'approved' || kyc === 'verified'){
+    kycEl.innerHTML = CHECK_SVG + 'Approved';
+    kycEl.className = 'badge ok';
+  } else if(kyc === 'pending' || kyc === 'submitted' || kyc === 'review'){
+    kycEl.textContent = 'Under Review';
+    kycEl.className = 'badge warn';
+  } else if(kyc === 'rejected'){
+    kycEl.textContent = 'Rejected';
+    kycEl.className = 'badge danger';
+  } else {
+    kycEl.textContent = 'Not Submitted';
+    kycEl.className = 'badge muted';
+  }
+
+  // Account tier
+  let tier = 'Standard';
+  if(profile.is_admin) tier = 'Administrator';
+  else if(profile.banned) tier = 'Banned';
+  else if(profile.is_suspended) tier = 'Suspended';
+  else if(profile.account_status === 'approved') tier = 'Founding Investor';
+  else if(profile.account_status === 'pending') tier = 'Pending Approval';
+  document.getElementById('accountTier').textContent = tier;
+
+  // Can withdraw
+  const wEl = document.getElementById('canWithdraw');
+  if(profile.can_withdraw === false){
+    wEl.innerHTML = X_SVG + 'Disabled';
+    wEl.className = 'badge danger';
+  } else {
+    wEl.innerHTML = CHECK_SVG + 'Enabled';
+    wEl.className = 'badge ok';
+  }
+
+  // Can deposit
+  const dEl = document.getElementById('canDeposit');
+  if(profile.can_deposit === false){
+    dEl.innerHTML = X_SVG + 'Disabled';
+    dEl.className = 'badge danger';
+  } else {
+    dEl.innerHTML = CHECK_SVG + 'Enabled';
+    dEl.className = 'badge ok';
+  }
+
+  // 2FA
+  const tfaEl = document.getElementById('twoFaStatus');
+  if(profile.two_factor_enabled){
+    tfaEl.innerHTML = CHECK_SVG + 'Enabled';
+    tfaEl.className = 'badge ok';
+    document.getElementById('twoFaMethodRow').style.display = 'flex';
+    document.getElementById('twoFaMethod').textContent = profile.two_factor_method || 'Email';
+  } else {
+    tfaEl.textContent = 'Not Enabled';
+    tfaEl.className = 'badge muted';
+  }
+
+  // Last login
+  const lastLogin = profile.last_login_at || user.last_sign_in_at;
+  if(lastLogin){
+    document.getElementById('lastLogin').textContent = new Date(lastLogin).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+  }
+  if(profile.last_login_ip){
+    document.getElementById('lastLoginIp').textContent = profile.last_login_ip;
   }
 });
 
@@ -168,6 +238,10 @@ async function changePassword(){
     if(typeof toast === 'function') toast('Reset link sent to ' + user.email, 'success');
     else alert('Reset link sent to ' + user.email);
   }
+}
+
+function setupTwoFa(){
+  alert('2FA setup coming soon. Contact support@apexipoaccess.com to enable 2FA on your account.');
 }
 
 async function signOutAll(){
