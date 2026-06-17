@@ -1630,14 +1630,13 @@ document.addEventListener('DOMContentLoaded', function () {
     setTimeout(updateNotifBadge, 800);
     setInterval(updateNotifBadge, 30000);
   });
-
+  window.__loadDashData = __loadDashData;
   // ✅ Safe-init wrapper (prevents sb-ready race)
   if (window.__sbReady) {
     window.__loadDashData();
   } else {
-    document.addEventListener("sb-ready", __loadDashData, { once: true });
+      document.addEventListener("sb-ready", window.__loadDashData, { once: true });
   }
-  window.__loadDashData = __loadDashData;
 </script>
 
   <script src="js/user-bell.js?v=1"></script>
