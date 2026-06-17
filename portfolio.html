@@ -127,6 +127,11 @@
   .holding:hover{border-color:rgba(74,158,255,0.35)}
   .h-success{font-size:11px;font-weight:600;color:#3ed598;margin-top:4px;letter-spacing:0.3px}
   .h-mature{color:#8a94a3;font-size:12px}
+  .h-tabs{display:flex;gap:8px;padding:0 20px 12px;overflow-x:auto;scrollbar-width:none}
+  .h-tabs::-webkit-scrollbar{display:none}
+  .h-tab{background:rgba(255,255,255,0.04);color:#8a94a3;border:1px solid rgba(255,255,255,0.06);padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit}
+  .h-tab:hover{color:#fff;border-color:rgba(74,158,255,0.3)}
+  .h-tab.active{background:rgba(74,158,255,0.15);color:#4a9eff;border-color:rgba(74,158,255,0.4)}
   .h-logo{
     width:46px;height:46px;border-radius:11px;
     background:#fff;flex-shrink:0;overflow:hidden;padding:6px;
@@ -323,6 +328,13 @@
   <div class="sec-h">
     <div class="title">Active Holdings</div>
     <div class="count" id="holdCount">0</div>
+  </div>
+
+  <!-- Filter tabs -->
+  <div class="h-tabs" id="hTabs">
+    <button class="h-tab active" data-filter="all">All</button>
+    <button class="h-tab" data-filter="reserved">Reserved</button>
+    <button class="h-tab" data-filter="matured">Matured</button>
   </div>
   <div id="holdingsContainer">
     <div class="empty" style="opacity:0.5">
