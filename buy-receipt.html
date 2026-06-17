@@ -291,7 +291,7 @@
           <div class="lbl">Confirmation</div>
           <div class="ref">${ref}</div>
         </div>
-        <div class="status-pill"><span class="dot"></span>Pending Funding</div>
+        <div class="status-pill"><span class="dot"></span>${({reserved:'Reserved',pending_funding:'Pending Funding',active:'Active',matured:'Matured'}[order.status] || 'Reserved')}</div>
       </div>
 
       <div class="co-row">

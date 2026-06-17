@@ -654,7 +654,8 @@
           shares: shares,
           price_per_share: state.price,
           hold_period_label: state.periodLabel || '',
-          hold_perk_pct: state.perkPct || 0
+          hold_perk_pct: state.perkPct || 0,
+          status: (newAlloc && newAlloc.status) || 'reserved'
         }));
 
       apexSuccess('Reservation confirmed!');
