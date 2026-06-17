@@ -16,23 +16,18 @@
   .back-btn{background:none;border:none;color:#4a9eff;font-size:14px;margin-bottom:16px;cursor:pointer;display:flex;align-items:center;gap:6px}
   h1{font-size:28px;font-weight:600;letter-spacing:-0.5px;margin-bottom:6px}
   .sub{color:#8a94a3;font-size:14px;margin-bottom:20px}
-
   .filters{display:flex;gap:8px;margin-bottom:18px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
   .filters::-webkit-scrollbar{display:none}
-  .chip{background:#0a0e14;border:1px solid rgba(255,255,255,0.08);color:#c4cdd9;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all 0.15s}
-  .chip:hover{background:rgba(74,158,255,0.08)}
+  .chip{background:#0a0e14;border:1px solid rgba(255,255,255,0.08);color:#c4cdd9;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
   .chip.active{background:#4a9eff;color:#000;border-color:#4a9eff}
-
   .empty{padding:60px 20px;text-align:center;color:#6b7280;font-size:14px;background:#0a0e14;border:1px solid rgba(255,255,255,0.06);border-radius:14px}
   .empty svg{width:40px;height:40px;color:#3a4252;margin-bottom:12px}
   .empty .lbl{display:block;margin-bottom:4px;color:#8a94a3}
   .empty .hint{font-size:12px;color:#5a6473}
-
   .loading{padding:40px 20px;text-align:center;color:#6b7280;font-size:14px}
-
   .group-h{font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.6px;margin:18px 4px 8px}
-
-  .row{background:#0a0e14;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+  .row{background:#0a0e14;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:background 0.15s}
+  .row:hover{background:#10151c}
   .row-ic{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#1a1d21}
   .row-ic svg{width:18px;height:18px}
   .row-ic.green{background:rgba(62,213,152,0.12);color:#3ed598}
@@ -40,19 +35,17 @@
   .row-ic.amber{background:rgba(255,189,74,0.12);color:#ffbd4a}
   .row-ic.red{background:rgba(239,68,68,0.12);color:#ef4444}
   .row-body{flex:1;min-width:0}
-  .row-title{font-size:14px;font-weight:600;color:#fff;margin-bottom:2px;display:flex;align-items:center;gap:8px}
+  .row-title{font-size:14px;font-weight:600;color:#fff;margin-bottom:2px}
   .row-sub{font-size:12px;color:#8a94a3}
   .row-right{text-align:right;flex-shrink:0}
-  .row-amt{font-size:14px;font-weight:600;color:#fff}
+  .row-amt{font-size:14px;font-weight:600}
   .row-amt.neg{color:#ff6b6b}
   .row-amt.pos{color:#3ed598}
   .row-status{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;margin-top:4px;text-transform:uppercase;letter-spacing:0.3px}
   .row-status.pending{background:rgba(255,189,74,0.15);color:#ffbd4a}
   .row-status.approved{background:rgba(62,213,152,0.15);color:#3ed598}
-  .row-status.completed{background:rgba(62,213,152,0.15);color:#3ed598}
   .row-status.rejected{background:rgba(239,68,68,0.15);color:#ef4444}
   .row-status.cancelled{background:rgba(138,148,163,0.15);color:#8a94a3}
-
   .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:9999;display:none;align-items:flex-end;justify-content:center}
   .modal-overlay.open{display:flex}
   .modal{background:#0a0e14;border:1px solid rgba(255,255,255,0.08);border-radius:18px 18px 0 0;width:100%;max-width:680px;max-height:85vh;overflow-y:auto;padding:24px 20px;animation:slideUp 0.25s ease-out}
@@ -66,7 +59,7 @@
   .receipt-row .val{font-size:13px;color:#fff;font-weight:500;text-align:right;word-break:break-all;max-width:60%}
   .receipt-amt{text-align:center;margin:8px 0 20px;padding:18px;background:rgba(255,255,255,0.03);border-radius:12px}
   .receipt-amt .num{font-size:32px;font-weight:700;letter-spacing:-1px}
-  .receipt-amt .lbl{font-size:12px;color:#8a94a3;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+  .receipt-amt .lblg{font-size:12px;color:#8a94a3;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
 </style>
 </head>
 <body>
@@ -98,6 +91,20 @@
   </div>
 </div>
 
+<div id="receiptModal" class="modal-overlay" onclick="if(event.target===this)closeReceipt()">
+  <div class="modal">
+    <div class="modal-h">
+      <h2 id="recTitle">Transaction Receipt</h2>
+      <button class="modal-close" onclick="closeReceipt()">×</button>
+    </div>
+    <div class="receipt-amt">
+      <div class="lblg" id="recAmtLbl">Amount</div>
+      <div class="num" id="recAmt">—</div>
+    </div>
+    <div id="recDetails"></div>
+  </div>
+</div>
+
 <script src="js/bottom-nav.js?v=1"></script>
 
 <script>
@@ -114,47 +121,40 @@ const ICONS = {
 function fmtMoney(n){
   return '$' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
-
 function fmtDate(d){
   if(!d) return '';
-  const dt = new Date(d);
-  return dt.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+  return new Date(d).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
 }
-
 function dateGroup(d){
   if(!d) return 'Earlier';
-  const dt = new Date(d);
-  const now = new Date();
-  const diff = (now - dt) / 86400000;
+  const diff = (new Date() - new Date(d)) / 86400000;
   if(diff < 1) return 'Today';
   if(diff < 2) return 'Yesterday';
   if(diff < 7) return 'This Week';
   if(diff < 30) return 'This Month';
   return 'Earlier';
 }
-
 function statusClass(s){
   s = (s||'').toLowerCase();
-  if(s.includes('approve') || s.includes('complete') || s.includes('credit')) return 'approved';
-  if(s.includes('reject') || s.includes('fail') || s.includes('denied')) return 'rejected';
-  if(s.includes('cancel')) return 'cancelled';
+  if(s.indexOf('approve')>=0 || s.indexOf('complete')>=0 || s.indexOf('credit')>=0) return 'approved';
+  if(s.indexOf('reject')>=0 || s.indexOf('fail')>=0 || s.indexOf('denied')>=0) return 'rejected';
+  if(s.indexOf('cancel')>=0) return 'cancelled';
   return 'pending';
 }
 
 function render(){
   const listEl = document.getElementById('activityList');
   let items = allItems;
-  if(currentFilter === 'pending') items = items.filter(i => statusClass(i.status) === 'pending');
-  else if(currentFilter !== 'all') items = items.filter(i => i.kind === currentFilter);
+  if(currentFilter === 'pending') items = items.filter(function(i){ return statusClass(i.status) === 'pending'; });
+  else if(currentFilter !== 'all') items = items.filter(function(i){ return i.kind === currentFilter; });
 
   if(!items.length){
     listEl.innerHTML = '<div class="empty">' + ICONS.emptyBox + '<span class="lbl">No activity yet</span><span class="hint">Your transactions will appear here</span></div>';
     return;
   }
 
-  // Group by date
   const groups = {};
-  items.forEach(it => {
+  items.forEach(function(it){
     const g = dateGroup(it.created_at);
     if(!groups[g]) groups[g] = [];
     groups[g].push(it);
@@ -162,15 +162,16 @@ function render(){
 
   const order = ['Today','Yesterday','This Week','This Month','Earlier'];
   let html = '';
-  order.forEach(g => {
+  order.forEach(function(g){
     if(!groups[g]) return;
     html += '<div class="group-h">' + g + '</div>';
-    groups[g].forEach(it => {
+    groups[g].forEach(function(it){
       const ic = it.kind === 'deposit' ? 'green' : (it.kind === 'withdrawal' ? 'blue' : 'amber');
       const svg = ICONS[it.kind] || ICONS.deposit;
       const amtCls = it.kind === 'withdrawal' ? 'neg' : (it.kind === 'deposit' ? 'pos' : '');
       const sign = it.kind === 'withdrawal' ? '-' : (it.kind === 'deposit' ? '+' : '');
-      html += '<div class="row" onclick="openReceipt(\'+JSON.stringify(it).replace(/'/g,"&#39;").replace(/"/g,'&quot;')+'\')" style="cursor:pointer">' +
+      const idx = allItems.indexOf(it);
+      html += '<div class="row" data-idx="' + idx + '">' +
         '<div class="row-ic ' + ic + '">' + svg + '</div>' +
         '<div class="row-body">' +
           '<div class="row-title">' + it.title + '</div>' +
@@ -187,16 +188,58 @@ function render(){
   listEl.innerHTML = html;
 }
 
+function openReceipt(it){
+  const sign = it.kind === 'withdrawal' ? '-' : (it.kind === 'deposit' ? '+' : '');
+  document.getElementById('recTitle').textContent = it.title;
+  document.getElementById('recAmt').textContent = sign + fmtMoney(it.amount);
+  document.getElementById('recAmt').style.color = it.kind === 'withdrawal' ? '#ff6b6b' : '#3ed598';
+  document.getElementById('recAmtLbl').textContent = it.kind === 'withdrawal' ? 'Amount sent' : (it.kind === 'deposit' ? 'Amount received' : 'Total');
+  const sc = statusClass(it.status);
+  const sColor = sc === 'approved' ? '#3ed598' : (sc === 'rejected' ? '#ef4444' : '#ffbd4a');
+  let details = '';
+  details += '<div class="receipt-row"><span class="lbl">Type</span><span class="val">' + (it.kind || '').toUpperCase() + '</span></div>';
+  details += '<div class="receipt-row"><span class="lbl">Status</span><span class="val" style="color:' + sColor + '">' + (it.status || 'pending').toUpperCase() + '</span></div>';
+  details += '<div class="receipt-row"><span class="lbl">Date</span><span class="val">' + fmtDate(it.created_at) + '</span></div>';
+  if(it.ref) details += '<div class="receipt-row"><span class="lbl">Reference</span><span class="val">' + it.ref + '</span></div>';
+  document.getElementById('recDetails').innerHTML = details;
+  document.getElementById('receiptModal').classList.add('open');
+}
+
+function closeReceipt(){
+  document.getElementById('receiptModal').classList.remove('open');
+}
+
+window.openReceipt = openReceipt;
+window.closeReceipt = closeReceipt;
+
+// Click delegation for activity rows
+document.addEventListener('click', function(e){
+  const row = e.target.closest('.row[data-idx]');
+  if(!row) return;
+  const idx = parseInt(row.dataset.idx);
+  if(!isNaN(idx) && allItems[idx]) openReceipt(allItems[idx]);
+});
+
+// Filter chips
+document.querySelectorAll('.chip').forEach(function(c){
+  c.addEventListener('click', function(){
+    document.querySelectorAll('.chip').forEach(function(x){ x.classList.remove('active'); });
+    c.classList.add('active');
+    currentFilter = c.dataset.filter;
+    render();
+  });
+});
+
 async function loadActivity(){
-  const { data:{ user } } = await sb.auth.getUser();
+  const userRes = await sb.auth.getUser();
+  const user = userRes.data.user;
   if(!user){ window.location.href = 'login.html'; return; }
 
   const items = [];
 
-  // Deposits
   try {
-    const { data: deposits } = await sb.from('deposits').select('*').eq('user_id', user.id).order('created_at',{ascending:false});
-    (deposits || []).forEach(d => {
+    const dep = await sb.from('deposits').select('*').eq('user_id', user.id).order('created_at',{ascending:false});
+    (dep.data || []).forEach(function(d){
       items.push({
         kind: 'deposit',
         title: 'Deposit · ' + (d.method ? d.method.toUpperCase() : 'CRYPTO') + (d.crypto_asset ? ' (' + d.crypto_asset.toUpperCase() + ')' : ''),
@@ -208,10 +251,9 @@ async function loadActivity(){
     });
   } catch(e){ console.warn('deposits:', e); }
 
-  // Withdrawals
   try {
-    const { data: withdrawals } = await sb.from('withdrawals').select('*').eq('user_id', user.id).order('created_at',{ascending:false});
-    (withdrawals || []).forEach(w => {
+    const wd = await sb.from('withdrawals').select('*').eq('user_id', user.id).order('created_at',{ascending:false});
+    (wd.data || []).forEach(function(w){
       items.push({
         kind: 'withdrawal',
         title: 'Withdrawal · ' + (w.method ? w.method.toUpperCase() : 'CRYPTO') + (w.asset ? ' (' + w.asset.toUpperCase() + ')' : ''),
@@ -223,10 +265,9 @@ async function loadActivity(){
     });
   } catch(e){ console.warn('withdrawals:', e); }
 
-  // Purchases / share orders (try common table names)
   try {
-    const { data: purchases } = await sb.from('share_orders').select('*').eq('user_id', user.id).order('created_at',{ascending:false});
-    (purchases || []).forEach(p => {
+    const so = await sb.from('share_orders').select('*').eq('user_id', user.id).order('created_at',{ascending:false});
+    (so.data || []).forEach(function(p){
       items.push({
         kind: 'purchase',
         title: 'Purchase · ' + (p.ticker || p.symbol || 'Shares') + (p.shares ? ' (' + p.shares + ' sh)' : ''),
@@ -236,74 +277,17 @@ async function loadActivity(){
         created_at: p.created_at
       });
     });
-  } catch(e){ /* table might not exist */ }
+  } catch(e){ /* table may not exist */ }
 
-  // Sort all by date desc
-  items.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+  items.sort(function(a,b){ return new Date(b.created_at) - new Date(a.created_at); });
   allItems = items;
   render();
 }
-
-document.querySelectorAll('.chip').forEach(c => {
-  c.addEventListener('click', () => {
-    document.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
-    c.classList.add('active');
-    currentFilter = c.dataset.filter;
-    render();
-  });
-});
-
-
-function openReceipt(it){
-  try {/g,'"').replace(/&#39;/g,"'")) : itJson;
-    const sign = it.kind === 'withdrawal' ? '-' : (it.kind === 'deposit' ? '+' : '');
-    document.getElementById('recTitle').textContent = it.title;
-    document.getElementById('recAmt').textContent = sign + fmtMoney(it.amount);
-    document.getElementById('recAmt').style.color = it.kind === 'withdrawal' ? '#ff6b6b' : '#3ed598';
-    document.getElementById('recAmtLbl').textContent = it.kind === 'withdrawal' ? 'Amount sent' : (it.kind === 'deposit' ? 'Amount received' : 'Total');
-    let details = '';
-    details += '<div class="receipt-row"><span class="lbl">Type</span><span class="val">' + (it.kind || '').toUpperCase() + '</span></div>';
-    details += '<div class="receipt-row"><span class="lbl">Status</span><span class="val" style="color:' + (statusClass(it.status)==='approved'?'#3ed598':statusClass(it.status)==='rejected'?'#ef4444':'#ffbd4a') + '">' + (it.status || 'pending').toUpperCase() + '</span></div>';
-    details += '<div class="receipt-row"><span class="lbl">Date</span><span class="val">' + fmtDate(it.created_at) + '</span></div>';
-    if(it.ref) details += '<div class="receipt-row"><span class="lbl">Reference</span><span class="val">' + it.ref + '</span></div>';
-    document.getElementById('recDetails').innerHTML = details;
-    document.getElementById('receiptModal').classList.add('open');
-  } catch(e){ console.error(e); }
-}
-function closeReceipt(){
-  document.getElementById('receiptModal').classList.remove('open');
-}
-window.openReceipt = openReceipt;
-window.closeReceipt = closeReceipt;
-
-
-document.addEventListener('click', function(e){
-  const row = e.target.closest('.row[data-idx]');
-  if(!row) return;
-  const idx = parseInt(row.dataset.idx);
-  if(isNaN(idx) || !allItems[idx]) return;
-  openReceipt(allItems[idx]);
-});
 
 window.__loadActivity = loadActivity;
 if(window.__sbReady){ loadActivity(); }
 else { document.addEventListener('sb-ready', loadActivity, { once: true }); }
 </script>
-
-
-<div id="receiptModal" class="modal-overlay" onclick="if(event.target===this)closeReceipt()">
-  <div class="modal">
-    <div class="modal-h">
-      <h2 id="recTitle">Transaction Receipt</h2>
-      <button class="modal-close" onclick="closeReceipt()">×</button>
-    </div>
-    <div class="receipt-amt">
-      <div class="lbl" id="recAmtLbl">Amount</div>
-      <div class="num" id="recAmt">—</div>
-    </div>
-    <div id="recDetails"></div>
-  </div>
-</div>
 
 </body>
 </html>
