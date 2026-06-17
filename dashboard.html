@@ -605,7 +605,14 @@
         return;
       }
     }
-  });
+  }
+
+  // ✅ Safe-init wrapper (prevents sb-ready race)
+  if (window.__sbReady) {
+    __loadDashData();
+  } else {
+    document.addEventListener("sb-ready", __loadDashData, { once: true });
+  }
 </script>
 <script src="js/sidebar.js?v=1781345031" defer></script>
 </head>
@@ -1393,7 +1400,7 @@
   // LOAD REAL USER DATA FROM SUPABASE
   // Welcome bonus banner logic added below
   // ============================================
-  document.addEventListener('sb-ready', async () => {
+  async function __loadDashData(){
     const { data: { user } } = await sb.auth.getUser();
     if(!user) return; // auth guard handles redirect
 
