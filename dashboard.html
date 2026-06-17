@@ -1430,6 +1430,21 @@
     let totalReserved = 0;
     (allocations || []).forEach(a => { totalReserved += parseFloat(a.total_value || 0); });
 
+// ✅ MARKET VALUE (SAFE PATCH)
+let totalShares = 0;
+(allocations || []).forEach(a => {
+  totalShares += parseFloat(a.shares || 0);
+});
+
+const SPCX_LIVE_PRICE = 135;
+const heroValue = totalShares * SPCX_LIVE_PRICE;
+
+const hv = document.getElementById('heroValue');
+if (hv) hv.textContent = '$' + heroValue.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+const hs = document.getElementById('heroShares');
+if (hs) hs.innerHTML = totalShares.toLocaleString('en-US') + ' <span>shares</span>';
+
     const fmtMoney = (n) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     // Fetch real cash + committed via RPC (bulletproof — defaults to 0 on any error)
