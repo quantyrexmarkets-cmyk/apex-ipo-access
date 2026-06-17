@@ -601,7 +601,7 @@
       maturesAt.setMonth(maturesAt.getMonth() + months);
 
       // Insert allocation
-      var { error: insErr } = await sb.from('allocations').insert({
+      var { data: newAlloc, error: insErr } = await sb.from('allocations').insert({
         user_id: uid,
         company_ticker: ticker,
         company_name: state.name,
@@ -613,7 +613,7 @@
         projected_return_max: state.returnMax,
         status: 'reserved',
         matures_at: maturesAt.toISOString()
-      });
+      }).select().single();
 
       if(insErr){
         apexError('Could not reserve: ' + insErr.message);
@@ -641,6 +641,21 @@
       sessionStorage.setItem('order_period', state.periodLabel);
       sessionStorage.setItem('order_return_min', String(minGain));
       sessionStorage.setItem('order_return_max', String(maxGain));
+
+        // ✅ Receipt page expects this format
+        sessionStorage.setItem('apex_last_allocation', JSON.stringify({
+          allocation_id: (newAlloc && newAlloc.id) || '',
+          created_at: (newAlloc && newAlloc.created_at) || new Date().toISOString(),
+          tier: (newAlloc && newAlloc.tier) || 3,
+          company_name: state.name,
+          company_logo: state.logo || '',
+          sector: state.sector || '',
+          stage: state.stage || '',
+          shares: shares,
+          price_per_share: state.price,
+          hold_period_label: state.periodLabel || '',
+          hold_perk_pct: state.perkPct || 0
+        }));
 
       apexSuccess('Reservation confirmed!');
       setTimeout(function(){
