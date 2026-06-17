@@ -1428,7 +1428,257 @@
     // 3. Allocations → portfolio totals
     const { data: allocations } = await sb.from('allocations').select('*').eq('user_id', user.id);
     let totalReserved = 0;
-    (allocations || []).forEach(a => { totalReserved += parseFloat(a.total_value || 0); });
+    let totalShares = 0;
+      (allocations || []).forEach(a => {
+        totalReserved += parseFloat(a.total_value || 0);
+        if(a.company_ticker === 'SPCX' || !a.company_ticker){
+          totalShares += parseFloat(a.shares || 0);
+        }
+      });
+
+      const SPCX_LIVE_PRICE = 135.00;
+      const marketValue = totalShares * SPCX_LIVE_PRICE;
+
+      const hv = document.getElementById('heroValue');
+      if(hv) hv.textContent = '
+
+    const fmtMoney = (n) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    // Fetch real cash + committed via RPC (bulletproof — defaults to 0 on any error)
+    const { data: __fin } = await sb.rpc('get_user_finances', { p_user_id: user.id });
+    const __row = (__fin && __fin[0]) || {};
+    const cash = parseFloat(__row.cash || 0);
+    totalReserved = parseFloat(__row.committed || totalReserved);
+    const total = cash + totalReserved;
+
+    const pv = document.getElementById('portfolioValue');
+    if(pv) pv.textContent = fmtMoney(total);
+    const rv = document.getElementById('reservedVal');
+    if(rv) rv.textContent = fmtMoney(totalReserved);
+    const cv = document.getElementById('cashVal');
+    if(cv) cv.textContent = fmtMoney(cash);
+    const bp = document.getElementById('buyingPower');
+    if(bp) bp.textContent = fmtMoney(cash);
+
+    const pc = document.getElementById('portfolioChange');
+    if(pc){
+      if(total === 0){
+        pc.textContent = 'Fund your account to begin investing';
+        pc.style.color = '#8a94a3';
+      } else {
+        pc.textContent = `Total committed: ${fmtMoney(totalReserved)}`;
+      }
+    }
+
+    // 4. Activity log → recent activity list
+    const activity = await window.apex.getActivity(6);
+    const list = document.getElementById('activityList');
+    if(list && activity.length){
+      const timeAgo = (iso) => {
+        const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+        if(diff < 60) return 'just now';
+        if(diff < 3600) return Math.floor(diff/60) + 'm ago';
+        if(diff < 86400) return Math.floor(diff/3600) + 'h ago';
+        if(diff < 604800) return Math.floor(diff/86400) + 'd ago';
+        return new Date(iso).toLocaleDateString();
+      };
+      const icons = {
+        green: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+        blue:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+        amber: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+        red:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+      };
+      list.innerHTML = activity.map(a => `
+        <div class="act-row">
+          <div class="act-ic ${a.icon_color === 'blue' ? '' : a.icon_color}">${icons[a.icon_color] || icons.blue}</div>
+          <div class="act-body">
+            <div class="act-title">${a.title || ''}</div>
+            <div class="act-sub">${a.description || ''}</div>
+          </div>
+          <div class="act-time">${timeAgo(a.created_at)}</div>
+        </div>
+      `).join('');
+    }
+  }
+</script>
+
+<!-- docs-quicknav-fix -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const els = document.querySelectorAll('a, button, [onclick], .quick-nav *, .quick-actions *, .shortcut *, .action-card *, .nav-card *');
+
+  els.forEach(function (el) {
+    const text  = ((el.textContent || '') + ' ' + (el.innerText || '')).replace(/\s+/g,' ').trim().toLowerCase();
+    const aria  = (el.getAttribute('aria-label') || '').toLowerCase();
+    const title = (el.getAttribute('title') || '').toLowerCase();
+    const href  = (el.getAttribute('href') || '').trim().toLowerCase();
+    const oc    = (el.getAttribute('onclick') || '').toLowerCase();
+
+    const looksLikeDocs =
+      /\bdocs\b/.test(text) || /\bdocuments?\b/.test(text) ||
+      /\bdocs\b/.test(aria) || /\bdocuments?\b/.test(aria) ||
+      /\bdocs\b/.test(title) || /\bdocuments?\b/.test(title);
+
+    const isDead =
+      href === '' || href === '#' || href === 'javascript:void(0)' || href === 'javascript:;' ||
+      oc.includes('docs page coming soon') ||
+      oc.includes('documents page coming soon') ||
+      oc.includes('docs coming soon') ||
+      oc.includes('documents coming soon');
+
+    if (looksLikeDocs && isDead) {
+      if (el.tagName === 'A') el.setAttribute('href', 'docs.html');
+      el.setAttribute('onclick', "location.href='docs.html'");
+      el.style.cursor = 'pointer';
+    }
+  });
+});
+</script>
+<!-- /docs-quicknav-fix -->
+
+<script src="js/bottom-nav.js?v=1"></script>
+<script src="js/floating-widget.js?v=1781343118" defer></script>
+
+<!-- NOTIFICATIONS PANEL -->
+<div id="notifPanel" style="display:none;position:fixed;top:70px;right:16px;width:340px;max-width:90vw;max-height:70vh;background:#0a0e14;border:1px solid rgba(255,255,255,0.1);border-radius:14px;z-index:9998;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.6)">
+  <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:center">
+    <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;color:#fff">Notifications</div>
+    <button onclick="window._markAllRead()" style="background:none;border:none;color:#4a9eff;font-size:11px;font-weight:600;cursor:pointer">Mark all read</button>
+  </div>
+  <div id="notifList" style="max-height:60vh;overflow-y:auto;padding:6px 0">
+    <div style="padding:30px 20px;text-align:center;color:#6a7585;font-size:13px">Loading...</div>
+  </div>
+</div>
+
+<script>
+  var notifsOpen = false;
+  window._toggleNotifs = function(){
+    var p = document.getElementById('notifPanel');
+    notifsOpen = !notifsOpen;
+    p.style.display = notifsOpen ? 'block' : 'none';
+    if(notifsOpen) loadUserNotifs();
+  };
+  document.addEventListener('click', function(e){
+    var p = document.getElementById('notifPanel');
+    var b = document.getElementById('notifBell');
+    if(notifsOpen && !p.contains(e.target) && !b.contains(e.target)){
+      p.style.display = 'none'; notifsOpen = false;
+    }
+  });
+
+  async function loadUserNotifs(){
+    try {
+      var { data: userData } = await sb.auth.getUser();
+      if(!userData?.user) return;
+      // Get user's personal notifs
+      var personal = await sb.from('notifications')
+        .select('*')
+        .eq('user_id', userData.user.id)
+        .order('created_at',{ascending:false})
+        .limit(30);
+      // Get broadcasts
+      var broadcasts = await sb.from('notifications')
+        .select('*')
+        .eq('is_broadcast', true)
+        .order('created_at',{ascending:false})
+        .limit(30);
+      var data = ((personal.data||[]).concat(broadcasts.data||[]))
+        .sort(function(a,b){ return new Date(b.created_at)-new Date(a.created_at); })
+        .slice(0,30);
+      var listEl = document.getElementById('notifList');
+      if(!data || !data.length){
+        listEl.innerHTML = '<div style="padding:30px 20px;text-align:center;color:#6a7585;font-size:13px">No notifications yet</div>';
+        return;
+      }
+      listEl.innerHTML = data.map(function(n){
+        var color = n.type==='success'?'#3ed598':n.type==='warning'?'#ffb800':n.type==='alert'?'#ff6a6a':'#4a9eff';
+        var when = new Date(n.created_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+        var unread = !n.read_at;
+        return '<div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;gap:10px;'+(unread?'background:rgba(74,158,255,0.04)':'')+'">' +
+          '<div style="width:32px;height:32px;border-radius:50%;background:'+color+'22;color:'+color+';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:700">'+(n.type==='success'?'✓':n.type==='warning'?'⚠':n.type==='alert'?'!':'ℹ')+'</div>' +
+          '<div style="flex:1;min-width:0">' +
+            '<div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:2px">'+n.title.replace(/</g,'&lt;')+'</div>' +
+            '<div style="font-size:12px;color:#a8b2c1;line-height:1.4;margin-bottom:4px">'+n.body.replace(/</g,'&lt;')+'</div>' +
+            '<div style="font-size:10px;color:#6a7585">'+when+(n.is_broadcast?' · 📢 Broadcast':'')+'</div>' +
+          '</div>' +
+          (unread?'<div style="width:8px;height:8px;border-radius:50%;background:#4a9eff;align-self:flex-start;margin-top:6px;flex-shrink:0"></div>':'') +
+        '</div>';
+      }).join('');
+    } catch(e){ console.warn('Notifs:', e); }
+  }
+
+  window._markAllRead = async function(){
+    var { data: userData } = await sb.auth.getUser();
+    if(!userData?.user) return;
+    var now = new Date().toISOString();
+    await sb.from('notifications').update({ read_at: now }).eq('user_id', userData.user.id).is('read_at', null);
+    loadUserNotifs();
+    updateNotifBadge();
+  };
+
+  async function updateNotifBadge(){
+    try {
+      var { data: userData } = await sb.auth.getUser();
+      if(!userData?.user) return;
+      var p = await sb.from('notifications').select('id').eq('user_id', userData.user.id).is('read_at', null);
+      var b = await sb.from('notifications').select('id').eq('is_broadcast', true).is('read_at', null);
+      var data = (p.data||[]).concat(b.data||[]);
+      var unread = (data||[]).length;
+      var badge = document.getElementById('notifBadge');
+      if(badge){
+        if(unread > 0){
+          badge.textContent = unread > 9 ? '9+' : unread;
+          badge.style.display = 'flex';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    } catch(e){}
+  }
+
+  document.addEventListener('sb-ready', function(){
+    setTimeout(updateNotifBadge, 800);
+    setInterval(updateNotifBadge, 30000);
+  });
+  window.__loadDashData = __loadDashData;
+  // ✅ Safe-init wrapper (prevents sb-ready race)
+  if (window.__sbReady) {
+    window.__loadDashData();
+  } else {
+      document.addEventListener("sb-ready", window.__loadDashData, { once: true });
+  }
+</script>
+
+  <script src="js/user-bell.js?v=1"></script>
+
+<!-- Smartsupp Live Chat -->
+<script>
+(function(d) {
+  var s, c, o = window.smartsupp = function(){ o._.push(arguments); };
+  o._ = [];
+  window._smartsupp = window._smartsupp || {};
+  window._smartsupp.key = '7d6445f6308e329b33468a584f675c298bd2c871';
+  s = d.getElementsByTagName('script')[0];
+  c = d.createElement('script');
+  c.type = 'text/javascript';
+  c.charset = 'utf-8';
+  c.async = true;
+  c.src = 'https://www.smartsuppchat.com/loader.js?';
+  s.parentNode.insertBefore(c, s);
+})(document);
+</script>
+<!-- End Smartsupp -->
+
+</body>
+</html>
+ + marketValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      const hs = document.getElementById('heroShares');
+      if(hs) hs.innerHTML = totalShares + ' <span>shares</span>';
+
+      if(totalShares > 0){
+        document.querySelectorAll('.no-position-badge, .position-badge, [class*="no-position"]').forEach(function(el){ el.style.display = 'none'; });
+      }
 
     const fmtMoney = (n) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
