@@ -245,7 +245,7 @@ async function loadActivity(){
         title: 'Deposit · ' + (d.method ? d.method.toUpperCase() : 'CRYPTO') + (d.crypto_asset ? ' (' + d.crypto_asset.toUpperCase() + ')' : ''),
         amount: d.amount,
         status: d.status || 'pending',
-        ref: d.reference_code,
+        ref: d.reference,
         created_at: d.created_at
       });
     });

@@ -1946,7 +1946,7 @@
       if(q){
         var u = state.users.find(function(x){return x.id===d.user_id;});
         var name = u ? ((u.first_name||'')+' '+(u.last_name||'')+' '+(u.email||'')).toLowerCase() : '';
-        if(!name.includes(q) && !(d.reference_code||'').toLowerCase().includes(q) && !String(d.amount).includes(q)) return false;
+        if(!name.includes(q) && !(d.reference||'').toLowerCase().includes(q) && !String(d.amount).includes(q)) return false;
       }
       return true;
     });
@@ -1982,7 +1982,7 @@
         '</div>' +
         '<div class="dep-meta">' +
           '<span class="chip">Method <b>' + (d.method||'wire').toUpperCase() + '</b></span>' +
-          '<span class="chip">Ref <b>' + escapeHtml(d.reference_code||'—') + '</b></span>' +
+          '<span class="chip">Ref <b>' + escapeHtml(d.reference||'—') + '</b></span>' +
         '</div>';
 
       if(d.notes){
@@ -2043,11 +2043,11 @@
           delta: parseFloat(d.amount),
           balance_before: balBefore,
           balance_after: balAfter,
-          reason: 'Deposit approved: ' + (d.reference_code || d.id)
+          reason: 'Deposit approved: ' + (d.reference || d.id)
         });
       } catch(e){ console.warn('Audit failed', e); }
 
-      await notifyUser(d.user_id, '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:6px"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Deposit Approved', 'Your deposit of ' + fmt(d.amount) + ' (ref: ' + (d.reference_code || 'N/A') + ') has been approved and credited to your account.', 'success');
+      await notifyUser(d.user_id, '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:6px"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Deposit Approved', 'Your deposit of ' + fmt(d.amount) + ' (ref: ' + (d.reference || 'N/A') + ') has been approved and credited to your account.', 'success');
       apexSuccess('Approved · ' + fmt(d.amount) + ' credited');
       await loadDeposits();
       await loadCustomers();
@@ -2799,7 +2799,7 @@
           kind:'deposit',id:d.id,user_id:d.user_id,
           amount:d.amount,delta:d.amount,
           status:d.status,when:d.created_at,
-          ref:d.reference_code||('DEP-'+String(d.id).slice(0,8)),
+          ref:d.reference||('DEP-'+String(d.id).slice(0,8)),
           method:d.method,note:d.notes
         };
       });
