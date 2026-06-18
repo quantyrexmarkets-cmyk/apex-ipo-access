@@ -31,13 +31,6 @@
   .ch-badge.ipo{background:rgba(74,158,255,0.14);color:#4a9eff}
   .ch-name{font-family:'Manrope',sans-serif;font-size:32px;font-weight:800;letter-spacing:-0.5px;line-height:1.05;color:#fff}
   .ch-sub{font-size:13px;color:#8a94a3;margin-top:4px}
-  .ch-logo{
-    width:72px;height:72px;border-radius:50%;flex-shrink:0;
-    border:1px solid rgba(255,255,255,0.08);
-    display:flex;align-items:center;justify-content:center;
-    background:#0a0e14;overflow:hidden;
-  }
-  .ch-logo img{width:60%;height:60%;object-fit:contain}
 
   .ch-price-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
   .ch-price{font-family:'Manrope',sans-serif;font-size:40px;font-weight:800;letter-spacing:-1px;line-height:1;color:#fff}
@@ -186,12 +179,6 @@
   const dayChange = currentPrice - dayOpen;
   const dayPct = (dayChange/dayOpen)*100;
   const isUp = dayChange >= 0;
-
-  // Logo HTML
-  const logoHtml = company.logo_url
-    ? `<img src="${company.logo_url}" alt="${ticker}" onerror="this.style.display='none'">`
-    : `<div style="font-weight:800;color:#4a9eff;font-size:24px">${ticker[0]}</div>`;
-
   main.innerHTML = `
     <div class="ch-head">
       <div class="ch-head-l">
@@ -202,7 +189,6 @@
         <div class="ch-name">${company.name || ticker}</div>
         <div class="ch-sub">${company.legal_name || (company.name + ' Holdings Inc.')}</div>
       </div>
-      <div class="ch-logo">${logoHtml}</div>
     </div>
 
     <div class="ch-price-row">
