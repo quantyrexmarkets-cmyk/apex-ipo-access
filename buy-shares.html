@@ -651,6 +651,7 @@
           stage: state.stage || '',
           shares: shares,
           price_per_share: state.price,
+          total_value: (parseFloat(shares) || 0) * (parseFloat(state.price) || 0),
           hold_period_label: state.periodLabel || '',
           hold_perk_pct: state.perkPct || 0,
           status: (newAlloc && newAlloc.status) || 'reserved',
