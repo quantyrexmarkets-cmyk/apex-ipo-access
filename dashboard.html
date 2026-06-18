@@ -701,6 +701,57 @@
   </div>
 
   <div id="dashChart" style="width:100%;height:90px;margin:14px 0 12px;cursor:pointer;border-radius:10px" onclick="location.href='chart.html?ticker=SPCX'"></div>
+<script>
+(function dashChartInit2(){
+  function draw(){
+    var el = document.getElementById('dashChart');
+    if(!el) return setTimeout(draw, 100);
+    if(el.dataset.drawn === '1') return;
+    var w = el.clientWidth;
+    if(w < 50) return setTimeout(draw, 100);
+    el.dataset.drawn = '1';
+    el.innerHTML = '';
+    var dpr = window.devicePixelRatio || 1, h = 90;
+    var c = document.createElement('canvas');
+    c.width = w*dpr; c.height = h*dpr;
+    c.style.cssText = 'width:'+w+'px;height:'+h+'px;display:block';
+    el.appendChild(c);
+    var ctx = c.getContext('2d');
+    ctx.scale(dpr, dpr);
+    var n = 60, pts = [], minY = h*0.78, maxY = h*0.18;
+    for(var i=0;i<n;i++){
+      var p = i/(n-1);
+      var t = minY - p*(minY-maxY);
+      var noise = (Math.sin(i*0.4)+Math.sin(i*0.8)*0.5+Math.sin(i*1.4)*0.3)*5;
+      pts.push([i*(w/(n-1)), t+noise]);
+    }
+    var g = ctx.createLinearGradient(0,0,0,h);
+    g.addColorStop(0,'rgba(62,213,152,0.45)');
+    g.addColorStop(0.7,'rgba(62,213,152,0.08)');
+    g.addColorStop(1,'rgba(62,213,152,0)');
+    ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(pts[0][0],h);
+    for(var j=0;j<pts.length;j++) ctx.lineTo(pts[j][0],pts[j][1]);
+    ctx.lineTo(pts[pts.length-1][0],h);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#3ed598';ctx.lineWidth=2;ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.shadowColor='rgba(62,213,152,0.4)';ctx.shadowBlur=4;
+    ctx.beginPath();
+    for(var k=0;k<pts.length;k++){
+      if(k===0) ctx.moveTo(pts[k][0],pts[k][1]);
+      else ctx.lineTo(pts[k][0],pts[k][1]);
+    }
+    ctx.stroke();ctx.shadowBlur=0;
+    var last = pts[pts.length-1];
+    ctx.fillStyle='#3ed598';ctx.beginPath();
+    ctx.arc(last[0],last[1],3,0,Math.PI*2);ctx.fill();
+    console.log('Dashboard chart drawn');
+  }
+  if(document.readyState!=='loading') setTimeout(draw, 50);
+  else document.addEventListener('DOMContentLoaded', function(){ setTimeout(draw, 50); });
+  window.addEventListener('load', draw);
+  setTimeout(draw, 1500);
+})();
+</script>
+
 
   <button class="hero-cta" onclick="location.href='buy-shares.html?ticker=SPCX'">
     Buy SpaceX Shares
