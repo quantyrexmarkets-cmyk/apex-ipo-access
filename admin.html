@@ -2018,7 +2018,6 @@
       // Update deposit status
       var { error: e1 } = await sb.from('deposits').update({
         status: 'approved',
-        approved_at: new Date().toISOString(),
         reviewed_at: new Date().toISOString(),
         reviewed_by: state.user.id
       }).eq('id', id);
