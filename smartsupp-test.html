@@ -27,6 +27,18 @@
 <h3>Status</h3>
 <pre id="log"></pre>
 
+<style>
+/* SmartSupp widget — push above bottom nav (mobile) */
+@media (max-width: 900px) {
+  #chat-application,
+  .smartsupp-widget-container,
+  iframe[id^="chat-application"],
+  iframe[title*="Smartsupp" i],
+  iframe[src*="smartsupp"] {
+    bottom: 80px !important;
+  }
+}
+</style>
 <script>
   var log = document.getElementById('log');
   function logIt(msg, isErr){
