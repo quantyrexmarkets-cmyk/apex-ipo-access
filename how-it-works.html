@@ -115,10 +115,16 @@
 @media (max-width: 900px) {
   #chat-application,
   .smartsupp-widget-container,
-  iframe[id^="chat-application"],
-  iframe[title*="Smartsupp" i],
-  iframe[src*="smartsupp"] {
-    bottom: 80px !important;
+  #smartsupp-widget-container,
+  div[class*="smartsupp" i],
+  div[id*="smartsupp" i],
+  iframe[id*="chat-application" i],
+  iframe[title*="smartsupp" i],
+  iframe[src*="smartsupp" i],
+  iframe[name*="smartsupp" i],
+  .widgetWrapper {
+    bottom: 90px !important;
+    z-index: 9998 !important;
   }
 }
 </style>
