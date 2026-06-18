@@ -2844,3 +2844,25 @@ footer { padding: 36px 20px !important; margin-top: 30px !important; }
   .sub-back { margin-bottom: 24px; }
   .sub-head { margin-bottom: 36px; }
 }
+
+
+/* ===== NEW HERO IMAGE FIT (override all previous duo-image rules) ===== */
+.duo-image-wrap{
+  background:transparent !important;
+  overflow:hidden !important;
+  max-width:720px !important;
+  margin:0 auto !important;
+  border-radius:20px !important;
+}
+.duo-image{
+  width:100% !important;
+  height:auto !important;
+  display:block !important;
+  transform:none !important;
+  filter:none !important;
+  mix-blend-mode:normal !important;
+}
+.duo-image-wrap::after,
+.duo-image-wrap::before{
+  display:none !important;
+}
