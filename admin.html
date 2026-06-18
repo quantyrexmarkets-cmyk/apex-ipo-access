@@ -4032,7 +4032,7 @@
       return '<div class="prof-sec"><div class="prof-sec-title">'+sec.title+'</div>'+
         '<div class="prof-rows">'+
           rows.map(function(r){
-            return '<div class="prof-row"><div class="prof-k">'+escapeHtml(r[0])+'</div><div class="prof-v">'+escapeHtml(String(r[1]))+'</div></div>';
+            return '<div class="prof-row"><div class="prof-k">'+escapeHtml(r[0])+'</div><div class="prof-v">'+(r[1]==null?'':String(r[1]))+'</div></div>';
           }).join('')+
         '</div></div>';
     }).join('');
