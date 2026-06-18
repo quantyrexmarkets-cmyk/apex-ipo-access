@@ -1,20 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Auth redirect: logged-in users go to premium chart view -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js?v=1781242485"></script>
-<script>
-(async function(){
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    if (session && session.user) {
-      // Logged-in user — send to premium investor view
-      location.replace('chart.html?ticker=SPCX');
-    }
-  } catch(e) { /* anonymous or error — show landing */ }
-})();
-</script>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -522,6 +508,44 @@
 })(document);
 </script>
 <!-- End Smartsupp -->
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js?v=1781242485"></script>
+<script>
+// Hide "Open an account" / "Sign In" for logged-in users, show investor CTA
+(async function(){
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session || !session.user) return;
+    
+    // Hide all anon-only elements
+    document.querySelectorAll('a[href="signup.html"], a[href="login.html"], .signin').forEach(el => {
+      el.style.display = 'none';
+    });
+    
+    // Add investor CTA bar at top
+    const bar = document.createElement('div');
+    bar.style.cssText = 'background:linear-gradient(135deg,rgba(74,158,255,0.1),rgba(139,92,246,0.08));border-bottom:1px solid rgba(74,158,255,0.2);padding:14px 20px;text-align:center;display:flex;justify-content:center;gap:14px;align-items:center;flex-wrap:wrap';
+    bar.innerHTML = '<span style="color:#cbd0d8;font-size:13px">Ready to reserve?</span><a href="buy-shares.html?ticker=SPCX" style="background:linear-gradient(135deg,#4a9eff,#8b5cf6);color:#fff;padding:9px 22px;border-radius:9px;font-weight:700;font-size:13px;text-decoration:none">Reserve SpaceX Shares →</a>';
+    document.body.insertBefore(bar, document.body.firstChild);
+    
+    // Replace "Open an account" buttons with "Reserve Shares"
+    document.querySelectorAll('a').forEach(a => {
+      if (a.textContent.trim() === 'Open an account') {
+        a.textContent = 'Reserve SpaceX Shares';
+        a.href = 'buy-shares.html?ticker=SPCX';
+        a.style.display = '';
+      }
+      if (a.textContent.trim() === 'Sign In') {
+        a.textContent = 'Dashboard';
+        a.href = 'dashboard.html';
+        a.style.display = '';
+      }
+    });
+  } catch(e) { console.warn('Auth check failed:', e); }
+})();
+</script>
 
 </body>
 </html>
