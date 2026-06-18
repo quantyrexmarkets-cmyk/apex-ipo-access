@@ -2848,17 +2848,20 @@ footer { padding: 36px 20px !important; margin-top: 30px !important; }
 
 /* ===== NEW HERO IMAGE FIT (override all previous duo-image rules) ===== */
 .duo-image-wrap{
-  background:transparent !important;
+  background:#000 !important;
   overflow:hidden !important;
   max-width:720px !important;
   margin:0 auto !important;
   border-radius:20px !important;
+  aspect-ratio:1/1 !important;
 }
 .duo-image{
   width:100% !important;
-  height:auto !important;
+  height:100% !important;
   display:block !important;
-  transform:none !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  transform:scale(1.02) !important;
   filter:none !important;
   mix-blend-mode:normal !important;
 }
