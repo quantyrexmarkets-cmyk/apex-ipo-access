@@ -460,3 +460,17 @@
   }
 
 })();
+
+// ============================================
+// Safety shim — expose toggleSidebar globally
+// Some pages use inline onclick="toggleSidebar()" 
+// ============================================
+if (typeof window.toggleSidebar !== 'function') {
+  window.toggleSidebar = function() {
+    var sb = document.getElementById('sidebar') || document.querySelector('.ax-sidebar') || document.querySelector('.sidebar');
+    var ov = document.getElementById('sidebarOverlay') || document.querySelector('.ax-sidebar-overlay') || document.querySelector('.sidebar-overlay');
+    if (!sb) return;
+    var open = sb.classList.toggle('open');
+    if (ov) ov.classList.toggle('open', open);
+  };
+}
