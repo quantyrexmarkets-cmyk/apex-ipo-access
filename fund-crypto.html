@@ -613,17 +613,18 @@
       }
 
       // Record deposit
+      const walletAddr = (state.wallets[state.selectedCoin] || {}).address || null;
       const { data: depositRow, error: depErr } = await sb
         .from('deposits')
         .insert({
           user_id: user.id,
           method: 'crypto',
-          asset: state.selectedCoin,
+          crypto_asset: state.selectedCoin,
           amount: amount,
-          reference_code: state.refCode,
+          reference: state.refCode,
           status: 'pending',
-          screenshot_url: screenshotUrl,
-          wallet_address: (state.wallets[state.selectedCoin] || {}).address || null
+          proof_url: screenshotUrl,
+          notes: walletAddr ? ('Wallet: ' + walletAddr) : null
         })
         .select()
         .single();
