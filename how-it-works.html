@@ -151,7 +151,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js?v=1781242485"></script>
 <script>
-// Logged-in user UX v2: hide marketing CTAs, swap hamburger -> Dashboard, keep Learn more
+// Logged-in user UX v3: hide marketing CTAs + footer, swap hamburger -> Dashboard, fix Back link
 (async function(){
   try {
     const { data: { session } } = await sb.auth.getSession();
@@ -162,13 +162,14 @@
       'a[href="signup.html"]',
       'a[href="login.html"]',
       'a[href="#signin"]',
-      '.signin','.btn-signin'
+      '.signin','.btn-signin',
+      'footer','.site-footer','.footer','.footer-grid','.footer-bottom'
     ];
     hideSelectors.forEach(function(sel){
       document.querySelectorAll(sel).forEach(function(el){ el.style.display = 'none'; });
     });
 
-    // Hide "Open an account" / "Sign In" by text (but KEEP Learn more)
+    // Hide "Open an account" / "Sign In" by text (keep Learn more)
     document.querySelectorAll('a, button').forEach(function(el){
       var t = (el.textContent || '').trim().toLowerCase();
       if (t === 'open an account' || t === 'sign in') {
@@ -176,7 +177,15 @@
       }
     });
 
-    // Replace hamburger ☰ with Dashboard link
+    // Redirect any "Back to Apex IPO Access" link to dashboard (not landing)
+    document.querySelectorAll('a').forEach(function(a){
+      var t = (a.textContent || '').trim().toLowerCase();
+      if (t.indexOf('back to apex ipo access') !== -1) {
+        a.href = 'dashboard.html';
+      }
+    });
+
+    // Replace hamburger with Dashboard link
     document.querySelectorAll('.menu-btn, button.menu-btn, .hamburger').forEach(function(btn){
       var link = document.createElement('a');
       link.href = 'dashboard.html';
@@ -185,9 +194,9 @@
       btn.parentNode.replaceChild(link, btn);
     });
 
-    // Remove any old apexInvBar that we previously injected
-    var oldBar = document.getElementById('apexInvBar');
-    if (oldBar) oldBar.remove();
+    // Clean up any stale apexInvBar
+    var old = document.getElementById('apexInvBar');
+    if (old) old.remove();
   } catch(e) { console.warn('Auth check failed:', e); }
 })();
 </script>
