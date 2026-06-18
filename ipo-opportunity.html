@@ -518,36 +518,37 @@
   try {
     const { data: { session } } = await sb.auth.getSession();
     if (!session || !session.user) return;
-    
+
     // Hide marketing-only links and footer
-    const hideSelectors = [
+    var hideSelectors = [
       'a[href="signup.html"]',
       'a[href="login.html"]',
       'a[href="how-it-works.html"]',
       'a[href="about.html"]',
       'a[href="careers.html"]',
-      '.signin',
-      'footer',
-      '.site-footer',
-      '.footer'
+      'a[href="contact.html"]',
+      'a[href="form-crs.html"]',
+      'a[href="#signin"]',
+      '.signin','.btn-signin',
+      'footer','.site-footer','.footer','.footer-grid','.footer-bottom'
     ];
-    hideSelectors.forEach(sel => {
-      document.querySelectorAll(sel).forEach(el => el.style.display = 'none');
+    hideSelectors.forEach(function(sel){
+      document.querySelectorAll(sel).forEach(function(el){ el.style.display = 'none'; });
     });
-    
-    // Hide buttons by text content (Open an account, Learn more, Sign In)
-    document.querySelectorAll('a, button').forEach(el => {
-      const t = (el.textContent || '').trim().toLowerCase();
+
+    // Hide buttons by text content
+    document.querySelectorAll('a, button').forEach(function(el){
+      var t = (el.textContent || '').trim().toLowerCase();
       if (t === 'open an account' || t === 'sign in' || t === 'learn more' || t === 'learn more →') {
         el.style.display = 'none';
       }
     });
-    
+
     // Inject investor bar at top
     if (!document.getElementById('apexInvBar')) {
-      const bar = document.createElement('div');
+      var bar = document.createElement('div');
       bar.id = 'apexInvBar';
-      bar.style.cssText = 'background:linear-gradient(135deg,rgba(74,158,255,0.1),rgba(139,92,246,0.08));border-bottom:1px solid rgba(74,158,255,0.2);padding:14px 20px;display:flex;justify-content:center;gap:14px;align-items:center;flex-wrap:wrap;font-family:Inter,sans-serif';
+      bar.style.cssText = 'background:linear-gradient(135deg,rgba(74,158,255,0.1),rgba(139,92,246,0.08));border-bottom:1px solid rgba(74,158,255,0.2);padding:14px 20px;display:flex;justify-content:center;gap:14px;align-items:center;flex-wrap:wrap;font-family:Inter,sans-serif;position:sticky;top:0;z-index:200';
       bar.innerHTML = '<span style="color:#cbd0d8;font-size:13px">Ready to reserve?</span><a href="buy-shares.html?ticker=SPCX" style="background:linear-gradient(135deg,#4a9eff,#8b5cf6);color:#fff;padding:9px 22px;border-radius:9px;font-weight:700;font-size:13px;text-decoration:none">Reserve SpaceX Shares →</a><a href="dashboard.html" style="color:#4a9eff;font-size:13px;font-weight:600;text-decoration:none">Dashboard →</a>';
       document.body.insertBefore(bar, document.body.firstChild);
     }
