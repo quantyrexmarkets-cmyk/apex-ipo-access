@@ -651,16 +651,31 @@ document.addEventListener('DOMContentLoaded', function () {
 <script src="js/bottom-nav.js?v=1"></script>
 <script src="js/floating-widget.js?v=1781343118" defer></script>
   <script src="js/user-bell.js?v=1">
-// === Premium mini chart (TradingView lightweight-charts) ===
-(function(){
-  function initSparkChart(){
-    const el = document.getElementById('sparkChart');
-    if(!el || typeof LightweightCharts === 'undefined') { setTimeout(initSparkChart, 200); return; }
-    if(el.dataset.charted) return;
-    el.dataset.charted = '1';
 
-    const chart = LightweightCharts.createChart(el, {
-      width: el.clientWidth,
+// === Premium mini chart (bulletproof) ===
+window.addEventListener('load', function(){
+  function tryInit(attempt){
+    attempt = attempt || 0;
+    var el = document.getElementById('sparkChart');
+    if(!el){
+      if(attempt < 20) return setTimeout(function(){tryInit(attempt+1);}, 150);
+      console.warn('sparkChart element not found'); return;
+    }
+    if(typeof LightweightCharts === 'undefined'){
+      if(attempt < 30) return setTimeout(function(){tryInit(attempt+1);}, 200);
+      console.warn('LightweightCharts not loaded'); return;
+    }
+    if(el.dataset.charted) return;
+    var w = el.clientWidth;
+    if(w < 50){
+      if(attempt < 20) return setTimeout(function(){tryInit(attempt+1);}, 150);
+    }
+    el.dataset.charted = '1';
+    el.style.cssText = 'width:100%;height:90px;margin:6px 0 10px;cursor:pointer';
+    el.onclick = function(){ location.href='chart.html?ticker=SPCX'; };
+
+    var chart = LightweightCharts.createChart(el, {
+      width: el.clientWidth || 320,
       height: 90,
       layout: { background:{type:'solid',color:'transparent'}, textColor:'transparent' },
       grid: { vertLines:{visible:false}, horzLines:{visible:false} },
@@ -671,9 +686,9 @@ document.addEventListener('DOMContentLoaded', function () {
       handleScroll:false, handleScale:false,
     });
 
-    const series = chart.addAreaSeries({
+    var series = chart.addAreaSeries({
       lineColor:'#3ed598',
-      topColor:'rgba(62,213,152,0.35)',
+      topColor:'rgba(62,213,152,0.4)',
       bottomColor:'rgba(62,213,152,0.0)',
       lineWidth:2,
       priceLineVisible:false,
@@ -681,27 +696,23 @@ document.addEventListener('DOMContentLoaded', function () {
       crosshairMarkerVisible:false,
     });
 
-    // Generate smooth aspirational upward-trending data
-    const pts = 60;
-    const end = Math.floor(Date.now()/1000);
-    const data = [];
-    let v = 100;
-    for(let i=pts-1; i>=0; i--){
-      const progress = (pts-i)/pts;
-      const trend = 100 + progress * 12; // +12% trend
-      const noise = (Math.sin(i*0.4) + Math.sin(i*0.7)*0.6) * 1.4;
+    var pts = 60, end = Math.floor(Date.now()/1000), data = [];
+    for(var i=pts-1; i>=0; i--){
+      var progress = (pts-i)/pts;
+      var trend = 100 + progress * 12;
+      var noise = (Math.sin(i*0.4) + Math.sin(i*0.7)*0.6) * 1.4;
       data.push({ time: end - i*86400, value: trend + noise });
     }
     series.setData(data);
     chart.timeScale().fitContent();
 
-    window.addEventListener('resize', () => {
+    window.addEventListener('resize', function(){
       chart.applyOptions({ width: el.clientWidth });
     });
+    console.log('✓ Portfolio mini chart rendered');
   }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSparkChart);
-  else initSparkChart();
-})();
+  tryInit();
+});
 
 </script>
 </body>
