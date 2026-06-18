@@ -428,8 +428,8 @@
 
   // ---- Sparkline (generate a smooth growth curve based on holdings count) ----
   function drawSpark(){
-    const lineEl = document.getElementById('sparkLine');
-    const areaEl = document.getElementById('sparkArea');
+    const lineEl = (document.getElementById('sparkLine') || {setAttribute:function(){}});
+    const areaEl = (document.getElementById('sparkArea') || {setAttribute:function(){}});
     if(totalNow === 0){
       // Empty flat line
       lineEl.setAttribute('d','M0,45 L320,45');
