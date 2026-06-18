@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="cache-control" content="no-cache, must-revalidate">
+<title>Holding Details — APEX IPO Access</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js?v=1781242485"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+
+  .hd-page{min-height:100vh;padding:20px 18px 120px;max-width:520px;margin:0 auto}
+
+  .hd-back{
+    display:inline-flex;align-items:center;gap:6px;
+    color:#8a94a3;font-size:13px;margin-bottom:18px;
+    background:rgba(255,255,255,0.04);padding:8px 14px;border-radius:10px;
+    border:1px solid rgba(255,255,255,0.06);
+  }
+  .hd-back:active{background:rgba(255,255,255,0.08)}
+
+  .hd-head{margin-bottom:24px}
+  .hd-badges{display:flex;gap:6px;margin-bottom:10px}
+  .hd-badge{font-size:10px;font-weight:700;letter-spacing:1px;padding:4px 9px;border-radius:6px;background:rgba(255,255,255,0.08);color:#cbd0d8}
+  .hd-badge.reserved{background:rgba(74,158,255,0.14);color:#4a9eff}
+  .hd-badge.active{background:rgba(62,213,152,0.14);color:#3ed598}
+  .hd-badge.matured{background:rgba(255,184,0,0.14);color:#ffb800}
+  .hd-name{font-family:'Manrope',sans-serif;font-size:30px;font-weight:800;letter-spacing:-0.5px;line-height:1.05;color:#fff}
+  .hd-sub{font-size:13px;color:#8a94a3;margin-top:4px}
+
+  .hd-value-card{
+    background:linear-gradient(135deg,rgba(74,158,255,0.06),rgba(139,92,246,0.04));
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:16px;padding:22px;margin-bottom:14px;
+  }
+  .hd-value-lbl{font-size:11px;letter-spacing:1.5px;color:#8a94a3;font-weight:600;text-transform:uppercase;margin-bottom:10px}
+  .hd-value{font-family:'Manrope',sans-serif;font-size:36px;font-weight:800;letter-spacing:-1px;color:#fff;line-height:1}
+  .hd-pl{display:flex;align-items:center;gap:8px;margin-top:12px}
+  .hd-pl .tri{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:9px solid #3ed598}
+  .hd-pl.dn .tri{border-bottom:none;border-top:9px solid #ef4444}
+  .hd-pl-amt{font-size:14px;font-weight:600;color:#3ed598}
+  .hd-pl.dn .hd-pl-amt{color:#ef4444}
+  .hd-pl-pct{font-size:14px;font-weight:600;color:#3ed598}
+  .hd-pl.dn .hd-pl-pct{color:#ef4444}
+  .hd-pl-when{font-size:12px;color:#8a94a3;margin-left:4px}
+
+  .hd-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .hd-tile{
+    background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);
+    border-radius:12px;padding:14px;
+  }
+  .hd-tile-lbl{font-size:10px;letter-spacing:1px;color:#8a94a3;font-weight:600;text-transform:uppercase;margin-bottom:6px}
+  .hd-tile-val{font-family:'Manrope',sans-serif;font-size:18px;font-weight:700;color:#fff}
+  .hd-tile-val.up{color:#3ed598}
+  .hd-tile-val.dn{color:#ef4444}
+  .hd-tile-val.sm{font-size:14px}
+
+  .hd-sect{
+    background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);
+    border-radius:14px;padding:18px;margin-bottom:14px;
+  }
+  .hd-sect-title{font-size:12px;letter-spacing:1.5px;color:#8a94a3;font-weight:700;text-transform:uppercase;margin-bottom:14px}
+  .hd-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px}
+  .hd-row:last-child{border-bottom:none}
+  .hd-row-lbl{color:#8a94a3}
+  .hd-row-val{color:#fff;font-weight:600;font-family:'Manrope',sans-serif}
+
+  .hd-cta{
+    position:fixed;left:0;right:0;bottom:0;
+    background:linear-gradient(180deg,transparent,#000 30%);
+    padding:30px 18px 22px;z-index:50;
+    display:flex;gap:10px;max-width:520px;margin:0 auto;left:50%;transform:translateX(-50%);
+  }
+  .hd-cta-btn{
+    flex:1;padding:15px;border:none;border-radius:14px;
+    font-family:'Manrope',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.3px;cursor:pointer;
+  }
+  .hd-cta-btn.primary{background:linear-gradient(135deg,#4a9eff,#8b5cf6);color:#fff;box-shadow:0 8px 32px rgba(74,158,255,0.35)}
+  .hd-cta-btn.secondary{background:rgba(255,255,255,0.06);color:#fff;border:1px solid rgba(255,255,255,0.08)}
+  .hd-cta-btn:active{transform:scale(0.98)}
+
+  .hd-loading{text-align:center;padding:80px 20px;color:#8a94a3;font-size:14px}
+</style>
+</head>
+<body>
+<div class="hd-page">
+  <a href="portfolio.html" class="hd-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Portfolio
+  </a>
+
+  <div id="hdMain">
+    <div class="hd-loading">Loading position…</div>
+  </div>
+</div>
+
+<script>
+(async function(){
+  const params = new URLSearchParams(location.search);
+  const allocId = params.get('id');
+  const main = document.getElementById('hdMain');
+
+  if(!allocId){
+    main.innerHTML = '<div class="hd-loading">Missing allocation ID.</div>';
+    return;
+  }
+
+  // Get user
+  const { data: { user } } = await sb.auth.getUser();
+  if(!user){
+    location.href = 'login.html';
+    return;
+  }
+
+  // Fetch allocation
+  let alloc;
+  try {
+    const { data, error } = await sb.from('allocations')
+      .select('*')
+      .eq('id', allocId)
+      .eq('user_id', user.id)
+      .single();
+    if(error) throw error;
+    alloc = data;
+  } catch(e){
+    main.innerHTML = '<div class="hd-loading">Position not found.</div>';
+    return;
+  }
+
+  // Fetch company
+  let company = null;
+  try {
+    const { data } = await sb.from('companies').select('*').eq('ticker', alloc.company_ticker).single();
+    company = data;
+  } catch(e){}
+
+  const shares = parseFloat(alloc.shares || 0);
+  const avgCost = parseFloat(alloc.price_per_share || 0);
+  const costBasis = shares * avgCost;
+  const currentPrice = parseFloat((company && company.current_price) || avgCost);
+  const currentValue = shares * currentPrice;
+  const pl = currentValue - costBasis;
+  const plPct = costBasis > 0 ? (pl / costBasis) * 100 : 0;
+  const isUp = pl >= 0;
+
+  const status = (alloc.status || 'reserved').toLowerCase();
+  const statusLabel = status.toUpperCase();
+  const statusClass = status === 'matured' ? 'matured' : (status === 'active' ? 'active' : 'reserved');
+
+  const createdAt = alloc.created_at ? new Date(alloc.created_at) : null;
+  const createdStr = createdAt ? createdAt.toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'}) : '—';
+
+  // Maturity calc
+  const lockupDays = alloc.lockup_days || 180;
+  const maturesAt = createdAt ? new Date(createdAt.getTime() + lockupDays*24*60*60*1000) : null;
+  const maturesStr = maturesAt ? maturesAt.toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'}) : '—';
+  const daysLeft = maturesAt ? Math.max(0, Math.ceil((maturesAt - new Date()) / (24*60*60*1000))) : 0;
+
+  const tierNames = {1:'Premium',2:'Priority',3:'Standard'};
+  const tierName = tierNames[alloc.tier] || 'Standard';
+
+  main.innerHTML = `
+    <div class="hd-head">
+      <div class="hd-badges">
+        <span class="hd-badge">${alloc.company_ticker}</span>
+        <span class="hd-badge ${statusClass}">${statusLabel}</span>
+        <span class="hd-badge">${tierName} · Tier ${alloc.tier||3}</span>
+      </div>
+      <div class="hd-name">${alloc.company_name||alloc.company_ticker}</div>
+      <div class="hd-sub">Your position</div>
+    </div>
+
+    <div class="hd-value-card">
+      <div class="hd-value-lbl">Current Value</div>
+      <div class="hd-value">$${currentValue.toFixed(2)}</div>
+      <div class="hd-pl ${isUp?'':'dn'}">
+        <span class="tri"></span>
+        <span class="hd-pl-amt">${isUp?'+':'−'}$${Math.abs(pl).toFixed(2)}</span>
+        <span class="hd-pl-pct">(${isUp?'+':''}${plPct.toFixed(2)}%)</span>
+        <span class="hd-pl-when">All-time</span>
+      </div>
+    </div>
+
+    <div class="hd-grid">
+      <div class="hd-tile">
+        <div class="hd-tile-lbl">Shares</div>
+        <div class="hd-tile-val">${shares.toLocaleString(undefined,{maximumFractionDigits:4})}</div>
+      </div>
+      <div class="hd-tile">
+        <div class="hd-tile-lbl">Avg Cost</div>
+        <div class="hd-tile-val">$${avgCost.toFixed(2)}</div>
+      </div>
+      <div class="hd-tile">
+        <div class="hd-tile-lbl">Cost Basis</div>
+        <div class="hd-tile-val sm">$${costBasis.toFixed(2)}</div>
+      </div>
+      <div class="hd-tile">
+        <div class="hd-tile-lbl">Current Price</div>
+        <div class="hd-tile-val sm ${isUp?'up':'dn'}">$${currentPrice.toFixed(2)}</div>
+      </div>
+    </div>
+
+    <div class="hd-sect">
+      <div class="hd-sect-title">Position Details</div>
+      <div class="hd-row"><span class="hd-row-lbl">Reservation Date</span><span class="hd-row-val">${createdStr}</span></div>
+      <div class="hd-row"><span class="hd-row-lbl">Status</span><span class="hd-row-val">${statusLabel}</span></div>
+      <div class="hd-row"><span class="hd-row-lbl">Allocation Tier</span><span class="hd-row-val">${tierName} · Tier ${alloc.tier||3}</span></div>
+      <div class="hd-row"><span class="hd-row-lbl">Holding Period</span><span class="hd-row-val">${alloc.hold_period_label||'Standard'}</span></div>
+      <div class="hd-row"><span class="hd-row-lbl">Matures On</span><span class="hd-row-val">${maturesStr}</span></div>
+      ${daysLeft > 0 ? `<div class="hd-row"><span class="hd-row-lbl">Days Until Maturity</span><span class="hd-row-val" style="color:#ffb800">${daysLeft} days</span></div>` : ''}
+    </div>
+
+    ${company ? `
+    <div class="hd-sect">
+      <div class="hd-sect-title">Company Outlook</div>
+      ${company.success_rate ? `<div class="hd-row"><span class="hd-row-lbl">Success Rate</span><span class="hd-row-val" style="color:#3ed598">${company.success_rate}%</span></div>` : ''}
+      ${company.valuation ? `<div class="hd-row"><span class="hd-row-lbl">Valuation</span><span class="hd-row-val">${company.valuation}</span></div>` : ''}
+      ${company.ipo_window ? `<div class="hd-row"><span class="hd-row-lbl">IPO Window</span><span class="hd-row-val">${company.ipo_window}</span></div>` : ''}
+      ${company.growth_yoy ? `<div class="hd-row"><span class="hd-row-lbl">YoY Growth</span><span class="hd-row-val" style="color:#3ed598">+${company.growth_yoy}%</span></div>` : ''}
+    </div>
+    ` : ''}
+  `;
+
+  // CTAs
+  const cta = document.createElement('div');
+  cta.className = 'hd-cta';
+  cta.innerHTML = `
+    <button class="hd-cta-btn secondary" onclick="location.href='chart.html?ticker=${alloc.company_ticker}'">View Chart</button>
+    <button class="hd-cta-btn primary" onclick="location.href='buy-shares.html?ticker=${alloc.company_ticker}'">Buy More</button>
+  `;
+  document.body.appendChild(cta);
+})();
+</script>
+</body>
+</html>

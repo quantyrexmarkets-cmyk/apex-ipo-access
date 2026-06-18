@@ -495,7 +495,7 @@
       const midPct = m ? ((parseInt(m[1]) + parseInt(m[2])) / 2) : 0;
 
       return `
-        <div class="holding" onclick="location.href='chart.html?ticker=${a.company_ticker}'">
+        <div class="holding" onclick="location.href='holding-detail.html?id=${a.id}'">
           <div class="h-logo">
             <img src="${logo}" alt="${a.company_name}" onerror="this.parentElement.innerHTML='<div style=&quot;color:#000;font-weight:700;font-size:18px&quot;>${(a.company_name||'?')[0]}</div>'">
           </div>
