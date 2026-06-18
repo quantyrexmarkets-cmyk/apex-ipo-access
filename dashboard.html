@@ -1655,42 +1655,6 @@ document.addEventListener('DOMContentLoaded', function () {
   <script src="js/user-bell.js?v=1"></script>
 
 <!-- Smartsupp Live Chat -->
-<style>
-/* SmartSupp widget — push above bottom nav (mobile) */
-@media (max-width: 900px) {
-  #chat-application,
-  .smartsupp-widget-container,
-  #smartsupp-widget-container,
-  div[class*="smartsupp" i],
-  div[id*="smartsupp" i],
-  iframe[id*="chat-application" i],
-  iframe[title*="smartsupp" i],
-  iframe[src*="smartsupp" i],
-  iframe[name*="smartsupp" i],
-  .widgetWrapper {
-    bottom: 90px !important;
-    z-index: 9998 !important;
-  }
-}
-</style>
-<script>
-(function(d) {
-  var s, c, o = window.smartsupp = function(){ o._.push(arguments); };
-  o._ = [];
-  window._smartsupp = window._smartsupp || {};
-  window._smartsupp.key = '7d6445f6308e329b33468a584f675c298bd2c871';
-  window._smartsupp.offsetY = 80;
-  window._smartsupp.offsetX = 10;
-  s = d.getElementsByTagName('script')[0];
-  c = d.createElement('script');
-  c.type = 'text/javascript';
-  c.charset = 'utf-8';
-  c.async = true;
-  c.src = 'https://www.smartsuppchat.com/loader.js?';
-  s.parentNode.insertBefore(c, s);
-})(document);
-</script>
-<!-- End Smartsupp -->
 
 </body>
 </html>
