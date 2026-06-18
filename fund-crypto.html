@@ -613,8 +613,9 @@
       }
 
       // Record deposit
-      try {
-        await sb.from('deposits').insert({
+      const { data: depositRow, error: depErr } = await sb
+        .from('deposits')
+        .insert({
           user_id: user.id,
           method: 'crypto',
           asset: state.selectedCoin,
@@ -623,8 +624,18 @@
           status: 'pending',
           screenshot_url: screenshotUrl,
           wallet_address: (state.wallets[state.selectedCoin] || {}).address || null
-        });
-      } catch(e){ apexError('Could not record deposit: ' + (e.message||'database error')); btn.disabled = false; btn.textContent = "I've sent the deposit"; return; }
+        })
+        .select()
+        .single();
+
+      if (depErr) {
+        console.error('Deposit insert failed:', depErr);
+        apexError('Could not record deposit: ' + (depErr.message || 'database error'));
+        btn.disabled = false;
+        btn.textContent = "I've sent the deposit";
+        return;
+      }
+      console.log('Deposit recorded:', depositRow)
 
       // Persist for fund-process.html
       sessionStorage.setItem('fund_method', 'crypto');
