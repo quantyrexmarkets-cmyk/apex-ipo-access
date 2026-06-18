@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Chart — APEX IPO Access</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js?v=1781242485"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+
+  .ch-page{min-height:100vh;padding:20px 18px 110px;max-width:520px;margin:0 auto}
+
+  .ch-back{
+    display:inline-flex;align-items:center;gap:6px;
+    color:#8a94a3;font-size:13px;margin-bottom:18px;
+    background:rgba(255,255,255,0.04);padding:8px 14px;border-radius:10px;
+    border:1px solid rgba(255,255,255,0.06);
+  }
+  .ch-back:active{background:rgba(255,255,255,0.08)}
+
+  .ch-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:22px}
+  .ch-head-l{flex:1;min-width:0}
+  .ch-badges{display:flex;gap:6px;margin-bottom:10px}
+  .ch-badge{font-size:10px;font-weight:700;letter-spacing:1px;padding:4px 9px;border-radius:6px;background:rgba(255,255,255,0.08);color:#cbd0d8}
+  .ch-badge.ipo{background:rgba(74,158,255,0.14);color:#4a9eff}
+  .ch-name{font-family:'Manrope',sans-serif;font-size:32px;font-weight:800;letter-spacing:-0.5px;line-height:1.05;color:#fff}
+  .ch-sub{font-size:13px;color:#8a94a3;margin-top:4px}
+  .ch-logo{
+    width:72px;height:72px;border-radius:50%;flex-shrink:0;
+    border:1px solid rgba(255,255,255,0.08);
+    display:flex;align-items:center;justify-content:center;
+    background:#0a0e14;overflow:hidden;
+  }
+  .ch-logo img{width:60%;height:60%;object-fit:contain}
+
+  .ch-price-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .ch-price{font-family:'Manrope',sans-serif;font-size:40px;font-weight:800;letter-spacing:-1px;line-height:1;color:#fff}
+  .ch-arrow{
+    width:30px;height:30px;border-radius:50%;
+    border:1.5px solid #3ed598;color:#3ed598;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .ch-arrow.dn{border-color:#ef4444;color:#ef4444}
+
+  .ch-change{display:flex;align-items:center;gap:8px;margin-bottom:22px}
+  .ch-change .tri{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:9px solid #3ed598}
+  .ch-change.dn .tri{border-bottom:none;border-top:9px solid #ef4444}
+  .ch-change .ch-delta{font-size:14px;font-weight:600;color:#3ed598}
+  .ch-change.dn .ch-delta{color:#ef4444}
+  .ch-change .ch-pct{font-size:14px;font-weight:600;color:#3ed598}
+  .ch-change.dn .ch-pct{color:#ef4444}
+  .ch-change .ch-when{font-size:13px;color:#8a94a3;margin-left:4px}
+
+  .ch-wrap{
+    position:relative;background:#000;border-radius:14px;
+    height:340px;margin-bottom:12px;
+  }
+  #chartCanvas{width:100%;height:100%}
+
+  .ch-ipo-tag{
+    position:absolute;left:8px;bottom:48px;z-index:5;
+    background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);
+    border-radius:8px;padding:6px 10px;
+    font-size:10px;color:#8a94a3;letter-spacing:0.5px;
+  }
+  .ch-ipo-tag b{display:block;color:#fff;font-size:13px;font-weight:700;margin-top:1px;font-family:'Manrope',sans-serif}
+
+  .ch-tabs{
+    display:flex;gap:4px;justify-content:space-between;
+    padding:14px 6px 4px;
+  }
+  .ch-tab{
+    flex:1;text-align:center;padding:9px 0;border-radius:8px;
+    font-size:13px;font-weight:600;color:#5a6473;
+    background:transparent;border:none;cursor:pointer;
+    transition:all .15s;
+  }
+  .ch-tab.active{background:#3ed598;color:#000}
+  .ch-tab:not(.active):active{background:rgba(255,255,255,0.06);color:#cbd0d8}
+
+  .ch-cta{
+    position:fixed;left:0;right:0;bottom:0;
+    background:linear-gradient(180deg,transparent,#000 30%);
+    padding:30px 18px 22px;z-index:50;
+  }
+  .ch-cta-btn{
+    display:block;width:100%;max-width:484px;margin:0 auto;
+    padding:16px;background:linear-gradient(135deg,#4a9eff,#8b5cf6);
+    color:#fff;border:none;border-radius:14px;
+    font-family:'Manrope',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.3px;
+    box-shadow:0 8px 32px rgba(74,158,255,0.35);
+    cursor:pointer;
+  }
+  .ch-cta-btn:active{transform:scale(0.98)}
+
+  .ch-loading{
+    text-align:center;padding:80px 20px;color:#8a94a3;font-size:14px;
+  }
+</style>
+</head>
+<body>
+<div class="ch-page">
+  <a href="javascript:history.back()" class="ch-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Back
+  </a>
+
+  <div id="chMain">
+    <div class="ch-loading">Loading chart…</div>
+  </div>
+</div>
+
+<script>
+(async function(){
+  const params = new URLSearchParams(location.search);
+  const ticker = (params.get('ticker') || 'SPCX').toUpperCase();
+  const main = document.getElementById('chMain');
+
+  // Fetch company
+  let company = null;
+  try {
+    const { data, error } = await sb.from('companies').select('*').eq('ticker', ticker).single();
+    if(error) throw error;
+    company = data;
+  } catch(e) {
+    main.innerHTML = `<div class="ch-loading">Company ${ticker} not found.</div>`;
+    return;
+  }
+
+  const ipoPrice = parseFloat(company.ipo_price || company.price || 100);
+  const currentPrice = parseFloat(company.current_price || company.price || ipoPrice * 1.16);
+
+  // --- Synthetic price data generator (seeded so it's consistent per ticker) ---
+  function seededRandom(seed) {
+    let s = seed;
+    return () => {
+      s = (s * 9301 + 49297) % 233280;
+      return s / 233280;
+    };
+  }
+  function tickerSeed(t) {
+    let h = 0;
+    for(let i=0;i<t.length;i++) h = ((h<<5)-h) + t.charCodeAt(i);
+    return Math.abs(h) || 1;
+  }
+  function genSeries(rangeKey){
+    const cfg = {
+      '1D':  {points: 78,  stepMin: 5,        startMult: 0.86},
+      '1W':  {points: 35,  stepMin: 5*60,     startMult: 0.78},
+      '1M':  {points: 60,  stepMin: 24*60/2,  startMult: 0.72},
+      '3M':  {points: 90,  stepMin: 24*60,    startMult: 0.62},
+      'YTD': {points: 120, stepMin: 24*60,    startMult: 0.55},
+      '1Y':  {points: 200, stepMin: 24*60*2,  startMult: 0.50},
+      '5Y':  {points: 260, stepMin: 24*60*7,  startMult: 0.30},
+    }[rangeKey];
+
+    const rng = seededRandom(tickerSeed(ticker) + rangeKey.charCodeAt(0));
+    const end = Math.floor(Date.now()/1000);
+    const stepSec = cfg.stepMin * 60;
+    const data = [];
+    let price = ipoPrice * cfg.startMult;
+    const target = currentPrice;
+    for(let i=cfg.points-1; i>=0; i--){
+      const t = end - i * stepSec;
+      // Trend toward currentPrice with noise
+      const progress = (cfg.points-i)/cfg.points;
+      const targetMix = price * (1-0.04) + target * 0.04;
+      const noise = (rng() - 0.45) * price * 0.018;
+      price = targetMix + noise;
+      data.push({time: t, value: Math.max(price, 1)});
+    }
+    // Pin last value to currentPrice for accuracy
+    data[data.length-1].value = currentPrice;
+    return data;
+  }
+
+  // Day change calc (from 1D series)
+  const oneDay = genSeries('1D');
+  const dayOpen = oneDay[0].value;
+  const dayChange = currentPrice - dayOpen;
+  const dayPct = (dayChange/dayOpen)*100;
+  const isUp = dayChange >= 0;
+
+  // Logo HTML
+  const logoHtml = company.logo_url
+    ? `<img src="${company.logo_url}" alt="${ticker}" onerror="this.style.display='none'">`
+    : `<div style="font-weight:800;color:#4a9eff;font-size:24px">${ticker[0]}</div>`;
+
+  main.innerHTML = `
+    <div class="ch-head">
+      <div class="ch-head-l">
+        <div class="ch-badges">
+          <span class="ch-badge">${ticker}</span>
+          <span class="ch-badge ipo">${(company.stage||'IPO').toUpperCase()}</span>
+        </div>
+        <div class="ch-name">${company.name || ticker}</div>
+        <div class="ch-sub">${company.legal_name || (company.name + ' Holdings Inc.')}</div>
+      </div>
+      <div class="ch-logo">${logoHtml}</div>
+    </div>
+
+    <div class="ch-price-row">
+      <div class="ch-price">$${currentPrice.toFixed(2)}</div>
+      <div class="ch-arrow ${isUp?'':'dn'}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          ${isUp ? '<line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>' : '<line x1="7" y1="7" x2="17" y2="17"/><polyline points="17 7 17 17 7 17"/>'}
+        </svg>
+      </div>
+    </div>
+
+    <div class="ch-change ${isUp?'':'dn'}">
+      <span class="tri"></span>
+      <span class="ch-delta">${isUp?'+':''}$${Math.abs(dayChange).toFixed(2)}</span>
+      <span class="ch-pct">(${isUp?'+':''}${dayPct.toFixed(2)}%)</span>
+      <span class="ch-when">Today</span>
+    </div>
+
+    <div class="ch-wrap">
+      <div class="ch-ipo-tag">IPO PRICE<b>$${ipoPrice.toFixed(2)}</b></div>
+      <div id="chartCanvas"></div>
+    </div>
+
+    <div class="ch-tabs">
+      <button class="ch-tab active" data-range="1D">1D</button>
+      <button class="ch-tab" data-range="1W">1W</button>
+      <button class="ch-tab" data-range="1M">1M</button>
+      <button class="ch-tab" data-range="3M">3M</button>
+      <button class="ch-tab" data-range="YTD">YTD</button>
+      <button class="ch-tab" data-range="1Y">1Y</button>
+      <button class="ch-tab" data-range="5Y">5Y</button>
+    </div>
+  `;
+
+  // CTA button
+  const cta = document.createElement('div');
+  cta.className = 'ch-cta';
+  cta.innerHTML = `<button class="ch-cta-btn" onclick="location.href='buy-shares.html?ticker=${ticker}'">Buy ${ticker} Shares</button>`;
+  document.body.appendChild(cta);
+
+  // --- Build chart ---
+  const chartEl = document.getElementById('chartCanvas');
+  const chart = LightweightCharts.createChart(chartEl, {
+    width: chartEl.clientWidth,
+    height: 340,
+    layout: { background:{type:'solid',color:'#000'}, textColor:'#5a6473', fontFamily:"'Inter',sans-serif" },
+    grid: { vertLines:{visible:false}, horzLines:{color:'rgba(255,255,255,0.04)'} },
+    rightPriceScale: { borderColor:'transparent', scaleMargins:{top:0.15,bottom:0.1} },
+    timeScale: { borderColor:'transparent', timeVisible:true, secondsVisible:false },
+    crosshair: { mode: 1, vertLine:{color:'rgba(62,213,152,0.4)',width:1,style:2}, horzLine:{color:'rgba(62,213,152,0.4)',width:1,style:2} },
+    handleScroll:false, handleScale:false,
+  });
+
+  const series = chart.addAreaSeries({
+    lineColor:'#3ed598',
+    topColor:'rgba(62,213,152,0.4)',
+    bottomColor:'rgba(62,213,152,0.0)',
+    lineWidth:2,
+    priceLineVisible:true,
+    priceLineColor:'#3ed598',
+    priceLineWidth:1,
+    priceLineStyle:0,
+    lastValueVisible:true,
+  });
+
+  // IPO reference dashed line
+  series.createPriceLine({
+    price: ipoPrice,
+    color: 'rgba(255,255,255,0.35)',
+    lineWidth: 1,
+    lineStyle: 2,
+    axisLabelVisible: false,
+    title: '',
+  });
+
+  function loadRange(rangeKey){
+    const data = genSeries(rangeKey);
+    series.setData(data);
+    chart.timeScale().fitContent();
+  }
+  loadRange('1D');
+
+  // Tab clicks
+  document.querySelectorAll('.ch-tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.ch-tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      loadRange(t.dataset.range);
+    });
+  });
+
+  // Resize
+  window.addEventListener('resize', () => {
+    chart.applyOptions({width: chartEl.clientWidth});
+  });
+})();
+</script>
+</body>
+</html>
