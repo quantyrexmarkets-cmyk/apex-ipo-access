@@ -1,6 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Auth redirect: logged-in users go to premium chart view -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js?v=1781242485"></script>
+<script>
+(async function(){
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session && session.user) {
+      // Logged-in user — send to premium investor view
+      location.replace('chart.html?ticker=SPCX');
+    }
+  } catch(e) { /* anonymous or error — show landing */ }
+})();
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IPO Opportunity — SpaceX & xAI | Apex IPO Access</title>
