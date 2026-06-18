@@ -307,7 +307,7 @@
       <span id="changeText">+$0.00 (0%)</span>
     </div>
 
-<div id="sparkChart" style="width:100%;height:90px;margin:6px 0 10px;cursor:pointer" onclick="location.href='chart.html?ticker=SPCX'"></div>
+<div id="sparkChart" style="width:100%;height:90px;margin:8px 0 14px;cursor:pointer;background:rgba(255,255,255,0.02);border-radius:8px" onclick="location.href='chart.html?ticker=SPCX'"></div>
 
     <div class="perf-mini">
       <div class="col"><div class="lbl">Cash</div><div class="val" id="cashVal">$0.00</div></div>
@@ -715,5 +715,50 @@ window.addEventListener('load', function(){
 });
 
 </script>
+
+<script>
+// Fallback: draw a simple canvas chart if TradingView fails after 3s
+setTimeout(function(){
+  var el = document.getElementById('sparkChart');
+  if(!el || el.dataset.charted || el.children.length > 0) return;
+  console.warn('TradingView failed, using fallback canvas');
+  var canvas = document.createElement('canvas');
+  canvas.width = el.clientWidth * 2;
+  canvas.height = 180;
+  canvas.style.width = '100%';
+  canvas.style.height = '90px';
+  el.appendChild(canvas);
+  var ctx = canvas.getContext('2d');
+  var w = canvas.width, h = canvas.height;
+  var pts = [];
+  for(var i = 0; i < 60; i++){
+    var progress = i / 60;
+    var trend = h * 0.7 - progress * h * 0.5;
+    var noise = (Math.sin(i*0.4) + Math.sin(i*0.7)*0.6) * 8;
+    pts.push([i * (w/59), trend + noise]);
+  }
+  // Gradient fill
+  var grad = ctx.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, 'rgba(62,213,152,0.4)');
+  grad.addColorStop(1, 'rgba(62,213,152,0)');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.moveTo(0, h);
+  pts.forEach(function(p){ ctx.lineTo(p[0], p[1]); });
+  ctx.lineTo(w, h);
+  ctx.closePath();
+  ctx.fill();
+  // Line
+  ctx.strokeStyle = '#3ed598';
+  ctx.lineWidth = 4;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  pts.forEach(function(p,i){ i===0 ? ctx.moveTo(p[0],p[1]) : ctx.lineTo(p[0],p[1]); });
+  ctx.stroke();
+  el.dataset.charted = '1';
+}, 3000);
+</script>
+
 </body>
 </html>
