@@ -151,45 +151,43 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js?v=1781242485"></script>
 <script>
-// Logged-in user UX: hide marketing CTAs + footer, show investor bar
+// Logged-in user UX v2: hide marketing CTAs, swap hamburger -> Dashboard, keep Learn more
 (async function(){
   try {
     const { data: { session } } = await sb.auth.getSession();
     if (!session || !session.user) return;
 
-    // Hide marketing-only links and footer
+    // Hide marketing-only auth links
     var hideSelectors = [
       'a[href="signup.html"]',
       'a[href="login.html"]',
-      'a[href="how-it-works.html"]',
-      'a[href="about.html"]',
-      'a[href="careers.html"]',
-      'a[href="contact.html"]',
-      'a[href="form-crs.html"]',
       'a[href="#signin"]',
-      '.signin','.btn-signin',
-      'footer','.site-footer','.footer','.footer-grid','.footer-bottom'
+      '.signin','.btn-signin'
     ];
     hideSelectors.forEach(function(sel){
       document.querySelectorAll(sel).forEach(function(el){ el.style.display = 'none'; });
     });
 
-    // Hide buttons by text content
+    // Hide "Open an account" / "Sign In" by text (but KEEP Learn more)
     document.querySelectorAll('a, button').forEach(function(el){
       var t = (el.textContent || '').trim().toLowerCase();
-      if (t === 'open an account' || t === 'sign in' || t === 'learn more' || t === 'learn more →') {
+      if (t === 'open an account' || t === 'sign in') {
         el.style.display = 'none';
       }
     });
 
-    // Inject investor bar at top
-    if (!document.getElementById('apexInvBar')) {
-      var bar = document.createElement('div');
-      bar.id = 'apexInvBar';
-      bar.style.cssText = 'background:linear-gradient(135deg,rgba(74,158,255,0.1),rgba(139,92,246,0.08));border-bottom:1px solid rgba(74,158,255,0.2);padding:14px 20px;display:flex;justify-content:center;gap:14px;align-items:center;flex-wrap:wrap;font-family:Inter,sans-serif;position:sticky;top:0;z-index:200';
-      bar.innerHTML = '<span style="color:#cbd0d8;font-size:13px">Ready to reserve?</span><a href="buy-shares.html?ticker=SPCX" style="background:linear-gradient(135deg,#4a9eff,#8b5cf6);color:#fff;padding:9px 22px;border-radius:9px;font-weight:700;font-size:13px;text-decoration:none">Reserve SpaceX Shares →</a><a href="dashboard.html" style="color:#4a9eff;font-size:13px;font-weight:600;text-decoration:none">Dashboard →</a>';
-      document.body.insertBefore(bar, document.body.firstChild);
-    }
+    // Replace hamburger ☰ with Dashboard link
+    document.querySelectorAll('.menu-btn, button.menu-btn, .hamburger').forEach(function(btn){
+      var link = document.createElement('a');
+      link.href = 'dashboard.html';
+      link.textContent = 'Dashboard →';
+      link.style.cssText = 'color:#4a9eff;font-size:14px;font-weight:600;text-decoration:none;padding:8px 14px;border:1px solid rgba(74,158,255,0.3);border-radius:8px;background:rgba(74,158,255,0.08);font-family:Inter,sans-serif';
+      btn.parentNode.replaceChild(link, btn);
+    });
+
+    // Remove any old apexInvBar that we previously injected
+    var oldBar = document.getElementById('apexInvBar');
+    if (oldBar) oldBar.remove();
   } catch(e) { console.warn('Auth check failed:', e); }
 })();
 </script>
