@@ -205,9 +205,12 @@
     window.location.href = 'login.html';
   };
 
-  document.addEventListener('sb-ready', async function(){
+  async function checkApproval(){
+    if (typeof sb === 'undefined' || !sb || !sb.auth) {
+      return setTimeout(checkApproval, 200);
+    }
     var { data } = await sb.auth.getUser();
-    if(!data.user){ window.location.href = 'login.html'; return; }
+    if(!data || !data.user){ window.location.href = 'login.html'; return; }
 
     var { data: profile } = await sb.from('profiles').select('*').eq('id', data.user.id).single();
     if(profile){
