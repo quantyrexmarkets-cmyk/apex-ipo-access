@@ -1096,7 +1096,7 @@
   </div>
 
     <div class="acct-wrap">
-      <button class="acct-btn" id="acctBtn">
+      <button class="acct-btn" id="acctMenuBtn">
         <span class="av" id="acctAv">A</span>
         <span id="acctNm">Admin</span>
         <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
@@ -1608,7 +1608,7 @@
         </div>
 
         <div class="act-row">
-        <button class="act-btn success" id="acctBtn" onclick="window._approveAccount()">
+        <button class="act-btn success" id="acctBtn" onclick="window._toggleAccountApproval()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           Approve Account
         </button>
@@ -1848,7 +1848,7 @@
   overlay.addEventListener('click', closeSb);
 
   // ========== ACCT DROPDOWN ==========
-  var acctBtn = document.getElementById('acctBtn');
+  var acctBtn = document.getElementById('acctMenuBtn');
   var acctMenu = document.getElementById('acctMenu');
   acctBtn.addEventListener('click', function(e){
     e.stopPropagation();
@@ -4805,6 +4805,41 @@ window._approveAccount = async function(){
   if(typeof populateModal === 'function') populateModal(currentUser);
   if(typeof loadCustomers === 'function') loadCustomers();
 };
+
+window._toggleAccountApproval = async function(){
+  if(!currentUser) return;
+  if(currentUser.account_status === 'approved'){
+    await window._revokeAccount();
+  } else {
+    await window._approveAccount();
+  }
+};
+
+window._revokeAccount = async function(){
+  if(!currentUser) return;
+  var ok = await apexConfirm({
+    title: 'Revoke Account Approval?',
+    body: 'User will lose dashboard access and be sent back to pending state. They will need to be re-approved to login again.',
+    okLabel: 'Revoke',
+    danger: true
+  });
+  if(!ok) return;
+  var { error } = await sb.from('profiles').update({ account_status: 'pending' }).eq('id', currentUser.id);
+  if(error){ apexError(error.message); return; }
+  try {
+    await sb.from('admin_log').insert({
+      admin_id: state.user.id,
+      action: 'revoke_account',
+      target_type: 'user',
+      target_id: currentUser.id
+    });
+  } catch(e){}
+  apexSuccess('Account approval revoked');
+  currentUser.account_status = 'pending';
+  if(typeof populateModal === 'function') populateModal(currentUser);
+  await loadCustomers();
+};
+
 
 window._rejectAccount = async function(){
   if(!currentUser) return;
