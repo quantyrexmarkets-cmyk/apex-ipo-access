@@ -1878,6 +1878,88 @@
     window.location.href = 'admin-login.html';
   };
 
+
+window._openAdminProfile = async function(){
+  var menu = document.getElementById('acctMenu');
+  if(menu) menu.classList.remove('show');
+  try {
+    var { data: { user } } = await sb.auth.getUser();
+    if(!user){ alert('Not logged in.'); return; }
+    var { data: profile, error } = await sb.from('profiles').select('*').eq('id', user.id).single();
+    if(error || !profile){ alert('Could not load profile: ' + (error && error.message || 'unknown')); return; }
+
+    var firstName = profile.first_name || '';
+    var lastName  = profile.last_name || '';
+    var email     = profile.email || user.email || '';
+    var role      = profile.is_admin ? 'Administrator' : 'User';
+    var created   = profile.created_at ? new Date(profile.created_at).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}) : '—';
+
+    var info = 'Admin Profile\n\n'
+      + 'Name: ' + ((firstName + ' ' + lastName).trim() || '—') + '\n'
+      + 'Email: ' + email + '\n'
+      + 'Role: ' + role + '\n'
+      + 'Member since: ' + created + '\n\n'
+      + 'Click OK to edit your name, or Cancel to close.';
+
+    if(!confirm(info)) return;
+
+    var newFirst = prompt('First name:', firstName);
+    if(newFirst === null) return;
+    var newLast = prompt('Last name:', lastName);
+    if(newLast === null) return;
+
+    var trimmedFirst = (newFirst || '').trim();
+    var trimmedLast  = (newLast || '').trim();
+    if(trimmedFirst === firstName && trimmedLast === lastName){
+      alert('No changes made.');
+      return;
+    }
+
+    var { error: updErr } = await sb.from('profiles').update({
+      first_name: trimmedFirst,
+      last_name: trimmedLast
+    }).eq('id', user.id);
+
+    if(updErr){ alert('Update failed: ' + updErr.message); return; }
+    alert('Profile updated');
+
+    var displayName = (trimmedFirst + ' ' + trimmedLast).trim() || 'Admin';
+    var nm = document.getElementById('acctNm');
+    var nm2 = document.getElementById('acctMenuName');
+    var av = document.getElementById('acctAv');
+    if(nm) nm.textContent = displayName;
+    if(nm2) nm2.textContent = displayName;
+    if(av) av.textContent = (displayName.charAt(0) || 'A').toUpperCase();
+  } catch(e){
+    alert('Error: ' + (e && e.message || e));
+  }
+};
+
+window._quickChangePassword = async function(){
+  var menu = document.getElementById('acctMenu');
+  if(menu) menu.classList.remove('show');
+  try {
+    var { data: { user } } = await sb.auth.getUser();
+    if(!user){ alert('Not logged in.'); return; }
+
+    var newPw = prompt('Enter new password (min 8 characters):');
+    if(newPw === null) return;
+    if(newPw.length < 8){ alert('Password must be at least 8 characters.'); return; }
+
+    var confirmPw = prompt('Re-enter new password to confirm:');
+    if(confirmPw === null) return;
+    if(newPw !== confirmPw){ alert('Passwords do not match. Try again.'); return; }
+
+    var { error } = await sb.auth.updateUser({ password: newPw });
+    if(error){ alert('Password change failed: ' + error.message); return; }
+
+    alert('Password updated successfully. Use the new password on your next login.');
+  } catch(e){
+    alert('Error: ' + (e && e.message || e));
+  }
+};
+
+
   // ========== LOAD DATA ==========
   async function loadCustomers(){
     try {
