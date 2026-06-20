@@ -234,8 +234,8 @@
   });
 
   function showApprovedState(){
-    document.getElementById('pendingState').style.display = 'none';
-    document.getElementById('approvedState').style.display = 'block';
+    // Account is approved — redirect to dashboard immediately
+    window.location.replace('dashboard.html');
   }
 
   window._goToLogin = async function(){
