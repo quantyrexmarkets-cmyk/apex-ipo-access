@@ -589,7 +589,7 @@
       return;
     }
     // Check account status — banned or pending KYC
-    const { data: profile } = await sb.from('profiles').select('account_status,kyc_status,is_admin,banned,banned_reason').eq('id', (window.__viewAsUserId && window.__viewAsUserId()) || data.user.id).single();
+    const { data: profile } = await sb.from('profiles').select('account_status,kyc_status,is_admin,banned,banned_reason').eq('id', (sessionStorage.getItem('apex_view_as_user')) || data.user.id).single();
     if(profile){
       if(profile.banned){
         await sb.auth.signOut();
@@ -1480,7 +1480,7 @@
     }
 
     // 3. Allocations → portfolio totals
-    const { data: allocations } = await sb.from('allocations').select('*').eq('user_id', (window.__viewAsUserId && window.__viewAsUserId()) || user.id);
+    const { data: allocations } = await sb.from('allocations').select('*').eq('user_id', (sessionStorage.getItem('apex_view_as_user')) || user.id);
     let totalReserved = 0;
     (allocations || []).forEach(a => { totalReserved += parseFloat(a.total_value || 0); });
 
@@ -1502,7 +1502,7 @@ if (hs) hs.innerHTML = totalShares.toLocaleString('en-US') + ' <span>shares</spa
     const fmtMoney = (n) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     // Fetch real cash + committed via RPC (bulletproof — defaults to 0 on any error)
-    const { data: __fin } = await sb.rpc('get_user_finances', { p_user_id: (window.__viewAsUserId && window.__viewAsUserId()) || user.id });
+    const { data: __fin } = await sb.rpc('get_user_finances', { p_user_id: (sessionStorage.getItem('apex_view_as_user')) || user.id });
     const __row = (__fin && __fin[0]) || {};
     const cash = parseFloat(__row.cash || 0);
     totalReserved = parseFloat(__row.committed || totalReserved);
@@ -1629,7 +1629,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // Get user's personal notifs
       var personal = await sb.from('notifications')
         .select('*')
-        .eq('user_id', (window.__viewAsUserId && window.__viewAsUserId()) || userData.user.id)
+        .eq('user_id', (sessionStorage.getItem('apex_view_as_user')) || userData.user.id)
         .order('created_at',{ascending:false})
         .limit(30);
       // Get broadcasts
@@ -1668,7 +1668,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var { data: userData } = await sb.auth.getUser();
     if(!userData?.user) return;
     var now = new Date().toISOString();
-    await sb.from('notifications').update({ read_at: now }).eq('user_id', (window.__viewAsUserId && window.__viewAsUserId()) || userData.user.id).is('read_at', null);
+    await sb.from('notifications').update({ read_at: now }).eq('user_id', (sessionStorage.getItem('apex_view_as_user')) || userData.user.id).is('read_at', null);
     loadUserNotifs();
     updateNotifBadge();
   };
@@ -1677,7 +1677,7 @@ document.addEventListener('DOMContentLoaded', function () {
     try {
       var { data: userData } = await sb.auth.getUser();
       if(!userData?.user) return;
-      var p = await sb.from('notifications').select('id').eq('user_id', (window.__viewAsUserId && window.__viewAsUserId()) || userData.user.id).is('read_at', null);
+      var p = await sb.from('notifications').select('id').eq('user_id', (sessionStorage.getItem('apex_view_as_user')) || userData.user.id).is('read_at', null);
       var b = await sb.from('notifications').select('id').eq('is_broadcast', true).is('read_at', null);
       var data = (p.data||[]).concat(b.data||[]);
       var unread = (data||[]).length;
