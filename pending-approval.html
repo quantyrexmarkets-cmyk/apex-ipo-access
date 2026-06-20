@@ -227,7 +227,7 @@
       }
 
       // <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> Approved — switch to success state
-      if(profile.kyc_status === 'verified' || profile.is_admin){
+      if(profile.account_status === 'approved' || profile.is_admin){
         showApprovedState();
       }
     }
