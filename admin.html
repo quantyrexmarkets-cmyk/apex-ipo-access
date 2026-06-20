@@ -3019,6 +3019,93 @@ window._fnEditStat = async function(field, label, isInt, isPercent){
 
 <script>
 // Auto-fire loaders after window load (functions are defined by then)
+// ─────────────────────────────────────────────
+// Crypto wallets management (admin)
+// ─────────────────────────────────────────────
+async function loadWallets(){
+  var listEl = document.getElementById('walletList');
+  if(!listEl) return;
+  try {
+    var { data, error } = await sb.from('crypto_wallets').select('*').order('coin');
+    if(error){
+      listEl.innerHTML = '<div class="empty" style="color:#ff6a6a">Failed to load wallets: ' + escapeHtml(error.message) + '</div>';
+      return;
+    }
+    if(!data || !data.length){
+      listEl.innerHTML = '<div class="empty">No wallets yet — add one below</div>';
+      return;
+    }
+    listEl.innerHTML = data.map(walletCardHtml).join('');
+  } catch(e){
+    console.error('loadWallets error:', e);
+    listEl.innerHTML = '<div class="empty" style="color:#ff6a6a">Error: ' + escapeHtml(e.message || String(e)) + '</div>';
+  }
+}
+
+function walletCardHtml(w){
+  var coin = (w.coin || '').toUpperCase();
+  var coinClass = coin.toLowerCase();
+  var network = w.network || 'Main';
+  var label = w.label ? ' • ' + escapeHtml(w.label) : '';
+  var addr = w.address || '';
+  var shortAddr = addr.length > 24 ? addr.substring(0,10) + '...' + addr.substring(addr.length-8) : addr;
+  var memo = w.memo ? '<div class="wallet-meta">Memo: ' + escapeHtml(w.memo) + '</div>' : '';
+  var qrBadge = w.qr_code_url ? '<span style="background:rgba(94,176,255,0.15);color:#5fb0ff;padding:2px 8px;border-radius:4px;font-size:10px;margin-left:6px">QR ✓</span>' : '';
+  return '<div class="wcard ' + (w.active ? '' : 'inactive') + '">'
+    + '<div class="wcard-head">'
+    +   '<div class="wcard-icon ' + coinClass + '">' + coin.charAt(0) + '</div>'
+    +   '<div style="flex:1;min-width:0">'
+    +     '<div style="font-weight:600;color:#fff;font-size:14px">' + escapeHtml(coin) + ' <span style="font-weight:400;color:#8a94a3;font-size:11px">' + escapeHtml(network) + '</span>' + qrBadge + '</div>'
+    +     '<div style="font-size:11px;color:#8a94a3;margin-top:2px">' + (w.active ? 'Active' : 'Inactive') + label + '</div>'
+    +   '</div>'
+    + '</div>'
+    + '<div class="wallet-addr" style="margin-bottom:8px"><span class="addr-text" style="font-family:monospace;font-size:12px;color:#bdc1c6;word-break:break-all">' + escapeHtml(addr) + '</span></div>'
+    + memo
+    + '<div class="wallet-actions" style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">'
+    +   '<button onclick="window._toggleWalletActive(\'' + w.id + '\', ' + (!w.active) + ')" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer">' + (w.active ? 'Deactivate' : 'Activate') + '</button>'
+    +   '<button onclick="window._deleteWallet(\'' + w.id + '\', \'' + coin + '\')" class="del" style="background:rgba(255,106,106,0.1);border:1px solid rgba(255,106,106,0.2);color:#ff6a6a;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer">Delete</button>'
+    + '</div>'
+    + '</div>';
+}
+
+window._addWallet = async function(){
+  var coin    = (document.getElementById('walletCoin').value || '').trim();
+  var network = (document.getElementById('walletNet').value || '').trim();
+  var address = (document.getElementById('walletAddr').value || '').trim();
+  var memo    = (document.getElementById('walletMemo').value || '').trim();
+  var label   = (document.getElementById('walletLabel').value || '').trim();
+  if(!coin){ alert('Coin is required'); return; }
+  if(!address){ alert('Wallet address is required'); return; }
+  var { error } = await sb.from('crypto_wallets').insert({
+    coin: coin,
+    network: network || null,
+    address: address,
+    memo: memo || null,
+    label: label || null,
+    active: true
+  });
+  if(error){ alert('Add failed: ' + error.message); return; }
+  // Reset form
+  document.getElementById('walletAddr').value = '';
+  document.getElementById('walletMemo').value = '';
+  document.getElementById('walletLabel').value = '';
+  alert('Wallet added');
+  await loadWallets();
+};
+
+window._toggleWalletActive = async function(id, makeActive){
+  var { error } = await sb.from('crypto_wallets').update({ active: makeActive }).eq('id', id);
+  if(error){ alert('Update failed: ' + error.message); return; }
+  await loadWallets();
+};
+
+window._deleteWallet = async function(id, coin){
+  if(!confirm('Delete this ' + (coin || '') + ' wallet?\n\nUsers will no longer see it as a deposit option.')) return;
+  var { error } = await sb.from('crypto_wallets').delete().eq('id', id);
+  if(error){ alert('Delete failed: ' + error.message); return; }
+  await loadWallets();
+};
+
 window.addEventListener('load', function(){
   setTimeout(async function(){
     try {
@@ -3038,6 +3125,7 @@ window.addEventListener('load', function(){
       }
       if(typeof loadDeposits === 'function') await loadDeposits().catch(()=>{});
       if(typeof loadWithdrawals === 'function') await loadWithdrawals().catch(()=>{});
+      if(typeof loadWallets === 'function') await loadWallets().catch(()=>{});
     } catch(e){ console.warn('auto-fire err', e); }
   }, 800);
 });
