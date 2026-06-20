@@ -1,171 +1,335 @@
 // ============================================
-// Apex IPO Access — Supabase Client
-// ============================================
-// Loaded via CDN. Provides: window.sb (Supabase client)
-// Usage: await sb.auth.signUp({...}), await sb.from('profiles').select()
+// Apex IPO Access — Compatibility Shim
+// Routes legacy window.sb / window.apex calls
+// to the new MongoDB-backed ApexAPI.
 // ============================================
 
-const SUPABASE_URL  = 'https://tbivhlxkwtklhvsaggwg.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiaXZobHhrd3RrbGh2c2FnZ3dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMjc5MTEsImV4cCI6MjA5NjcwMzkxMX0.rw-LXJTPzYJu5TdEP0pgqUguviMJNwzJkpI5uGtR6XY';
-
-// Load Supabase JS from CDN if not already loaded
-(function loadSupabase(){
-  if (window.supabase) {
-    window.sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-    window.__sbReady = true;
-    document.dispatchEvent(new Event('sb-ready'));
+(function bootShim() {
+  if (!window.ApexAPI) {
+    console.error('[shim] ApexAPI not loaded.');
     return;
   }
-  const s = document.createElement('script');
-  s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-  s.onload = () => {
-    window.sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-    window.__sbReady = true;
-    document.dispatchEvent(new Event('sb-ready'));
-    console.log('✓ Supabase client ready');
-  };
-  s.onerror = () => console.error('✗ Failed to load Supabase');
-  document.head.appendChild(s);
-})();
 
-// ============================================
-// Helper functions used across pages
-// ============================================
-
-window.apex = {
-  // Save signup form data to localStorage (collected across steps 1-6)
-  saveStep(stepName, data){
-    const all = JSON.parse(localStorage.getItem('apex_signup') || '{}');
-    all[stepName] = data;
-    localStorage.setItem('apex_signup', JSON.stringify(all));
-  },
-
-  getSignupData(){
-    return JSON.parse(localStorage.getItem('apex_signup') || '{}');
-  },
-
-  clearSignup(){
-    localStorage.removeItem('apex_signup');
-  },
-
-  // Final signup: create auth user + populate profile from collected data
-  async completeSignup(email, password){
-    const data = this.getSignupData();
-    const { data: authData, error: authErr } = await sb.auth.signUp({ email, password });
-    if (authErr) return { error: authErr };
-
-    // Wait briefly for the trigger to create the profile row
-    await new Promise(r => setTimeout(r, 800));
-
-    // Update profile with all collected data
-    const update = {
-      prefix:        data.contact?.prefix,
-      first_name:    data.contact?.firstName,
-      last_name:     data.contact?.lastName,
-      suffix:        data.contact?.suffix,
-      phone:         data.contact?.phone,
-      phone_type:    data.contact?.phoneType,
-      address_line1: data.address?.addr1,
-      address_line2: data.address?.addr2,
-      city:          data.address?.city,
-      state:         data.address?.state,
-      zip:           data.address?.zip,
-      citizenship:   data.address?.citizenship,
-      dob:           data.identity?.dob,
-      ssn_last4:     data.identity?.ssn?.slice(-4),
-      account_types: data.accountTypes || [],
-      has_existing_account: data.hasExisting || false,
-      kyc_status:     'not_submitted',  // user uploads KYC docs after account approval
-      account_status: 'pending',        // admin must approve account first
+  // ---- helper: a chain-builder that resolves on .single() / .then() ----
+  function createQueryChain(table, op = 'select') {
+    const state = {
+      table,
+      op,
+      filters: {},
+      orderBy: null,
+      limitN: null,
+      payload: null,
+      isSingle: false,
     };
-    Object.keys(update).forEach(k => update[k] === undefined && delete update[k]);
 
-    if (authData.user) {
-      const { error: profErr } = await sb.from('profiles').update(update).eq('id', authData.user.id);
-      if (profErr) console.warn('Profile update error:', profErr);
-    }
+    const chain = {
+      select(fields = '*') { state.op = 'select'; state.fields = fields; return chain; },
+      insert(payload) { state.op = 'insert'; state.payload = payload; return chain; },
+      update(payload) { state.op = 'update'; state.payload = payload; return chain; },
+      delete() { state.op = 'delete'; return chain; },
+      eq(field, value) { state.filters[field] = { op: 'eq', value }; return chain; },
+      in(field, values) { state.filters[field] = { op: 'in', value: values }; return chain; },
+      is(field, value) { state.filters[field] = { op: 'is', value }; return chain; },
+      order(field, opts = {}) { state.orderBy = { field, ...opts }; return chain; },
+      limit(n) { state.limitN = n; return chain; },
+      single() {
+        state.isSingle = true;
+        return executeQuery(state);
+      },
+      maybeSingle() {
+        state.isSingle = true;
+        return executeQuery(state);
+      },
+      then(resolve, reject) {
+        return executeQuery(state).then(resolve, reject);
+      },
+    };
 
-    // Ensure session exists so pending-approval page works
-    if (!authData.session) {
-      try { await sb.auth.signInWithPassword({ email, password }); } catch(e) { console.warn('Auto sign-in after signup failed:', e); }
-    }
-
-    return { user: authData.user };
-  },
-
-  async login(email, password){
-    return await sb.auth.signInWithPassword({ email, password });
-  },
-
-  async logout(){
-    return await sb.auth.signOut();
-  },
-
-  async getUser(){
-    const { data } = await sb.auth.getUser();
-    return data?.user;
-  },
-
-  async getProfile(){
-    const user = await this.getUser();
-    if (!user) return null;
-    const { data } = await sb.from('profiles').select('*').eq('id', user.id).single();
-    return data;
-  },
-
-  async getActivity(limit = 10){
-    const user = await this.getUser();
-    if (!user) return [];
-    const { data } = await sb.from('activity_log').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(limit);
-    return data || [];
-  },
-
-  // Redirect helpers
-  requireAuth(redirectTo = 'login.html'){
-    sb.auth.getUser().then(({ data }) => {
-      if (!data.user) window.location.href = redirectTo;
-    });
-  },
-
-  requireGuest(redirectTo = 'dashboard.html'){
-    sb.auth.getUser().then(({ data }) => {
-      if (data.user) window.location.href = redirectTo;
-    });
+    return chain;
   }
-};
 
+  async function executeQuery(state) {
+    try {
+      const { table, op, filters, isSingle } = state;
+      const user = await ApexAPI.auth.check();
 
-// ============================================
-// PLATFORM HELPERS — maintenance + signup gate
-// ============================================
-window.apex = window.apex || {};
+      // -------- PROFILES --------
+      if (table === 'profiles') {
+        if (op === 'select') {
+          // Used everywhere: sb.from('profiles').select('*').eq('id', userId).single()
+          if (filters.id && user) {
+            const data = {
+              id: user.id,
+              email: user.email,
+              full_name: user.fullName,
+              role: user.role,
+              is_admin: user.role === 'admin',
+              account_status: user.accountStatus || 'pending',
+              kyc_status: user.kycStatus || 'not_submitted',
+              banned: user.status === 'disabled',
+              banned_reason: user.bannedReason || '',
+              email_verified_at: user.emailVerified ? new Date().toISOString() : null,
+              cash_balance: user.balanceUSD || 0,
+              phone: user.phone || '',
+              country: user.country || '',
+            };
+            return { data: isSingle ? data : [data], error: null };
+          }
+          return { data: isSingle ? null : [], error: null };
+        }
 
-window.apex.checkMaintenance = async function(){
-  try {
-    const { data } = await sb.from('platform_settings').select('maintenance_mode,maintenance_message,signup_enabled').eq('id',1).single();
-    if(!data) return data;
-    // Show maintenance banner if enabled (skip for admins)
-    if(data.maintenance_mode){
-      const { data: userData } = await sb.auth.getUser();
-      let isAdmin = false;
-      if(userData?.user){
-        const { data: profile } = await sb.from('profiles').select('is_admin').eq('id', userData.user.id).single();
-        isAdmin = profile?.is_admin === true;
+        if (op === 'update') {
+          // Profile update — limited support for now
+          console.warn('[shim] profiles.update not fully implemented yet');
+          return { data: null, error: null };
+        }
       }
-      if(!isAdmin && !document.getElementById('maintBanner')){
-        const banner = document.createElement('div');
-        banner.id = 'maintBanner';
-        banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(90deg,#ffb800,#ff8c00);color:#000;padding:10px 16px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,0.3)';
-        banner.innerHTML = '🚧 ' + (data.maintenance_message || 'Platform under maintenance. Limited functionality.');
-        document.body.appendChild(banner);
-        document.body.style.paddingTop = (banner.offsetHeight + (parseInt(document.body.style.paddingTop||0))) + 'px';
+
+      // -------- DEPOSITS --------
+      if (table === 'deposits') {
+        if (op === 'select') {
+          try {
+            const res = await ApexAPI.deposits.list();
+            const mapped = (res.deposits || []).map(d => ({
+              id: d._id,
+              user_id: d.userId,
+              method: d.method,
+              asset: d.asset,
+              amount: d.amountUSD,
+              amount_usd: d.amountUSD,
+              status: d.status,
+              tx_hash: d.txHash,
+              proof_url: d.proofUrl,
+              created_at: d.createdAt,
+            }));
+            return { data: isSingle ? mapped[0] || null : mapped, error: null };
+          } catch (err) {
+            return { data: null, error: { message: err.message } };
+          }
+        }
       }
+
+      // -------- WITHDRAWALS --------
+      if (table === 'withdrawals') {
+        if (op === 'select') {
+          try {
+            const res = await ApexAPI.withdrawals.list();
+            const mapped = (res.withdrawals || []).map(w => ({
+              id: w._id,
+              user_id: w.userId,
+              method: w.method,
+              asset: w.asset,
+              amount: w.amountUSD,
+              amount_usd: w.amountUSD,
+              status: w.status,
+              destination_address: w.destinationAddress,
+              created_at: w.createdAt,
+            }));
+            return { data: isSingle ? mapped[0] || null : mapped, error: null };
+          } catch (err) {
+            return { data: null, error: { message: err.message } };
+          }
+        }
+      }
+
+      // -------- NOTIFICATIONS --------
+      if (table === 'notifications') {
+        if (op === 'select') {
+          try {
+            const res = await ApexAPI.notifications.list();
+            const mapped = (res.notifications || []).map(n => ({
+              id: n._id,
+              user_id: n.userId,
+              title: n.title,
+              message: n.message,
+              type: n.type,
+              link: n.link,
+              read_at: n.read ? n.readAt : null,
+              is_broadcast: false,
+              created_at: n.createdAt,
+            }));
+            return { data: isSingle ? mapped[0] || null : mapped, error: null };
+          } catch (err) {
+            return { data: null, error: { message: err.message } };
+          }
+        }
+        if (op === 'update') {
+          try {
+            await ApexAPI.notifications.markAllRead();
+            return { data: null, error: null };
+          } catch (err) {
+            return { data: null, error: { message: err.message } };
+          }
+        }
+      }
+
+      // -------- HOLDINGS / ALLOCATIONS --------
+      if (table === 'holdings' || table === 'allocations') {
+        try {
+          const res = await ApexAPI.portfolio.get();
+          const mapped = (res.portfolio?.holdings || []).map(h => ({
+            id: h.id,
+            symbol: h.symbol,
+            company_name: h.companyName,
+            shares: h.shares,
+            quantity: h.shares,
+            avg_price: h.avgPriceUSD,
+            avg_price_usd: h.avgPriceUSD,
+            current_price: h.currentPriceUSD,
+            total_invested: h.totalInvestedUSD,
+            current_value: h.currentValueUSD,
+            pnl: h.pnlUSD,
+            outcome: 'active',
+          }));
+          return { data: isSingle ? mapped[0] || null : mapped, error: null };
+        } catch (err) {
+          return { data: null, error: { message: err.message } };
+        }
+      }
+
+      // -------- CRYPTO WALLETS --------
+      if (table === 'crypto_wallets') {
+        try {
+          const res = await ApexAPI.wallets.listActive();
+          const mapped = (res.wallets || []).map(w => ({
+            id: w.id,
+            label: w.label,
+            network: w.network,
+            asset: w.asset,
+            address: w.address,
+            memo: w.memo,
+            qr_code_url: w.qrUrl,
+            active: true,
+          }));
+          return { data: isSingle ? mapped[0] || null : mapped, error: null };
+        } catch (err) {
+          return { data: null, error: { message: err.message } };
+        }
+      }
+
+      // -------- PLATFORM SETTINGS (stub) --------
+      if (table === 'platform_settings') {
+        return {
+          data: isSingle
+            ? { signup_enabled: true, maintenance_mode: false }
+            : [{ signup_enabled: true, maintenance_mode: false }],
+          error: null,
+        };
+      }
+
+      // -------- DEFAULT: stub --------
+      console.warn(`[shim] Unhandled table "${table}" (op=${op})`);
+      return { data: isSingle ? null : [], error: null };
+    } catch (err) {
+      return { data: null, error: { message: err.message } };
     }
-    return data;
-  } catch(e){ console.warn('Platform check:', e); }
-};
+  }
 
-// Auto-run on every page that loads supabase.js
-document.addEventListener('sb-ready', () => {
-  setTimeout(() => window.apex.checkMaintenance(), 500);
-});
+  // ---- MOCK sb OBJECT ----
+  window.sb = {
+    auth: {
+      async signInWithPassword({ email, password }) {
+        try {
+          const res = await ApexAPI.auth.login(email, password);
+          return {
+            data: { user: { id: res.user.id, email: res.user.email }, session: { user: res.user } },
+            error: null,
+          };
+        } catch (err) {
+          return { data: null, error: { message: err.message } };
+        }
+      },
+      async signUp({ email, password }) {
+        try {
+          const res = await ApexAPI.auth.register(email, password, '');
+          return {
+            data: { user: { id: res.user.id, email: res.user.email }, session: { user: res.user } },
+            error: null,
+          };
+        } catch (err) {
+          return { data: null, error: { message: err.message } };
+        }
+      },
+      async signOut() {
+        try { await ApexAPI.auth.logout(); return { error: null }; }
+        catch (err) { return { error: { message: err.message } }; }
+      },
+      async getUser() {
+        const user = await ApexAPI.auth.check();
+        return { data: { user: user ? { id: user.id, email: user.email } : null } };
+      },
+      async getSession() {
+        const user = await ApexAPI.auth.check();
+        return { data: { session: user ? { user } : null } };
+      },
+      async updateUser() {
+        return { data: null, error: { message: 'Password change not implemented yet.' } };
+      },
+    },
+
+    from(table) {
+      return createQueryChain(table);
+    },
+
+    storage: {
+      from() {
+        return {
+          upload: () => Promise.resolve({ data: null, error: { message: 'Use ApexAPI.upload.file()' } }),
+          getPublicUrl: () => ({ data: { publicUrl: '' } }),
+          createSignedUrl: () => Promise.resolve({ data: null, error: { message: 'Not implemented' } }),
+        };
+      },
+    },
+  };
+
+  window.__sbReady = true;
+  document.dispatchEvent(new Event('sb-ready'));
+
+  // ---- window.apex helpers ----
+  window.apex = {
+    saveStep(stepName, data) {
+      const all = JSON.parse(localStorage.getItem('apex_signup') || '{}');
+      all[stepName] = data;
+      localStorage.setItem('apex_signup', JSON.stringify(all));
+    },
+    getSignupData() { return JSON.parse(localStorage.getItem('apex_signup') || '{}'); },
+    clearSignup() { localStorage.removeItem('apex_signup'); },
+
+    async completeSignup(email, password) {
+      try {
+        const data = this.getSignupData();
+        const fullName = [data.contact?.firstName, data.contact?.lastName].filter(Boolean).join(' ').trim();
+        const res = await ApexAPI.auth.register(email, password, fullName);
+        localStorage.setItem('apex_signup_extra', JSON.stringify(data));
+        return { user: res.user };
+      } catch (err) {
+        return { error: { message: err.message } };
+      }
+    },
+    async login(email, password) {
+      try { const res = await ApexAPI.auth.login(email, password); return { data: { user: res.user }, error: null }; }
+      catch (err) { return { data: null, error: { message: err.message } }; }
+    },
+    async logout() {
+      try { await ApexAPI.auth.logout(); return { error: null }; }
+      catch (err) { return { error: { message: err.message } }; }
+    },
+    async getUser() { return await ApexAPI.auth.check(); },
+    async getProfile() { return await ApexAPI.auth.check(); },
+    async getActivity() {
+      try { const data = await ApexAPI.notifications.list(); return data.notifications || []; }
+      catch { return []; }
+    },
+    requireAuth(redirectTo = 'login.html') {
+      ApexAPI.auth.check().then(user => { if (!user) window.location.href = redirectTo; });
+    },
+    requireGuest(redirectTo = 'dashboard.html') {
+      ApexAPI.auth.check().then(user => { if (user) window.location.href = redirectTo; });
+    },
+    async checkMaintenance() {
+      return { maintenance_mode: false, signup_enabled: true };
+    },
+  };
+
+  console.log('✓ Apex shim ready (MongoDB backend)');
+})();

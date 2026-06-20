@@ -37,3 +37,5 @@ nohup.out
 js/_*
 *.bak.*
 .backup-*/
+node_modules/
+.vercel

@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>Admin Panel | Apex IPO Access</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#000;
+    --bg-1:#0a0a0a;
+    --bg-2:#111;
+    --bg-3:#171717;
+    --bg-hover:#1c1c1c;
+    --border:#1f1f1f;
+    --border-2:#2a2a2a;
+    --text:#fff;
+    --text-2:#b4bcc9;
+    --text-3:#737a87;
+    --accent:#4a9eff;
+    --accent-hover:#6db1ff;
+    --success:#10b981;
+    --warn:#f59e0b;
+    --danger:#ef4444;
+    --purple:#a855f7;
+    --radius:14px;
+    --radius-sm:10px;
+    --sidebar-w:248px;
+    --topbar-h:64px;
+    --shadow:0 8px 32px rgba(0,0,0,.5);
+  }
+  html,body{
+    background:var(--bg);color:var(--text);
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;min-height:100vh;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input,select,textarea{font-family:inherit}
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:4px}
+  ::-webkit-scrollbar-thumb:hover{background:#3a3a3a}
+
+  /* ─────────── LAYOUT ─────────── */
+  .layout{display:flex;min-height:100vh;min-height:100dvh}
+
+  /* ─────────── SIDEBAR ─────────── */
+  .sidebar{
+    position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);
+    background:var(--bg-1);border-right:1px solid var(--border);
+    display:flex;flex-direction:column;z-index:60;
+    transition:transform .25s ease;
+  }
+  .brand{
+    padding:22px 22px 22px;display:flex;align-items:center;gap:10px;
+    border-bottom:1px solid var(--border);
+  }
+  .brand-icon{
+    width:32px;height:32px;border-radius:8px;
+    background:linear-gradient(135deg,var(--accent),#00d4aa);
+    display:flex;align-items:center;justify-content:center;color:#000;
+    flex-shrink:0;
+  }
+  .brand-text{
+    font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:15px;
+    letter-spacing:.5px;line-height:1.2;
+  }
+  .brand-text small{
+    display:block;color:var(--text-3);font-weight:500;font-size:10px;
+    letter-spacing:1.5px;margin-top:2px;
+  }
+  .nav{
+    padding:18px 12px;flex:1;overflow-y:auto;
+    display:flex;flex-direction:column;gap:2px;
+  }
+  .nav-section{
+    font-size:10px;text-transform:uppercase;letter-spacing:1.5px;
+    color:var(--text-3);font-weight:700;padding:14px 12px 8px;
+  }
+  .nav-item{
+    display:flex;align-items:center;gap:12px;padding:11px 12px;
+    color:var(--text-2);font-size:13.5px;font-weight:500;
+    border-radius:var(--radius-sm);transition:all .15s;cursor:pointer;
+    position:relative;width:100%;text-align:left;
+  }
+  .nav-item:hover{color:var(--text);background:var(--bg-3)}
+  .nav-item.active{color:var(--text);background:var(--bg-3)}
+  .nav-item.active::before{
+    content:'';position:absolute;left:-12px;top:50%;transform:translateY(-50%);
+    width:3px;height:18px;background:var(--accent);border-radius:0 3px 3px 0;
+  }
+  .nav-item svg{width:18px;height:18px;stroke-width:2;flex-shrink:0}
+  .nav-badge{
+    margin-left:auto;background:var(--danger);color:#fff;font-size:10px;
+    font-weight:700;padding:2px 6px;border-radius:10px;min-width:18px;
+    text-align:center;line-height:1.4;
+  }
+  .sidebar-footer{
+    padding:14px;border-top:1px solid var(--border);
+    display:flex;align-items:center;gap:10px;
+  }
+  .sidebar-footer .avatar{
+    width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#4a9eff,#00d4aa);
+    display:flex;align-items:center;justify-content:center;font-weight:700;color:#000;font-size:13px;
+    flex-shrink:0;
+  }
+  .sidebar-footer .info{flex:1;min-width:0;overflow:hidden}
+  .sidebar-footer .name{font-size:13px;font-weight:600;text-overflow:ellipsis;overflow:hidden;white-space:nowrap}
+  .sidebar-footer .role{font-size:11px;color:var(--text-3)}
+  .sidebar-footer .logout{
+    color:var(--text-3);padding:8px;border-radius:8px;
+  }
+  .sidebar-footer .logout:hover{color:var(--danger);background:rgba(239,68,68,.1)}
+
+  /* ─────────── MAIN ─────────── */
+  .main{
+    margin-left:var(--sidebar-w);flex:1;min-width:0;
+    display:flex;flex-direction:column;min-height:100vh;
+  }
+  .topbar{
+    height:var(--topbar-h);padding:0 28px;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    background:rgba(0,0,0,.7);backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--border);
+    position:sticky;top:0;z-index:50;
+  }
+  .topbar-left{display:flex;align-items:center;gap:14px;min-width:0;flex:1}
+  .menu-btn{
+    width:38px;height:38px;border-radius:10px;display:none;
+    align-items:center;justify-content:center;color:var(--text);
+    border:1px solid var(--border-2);
+  }
+  .menu-btn:active{background:var(--bg-3)}
+  .page-title{
+    font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;
+    font-size:20px;letter-spacing:-.3px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .topbar-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .icon-btn{
+    width:38px;height:38px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--text-2);background:var(--bg-3);
+    transition:all .15s;
+  }
+  .icon-btn:hover{color:var(--text);background:var(--bg-hover)}
+  .icon-btn svg{width:18px;height:18px;stroke-width:2}
+
+  .content{padding:28px;flex:1}
+
+  /* ─────────── STATS GRID ─────────── */
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:16px;margin-bottom:28px;
+  }
+  .stat-card{
+    background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);
+    padding:20px;display:flex;align-items:center;gap:16px;
+    transition:border-color .15s;
+  }
+  .stat-card:hover{border-color:var(--border-2)}
+  .stat-icon{
+    width:44px;height:44px;border-radius:12px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .stat-icon svg{width:22px;height:22px;stroke-width:2}
+  .stat-icon.blue{background:rgba(74,158,255,.15);color:var(--accent)}
+  .stat-icon.green{background:rgba(16,185,129,.15);color:var(--success)}
+  .stat-icon.yellow{background:rgba(245,158,11,.15);color:var(--warn)}
+  .stat-icon.red{background:rgba(239,68,68,.15);color:var(--danger)}
+  .stat-info{min-width:0;flex:1}
+  .stat-label{font-size:12px;color:var(--text-3);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+  .stat-value{
+    font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:26px;
+    letter-spacing:-.5px;line-height:1.1;
+  }
+
+  /* ─────────── PANEL ─────────── */
+  .panel{
+    background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);
+    overflow:hidden;margin-bottom:20px;
+  }
+  .panel-head{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:18px 22px;border-bottom:1px solid var(--border);gap:12px;
+    flex-wrap:wrap;
+  }
+  .panel-title{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:700;font-size:15px;letter-spacing:-.2px;
+  }
+  .panel-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .panel-body{padding:0}
+  .panel-body.padded{padding:22px}
+
+  .filter-bar{
+    padding:14px 22px;border-bottom:1px solid var(--border);
+    display:flex;gap:8px;flex-wrap:wrap;
+  }
+
+  /* ─────────── BUTTONS ─────────── */
+  .btn{
+    background:var(--accent);color:#000;padding:9px 16px;
+    border-radius:8px;font-size:13px;font-weight:600;
+    display:inline-flex;align-items:center;gap:6px;
+    transition:all .15s;line-height:1;white-space:nowrap;
+  }
+  .btn:hover{background:var(--accent-hover)}
+  .btn:active{transform:scale(.97)}
+  .btn svg{width:14px;height:14px;stroke-width:2.5}
+  .btn-sm{padding:7px 12px;font-size:12px}
+  .btn-xs{padding:5px 10px;font-size:11px;font-weight:700}
+  .btn-ghost{background:var(--bg-3);color:var(--text-2)}
+  .btn-ghost:hover{background:var(--bg-hover);color:var(--text)}
+  .btn-ghost.active{background:var(--accent);color:#000}
+  .btn-success{background:var(--success);color:#fff}
+  .btn-success:hover{background:#0ea571}
+  .btn-danger{background:var(--danger);color:#fff}
+  .btn-danger:hover{background:#dc2626}
+  .btn-warn{background:var(--warn);color:#000}
+  .btn-warn:hover{background:#d97706}
+
+  /* ─────────── TABLE ─────────── */
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{
+    width:100%;border-collapse:collapse;min-width:600px;
+  }
+  thead th{
+    text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.7px;
+    color:var(--text-3);font-weight:700;padding:14px 18px;
+    border-bottom:1px solid var(--border);background:var(--bg-1);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:16px 18px;border-bottom:1px solid var(--border);
+    font-size:13.5px;color:var(--text);vertical-align:middle;
+  }
+  tbody tr{transition:background .1s}
+  tbody tr:hover{background:var(--bg-3)}
+  tbody tr:last-child td{border-bottom:none}
+  .mono{font-family:'SF Mono',Monaco,monospace;font-size:12px}
+  .truncate{max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* ─────────── BADGES ─────────── */
+  .badge{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:4px 9px;border-radius:20px;
+    font-size:11px;font-weight:600;text-transform:capitalize;letter-spacing:.2px;
+    white-space:nowrap;line-height:1.3;
+  }
+  .badge::before{
+    content:'';width:6px;height:6px;border-radius:50%;background:currentColor;
+  }
+  .badge-pending{background:rgba(245,158,11,.13);color:#fbbf24}
+  .badge-approved{background:rgba(16,185,129,.13);color:#34d399}
+  .badge-rejected{background:rgba(239,68,68,.13);color:#f87171}
+  .badge-processing{background:rgba(74,158,255,.13);color:#60a5fa}
+  .badge-completed{background:rgba(16,185,129,.18);color:#10b981}
+  .badge-active{background:rgba(16,185,129,.13);color:#34d399}
+  .badge-disabled{background:rgba(239,68,68,.13);color:#f87171}
+  .badge-admin{background:rgba(168,85,247,.13);color:#c084fc}
+  .badge-not_submitted{background:rgba(115,122,135,.15);color:#9ba3b4}
+
+  /* ─────────── INPUTS ─────────── */
+  .input,.select,.textarea{
+    width:100%;background:var(--bg-1);border:1px solid var(--border-2);color:var(--text);
+    padding:11px 14px;border-radius:10px;font-size:14px;font-family:inherit;
+    transition:border-color .15s;
+  }
+  .input:focus,.select:focus,.textarea:focus{outline:none;border-color:var(--accent)}
+  .textarea{min-height:90px;resize:vertical}
+  .select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23737a87' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+
+  .search-row{
+    display:flex;gap:10px;padding:18px 22px;border-bottom:1px solid var(--border);
+  }
+  .search-input{
+    flex:1;background:var(--bg-1);border:1px solid var(--border-2);color:var(--text);
+    padding:10px 14px 10px 38px;border-radius:10px;font-size:14px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23737a87' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='8'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>");
+    background-repeat:no-repeat;background-position:left 12px center;
+  }
+  .search-input:focus{outline:none;border-color:var(--accent)}
+
+  /* ─────────── EMPTY / LOADING ─────────── */
+  .empty,.loading{
+    padding:64px 24px;text-align:center;color:var(--text-3);font-size:14px;
+  }
+  .empty-icon{
+    width:48px;height:48px;margin:0 auto 14px;color:var(--text-3);
+    opacity:.5;
+  }
+  .empty-icon svg{width:100%;height:100%}
+  .spinner{
+    width:24px;height:24px;border:2px solid var(--border-2);border-top-color:var(--accent);
+    border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ─────────── ROW ACTIONS ─────────── */
+  .row-actions{display:flex;gap:6px;flex-wrap:wrap}
+
+  /* ─────────── MODAL ─────────── */
+  .modal-back{
+    position:fixed;inset:0;background:rgba(0,0,0,.78);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    z-index:200;display:none;align-items:center;justify-content:center;
+    padding:16px;
+  }
+  .modal-back.show{display:flex}
+  .modal{
+    background:var(--bg-2);border:1px solid var(--border-2);
+    border-radius:var(--radius);box-shadow:var(--shadow);
+    width:100%;max-width:560px;max-height:90vh;
+    overflow-y:auto;display:flex;flex-direction:column;
+  }
+  .modal-head{
+    padding:22px 24px 14px;border-bottom:1px solid var(--border);
+    display:flex;justify-content:space-between;align-items:flex-start;gap:10px;
+  }
+  .modal-head h2{
+    font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:700;
+    letter-spacing:-.2px;line-height:1.3;
+  }
+  .modal-head .sub{font-size:13px;color:var(--text-3);margin-top:4px}
+  .modal-close{
+    width:32px;height:32px;border-radius:8px;color:var(--text-3);flex-shrink:0;
+  }
+  .modal-close:hover{background:var(--bg-3);color:var(--text)}
+  .modal-body{padding:20px 24px}
+  .modal-foot{
+    padding:16px 24px;border-top:1px solid var(--border);
+    display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;
+  }
+  .form-row{margin-bottom:14px}
+  .form-row:last-child{margin-bottom:0}
+  .form-row label{
+    display:block;font-size:12px;color:var(--text-2);font-weight:500;
+    margin-bottom:6px;letter-spacing:.2px;
+  }
+  .form-row .hint{font-size:11px;color:var(--text-3);margin-top:4px}
+  .form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .checkbox-row{display:flex;align-items:center;gap:10px;padding:8px 0}
+  .checkbox-row input{width:18px;height:18px;accent-color:var(--accent)}
+
+  /* User detail mini sections */
+  .detail-block{
+    background:var(--bg-1);border:1px solid var(--border);border-radius:10px;
+    padding:14px;margin-bottom:12px;
+  }
+  .detail-block h4{
+    font-size:12px;color:var(--text-3);text-transform:uppercase;
+    letter-spacing:.5px;margin-bottom:10px;font-weight:600;
+  }
+  .detail-balance{
+    font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:700;
+    letter-spacing:-.5px;
+  }
+  .detail-list{display:flex;flex-direction:column;gap:8px;font-size:13px}
+  .detail-list .row{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    padding:8px 10px;background:var(--bg-2);border-radius:8px;
+  }
+
+  /* ─────────── TOAST ─────────── */
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
+    background:var(--success);color:#fff;
+    padding:13px 20px;border-radius:10px;font-weight:600;font-size:13.5px;
+    box-shadow:var(--shadow);z-index:300;
+    display:flex;align-items:center;gap:8px;
+    transition:transform .25s;max-width:90vw;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .toast.error{background:var(--danger)}
+  .toast svg{width:18px;height:18px;flex-shrink:0}
+
+  /* ─────────── SECTIONS ─────────── */
+  .section{display:none}
+  .section.active{display:block}
+
+  .backdrop{
+    position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:55;display:none;
+  }
+  .backdrop.show{display:block}
+
+
+
+  /* ─── COMPACT USER/ROW CARDS (mobile) ─── */
+  .user-card{
+    display:flex;align-items:center;gap:12px;
+    padding:14px 16px;border-bottom:1px solid var(--border);
+    transition:background .1s;
+  }
+  .user-card:last-child{border-bottom:none}
+  .user-card:active{background:var(--bg-3)}
+  .uc-avatar{
+    width:40px;height:40px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(135deg,#4a9eff,#00d4aa);
+    display:flex;align-items:center;justify-content:center;
+    color:#000;font-weight:700;font-size:15px;
+  }
+  .uc-info{flex:1;min-width:0;overflow:hidden}
+  .uc-name{
+    font-size:14px;font-weight:600;color:var(--text);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    line-height:1.3;
+  }
+  .uc-email{
+    font-size:12px;color:var(--text-3);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    line-height:1.3;margin-top:1px;
+  }
+  .uc-right{
+    display:flex;flex-direction:column;align-items:flex-end;gap:4px;
+    flex-shrink:0;
+  }
+  .uc-balance{
+    font-size:14px;font-weight:700;
+    font-family:'Plus Jakarta Sans',sans-serif;
+  }
+  .uc-badges{display:flex;gap:4px;align-items:center}
+  .uc-badges .badge{font-size:10px;padding:2px 7px}
+  .uc-action{
+    margin-left:8px;flex-shrink:0;color:var(--text-3);
+    width:32px;height:32px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .uc-action:hover{color:var(--accent);background:var(--bg-3)}
+  .uc-action svg{width:16px;height:16px;stroke-width:2.2}
+
+  /* ─── COMPACT TX ROW (deposits/withdrawals/kyc) ─── */
+  .tx-card{
+    display:flex;align-items:center;gap:12px;
+    padding:14px 16px;border-bottom:1px solid var(--border);
+  }
+  .tx-card:last-child{border-bottom:none}
+  .tx-icon{
+    width:40px;height:40px;border-radius:10px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .tx-icon svg{width:18px;height:18px;stroke-width:2}
+  .tx-icon.in{background:rgba(16,185,129,.13);color:#10b981}
+  .tx-icon.out{background:rgba(239,68,68,.13);color:#ef4444}
+  .tx-icon.kyc{background:rgba(168,85,247,.13);color:#a855f7}
+  .tx-info{flex:1;min-width:0;overflow:hidden}
+  .tx-title{
+    font-size:14px;font-weight:600;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .tx-sub{
+    font-size:12px;color:var(--text-3);margin-top:2px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .tx-right{
+    display:flex;flex-direction:column;align-items:flex-end;gap:5px;
+    flex-shrink:0;
+  }
+  .tx-amount{
+    font-size:14px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;
+  }
+  .tx-actions{
+    display:flex;gap:6px;margin-top:8px;justify-content:flex-end;
+  }
+  .tx-meta-row{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    padding:10px 16px;background:var(--bg-1);font-size:12px;color:var(--text-3);
+    border-bottom:1px solid var(--border);
+  }
+
+  /* ─── DESKTOP: hide cards / show tables ─── */
+  @media (min-width:761px){
+    .users-list,.tx-list{display:none}
+    .table-wrap{display:block}
+  }
+  @media (max-width:760px){
+    .users-list,.tx-list{display:block}
+    .table-wrap{display:none}
+  }
+
+  /* ─────────── MOBILE ─────────── */
+  @media (max-width:960px){
+    :root{--topbar-h:60px}
+    .sidebar{transform:translateX(-100%);width:280px;box-shadow:var(--shadow)}
+    .sidebar.open{transform:translateX(0)}
+    .main{margin-left:0}
+    .menu-btn{display:flex}
+    .topbar{padding:0 16px}
+    .content{padding:18px 14px}
+    .stat-card{padding:16px}
+    .stat-value{font-size:22px}
+    .panel-head{padding:14px 16px}
+    .filter-bar{padding:12px 16px}
+    .search-row{padding:14px 16px}
+    thead th{padding:12px 14px}
+    tbody td{padding:14px 14px;font-size:13px}
+    .modal{max-height:95vh}
+    .modal-head{padding:18px 18px 12px}
+    .modal-body{padding:16px 18px}
+    .modal-foot{padding:14px 18px}
+  }
+  @media (max-width:480px){
+    .stats{grid-template-columns:1fr 1fr;gap:10px}
+    .stat-card{padding:14px;gap:10px}
+    .stat-icon{width:38px;height:38px}
+    .stat-icon svg{width:18px;height:18px}
+    .stat-value{font-size:18px}
+    .stat-label{font-size:10px}
+    .form-grid-2{grid-template-columns:1fr}
+  }
+</style>
+<script src="js/apex-api.js?v=2"></script>
+</head>
+<body>
+
+<div class="backdrop" id="backdrop"></div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </div>
+      <div class="brand-text">APEX<small>IPO ACCESS · ADMIN</small></div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-section">Overview</div>
+      <button class="nav-item active" data-section="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+        Dashboard
+      </button>
+
+      <div class="nav-section">Management</div>
+      <button class="nav-item" data-section="users">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Users
+      </button>
+      <button class="nav-item" data-section="deposits">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><polyline points="19 12 12 19 5 12"/></svg>
+        Deposits
+        <span class="nav-badge" id="badge-deposits" style="display:none">0</span>
+      </button>
+      <button class="nav-item" data-section="withdrawals">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><polyline points="5 12 12 5 19 12"/></svg>
+        Withdrawals
+        <span class="nav-badge" id="badge-withdrawals" style="display:none">0</span>
+      </button>
+      <button class="nav-item" data-section="kyc">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        KYC Review
+        <span class="nav-badge" id="badge-kyc" style="display:none">0</span>
+      </button>
+
+      <div class="nav-section">Settings</div>
+      <button class="nav-item" data-section="wallets">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+        Crypto Wallets
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="avatar" id="sideAvatar">A</div>
+      <div class="info">
+        <div class="name" id="sideName">Loading…</div>
+        <div class="role">Administrator</div>
+      </div>
+      <button class="logout" id="logoutBtn" title="Logout">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-btn" id="menuBtn" aria-label="Menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <h1 class="page-title" id="pageTitle">Dashboard</h1>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn" id="refreshBtn" title="Refresh">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ─── DASHBOARD ─── -->
+      <section class="section active" data-section="dashboard">
+        <div class="stats">
+          <div class="stat-card">
+            <div class="stat-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">Total Users</div>
+              <div class="stat-value" id="statUsers">—</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon yellow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">Pending KYC</div>
+              <div class="stat-value" id="statKyc">—</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">Pending Deposits</div>
+              <div class="stat-value" id="statDeposits">—</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">Pending Withdrawals</div>
+              <div class="stat-value" id="statWithdrawals">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Recent Users</div>
+            <button class="btn btn-ghost btn-sm" data-jump="users">View all →</button>
+          </div>
+          <div class="panel-body" id="recentUsers">
+            <div class="loading"><div class="spinner"></div>Loading…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── USERS ─── -->
+      <section class="section" data-section="users">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">All Users</div>
+          </div>
+          <div class="search-row">
+            <input type="text" class="search-input" id="userSearch" placeholder="Search by email or name…">
+            <button class="btn" id="userSearchBtn">Search</button>
+          </div>
+          <div class="panel-body" id="usersTable">
+            <div class="loading"><div class="spinner"></div>Loading…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── DEPOSITS ─── -->
+      <section class="section" data-section="deposits">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Deposits</div>
+          </div>
+          <div class="filter-bar">
+            <button class="btn btn-ghost btn-sm active" data-filter="pending">Pending</button>
+            <button class="btn btn-ghost btn-sm" data-filter="approved">Approved</button>
+            <button class="btn btn-ghost btn-sm" data-filter="rejected">Rejected</button>
+            <button class="btn btn-ghost btn-sm" data-filter="all">All</button>
+          </div>
+          <div class="panel-body" id="depositsTable">
+            <div class="loading"><div class="spinner"></div>Loading…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── WITHDRAWALS ─── -->
+      <section class="section" data-section="withdrawals">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Withdrawals</div>
+          </div>
+          <div class="filter-bar">
+            <button class="btn btn-ghost btn-sm active" data-wfilter="pending">Pending</button>
+            <button class="btn btn-ghost btn-sm" data-wfilter="processing">Processing</button>
+            <button class="btn btn-ghost btn-sm" data-wfilter="completed">Completed</button>
+            <button class="btn btn-ghost btn-sm" data-wfilter="rejected">Rejected</button>
+            <button class="btn btn-ghost btn-sm" data-wfilter="all">All</button>
+          </div>
+          <div class="panel-body" id="withdrawalsTable">
+            <div class="loading"><div class="spinner"></div>Loading…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── KYC ─── -->
+      <section class="section" data-section="kyc">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">KYC Submissions</div>
+          </div>
+          <div class="filter-bar">
+            <button class="btn btn-ghost btn-sm active" data-kfilter="pending">Pending</button>
+            <button class="btn btn-ghost btn-sm" data-kfilter="approved">Approved</button>
+            <button class="btn btn-ghost btn-sm" data-kfilter="rejected">Rejected</button>
+            <button class="btn btn-ghost btn-sm" data-kfilter="all">All</button>
+          </div>
+          <div class="panel-body" id="kycTable">
+            <div class="loading"><div class="spinner"></div>Loading…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── WALLETS ─── -->
+      <section class="section" data-section="wallets">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Crypto Wallets</div>
+            <button class="btn" id="addWalletBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Wallet
+            </button>
+          </div>
+          <div class="panel-body" id="walletsTable">
+            <div class="loading"><div class="spinner"></div>Loading…</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- ─────── MODALS ─────── -->
+<div class="modal-back" id="userModal">
+  <div class="modal" id="userModalContent"></div>
+</div>
+
+<div class="modal-back" id="walletModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h2 id="walletModalTitle">Add Wallet</h2>
+        <p class="sub">A crypto address users can deposit to.</p>
+      </div>
+      <button class="modal-close" data-close-modal>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="walletId">
+      <div class="form-grid-2">
+        <div class="form-row"><label>Label</label><input class="input" id="wLabel" placeholder="Bitcoin"></div>
+        <div class="form-row"><label>Asset</label><input class="input" id="wAsset" placeholder="BTC"></div>
+      </div>
+      <div class="form-row"><label>Network</label><input class="input" id="wNetwork" placeholder="Bitcoin / ERC20 / TRC20"></div>
+      <div class="form-row"><label>Address</label><input class="input" id="wAddress" placeholder="Wallet address"></div>
+      <div class="form-grid-2">
+        <div class="form-row"><label>Memo / Tag <span style="color:var(--text-3)">(optional)</span></label><input class="input" id="wMemo"></div>
+        <div class="form-row"><label>Sort Order</label><input class="input" type="number" id="wSortOrder" value="0"></div>
+      </div>
+      <div class="form-row">
+        <label>QR Code URL <span style="color:var(--text-3)">(optional)</span></label>
+        <input class="input" id="wQrUrl" placeholder="https://res.cloudinary.com/...">
+        <div class="hint">Upload your QR image to Cloudinary and paste the URL here.</div>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="wActive" checked>
+        <label for="wActive" style="margin:0;cursor:pointer">Active (visible to users)</label>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close-modal>Cancel</button>
+      <button class="btn" id="walletSaveBtn">Save Wallet</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-back" id="actionModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h2 id="actionModalTitle">Action</h2>
+        <p class="sub" id="actionModalSub"></p>
+      </div>
+      <button class="modal-close" data-close-modal>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label>Note (optional)</label>
+        <textarea class="textarea" id="actionNote" placeholder="Visible to the user…"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close-modal>Cancel</button>
+      <button class="btn" id="actionConfirmBtn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-back" id="balanceModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h2>Adjust Balance</h2>
+        <p class="sub" id="balanceModalSub"></p>
+      </div>
+      <button class="modal-close" data-close-modal>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="balanceUserId">
+      <div class="form-row">
+        <label>Type</label>
+        <select class="select" id="balanceType">
+          <option value="adjust">Adjust (add / subtract)</option>
+          <option value="set">Set (overwrite)</option>
+        </select>
+        <div class="hint">Adjust: positive adds, negative subtracts. Set: replaces balance entirely.</div>
+      </div>
+      <div class="form-row">
+        <label>Amount (USD)</label>
+        <input class="input" type="number" step="0.01" id="balanceAmount" placeholder="0.00">
+      </div>
+      <div class="form-row">
+        <label>Reason</label>
+        <input class="input" id="balanceReason" placeholder="Bonus credit, refund, etc.">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close-modal>Cancel</button>
+      <button class="btn btn-warn" id="balanceConfirmBtn">Apply</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// =====================================================
+// APEX ADMIN — MongoDB / ApexAPI
+// =====================================================
+
+const $  = (s,p=document) => p.querySelector(s);
+const $$ = (s,p=document) => Array.from(p.querySelectorAll(s));
+
+const state = {
+  user:null, users:[], deposits:[], withdrawals:[], kyc:[], wallets:[],
+  depositFilter:'pending', withdrawalFilter:'pending', kycFilter:'pending',
+  currentSection:'dashboard',
+};
+
+// ---------- TOAST ----------
+function toast(msg, isError){
+  const t = $('#toast');
+  t.innerHTML = (isError
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+  ) + '<span>' + esc(msg) + '</span>';
+  t.classList.toggle('error', !!isError);
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+// ---------- INIT ----------
+async function init(){
+  const user = await ApexAPI.auth.requireAdmin();
+  if (!user) return;
+  state.user = user;
+  $('#sideName').textContent = user.fullName || user.email;
+  $('#sideAvatar').textContent = (user.fullName || user.email).charAt(0).toUpperCase();
+
+  bindNav();
+  bindLogout();
+  bindMobileMenu();
+  bindRefresh();
+  bindFilters();
+  bindModals();
+  bindWalletForm();
+  bindBalanceForm();
+  bindUserSearch();
+  bindJumpButtons();
+
+  loadDashboard();
+  pollBadges();
+}
+
+function bindNav(){
+  $$('.nav-item').forEach(item=>{
+    item.addEventListener('click',()=>switchSection(item.dataset.section));
+  });
+}
+
+function bindJumpButtons(){
+  $$('[data-jump]').forEach(b=>b.addEventListener('click',()=>switchSection(b.dataset.jump)));
+}
+
+function switchSection(name){
+  state.currentSection = name;
+  $$('.nav-item').forEach(i=>i.classList.toggle('active', i.dataset.section===name));
+  $$('.section').forEach(s=>s.classList.toggle('active', s.dataset.section===name));
+  $('#pageTitle').textContent = ({
+    dashboard:'Dashboard', users:'Users', deposits:'Deposits',
+    withdrawals:'Withdrawals', kyc:'KYC Review', wallets:'Crypto Wallets',
+  })[name];
+  closeSidebar();
+
+  if (name==='dashboard') loadDashboard();
+  if (name==='users') loadUsers();
+  if (name==='deposits') loadDeposits();
+  if (name==='withdrawals') loadWithdrawals();
+  if (name==='kyc') loadKyc();
+  if (name==='wallets') loadWallets();
+}
+
+function bindLogout(){
+  $('#logoutBtn').addEventListener('click', async ()=>{
+    await ApexAPI.auth.logout();
+    location.href='login.html';
+  });
+}
+
+function bindMobileMenu(){
+  $('#menuBtn').addEventListener('click',()=>{
+    $('#sidebar').classList.add('open');
+    $('#backdrop').classList.add('show');
+  });
+  $('#backdrop').addEventListener('click', closeSidebar);
+}
+function closeSidebar(){
+  $('#sidebar').classList.remove('open');
+  $('#backdrop').classList.remove('show');
+}
+
+function bindRefresh(){
+  $('#refreshBtn').addEventListener('click',()=>{
+    const refresh = $('#refreshBtn');
+    refresh.style.transform='rotate(360deg)';
+    refresh.style.transition='transform .6s';
+    setTimeout(()=>{refresh.style.transform='';refresh.style.transition='';}, 700);
+    switchSection(state.currentSection);
+  });
+}
+
+function bindFilters(){
+  $$('[data-filter]').forEach(b=>b.addEventListener('click',e=>{
+    $$('[data-filter]').forEach(x=>x.classList.remove('active'));
+    e.target.classList.add('active');
+    state.depositFilter = b.dataset.filter;
+    loadDeposits();
+  }));
+  $$('[data-wfilter]').forEach(b=>b.addEventListener('click',e=>{
+    $$('[data-wfilter]').forEach(x=>x.classList.remove('active'));
+    e.target.classList.add('active');
+    state.withdrawalFilter = b.dataset.wfilter;
+    loadWithdrawals();
+  }));
+  $$('[data-kfilter]').forEach(b=>b.addEventListener('click',e=>{
+    $$('[data-kfilter]').forEach(x=>x.classList.remove('active'));
+    e.target.classList.add('active');
+    state.kycFilter = b.dataset.kfilter;
+    loadKyc();
+  }));
+}
+
+function bindModals(){
+  $$('[data-close-modal]').forEach(b=>b.addEventListener('click',e=>{
+    e.target.closest('.modal-back').classList.remove('show');
+  }));
+  $$('.modal-back').forEach(m=>m.addEventListener('click',e=>{
+    if (e.target===m) m.classList.remove('show');
+  }));
+}
+
+// ---------- BADGE POLL ----------
+async function pollBadges(){
+  try{
+    const [d,w,k] = await Promise.all([
+      ApexAPI.admin.listDeposits('pending'),
+      ApexAPI.admin.listWithdrawals('pending'),
+      ApexAPI.admin.listKyc('pending'),
+    ]);
+    updateBadge('badge-deposits', d.count);
+    updateBadge('badge-withdrawals', w.count);
+    updateBadge('badge-kyc', k.count);
+  } catch{}
+}
+function updateBadge(id,n){
+  const el=$('#'+id);
+  if (n>0){ el.style.display=''; el.textContent=n; }
+  else el.style.display='none';
+}
+
+// ---------- DASHBOARD ----------
+async function loadDashboard(){
+  try{
+    const [usersRes, depRes, wdRes, kycRes] = await Promise.all([
+      ApexAPI.admin.listUsers(),
+      ApexAPI.admin.listDeposits('pending'),
+      ApexAPI.admin.listWithdrawals('pending'),
+      ApexAPI.admin.listKyc('pending'),
+    ]);
+    $('#statUsers').textContent = usersRes.count;
+    $('#statKyc').textContent = kycRes.count;
+    $('#statDeposits').textContent = depRes.count;
+    $('#statWithdrawals').textContent = wdRes.count;
+    updateBadge('badge-deposits', depRes.count);
+    updateBadge('badge-withdrawals', wdRes.count);
+    updateBadge('badge-kyc', kycRes.count);
+    renderRecentUsers(usersRes.users.slice(0,8));
+  } catch(err){
+    toast('Failed to load dashboard: ' + err.message, true);
+  }
+}
+
+function renderRecentUsers(users){
+  if (!users.length) return $('#recentUsers').innerHTML = emptyState('No users yet');
+  const cards = users.map(u=>userCardHTML(u)).join('');
+  const rows = users.map(u=>`
+        <tr>
+          <td>${esc(u.fullName)||'—'}</td>
+          <td>${esc(u.email)}</td>
+          <td>${badge(u.accountStatus||'pending')}</td>
+          <td>${badge(u.kycStatus||'not_submitted')}</td>
+          <td style="text-align:right;font-weight:600">$${money(u.balanceUSD)}</td>
+          <td style="text-align:right"><button class="btn btn-ghost btn-xs" onclick="viewUser('${u.id}')">View</button></td>
+        </tr>`).join('');
+  $('#recentUsers').innerHTML = `
+    <div class="users-list">${cards}</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Name</th><th>Email</th><th>Status</th><th>KYC</th><th style="text-align:right">Balance</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+
+// ---------- USERS ----------
+function bindUserSearch(){
+  $('#userSearchBtn').addEventListener('click', loadUsers);
+  $('#userSearch').addEventListener('keydown',e=>{if(e.key==='Enter') loadUsers();});
+}
+async function loadUsers(){
+  const search = $('#userSearch').value.trim();
+  try{
+    const res = await ApexAPI.admin.listUsers(search ? {search} : {});
+    state.users = res.users;
+    renderUsers();
+  } catch(err){
+    toast('Failed: ' + err.message, true);
+  }
+}
+function renderUsers(){
+  if (!state.users.length) return $('#usersTable').innerHTML = emptyState('No users found');
+  const cards = state.users.map(u=>userCardHTML(u)).join('');
+  const rows = state.users.map(u=>`
+        <tr>
+          <td>${esc(u.fullName)||'<span style="color:var(--text-3)">unnamed</span>'}</td>
+          <td>${esc(u.email)}</td>
+          <td>${u.role==='admin'?'<span class="badge badge-admin">Admin</span>':'<span style="color:var(--text-3)">User</span>'}</td>
+          <td>${badge(u.accountStatus||'pending')}</td>
+          <td>${badge(u.kycStatus||'not_submitted')}</td>
+          <td style="text-align:right;font-weight:600">$${money(u.balanceUSD)}</td>
+          <td style="text-align:right"><button class="btn btn-ghost btn-xs" onclick="viewUser('${u.id}')">View</button></td>
+        </tr>`).join('');
+  $('#usersTable').innerHTML = `
+    <div class="users-list">${cards}</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>User</th><th>Email</th><th>Role</th><th>Account</th><th>KYC</th><th style="text-align:right">Balance</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+
+function userCardHTML(u){
+  const initial = (u.fullName || u.email || '?').charAt(0).toUpperCase();
+  return `<div class="user-card" onclick="viewUser('${u.id}')">
+    <div class="uc-avatar">${initial}</div>
+    <div class="uc-info">
+      <div class="uc-name">${esc(u.fullName)||'<span style="color:var(--text-3)">unnamed</span>'} ${u.role==='admin'?'<span class="badge badge-admin" style="margin-left:4px;font-size:9px;padding:1px 6px">Admin</span>':''}</div>
+      <div class="uc-email">${esc(u.email)}</div>
+    </div>
+    <div class="uc-right">
+      <div class="uc-balance">$${money(u.balanceUSD)}</div>
+      <div class="uc-badges">${badge(u.accountStatus||'pending')}</div>
+    </div>
+    <div class="uc-action">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+  </div>`;
+}
+
+async function viewUser(id){
+  try{
+    const res = await ApexAPI.admin.getUser(id);
+    const u = res.user;
+    $('#userModalContent').innerHTML = `
+      <div class="modal-head">
+        <div>
+          <h2>${esc(u.fullName)||'User'} ${u.role==='admin'?'<span class="badge badge-admin" style="margin-left:6px">Admin</span>':''}</h2>
+          <p class="sub">${esc(u.email)}</p>
+        </div>
+        <button class="modal-close" data-close-modal>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-block">
+          <h4>Balance</h4>
+          <div class="detail-balance">$${money(u.balanceUSD)}</div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>Account Status</label>
+            <select class="select" id="editAccountStatus">
+              <option value="pending"${u.accountStatus==='pending'?' selected':''}>Pending</option>
+              <option value="approved"${u.accountStatus==='approved'?' selected':''}>Approved</option>
+              <option value="rejected"${u.accountStatus==='rejected'?' selected':''}>Rejected</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>KYC Status</label>
+            <select class="select" id="editKycStatus">
+              <option value="not_submitted"${u.kycStatus==='not_submitted'?' selected':''}>Not submitted</option>
+              <option value="pending"${u.kycStatus==='pending'?' selected':''}>Pending</option>
+              <option value="approved"${u.kycStatus==='approved'?' selected':''}>Approved</option>
+              <option value="rejected"${u.kycStatus==='rejected'?' selected':''}>Rejected</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Account Active</label>
+          <select class="select" id="editStatus">
+            <option value="active"${u.status==='active'?' selected':''}>Active</option>
+            <option value="disabled"${u.status==='disabled'?' selected':''}>Disabled</option>
+          </select>
+        </div>
+
+        ${miniBlock('Recent Deposits', res.deposits, d=>`${esc(d.method)} • $${money(d.amountUSD)} • ${badge(d.status)}`)}
+        ${miniBlock('Recent Withdrawals', res.withdrawals, w=>`${esc(w.method)} • $${money(w.amountUSD)} • ${badge(w.status)}`)}
+        ${miniBlock('Holdings', res.holdings, h=>`${esc(h.symbol)} • ${h.shares} shares • avg $${money(h.avgPriceUSD)}`)}
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-warn" onclick="openBalance('${u.id}','${esc(u.email)}')">Adjust Balance</button>
+        <button class="btn btn-ghost" data-close-modal>Close</button>
+        <button class="btn" onclick="saveUser('${u.id}')">Save Changes</button>
+      </div>`;
+    $('#userModal').classList.add('show');
+    bindModals();
+  } catch(err){
+    toast('Failed: ' + err.message, true);
+  }
+}
+
+function miniBlock(title, items, fn){
+  return `<div class="detail-block">
+    <h4>${title} (${items.length})</h4>
+    <div class="detail-list">
+      ${items.length?items.slice(0,5).map(i=>`<div class="row"><span>${fn(i)}</span></div>`).join(''):'<div style="color:var(--text-3);font-size:13px">None</div>'}
+    </div>
+  </div>`;
+}
+
+async function saveUser(id){
+  try{
+    await ApexAPI.admin.updateUser(id,{
+      accountStatus: $('#editAccountStatus').value,
+      kycStatus: $('#editKycStatus').value,
+      status: $('#editStatus').value,
+    });
+    toast('User updated');
+    $('#userModal').classList.remove('show');
+    loadUsers();
+    pollBadges();
+  } catch(err){
+    toast('Failed: ' + err.message, true);
+  }
+}
+
+// ---------- DEPOSITS ----------
+async function loadDeposits(){
+  try{
+    const filter = state.depositFilter==='all' ? null : state.depositFilter;
+    const res = await ApexAPI.admin.listDeposits(filter);
+    state.deposits = res.deposits;
+    renderDeposits();
+  } catch(err){
+    toast('Failed: ' + err.message, true);
+  }
+}
+function renderDeposits(){
+  if (!state.deposits.length) return $('#depositsTable').innerHTML = emptyState('No deposits found');
+  const cards = state.deposits.map(d=>txCardHTML(d,'deposit')).join('');
+  $('#depositsTable').innerHTML = `
+    <div class="tx-list">${cards}</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>User</th><th>Method</th><th style="text-align:right">Amount</th><th>Asset</th><th>TX Hash</th><th>Status</th><th>Date</th><th></th></tr></thead>
+      <tbody>${state.deposits.map(d=>`
+        <tr>
+          <td data-label="User">${esc(d.userId?.email||'—')}</td>
+          <td data-label="Method"><span style="text-transform:capitalize">${esc(d.method)}</span></td>
+          <td data-label="Amount" style="font-weight:600">$${money(d.amountUSD)}</td>
+          <td data-label="Asset"><span class="mono">${esc(d.asset)}</span>${d.network?'<span style="color:var(--text-3);font-size:11px"> · '+esc(d.network)+'</span>':''}</td>
+          <td data-label="TX"><span class="mono truncate" title="${esc(d.txHash||'')}">${esc((d.txHash||'').slice(0,14))}${d.txHash?'…':'—'}</span></td>
+          <td data-label="Status">${badge(d.status)}</td>
+          <td data-label="Date"><span style="color:var(--text-3);font-size:12px">${formatDate(d.createdAt)}</span></td>
+          <td data-label=""><div class="row-actions">
+            ${d.status==='pending'?`
+              <button class="btn btn-success btn-xs" onclick="reviewDeposit('${d._id}','approve')">Approve</button>
+              <button class="btn btn-danger btn-xs" onclick="reviewDeposit('${d._id}','reject')">Reject</button>
+            `:'<span style="color:var(--text-3);font-size:12px">—</span>'}
+          </div></td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+}
+function reviewDeposit(id,action){
+  openAction(
+    action==='approve'?'Approve Deposit':'Reject Deposit',
+    action==='approve'?'This will credit the user\'s balance.':'This will reject the deposit.',
+    async (note)=>{
+      await ApexAPI.admin.reviewDeposit(id,action,note);
+      toast('Deposit ' + (action==='approve'?'approved':'rejected'));
+      loadDeposits(); pollBadges();
+    });
+}
+
+// ---------- WITHDRAWALS ----------
+async function loadWithdrawals(){
+  try{
+    const filter = state.withdrawalFilter==='all' ? null : state.withdrawalFilter;
+    const res = await ApexAPI.admin.listWithdrawals(filter);
+    state.withdrawals = res.withdrawals;
+    renderWithdrawals();
+  } catch(err){
+    toast('Failed: ' + err.message, true);
+  }
+}
+function renderWithdrawals(){
+  if (!state.withdrawals.length) return $('#withdrawalsTable').innerHTML = emptyState('No withdrawals found');
+  const cards = state.withdrawals.map(w=>txCardHTML(w,'withdrawal')).join('');
+  $('#withdrawalsTable').innerHTML = `
+    <div class="tx-list">${cards}</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>User</th><th>Method</th><th style="text-align:right">Amount</th><th>Destination</th><th>Status</th><th>Date</th><th></th></tr></thead>
+      <tbody>${state.withdrawals.map(w=>`
+        <tr>
+          <td data-label="User">${esc(w.userId?.email||'—')}</td>
+          <td data-label="Method"><span style="text-transform:capitalize">${esc(w.method)}</span></td>
+          <td data-label="Amount" style="font-weight:600">$${money(w.amountUSD)}</td>
+          <td data-label="Destination"><span class="mono truncate" title="${esc(w.destinationAddress||'')}">${esc((w.destinationAddress||'').slice(0,18))}${w.destinationAddress?'…':'—'}</span></td>
+          <td data-label="Status">${badge(w.status)}</td>
+          <td data-label="Date"><span style="color:var(--text-3);font-size:12px">${formatDate(w.createdAt)}</span></td>
+          <td data-label=""><div class="row-actions">
+            ${w.status==='pending'?`
+              <button class="btn btn-warn btn-xs" onclick="reviewWithdrawal('${w._id}','approve')">Process</button>
+              <button class="btn btn-danger btn-xs" onclick="reviewWithdrawal('${w._id}','reject')">Reject</button>
+            `:w.status==='processing'?`
+              <button class="btn btn-success btn-xs" onclick="reviewWithdrawal('${w._id}','complete')">Complete</button>
+              <button class="btn btn-danger btn-xs" onclick="reviewWithdrawal('${w._id}','reject')">Reject</button>
+            `:'<span style="color:var(--text-3);font-size:12px">—</span>'}
+          </div></td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+}
+function reviewWithdrawal(id,action){
+  openAction(
+    action.charAt(0).toUpperCase()+action.slice(1)+' Withdrawal',
+    action==='reject'?'Funds will be refunded to the user.':'Optional note for the user.',
+    async (note)=>{
+      await ApexAPI.admin.reviewWithdrawal(id,action,note);
+      toast('Withdrawal ' + action + 'd');
+      loadWithdrawals(); pollBadges();
+    });
+}
+
+// ---------- KYC ----------
+async function loadKyc(){
+  try{
+    const filter = state.kycFilter==='all' ? null : state.kycFilter;
+    const res = await ApexAPI.admin.listKyc(filter);
+    state.kyc = res.documents;
+    renderKyc();
+  } catch(err){
+    toast('Failed: ' + err.message, true);
+  }
+}
+function renderKyc(){
+  if (!state.kyc.length) return $('#kycTable').innerHTML = emptyState('No KYC submissions');
+  const cards = state.kyc.map(d=>kycCardHTML(d)).join('');
+  $('#kycTable').innerHTML = `
+    <div class="tx-list">${cards}</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>User</th><th>Type</th><th>Name</th><th>Country</th><th>Status</th><th>Date</th><th></th></tr></thead>
+      <tbody>${state.kyc.map(d=>`
+        <tr>
+          <td data-label="User">${esc(d.userId?.email||'—')}</td>
+          <td data-label="Type"><span style="text-transform:capitalize">${esc((d.documentType||'').replace('_',' '))}</span></td>
+          <td data-label="Name">${esc(d.fullName)||'—'}</td>
+          <td data-label="Country">${esc(d.country)||'—'}</td>
+          <td data-label="Status">${badge(d.status)}</td>
+          <td data-label="Date"><span style="color:var(--text-3);font-size:12px">${formatDate(d.createdAt)}</span></td>
+          <td data-label=""><div class="row-actions">
+            ${d.status==='pending'?`
+              <button class="btn btn-success btn-xs" onclick="reviewKyc('${d._id}','approve')">Approve</button>
+              <button class="btn btn-danger btn-xs" onclick="reviewKyc('${d._id}','reject')">Reject</button>
+            `:'<span style="color:var(--text-3);font-size:12px">—</span>'}
+          </div></td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+}
+function reviewKyc(id,action){
+  openAction(
+    action==='approve'?'Approve KYC':'Reject KYC',
+    action==='approve'?'User can now trade and withdraw.':'User must re-submit documents.',
+    async (note)=>{
+      await ApexAPI.admin.reviewKyc(id,action,note);
+      toast('KYC ' + (action==='approve'?'approved':'rejected'));
+      loadKyc(); pollBadges();
+    });
+}
+
+// ---------- WALLETS ----------
+async function loadWallets(){
+  try{
+    const res = await ApexAPI.admin.listWallets();
+    state.wallets = res.wallets;
+    renderWallets();
+  } catch(err){
+    toast('Failed: ' + err.message, true);
+  }
+}
+function renderWallets(){
+  if (!state.wallets.length) return $('#walletsTable').innerHTML = emptyState('No wallets yet — tap "Add Wallet" to create one');
+  const cards = state.wallets.map(w=>walletCardHTML(w)).join('');
+  $('#walletsTable').innerHTML = `
+    <div class="tx-list">${cards}</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Label</th><th>Asset</th><th>Network</th><th>Address</th><th>Status</th><th></th></tr></thead>
+      <tbody>${state.wallets.map(w=>`
+        <tr>
+          <td data-label="Label"><strong>${esc(w.label)}</strong></td>
+          <td data-label="Asset"><span class="badge badge-admin">${esc(w.asset)}</span></td>
+          <td data-label="Network">${esc(w.network)}</td>
+          <td data-label="Address"><span class="mono truncate" style="max-width:60vw;display:inline-block;vertical-align:middle" title="${esc(w.address)}">${esc(w.address.slice(0,20))}…</span></td>
+          <td data-label="Status">${w.active?'<span class="badge badge-active">Active</span>':'<span class="badge badge-disabled">Off</span>'}</td>
+          <td data-label=""><div class="row-actions">
+            <button class="btn btn-ghost btn-xs" onclick='editWallet(${JSON.stringify(w).replace(/'/g,"&apos;")})'>Edit</button>
+            <button class="btn btn-danger btn-xs" onclick="deleteWallet('${w._id}')">Delete</button>
+          </div></td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+}
+
+function bindWalletForm(){
+  $('#addWalletBtn').addEventListener('click',()=>{
+    $('#walletModalTitle').textContent = 'Add Wallet';
+    $('#walletId').value='';
+    ['wLabel','wAsset','wNetwork','wAddress','wMemo','wQrUrl'].forEach(id=>$('#'+id).value='');
+    $('#wSortOrder').value = state.wallets.length + 1;
+    $('#wActive').checked = true;
+    $('#walletModal').classList.add('show');
+  });
+
+  $('#walletSaveBtn').addEventListener('click', async ()=>{
+    try{
+      const data = {
+        label: $('#wLabel').value.trim(),
+        asset: $('#wAsset').value.trim(),
+        network: $('#wNetwork').value.trim(),
+        address: $('#wAddress').value.trim(),
+        memo: $('#wMemo').value.trim(),
+        qrUrl: $('#wQrUrl').value.trim(),
+        sortOrder: parseInt($('#wSortOrder').value)||0,
+        active: $('#wActive').checked,
+      };
+      if (!data.label || !data.asset || !data.network || !data.address) {
+        toast('Label, asset, network, and address are required', true);
+        return;
+      }
+      const id = $('#walletId').value;
+      if (id) {
+        await ApexAPI.admin.updateWallet(id,data);
+        toast('Wallet updated');
+      } else {
+        await ApexAPI.admin.createWallet(data);
+        toast('Wallet created');
+      }
+      $('#walletModal').classList.remove('show');
+      loadWallets();
+    } catch(err){
+      toast('Failed: ' + err.message, true);
+    }
+  });
+}
+
+function editWallet(w){
+  $('#walletModalTitle').textContent = 'Edit Wallet';
+  $('#walletId').value = w._id;
+  $('#wLabel').value = w.label||'';
+  $('#wAsset').value = w.asset||'';
+  $('#wNetwork').value = w.network||'';
+  $('#wAddress').value = w.address||'';
+  $('#wMemo').value = w.memo||'';
+  $('#wQrUrl').value = w.qrUrl||'';
+  $('#wSortOrder').value = w.sortOrder||0;
+  $('#wActive').checked = !!w.active;
+  $('#walletModal').classList.add('show');
+}
+
+async function deleteWallet(id){
+  if (!confirm('Delete this wallet? This cannot be undone.')) return;
+  try{
+    await ApexAPI.admin.deleteWallet(id);
+    toast('Wallet deleted');
+    loadWallets();
+  } catch(err){
+    toast('Failed: ' + err.message, true);
+  }
+}
+
+// ---------- ACTION MODAL ----------
+let actionCallback = null;
+function openAction(title, sub, callback){
+  $('#actionModalTitle').textContent = title;
+  $('#actionModalSub').textContent = sub||'';
+  $('#actionNote').value='';
+  actionCallback = callback;
+  $('#actionModal').classList.add('show');
+}
+$('#actionConfirmBtn').addEventListener('click', async ()=>{
+  try{
+    await actionCallback($('#actionNote').value.trim());
+    $('#actionModal').classList.remove('show');
+  } catch(err){
+    toast('Failed: ' + err.message, true);
+  }
+});
+
+// ---------- BALANCE ----------
+function openBalance(userId, email){
+  $('#balanceUserId').value = userId;
+  $('#balanceModalSub').textContent = 'Adjust balance for ' + email;
+  $('#balanceAmount').value='';
+  $('#balanceReason').value='';
+  $('#balanceType').value='adjust';
+  $('#balanceModal').classList.add('show');
+}
+function bindBalanceForm(){
+  $('#balanceConfirmBtn').addEventListener('click', async ()=>{
+    try{
+      const userId = $('#balanceUserId').value;
+      const amount = parseFloat($('#balanceAmount').value);
+      const reason = $('#balanceReason').value.trim();
+      const type = $('#balanceType').value;
+      if (isNaN(amount)) { toast('Amount required', true); return; }
+      await ApexAPI.admin.adjustBalance(userId, amount, reason, type);
+      toast('Balance updated');
+      $('#balanceModal').classList.remove('show');
+      $('#userModal').classList.remove('show');
+      loadUsers();
+    } catch(err){
+      toast('Failed: ' + err.message, true);
+    }
+  });
+}
+
+
+function txCardHTML(t, kind){
+  const dir = kind === 'deposit' ? 'in' : 'out';
+  const icon = kind === 'deposit'
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>';
+  const actions = t.status === 'pending'
+    ? (kind === 'deposit'
+      ? `<button class="btn btn-success btn-xs" onclick="event.stopPropagation();reviewDeposit('${t._id}','approve')">Approve</button>
+         <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();reviewDeposit('${t._id}','reject')">Reject</button>`
+      : `<button class="btn btn-warn btn-xs" onclick="event.stopPropagation();reviewWithdrawal('${t._id}','approve')">Process</button>
+         <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();reviewWithdrawal('${t._id}','reject')">Reject</button>`)
+    : (t.status === 'processing' && kind === 'withdrawal'
+      ? `<button class="btn btn-success btn-xs" onclick="event.stopPropagation();reviewWithdrawal('${t._id}','complete')">Complete</button>
+         <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();reviewWithdrawal('${t._id}','reject')">Reject</button>`
+      : '');
+  return `<div class="tx-card">
+    <div class="tx-icon ${dir}">${icon}</div>
+    <div class="tx-info">
+      <div class="tx-title">${esc(t.userId?.email||'—')}</div>
+      <div class="tx-sub"><span style="text-transform:capitalize">${esc(t.method)}</span> · ${esc(t.asset||'USD')} · ${formatDate(t.createdAt)}</div>
+    </div>
+    <div class="tx-right">
+      <div class="tx-amount">$${money(t.amountUSD)}</div>
+      ${badge(t.status)}
+    </div>
+  </div>
+  ${actions ? `<div class="tx-meta-row"><span>Actions</span><div style="display:flex;gap:6px">${actions}</div></div>` : ''}`;
+}
+
+function kycCardHTML(d){
+  const actions = d.status === 'pending'
+    ? `<button class="btn btn-success btn-xs" onclick="event.stopPropagation();reviewKyc('${d._id}','approve')">Approve</button>
+       <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();reviewKyc('${d._id}','reject')">Reject</button>`
+    : '';
+  return `<div class="tx-card">
+    <div class="tx-icon kyc">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    </div>
+    <div class="tx-info">
+      <div class="tx-title">${esc(d.fullName)||esc(d.userId?.email)||'—'}</div>
+      <div class="tx-sub"><span style="text-transform:capitalize">${esc((d.documentType||'').replace('_',' '))}</span> · ${esc(d.country)||'—'} · ${formatDate(d.createdAt)}</div>
+    </div>
+    <div class="tx-right">${badge(d.status)}</div>
+  </div>
+  ${actions ? `<div class="tx-meta-row"><span>Actions</span><div style="display:flex;gap:6px">${actions}</div></div>` : ''}`;
+}
+
+function walletCardHTML(w){
+  return `<div class="tx-card">
+    <div class="tx-icon ${w.active?'in':'out'}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+    </div>
+    <div class="tx-info">
+      <div class="tx-title">${esc(w.label)} <span class="badge badge-admin" style="font-size:9px;padding:1px 6px;margin-left:4px">${esc(w.asset)}</span></div>
+      <div class="tx-sub">${esc(w.network)} · <span class="mono">${esc(w.address.slice(0,16))}…</span></div>
+    </div>
+    <div class="tx-right">${w.active?'<span class="badge badge-active">Active</span>':'<span class="badge badge-disabled">Off</span>'}</div>
+  </div>
+  <div class="tx-meta-row"><span>Actions</span><div style="display:flex;gap:6px">
+    <button class="btn btn-ghost btn-xs" onclick='editWallet(${JSON.stringify(w).replace(/'/g,"&apos;")})'>Edit</button>
+    <button class="btn btn-danger btn-xs" onclick="deleteWallet('${w._id}')">Delete</button>
+  </div></div>`;
+}
+
+// ---------- HELPERS ----------
+function badge(status){
+  const map = {
+    pending:'badge-pending', approved:'badge-approved', rejected:'badge-rejected',
+    processing:'badge-processing', completed:'badge-completed',
+    active:'badge-active', disabled:'badge-disabled',
+    not_submitted:'badge-not_submitted', cancelled:'badge-rejected',
+  };
+  const cls = map[status] || 'badge-pending';
+  const label = (status||'—').replace('_',' ');
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function emptyState(msg){
+  return `<div class="empty">
+    <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
+    <div>${esc(msg)}</div>
+  </div>`;
+}
+
+function esc(s){
+  if (s===null||s===undefined) return '';
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function money(n){
+  return Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function formatDate(d){
+  if (!d) return '—';
+  const date = new Date(d);
+  const today = new Date();
+  const sameDay = date.toDateString() === today.toDateString();
+  if (sameDay) return date.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  return date.toLocaleDateString();
+}
+
+// expose
+window.viewUser = viewUser;
+window.saveUser = saveUser;
+window.reviewDeposit = reviewDeposit;
+window.reviewWithdrawal = reviewWithdrawal;
+window.reviewKyc = reviewKyc;
+window.editWallet = editWallet;
+window.deleteWallet = deleteWallet;
+window.openBalance = openBalance;
+
+init();
+</script>
+</body>
+</html>
