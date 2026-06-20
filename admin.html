@@ -1612,13 +1612,13 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           Approve Account
         </button>
-          <button class="act-btn success" id="kycBtn" onclick="window._approveKyc()">
+          <button class="act-btn success" id="kycBtn" onclick="window._toggleKycApproval()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
             Approve KYC
           </button>
-          <button class="act-btn warn" id="adminBtn" onclick="window._toggleAdmin()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Toggle Admin
+          <button class="act-btn" id="loginAsBtn" onclick="window._loginAsUser()" style="background:rgba(59,130,246,.15);color:#3b82f6;border:1px solid rgba(59,130,246,.3)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Login as User
           </button>
         </div>
 
@@ -4839,6 +4839,69 @@ window._revokeAccount = async function(){
   if(typeof populateModal === 'function') populateModal(currentUser);
   await loadCustomers();
 };
+
+window._toggleKycApproval = async function(){
+  if(!currentUser) return;
+  if(currentUser.kyc_status === 'verified'){
+    await window._revokeKyc();
+  } else {
+    await window._approveKyc();
+  }
+};
+
+window._revokeKyc = async function(){
+  if(!currentUser) return;
+  var ok = await apexConfirm({
+    title: 'Revoke KYC Verification?',
+    body: 'User KYC status will be reset. They may need to resubmit documents.',
+    okLabel: 'Revoke KYC',
+    danger: true
+  });
+  if(!ok) return;
+  var { error } = await sb.from('profiles').update({ kyc_status: 'pending' }).eq('id', currentUser.id);
+  if(error){ apexError(error.message); return; }
+  try {
+    await sb.from('admin_log').insert({
+      admin_id: state.user.id,
+      action: 'revoke_kyc',
+      target_type: 'user',
+      target_id: currentUser.id
+    });
+  } catch(e){}
+  apexSuccess('KYC verification revoked');
+  currentUser.kyc_status = 'pending';
+  if(typeof populateModal === 'function') populateModal(currentUser);
+  await loadCustomers();
+};
+
+window._loginAsUser = async function(){
+  if(!currentUser) return;
+  if(currentUser.is_admin){
+    apexError('Cannot impersonate another admin account.');
+    return;
+  }
+  var ok = await apexConfirm({
+    title: 'Login as ' + (currentUser.first_name || currentUser.email || 'this user') + '?',
+    body: 'You will open a NEW TAB showing the user dashboard with read-only access. All write actions (deposits, KYC, withdrawals, settings) will be blocked. Use Exit View to return.',
+    okLabel: 'Login as User'
+  });
+  if(!ok) return;
+  try {
+    await sb.from('admin_log').insert({
+      admin_id: state.user.id,
+      action: 'view_as_user_start',
+      target_type: 'user',
+      target_id: currentUser.id
+    });
+  } catch(e){}
+  var fullName = ((currentUser.first_name||'') + ' ' + (currentUser.last_name||'')).trim() || currentUser.email || 'User';
+  sessionStorage.setItem('apex_view_as_user', currentUser.id);
+  sessionStorage.setItem('apex_view_as_user_name', fullName);
+  sessionStorage.setItem('apex_view_as_user_email', currentUser.email || '');
+  sessionStorage.setItem('apex_view_as_admin', state.user.id);
+  window.open('dashboard.html', '_blank');
+};
+
 
 
 window._rejectAccount = async function(){
