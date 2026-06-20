@@ -193,7 +193,7 @@ async function verifyToken(token){
   if(!u.user){ window.location.href = 'login.html'; return; }
 
   const { data: p } = await sb.from('profiles').select('*').eq('id', u.user.id).single();
-  if(!p || (p.kyc_status !== 'verified' && !p.is_admin)){
+  if(!p || (p.account_status !== 'approved' && !p.is_admin)){
     window.location.href = 'pending-approval.html';
     return;
   }
