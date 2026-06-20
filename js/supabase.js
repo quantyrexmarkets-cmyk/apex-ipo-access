@@ -109,14 +109,16 @@ window.apex = {
   async getProfile(){
     const user = await this.getUser();
     if (!user) return null;
-    const { data } = await sb.from('profiles').select('*').eq('id', user.id).single();
+    const targetId = sessionStorage.getItem('apex_view_as_user') || user.id;
+    const { data } = await sb.from('profiles').select('*').eq('id', targetId).single();
     return data;
   },
 
   async getActivity(limit = 10){
     const user = await this.getUser();
     if (!user) return [];
-    const { data } = await sb.from('activity_log').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(limit);
+    const targetId = sessionStorage.getItem('apex_view_as_user') || user.id;
+    const { data } = await sb.from('activity_log').select('*').eq('user_id', targetId).order('created_at', { ascending: false }).limit(limit);
     return data || [];
   },
 
