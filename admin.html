@@ -3022,6 +3022,17 @@ window._fnEditStat = async function(field, label, isInt, isPercent){
 window.addEventListener('load', function(){
   setTimeout(async function(){
     try {
+      // Boot: hydrate state.user + state.profile before any loader runs
+      try {
+        var authRes = await sb.auth.getUser();
+        var bootUser = authRes && authRes.data && authRes.data.user;
+        if(bootUser){
+          state.user = bootUser;
+          var profRes = await sb.from('profiles').select('*').eq('id', bootUser.id).single();
+          if(profRes && profRes.data) state.profile = profRes.data;
+        }
+      } catch(bootErr){ console.warn('boot hydrate err', bootErr); }
+
       if(typeof loadCustomers === 'function' && (!window.state || !window.state.users || !window.state.users.length)){
         await loadCustomers();
       }
