@@ -1608,6 +1608,10 @@
         </div>
 
         <div class="act-row">
+        <button class="act-btn success" id="acctBtn" onclick="window._approveAccount()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Approve Account
+        </button>
           <button class="act-btn success" id="kycBtn" onclick="window._approveKyc()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
             Approve KYC
@@ -2493,6 +2497,19 @@
 
     // KYC button label
     var kycBtn = document.getElementById('kycBtn');
+    // Update Approve Account button label
+    var acctBtn = document.getElementById('acctBtn');
+    if (acctBtn) {
+      if (u.account_status === 'approved') {
+        acctBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Revoke Account';
+        acctBtn.classList.remove('success');
+        acctBtn.classList.add('warn');
+      } else {
+        acctBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Approve Account';
+        acctBtn.classList.remove('warn');
+        acctBtn.classList.add('success');
+      }
+    }
     if(u.kyc_status === 'verified'){
       kycBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Revoke KYC';
       kycBtn.className = 'act-btn warn';
