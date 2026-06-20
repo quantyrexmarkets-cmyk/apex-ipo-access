@@ -236,6 +236,8 @@
     }
   });
 
+  checkApproval();
+
   function showApprovedState(){
     // Account is approved — redirect to dashboard immediately
     window.location.replace('dashboard.html');
@@ -245,50 +247,6 @@
     try { await sb.auth.signOut(); } catch(e){}
     window.location.href = 'login.html';
   };
-</script>
-
-
-<script>
-// === DIAGNOSTIC MODE ===
-window.addEventListener('error', function(e){
-  document.body.insertAdjacentHTML('afterbegin',
-    '<div style="background:red;color:white;padding:20px;font-size:14px;position:fixed;top:0;left:0;right:0;z-index:99999">JS ERROR: ' + (e.message || e) + ' at ' + (e.filename || '') + ':' + (e.lineno || '') + '</div>'
-  );
-});
-window.addEventListener('load', function(){
-  setTimeout(function(){
-    var diag = document.createElement('div');
-    diag.style.cssText = 'background:#000;color:#0f0;padding:14px;font-family:monospace;font-size:11px;position:fixed;bottom:0;left:0;right:0;z-index:99999;max-height:50vh;overflow:auto;border-top:2px solid #0f0';
-    var log = '🔍 DIAGNOSTIC:\n';
-    log += 'sb defined: ' + (typeof sb !== 'undefined') + '\n';
-    log += 'sb.auth: ' + (typeof sb !== 'undefined' && !!sb.auth) + '\n';
-    diag.textContent = log;
-    document.body.appendChild(diag);
-
-    if (typeof sb !== 'undefined' && sb.auth) {
-      sb.auth.getUser().then(function(r){
-        var u = r.data && r.data.user;
-        diag.textContent += 'user: ' + (u ? u.email : 'NULL') + '\n';
-        if (u) {
-          sb.from('profiles').select('*').eq('id', u.id).single().then(function(p){
-            if (p.error) {
-              diag.textContent += 'PROFILE ERROR: ' + JSON.stringify(p.error) + '\n';
-            } else if (p.data) {
-              diag.textContent += 'account_status: ' + p.data.account_status + '\n';
-              diag.textContent += 'kyc_status: ' + p.data.kyc_status + '\n';
-              diag.textContent += 'is_admin: ' + p.data.is_admin + '\n';
-              diag.textContent += 'email: ' + p.data.email + '\n';
-              diag.textContent += 'banned: ' + p.data.banned + '\n';
-              diag.textContent += '\n=> Should redirect? ' + (p.data.account_status === 'approved' || p.data.is_admin);
-            } else {
-              diag.textContent += 'PROFILE: NO DATA\n';
-            }
-          });
-        }
-      });
-    }
-  }, 1500);
-});
 </script>
 
 </body>
