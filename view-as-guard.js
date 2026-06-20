@@ -22,6 +22,12 @@
     return;
   }
 
+  // OPTIMISTIC: set flag synchronously so downstream page code can branch immediately.
+  // Async verifyAdmin() below will UNSET if check fails (anti-tamper safety net).
+  window.__VIEW_AS_MODE = true;
+  window.__VIEW_AS_USER_ID = viewAsId;
+  window.__VIEW_AS_ADMIN_ID = adminId;
+
   // Layer 1: verify current auth user is actually admin (anti-tamper)
   function verifyAdmin(){
     if(typeof sb === 'undefined' || !sb || !sb.auth){
