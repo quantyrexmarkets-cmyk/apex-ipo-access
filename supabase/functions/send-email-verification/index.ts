@@ -119,12 +119,8 @@ Deno.serve(async (req) => {
         <tr><td style="padding:0 8px 28px">
           <table role="presentation" cellpadding="0" cellspacing="0">
             <tr>
-              <td align="center" style="vertical-align:middle">
-                <img src="https://apexipoaccess.com/assets/apex-logo-dark.png?v=2" alt="" width="180" style="display:block;max-width:180px;height:auto">
-              </td>
-              <td style="vertical-align:middle">
-                <span class="brand-text" style="font-family:'Oswald','Impact','Helvetica Neue',Arial,sans-serif;font-size:26px;font-weight:600;letter-spacing:2px;text-transform:uppercase">APEX</span>
-                <span class="brand-sub" style="font-family:'Oswald','Impact','Helvetica Neue',Arial,sans-serif;font-size:26px;font-weight:300;letter-spacing:2px;text-transform:uppercase;margin-left:6px">IPO Access</span>
+              <td align="center">
+                <img src="https://apexipoaccess.com/assets/apex-logo-dark.png?v=2" alt="Apex IPO Access" width="220" style="display:block;max-width:220px;height:auto;margin:0 auto">
               </td>
             </tr>
           </table>

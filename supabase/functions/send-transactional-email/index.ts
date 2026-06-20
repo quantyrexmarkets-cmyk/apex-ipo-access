@@ -207,42 +207,33 @@ function shell(opts: {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="light dark">
-<meta name="supported-color-schemes" content="light dark">
+<meta name="color-scheme" content="dark only">
+<meta name="supported-color-schemes" content="dark only">
 <title>${escape(opts.headline)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { color-scheme: light dark; supported-color-schemes: light dark; }
-  body, .bg { background:#1f2123 !important; }
+  :root { color-scheme: dark only; supported-color-schemes: dark only; }
+  body, .bg { background:#1f2123 !important; color:#e3e3e3 !important; }
   .card { background:#28292c !important; }
-  .brand-apex { color:#1a73e8 !important; }
-  .brand-rest { color:#202124 !important; }
-  .headline { color:#202124 !important; }
-  .subtitle { color:#5f6368 !important; }
-  .details { color:#5f6368 !important; }
-  .footer { color:#5f6368 !important; }
-  .footer-strong { color:#3c4043 !important; }
-  .footer-link { color:#1a73e8 !important; }
-  .divider { border-color:#e8eaed !important; }
+  .brand-apex { color:#5fb0ff !important; }
+  .brand-rest { color:#ffffff !important; }
+  .headline { color:#ffffff !important; }
+  .subtitle { color:#bdc1c6 !important; }
+  .details { color:#a0a4a8 !important; }
+  .footer { color:#a0a4a8 !important; }
+  .footer-strong { color:#e3e3e3 !important; }
+  .footer-link { color:#5fb0ff !important; }
+  .divider { border-color:#3c3f43 !important; }
   .cta { background:#1a73e8 !important; color:#ffffff !important; }
-  .inner-box { border-color:#5f6368 !important; }
-  @media (prefers-color-scheme: dark) {
-    .inner-box { border-color:#5f6368 !important; }
-    body, .bg { background:#1f2123 !important; }
-    .card { background:#28292c !important; }
-    .brand-apex { color:#5fb0ff !important; }
-    .brand-rest { color:#ffffff !important; }
-    .headline { color:#ffffff !important; }
-    .subtitle { color:#bdc1c6 !important; }
-    .details { color:#a0a4a8 !important; }
-    .footer { color:#a0a4a8 !important; }
-    .footer-strong { color:#e3e3e3 !important; }
-    .footer-link { color:#5fb0ff !important; }
-    .divider { border-color:#3c3f43 !important; }
-    .cta { background:#1a73e8 !important; color:#ffffff !important; }
-  }
+  .inner-box { border-color:#3c3f43 !important; }
+  /* Force dark even when client tries to invert */
+  [data-ogsc] body, [data-ogsc] .bg { background:#1f2123 !important; }
+  [data-ogsc] .card { background:#28292c !important; }
+  [data-ogsc] .headline { color:#ffffff !important; }
+  [data-ogsc] .subtitle { color:#bdc1c6 !important; }
+  [data-ogsc] .details { color:#a0a4a8 !important; }
   @media only screen and (max-width:600px) {
     .headline { font-size:26px !important; line-height:1.35 !important; font-weight:400 !important; padding:16px 24px 24px !important; }
     .card { border-radius:16px !important; }
