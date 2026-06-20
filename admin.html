@@ -2436,7 +2436,7 @@
     // Set overview tab default
     switchPane('overview');
     // Load activity in background
-    loadUserActivity(u.id);
+    if(typeof window.loadUserActivity === "function") window.loadUserActivity(u.id);
   };
 
   window._closeUser = function(){
