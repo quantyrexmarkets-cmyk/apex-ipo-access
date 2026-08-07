@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -8,16 +9,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Browse IPOs | Apex IPO Access</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
-<script src="js/apex-api.js?v=1"></script>
-<script src="js/supabase.js?v=1781643381"></script>
-<script src="js/notify.js?v=1781643381"></script>
-<script src="js/sidebar.js?v=2" defer></script>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script src="/js/notify.js?v=1786129802"></script>
+<script src="/js/sidebar.js?v=1786129802" defer></script>
 <script>
-  document.addEventListener('sb-ready', async () => {
-    const { data } = await sb.auth.getUser();
-    if(!data.user) window.location.href = 'login.html';
-  });
+  (async () => {
+    try {
+      const r = await fetch('/api/auth?action=me', { credentials: 'include' });
+      const j = await r.json();
+      if (!j.ok || !j.user) window.location.href = 'login.html';
+    } catch(e) { window.location.href = 'login.html'; }
+  })();
 </script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
@@ -278,7 +281,7 @@
   <button class="menu-btn" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
-  <a href="dashboard.html" class="logo">
+  <a href="/dashboard.html" class="logo">
     <img src="assets/spacex-logo.png" class="logo-x" alt="X" />
     <div class="logo-text-stack">
       <span class="logo-line1">APEX</span>
@@ -299,7 +302,7 @@
 <div class="page-title">
   <div class="lede">Investment Opportunities</div>
   <h1>Browse IPOs</h1>
-  <div class="sub">Curated pre-IPO allocations from leading private companies</div>
+  <div class="sub">Curated IPO allocations from leading private companies</div>
 </div>
 
 <div class="wrap">
@@ -356,23 +359,23 @@
 
 <!-- BOTTOM TAB NAV -->
 <nav class="tab-nav">
-  <div onclick="location.href='dashboard.html'" class="tab">
+  <div onclick="location.href='/dashboard.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span class="lbl">Home</span>
   </div>
-  <div onclick="location.href='portfolio.html'" class="tab">
+  <div onclick="location.href='/portfolio.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
     <span class="lbl">Portfolio</span>
   </div>
-  <div onclick="location.href='ipos.html'" class="tab">
+  <div onclick="location.href='/ipos.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
     <span class="lbl">IPOs</span>
   </div>
-  <div onclick="location.href='docs.html'" class="tab">
+  <div onclick="location.href='/docs.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
     <span class="lbl">Docs</span>
   </div>
-  <div onclick="location.href='account.html'" class="tab">
+  <div onclick="location.href='/account.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>
     <span class="lbl">Account</span>
   </div>
@@ -380,7 +383,6 @@
 
 <script>
 (async function(){
-  if(!window.sb) await new Promise(r => document.addEventListener('sb-ready', r, { once:true }));
 
   const fmt = n => '$' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 
@@ -388,7 +390,42 @@
   const VRF_SVG = '<svg class="vrf" viewBox="0 0 22 22"><path fill="currentColor" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.751-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg>';
 
   // Load all companies
-  const { data: companies, error } = await sb.from('companies').select('*');
+  let companies = null, error = null;
+  try {
+    
+  // ─── Live price integration (public tickers via Finnhub) ───
+  window.PUBLIC_TICKERS = window.PUBLIC_TICKERS || { TESLA:'TSLA', AAPL:'AAPL', MSFT:'MSFT', GOOGL:'GOOGL', AMZN:'AMZN', META:'META', NVDA:'NVDA', V:'V', NXPI:'NXPI', UBS:'UBS', JPM:'JPM', BAC:'BAC', NFLX:'NFLX', PLTR:'PLTR' };
+
+  window._apexRouteFor = function(ticker, stage) {
+    const s = (stage || '').toLowerCase();
+    if (s === 'public' || s === 'crypto') return '/trade?ticker=' + encodeURIComponent(ticker);
+    return '/buy-shares.html?ticker=' + encodeURIComponent(ticker);
+  }
+
+  window.loadLiveQuotes = async function(companies) {
+    const pub = companies
+      .map(c => ({ db: (c.ticker||'').toUpperCase(), live: window.PUBLIC_TICKERS[(c.ticker||'').toUpperCase()] }))
+      .filter(x => x.live);
+    if (!pub.length) return {};
+    try {
+      const syms = pub.map(x => x.live).join(',');
+      const r = await fetch('/api/companies?live=' + encodeURIComponent(syms));
+      const j = await r.json();
+      if (!j.ok) return {};
+      const bySym = {}; (j.quotes||[]).forEach(q => bySym[q.symbol] = q);
+      const byDb = {};
+      pub.forEach(x => { if (bySym[x.live]) byDb[x.db] = bySym[x.live]; });
+      return byDb;
+    } catch(e) { return {}; }
+  }
+  window._liveQuotes = {};
+  
+  const _r = await fetch('/api/companies');
+    const _j = await _r.json();
+    if (_j.ok && _j.companies) { window._liveQuotes = await window.loadLiveQuotes(_j.companies); }
+    if (!_j.ok) { error = { message: _j.error || 'Load failed' }; }
+    else { companies = _j.companies; }
+  } catch(e) { error = { message: e.message }; }
   if(error || !companies){
     document.getElementById('ipoGrid').innerHTML = `
       <div class="empty">
@@ -401,7 +438,7 @@
   // Categorization
   function categoryOf(c){
     const s = (c.sector || '').toLowerCase();
-    if(c.is_musk) return ['musk'];
+    if((c.isMusk || c.is_musk)) return ['musk'];
     const cats = [];
     if(/\bai\b|foundation models|developer/.test(s)) cats.push('ai');
     if(/fintech|payment|bank|bnpl/.test(s)) cats.push('fintech');
@@ -430,7 +467,7 @@
   function matchesFilter(c){
     if(activeFilter === 'all') return true;
     if(activeFilter === 'hot') return isHot(c);
-    if(activeFilter === 'musk') return c.is_musk;
+    if(activeFilter === 'musk') return (c.isMusk || c.is_musk);
     return categoryOf(c).includes(activeFilter);
   }
 
@@ -446,8 +483,8 @@
   function sortCompanies(list){
     const arr = [...list];
     switch(activeSort){
-      case 'price-high': return arr.sort((a,b) => b.price_per_share - a.price_per_share);
-      case 'price-low':  return arr.sort((a,b) => a.price_per_share - b.price_per_share);
+      case 'price-high': return arr.sort((a,b) => (b.pricePerShare || b.price_per_share || 0) - (a.pricePerShare || a.price_per_share || 0));
+      case 'price-low':  return arr.sort((a,b) => (a.pricePerShare || a.price_per_share || 0) - (b.pricePerShare || b.price_per_share || 0));
       case 'name':       return arr.sort((a,b) => (a.name||'').localeCompare(b.name||''));
       case 'growth':     return arr.sort((a,b) => {
         const ga = parseInt((a.growth_yoy||'0').replace(/\D/g,'')) || 0;
@@ -456,7 +493,7 @@
       });
       default: // featured: Musk first → featured → rest
         return arr.sort((a,b) => {
-          if(a.is_musk !== b.is_musk) return b.is_musk - a.is_musk;
+          if((a.isMusk || a.is_musk) !== (b.isMusk || b.is_musk)) return (b.isMusk || b.is_musk) - (a.isMusk || a.is_musk);
           if(a.is_featured !== b.is_featured) return b.is_featured - a.is_featured;
           return 0;
         });
@@ -484,17 +521,17 @@
 
     grid.innerHTML = list.map(c => {
       const logo = c.domain ? `https://icons.duckduckgo.com/ip3/${c.domain}.ico` : '';
-      const muskBadge = c.is_musk ? `<span class="musk-badge">${VRF_SVG}Musk</span>` : '';
+      const muskBadge = (c.isMusk || c.is_musk) ? `<span class="musk-badge">${VRF_SVG}Musk</span>` : '';
       const hot = isHot(c) ? `<div class="hot-badge">🔥 Hot</div>` : '';
 
       // Parse expected return for color coding
-      const m = (c.expected_return || '').match(/\+(\d+)%\s*to\s*\+(\d+)%/);
+      const m = (c.expectedReturn || c.expected_return || '').match(/\+(\d+)%\s*to\s*\+(\d+)%/);
       const midPct = m ? Math.round((parseInt(m[1]) + parseInt(m[2])) / 2) : 0;
       const retClass = midPct >= 60 ? 'high' : (midPct >= 30 ? 'med' : '');
       const retText = midPct ? `+${midPct}% est.` : '';
 
       return `
-        <div class="ipo-card ${c.is_musk ? 'musk' : ''}" onclick="location.href='buy-shares.html?ticker=${c.ticker}'">
+        <div class="ipo-card ${(c.isMusk || c.is_musk) ? 'musk' : ''}" onclick="location.href='${window._apexRouteFor(c.ticker, c.stage)}'">
           ${hot}
           <div class="ipo-logo">
             <img src="${logo}" alt="${c.name}" loading="lazy" onerror="this.parentElement.innerHTML='<div style=&quot;color:#000;font-weight:700;font-size:18px&quot;>${(c.name||'?')[0]}</div>'">
@@ -510,7 +547,15 @@
             </div>
           </div>
           <div class="ipo-right">
-            <div class="ipo-price">${fmt(c.price_per_share)}</div>
+            <div class="ipo-price">${(function(){
+              const live = window._liveQuotes[(c.ticker||'').toUpperCase()];
+              if (live && typeof live.price === 'number') {
+                const col = live.changePercent >= 0 ? '#17e08a' : '#ff5c5c';
+                const sign = live.changePercent >= 0 ? '+' : '';
+                return `$${live.price.toFixed(2)}<div style="font-size:11px;font-weight:600;color:${col};margin-top:2px">${sign}${live.changePercent.toFixed(2)}%</div>`;
+              }
+              return fmt(c.pricePerShare || c.price_per_share);
+            })()}</div>
             ${retText ? `<div class="ipo-return ${retClass}">${retText}</div>` : ''}
           </div>
         </div>
@@ -557,7 +602,6 @@
 
 <script>
 (async function(){
-  if(!window.sb) await new Promise(r => document.addEventListener('sb-ready', r, { once:true }));
 
   const fmt = n => '$' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 
@@ -565,7 +609,14 @@
   const VRF_SVG = '<svg class="vrf" viewBox="0 0 22 22"><path fill="currentColor" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.751-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg>';
 
   // Load all companies
-  const { data: companies, error } = await sb.from('companies').select('*');
+  let companies = null, error = null;
+  try {
+    const _r = await fetch('/api/companies');
+    const _j = await _r.json();
+    if (_j.ok && _j.companies) { window._liveQuotes = await window.loadLiveQuotes(_j.companies); }
+    if (!_j.ok) { error = { message: _j.error || 'Load failed' }; }
+    else { companies = _j.companies; }
+  } catch(e) { error = { message: e.message }; }
   if(error || !companies){
     document.getElementById('ipoGrid').innerHTML = `
       <div class="empty">
@@ -578,7 +629,7 @@
   // Categorization
   function categoryOf(c){
     const s = (c.sector || '').toLowerCase();
-    if(c.is_musk) return ['musk'];
+    if((c.isMusk || c.is_musk)) return ['musk'];
     const cats = [];
     if(/\bai\b|foundation models|developer/.test(s)) cats.push('ai');
     if(/fintech|payment|bank|bnpl/.test(s)) cats.push('fintech');
@@ -607,7 +658,7 @@
   function matchesFilter(c){
     if(activeFilter === 'all') return true;
     if(activeFilter === 'hot') return isHot(c);
-    if(activeFilter === 'musk') return c.is_musk;
+    if(activeFilter === 'musk') return (c.isMusk || c.is_musk);
     return categoryOf(c).includes(activeFilter);
   }
 
@@ -623,8 +674,8 @@
   function sortCompanies(list){
     const arr = [...list];
     switch(activeSort){
-      case 'price-high': return arr.sort((a,b) => b.price_per_share - a.price_per_share);
-      case 'price-low':  return arr.sort((a,b) => a.price_per_share - b.price_per_share);
+      case 'price-high': return arr.sort((a,b) => (b.pricePerShare || b.price_per_share || 0) - (a.pricePerShare || a.price_per_share || 0));
+      case 'price-low':  return arr.sort((a,b) => (a.pricePerShare || a.price_per_share || 0) - (b.pricePerShare || b.price_per_share || 0));
       case 'name':       return arr.sort((a,b) => (a.name||'').localeCompare(b.name||''));
       case 'growth':     return arr.sort((a,b) => {
         const ga = parseInt((a.growth_yoy||'0').replace(/\D/g,'')) || 0;
@@ -633,7 +684,7 @@
       });
       default: // featured: Musk first → featured → rest
         return arr.sort((a,b) => {
-          if(a.is_musk !== b.is_musk) return b.is_musk - a.is_musk;
+          if((a.isMusk || a.is_musk) !== (b.isMusk || b.is_musk)) return (b.isMusk || b.is_musk) - (a.isMusk || a.is_musk);
           if(a.is_featured !== b.is_featured) return b.is_featured - a.is_featured;
           return 0;
         });
@@ -661,17 +712,17 @@
 
     grid.innerHTML = list.map(c => {
       const logo = c.domain ? `https://icons.duckduckgo.com/ip3/${c.domain}.ico` : '';
-      const muskBadge = c.is_musk ? `<span class="musk-badge">${VRF_SVG}Musk</span>` : '';
+      const muskBadge = (c.isMusk || c.is_musk) ? `<span class="musk-badge">${VRF_SVG}Musk</span>` : '';
       const hot = isHot(c) ? `<div class="hot-badge">🔥 Hot</div>` : '';
 
       // Parse expected return for color coding
-      const m = (c.expected_return || '').match(/\+(\d+)%\s*to\s*\+(\d+)%/);
+      const m = (c.expectedReturn || c.expected_return || '').match(/\+(\d+)%\s*to\s*\+(\d+)%/);
       const midPct = m ? Math.round((parseInt(m[1]) + parseInt(m[2])) / 2) : 0;
       const retClass = midPct >= 60 ? 'high' : (midPct >= 30 ? 'med' : '');
       const retText = midPct ? `+${midPct}% est.` : '';
 
       return `
-        <div class="ipo-card ${c.is_musk ? 'musk' : ''}" onclick="location.href='buy-shares.html?ticker=${c.ticker}'">
+        <div class="ipo-card ${(c.isMusk || c.is_musk) ? 'musk' : ''}" onclick="location.href='${window._apexRouteFor(c.ticker, c.stage)}'">
           ${hot}
           <div class="ipo-logo">
             <img src="${logo}" alt="${c.name}" loading="lazy" onerror="this.parentElement.innerHTML='<div style=&quot;color:#000;font-weight:700;font-size:18px&quot;>${(c.name||'?')[0]}</div>'">
@@ -687,7 +738,15 @@
             </div>
           </div>
           <div class="ipo-right">
-            <div class="ipo-price">${fmt(c.price_per_share)}</div>
+            <div class="ipo-price">${(function(){
+              const live = window._liveQuotes[(c.ticker||'').toUpperCase()];
+              if (live && typeof live.price === 'number') {
+                const col = live.changePercent >= 0 ? '#17e08a' : '#ff5c5c';
+                const sign = live.changePercent >= 0 ? '+' : '';
+                return `$${live.price.toFixed(2)}<div style="font-size:11px;font-weight:600;color:${col};margin-top:2px">${sign}${live.changePercent.toFixed(2)}%</div>`;
+              }
+              return fmt(c.pricePerShare || c.price_per_share);
+            })()}</div>
             ${retText ? `<div class="ipo-return ${retClass}">${retText}</div>` : ''}
           </div>
         </div>
@@ -759,7 +818,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (looksLikeDocs && isDead) {
       if (el.tagName === 'A') el.setAttribute('href', 'docs.html');
-      el.setAttribute('onclick', "location.href='docs.html'");
+      el.setAttribute('onclick', "location.href='/docs.html'");
       el.style.cursor = 'pointer';
     }
   });
@@ -767,9 +826,9 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 <!-- /docs-quicknav-fix -->
 
-<script src="js/bottom-nav.js?v=1"></script>
-<script src="js/floating-widget.js?v=1781343118" defer></script>
-  <script src="js/user-bell.js?v=1"></script>
-  <script src="js/session-guard.js?v=3" defer></script>
+<script src="/js/bottom-nav.js?v=1786129802"></script>
+<script src="/js/floating-widget.js?v=1786129802" defer></script>
+  <script src="/js/user-bell.js?v=1786129802"></script>
+  <script src="/js/session-guard.js?v=1786129802" defer></script>
 </body>
 </html>

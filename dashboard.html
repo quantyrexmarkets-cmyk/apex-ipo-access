@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -332,7 +333,7 @@
     border:1px solid rgba(255,255,255,0.08);
     border-radius:16px;
     padding:20px;
-    margin-bottom:18px;
+    margin:0 16px 18px;
     position:relative;
     overflow:hidden;
   }
@@ -576,10 +577,11 @@
   .lp-change.up{ color:#3ed598; background:rgba(62,213,152,0.1); }
   .lp-change.down{ color:#ff6a6a; background:rgba(255,106,106,0.1); }
 
+
 </style>
-<script src="js/apex-api.js?v=1"></script>
-<script src="js/supabase.js?v=1781242485"></script>
-<script src="js/notify.js?v=1"></script>
+<script src="js/apex-api.js?v=1786129802"></script>
+<script src="js/supabase.js?v=1786130265"></script>
+<script src="js/notify.js?v=1786129802"></script>
 <script>
   // AUTH GUARD
   document.addEventListener('sb-ready', async () => {
@@ -604,7 +606,7 @@
     }
   }
  });</script>
-<script src="js/sidebar.js?v=2" defer></script>
+<script src="js/sidebar.js?v=1786129802" defer></script>
 </head>
 <body>
 
@@ -621,7 +623,7 @@
     </div>
   </a>
   <div class="header-icons">
-      <button class="notif-bell-btn" id="notifBell" onclick="window._toggleNotifs()" aria-label="Notifications" style="position:relative;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);background:none;color:#4a9eff;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-right:8px">
+      <button class="notif-bell-btn icon-btn" id="notifBell" aria-label="Notifications" style="position:relative;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);background:none;color:#4a9eff;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-right:8px">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         <span id="notifBadge" style="display:none;position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 4px;background:#ff6a6a;color:#000;border-radius:9px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #000;font-family:Manrope,sans-serif">0</span>
       </button>
@@ -642,7 +644,7 @@
       <span class="status-dot"></span>LIVE · TRADING
     </span>
     <span class="ticker-badge">
-      <span class="ticker-label">PRE-IPO</span>
+      <span class="ticker-label">IPO</span>
       <span class="ticker-sym">SPCX</span>
     </span>
   </div>
@@ -663,10 +665,7 @@
     <div class="value-label">Market Value</div>
     <div class="value-row">
       <div class="value-amount" id="heroValue">$0.00</div>
-      <div class="value-change" id="heroChange">
-        <span class="change-dot"></span>No position
-      </div>
-    </div>
+</div>
   </div>
 
   <div class="divider"></div>
@@ -881,498 +880,83 @@
     <a href="#" class="more">Browse →</a>
   </div>
 
-  <div class="opp-section-label"><svg class="vrf-ic" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><path fill="#4a9eff" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.751-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg><span>Musk Portfolio Companies</span></div>
-  <div class="opp-scroll">
-    <div onclick="location.href='buy-shares.html?ticker=SPCX'" style="cursor:pointer" class="opp-card featured">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/spacex.com.ico" alt="SpaceX" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=spacex.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">SpaceX <span class="musk-badge"><svg class="vrf-ic" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><path fill="#4a9eff" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.751-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg>Musk</span></div>
-          <div class="opp-meta">Aerospace · Satellite Communications</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$150.00/sh</span>
-          <span class="opp-pct">+42.8%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=XAI'" style="cursor:pointer" class="opp-card featured">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/x.ai.ico" alt="xAI" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=x.ai&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">xAI <span class="musk-badge"><svg class="vrf-ic" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><path fill="#4a9eff" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.751-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg>Musk</span></div>
-          <div class="opp-meta">AI · Foundation Models</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$145.00/sh</span>
-          <span class="opp-pct">+125.0%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=NLNK'" style="cursor:pointer" class="opp-card featured">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/neuralink.com.ico" alt="Neuralink" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=neuralink.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Neuralink <span class="musk-badge"><svg class="vrf-ic" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><path fill="#4a9eff" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.751-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg>Musk</span></div>
-          <div class="opp-meta">Neurotech · BCI</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$85.00/sh</span>
-          <span class="opp-pct">+95.0%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=TBC'" style="cursor:pointer" class="opp-card featured">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/boringcompany.com.ico" alt="The Boring Company" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=boringcompany.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">The Boring Company <span class="musk-badge"><svg class="vrf-ic" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><path fill="#4a9eff" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.751-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg>Musk</span></div>
-          <div class="opp-meta">Infrastructure · Tunneling</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$62.00/sh</span>
-          <span class="opp-pct">+38.0%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=XCOM'" style="cursor:pointer" class="opp-card featured">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/x.com.ico" alt="X (formerly Twitter)" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=x.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">X (formerly Twitter) <span class="musk-badge"><svg class="vrf-ic" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><path fill="#4a9eff" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.751-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg>Musk</span></div>
-          <div class="opp-meta">Social · Communication</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$95.00/sh</span>
-          <span class="opp-pct">+15.0%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=TSLA'" style="cursor:pointer" class="opp-card featured">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/tesla.com.ico" alt="Tesla" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=tesla.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Tesla <span class="musk-badge"><svg class="vrf-ic" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><path fill="#4a9eff" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.751-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg>Musk</span></div>
-          <div class="opp-meta">EV · Energy · Public</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$248.30/sh</span>
-          <span class="opp-pct">+11.0%</span>
-        </div>
-      </div>
-    </div>
+  <div class="opp-section-label"><svg class="vrf-ic" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><path fill="#4a9eff" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.751-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg><span>All Companies</span></div>
+  <div class="opp-scroll" id="oppScroll">
+    <div style="color:#666;padding:20px;font-size:13px">Loading opportunities...</div>
   </div>
 
-  <div class="opp-section-label" style="margin-top:24px">Other High-Demand Pre-IPOs</div>
-<div class="opp-scroll">
-    <div class="opp-card featured">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/spacex.com.ico" alt="SpaceX" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=spacex.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">SpaceX <span class="musk-badge"><svg class="vrf-ic" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><path fill="#4a9eff" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.751-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg>Musk</span></div>
-          <div class="opp-meta">Aerospace · Pre-IPO</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$118.40/sh</span>
-          <span class="opp-pct">+42.8%</span>
-        </div>
-      </div>
-    </div>
-    <div class="opp-card featured">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/x.ai.ico" alt="xAI" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=x.ai&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">xAI <span class="musk-badge"><svg class="vrf-ic" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><path fill="#4a9eff" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.751-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg>Musk</span></div>
-          <div class="opp-meta">AI · Series C</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$36.90/sh</span>
-          <span class="opp-pct">+45.2%</span>
-        </div>
-      </div>
-    </div>
-    <div class="opp-card featured">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/neuralink.com.ico" alt="Neuralink" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=neuralink.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Neuralink <span class="musk-badge"><svg class="vrf-ic" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><path fill="#4a9eff" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.751-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg>Musk</span></div>
-          <div class="opp-meta">Neurotech · Series D</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$15.80/sh</span>
-          <span class="opp-pct">+31.4%</span>
-        </div>
-      </div>
-    </div>
-    <div class="opp-card featured">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/boringcompany.com.ico" alt="The Boring Company" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=boringcompany.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">The Boring Company <span class="musk-badge"><svg class="vrf-ic" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><path fill="#4a9eff" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.751-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg>Musk</span></div>
-          <div class="opp-meta">Infrastructure · Series C</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$8.70/sh</span>
-          <span class="opp-pct">+18.9%</span>
-        </div>
-      </div>
-    </div>
-    <div class="opp-card featured">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/x.com.ico" alt="X (formerly Twitter)" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=x.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">X (formerly Twitter) <span class="musk-badge"><svg class="vrf-ic" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><path fill="#4a9eff" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.751-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg>Musk</span></div>
-          <div class="opp-meta">Social · Private</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$24.50/sh</span>
-          <span class="opp-pct">+12.6%</span>
-        </div>
-      </div>
-    </div>
-    <div class="opp-card featured">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/tesla.com.ico" alt="Tesla" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=tesla.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Tesla <span class="musk-badge"><svg class="vrf-ic" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><path fill="#4a9eff" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.751-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg>Musk</span></div>
-          <div class="opp-meta">EV · Public · TSLA</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$248.30/sh</span>
-          <span class="opp-pct">+6.4%</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="opp-section-label" style="margin-top:24px">Other High-Demand Pre-IPOs</div>
-  <div class="opp-scroll">
-    <div onclick="location.href='buy-shares.html?ticker=OPENAI'" style="cursor:pointer" class="opp-card">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/openai.com.ico" alt="OpenAI" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=openai.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">OpenAI </div>
-          <div class="opp-meta">AI · Pre-IPO</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$58.20/sh</span>
-          <span class="opp-pct">+38.7%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=ANTHRPC'" style="cursor:pointer" class="opp-card">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/anthropic.com.ico" alt="Anthropic" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=anthropic.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Anthropic </div>
-          <div class="opp-meta">AI · Series F</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$42.10/sh</span>
-          <span class="opp-pct">+24.6%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=STRIPE'" style="cursor:pointer" class="opp-card">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/stripe.com.ico" alt="Stripe" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=stripe.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Stripe </div>
-          <div class="opp-meta">Fintech · Late stage</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$28.40/sh</span>
-          <span class="opp-pct">+12.1%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=DBRX'" style="cursor:pointer" class="opp-card">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/databricks.com.ico" alt="Databricks" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=databricks.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Databricks </div>
-          <div class="opp-meta">Data · Pre-IPO</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$73.50/sh</span>
-          <span class="opp-pct">+8.3%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=CANVA'" style="cursor:pointer" class="opp-card">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/canva.com.ico" alt="Canva" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=canva.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Canva </div>
-          <div class="opp-meta">Design · Pre-IPO</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$22.15/sh</span>
-          <span class="opp-pct">+9.6%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=DISCORD'" style="cursor:pointer" class="opp-card">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/discord.com.ico" alt="Discord" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=discord.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Discord </div>
-          <div class="opp-meta">Social · Pre-IPO</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$18.40/sh</span>
-          <span class="opp-pct">+6.1%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=REDDIT'" style="cursor:pointer" class="opp-card">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/reddit.com.ico" alt="Reddit" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=reddit.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Reddit </div>
-          <div class="opp-meta">Social · Late stage</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$31.70/sh</span>
-          <span class="opp-pct">+14.8%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=SHEIN'" style="cursor:pointer" class="opp-card">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/shein.com.ico" alt="Shein" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=shein.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Shein </div>
-          <div class="opp-meta">E-commerce · Pre-IPO</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$12.30/sh</span>
-          <span class="opp-pct">+4.2%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=INSTACRT'" style="cursor:pointer" class="opp-card">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/instacart.com.ico" alt="Instacart" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=instacart.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Instacart </div>
-          <div class="opp-meta">Delivery · Late stage</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$26.80/sh</span>
-          <span class="opp-pct">+7.9%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=KLARNA'" style="cursor:pointer" class="opp-card">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/klarna.com.ico" alt="Klarna" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=klarna.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Klarna </div>
-          <div class="opp-meta">Fintech · Pre-IPO</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$19.50/sh</span>
-          <span class="opp-pct">+11.3%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=REVOLUT'" style="cursor:pointer" class="opp-card">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/revolut.com.ico" alt="Revolut" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=revolut.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Revolut </div>
-          <div class="opp-meta">Fintech · Series H</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$33.20/sh</span>
-          <span class="opp-pct">+22.5%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=PLAID'" style="cursor:pointer" class="opp-card">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/plaid.com.ico" alt="Plaid" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=plaid.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Plaid </div>
-          <div class="opp-meta">Fintech · Series D</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$24.60/sh</span>
-          <span class="opp-pct">+10.4%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=CHIME'" style="cursor:pointer" class="opp-card">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/chime.com.ico" alt="Chime" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=chime.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Chime </div>
-          <div class="opp-meta">Banking · Pre-IPO</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$17.90/sh</span>
-          <span class="opp-pct">+5.8%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=EPIC'" style="cursor:pointer" class="opp-card">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/epicgames.com.ico" alt="Epic Games" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=epicgames.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Epic Games </div>
-          <div class="opp-meta">Gaming · Late stage</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$45.30/sh</span>
-          <span class="opp-pct">+18.2%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=RIPPLING'" style="cursor:pointer" class="opp-card">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/rippling.com.ico" alt="Rippling" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=rippling.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Rippling </div>
-          <div class="opp-meta">HR Tech · Series F</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$29.40/sh</span>
-          <span class="opp-pct">+16.7%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=NOTION'" style="cursor:pointer" class="opp-card">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/notion.so.ico" alt="Notion" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=notion.so&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Notion </div>
-          <div class="opp-meta">Productivity · Series C</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$21.80/sh</span>
-          <span class="opp-pct">+13.5%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=FIGMA'" style="cursor:pointer" class="opp-card">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/figma.com.ico" alt="Figma" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=figma.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Figma </div>
-          <div class="opp-meta">Design · Late stage</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$38.60/sh</span>
-          <span class="opp-pct">+19.3%</span>
-        </div>
-      </div>
-    </div>
-    <div onclick="location.href='buy-shares.html?ticker=BREX'" style="cursor:pointer" class="opp-card">
-      <div class="opp-logo">
-        <img src="https://icons.duckduckgo.com/ip3/brex.com.ico" alt="Brex" loading="lazy"
-             onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://www.google.com/s2/favicons?domain=brex.com&sz=128'}">
-      </div>
-      <div class="opp-body">
-        <div class="opp-row-top">
-          <div class="opp-name">Brex </div>
-          <div class="opp-meta">Fintech · Series D</div>
-        </div>
-        <div class="opp-row-bot">
-          <span class="opp-price">$16.40/sh</span>
-          <span class="opp-pct">+8.7%</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<script>
+(function(){
+  const PUBLIC_TICKERS = { TESLA:'TSLA', AAPL:'AAPL', MSFT:'MSFT', GOOGL:'GOOGL', AMZN:'AMZN', META:'META', NVDA:'NVDA', V:'V', NXPI:'NXPI', UBS:'UBS', JPM:'JPM', BAC:'BAC', NFLX:'NFLX', PLTR:'PLTR' };
+  const CRYPTO_TICKERS = { BTC:'BINANCE:BTCUSDT', ETH:'BINANCE:ETHUSDT', SOL:'BINANCE:SOLUSDT', XRP:'BINANCE:XRPUSDT', BNB:'BINANCE:BNBUSDT', ADA:'BINANCE:ADAUSDT' };
+  function routeFor(ticker, stage) {
+    const s = (stage || '').toLowerCase();
+    if (s === 'public' || s === 'crypto') return '/trade?ticker=' + encodeURIComponent(ticker);
+    return '/buy-shares.html?ticker=' + encodeURIComponent(ticker);
+  }
+  async function fetchLive(tickers) {
+    const pub = tickers.map(t => ({ db: t.toUpperCase(), live: PUBLIC_TICKERS[t.toUpperCase()] || CRYPTO_TICKERS[t.toUpperCase()] })).filter(x => x.live);
+    if (!pub.length) return {};
+    try {
+      const syms = pub.map(x => x.live).join(',');
+      const r = await fetch('/api/companies?live=' + encodeURIComponent(syms));
+      const j = await r.json();
+      if (!j.ok) return {};
+      const bySym = {}; (j.quotes||[]).forEach(q => bySym[q.symbol] = q);
+      const byDb = {};
+      pub.forEach(x => { if (bySym[x.live]) byDb[x.db] = bySym[x.live]; });
+      return byDb;
+    } catch(e) { return {}; }
+  }
+  async function loadOpps() {
+    const el = document.getElementById('oppScroll');
+    if (!el) return;
+    try {
+      const r = await fetch('/api/companies');
+      const j = await r.json();
+      if (!j.ok || !(j.companies||[]).length) {
+        el.innerHTML = '<div style="color:#666;padding:20px;font-size:13px">No opportunities available yet.</div>';
+        return;
+      }
+      const companies = j.companies;
+      const live = await fetchLive(companies.map(c => c.ticker));
+      el.innerHTML = companies.map(c => {
+        const tickerU = (c.ticker||'').toUpperCase();
+        const q = live[tickerU];
+        const isPub = !!PUBLIC_TICKERS[tickerU] || !!CRYPTO_TICKERS[tickerU];
+        let priceHTML, badgeHTML;
+        if (isPub && q && typeof q.price === 'number') {
+          priceHTML = '$' + q.price.toFixed(2) + '/sh';
+          const col = q.changePercent >= 0 ? '#17e08a' : '#ff5c5c';
+          const sign = q.changePercent >= 0 ? '+' : '';
+          badgeHTML = '<span class="opp-pct" style="color:' + col + '">' + sign + q.changePercent.toFixed(2) + '%</span>';
+        } else {
+          priceHTML = (typeof c.pricePerShare === 'number' && c.pricePerShare > 0) ? '$' + c.pricePerShare.toFixed(2) + '/sh' : 'TBA';
+          badgeHTML = '<span class="opp-pct" style="color:#8a8aff">' + (c.stage || 'IPO') + '</span>';
+        }
+        const meta = [(c.sector||''), (c.stage||'IPO')].filter(Boolean).join(' · ');
+        const initial = (c.name||'?').charAt(0);
+        const logoSrc = c.logoUrl || (c.domain ? 'https://icons.duckduckgo.com/ip3/' + c.domain + '.ico' : '');
+        const logoHTML = logoSrc ? '<img src="' + logoSrc + '" alt="' + c.name + '" loading="lazy" onerror="this.parentNode.textContent=\'' + initial + '\'">' : initial;
+        const musk = ['SPCX','XAI','NLNK','TBC','XCORP','TESLA','BORING','STARLINK','TFAB'].indexOf(tickerU) >= 0;
+        const featCls = musk ? ' featured' : '';
+        return '<div onclick="location.href=\'' + routeFor(c.ticker, c.stage) + '\'" style="cursor:pointer" class="opp-card' + featCls + '">'
+          + '<div class="opp-logo">' + logoHTML + '</div>'
+          + '<div class="opp-body">'
+          +   '<div class="opp-row-top"><div class="opp-name">' + c.name + '</div><div class="opp-meta">' + meta + '</div></div>'
+          +   '<div class="opp-row-bot"><span class="opp-price">' + priceHTML + '</span>' + badgeHTML + '</div>'
+          + '</div>'
+          + '</div>';
+      }).join('');
+    } catch(e) {
+      console.error('loadOpps failed', e);
+      el.innerHTML = '<div style="color:#666;padding:20px;font-size:13px">Unable to load.</div>';
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadOpps);
+  else loadOpps();
+})();
+</script>
 
 <div class="page-end"></div>
 
@@ -1551,7 +1135,7 @@ if (hs) hs.innerHTML = totalShares.toLocaleString('en-US') + ' <span>shares</spa
             <div class="act-title">${a.title || ''}</div>
             <div class="act-sub">${a.description || ''}</div>
           </div>
-          <div class="act-time">${timeAgo(a.created_at)}</div>
+          <div class="act-time">${timeAgo(a.createdAt || a.created_at)}</div>
         </div>
       `).join('');
     }
@@ -1592,7 +1176,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 <!-- /docs-quicknav-fix -->
 
-<script src="js/bottom-nav.js?v=1"></script>
+<script src="js/bottom-nav.js?v=1786129802"></script>
 
 <!-- NOTIFICATIONS PANEL -->
 <div id="notifPanel" style="display:none;position:fixed;top:70px;right:16px;width:340px;max-width:90vw;max-height:70vh;background:#0a0e14;border:1px solid rgba(255,255,255,0.1);border-radius:14px;z-index:9998;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.6)">
@@ -1704,5 +1288,5 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 </script>
 
-  <script src="js/user-bell.js?v=1"></script>
+  <script src="js/user-bell.js?v=1786129802"></script>
 

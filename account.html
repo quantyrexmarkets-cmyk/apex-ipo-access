@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Account | Apex IPO Access</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
-<script src="js/apex-api.js?v=1"></script>
-<script src="js/supabase.js?v=1781643381"></script>
-<script src="js/notify.js?v=1781643381"></script>
-<script src="js/sidebar.js?v=2" defer></script>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script src="/js/supabase.js?v=1786130265"></script>
+<script src="/js/notify.js?v=1786129802"></script>
+<script src="/js/sidebar.js?v=1786129802" defer></script>
 <script>
-  document.addEventListener('sb-ready', async () => {
-    const { data } = await sb.auth.getUser();
-    if(!data.user) window.location.href = 'login.html';
-  });
+(async function authGuard(){
+  try {
+    const r = await fetch('/api/auth?action=me', { credentials:'include' });
+    if(!r.ok){ window.location.href = '/login.html'; return; }
+  } catch(e){ window.location.href = '/login.html'; }
+})();
 </script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
@@ -305,12 +308,49 @@
 </style>
 </head>
 <body>
+<!-- Admin impersonation banner -->
+<div id="impersonationBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(90deg,#ff9500,#ffb80b);color:#1a1a1a;padding:8px 12px;font-family:'Montserrat',-apple-system,sans-serif;font-size:12px;font-weight:600;box-shadow:0 2px 10px rgba(0,0,0,0.35);align-items:center;justify-content:space-between;gap:10px">
+  <span style="display:flex;align-items:center;gap:6px;min-width:0;flex:1;overflow:hidden">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">Admin viewing <span id="impEmail" style="font-weight:700">user</span></span>
+  </span>
+  <button onclick="returnToAdmin()" style="background:#1a1a1a;color:#ffb80b;border:none;padding:5px 11px;border-radius:6px;cursor:pointer;font-weight:700;font-size:11px;font-family:'Montserrat',sans-serif;white-space:nowrap;flex-shrink:0">← Admin</button>
+</div>
+<script>
+(function(){
+  function getCookie(n){const m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):'';}
+  if(getCookie('apex_impersonating')==='1'){
+    const b=document.getElementById('impersonationBanner');
+    if(b){
+      b.style.display='flex';
+      const spacer=document.createElement('div');
+      spacer.id='impBannerSpacer';
+      spacer.style.height='38px';
+      spacer.style.width='100%';
+      document.body.insertBefore(spacer, document.body.firstChild);
+      let raw=getCookie('apex_impersonating_email');
+      try{ raw=decodeURIComponent(raw); }catch(_){}
+      const e=document.getElementById('impEmail');
+      if(e&&raw) e.textContent=raw;
+    }
+  }
+  window.returnToAdmin=async function(){
+    try{
+      const res=await fetch('/api/admin?resource=unimpersonate',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:'{}'});
+      const data=await res.json();
+      if(data.ok){ window.location.href = data.redirect || '/adminprivate'; }
+      else alert(data.error||'Failed to return');
+    }catch(e){ alert(e.message); }
+  };
+})();
+</script>
+<!-- /impersonation banner -->
 
 <header class="dash-header">
   <button class="menu-btn" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
-  <a href="dashboard.html" class="logo">
+  <a href="/dashboard.html" class="logo">
     <img src="assets/spacex-logo.png" class="logo-x" alt="X" />
     <div class="logo-text-stack">
       <span class="logo-line1">APEX</span>
@@ -348,13 +388,17 @@
       <div class="ph-name" id="phName"><span class="skel">·········</span></div>
       <div class="ph-email" id="phEmail"><span class="skel">·············</span></div>
       <div class="ph-badges">
-        <span class="badge verified" id="phKycBadge">
+        <span class="badge verified" id="phKycBadge" style="display:none">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           KYC Verified
         </span>
-        <span class="badge tier">
+        <span class="badge warn" id="phKycPending" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          KYC Pending
+        </span>
+        <span class="badge tier" id="phTierBadge" style="display:none">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8 12 2"/></svg>
-          Founding Investor
+          <span id="phTierLabel">Founding Investor</span>
         </span>
       </div>
     </div>
@@ -391,7 +435,7 @@
       </div>
       <div class="row-val"><span id="vAddress">—</span></div>
     </div>
-    <a href="kyc.html" id="kycCtaBtn" class="kyc-cta-btn" style="display:flex">
+    <a href="/kyc.html" id="kycCtaBtn" class="kyc-cta-btn" style="display:flex">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M15 8h2M15 12h2M7 16h10"/></svg>
     <span id="kycCtaLabel">Verify Your Identity</span>
   </a>
@@ -426,7 +470,7 @@
         <div class="ic amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
         Investor tier
       </div>
-      <div class="row-val"><span class="pill warn">Founding</span></div>
+      <div class="row-val"><span class="pill warn" id="vTier">—</span></div>
     </div>
     <div class="row no-hover">
       <div class="row-lbl">
@@ -454,7 +498,7 @@
       </div>
       <div class="row-val"><span id="vCommitted">$0.00</span></div>
     </div>
-    <div class="row" onclick="location.href='fund-account.html'">
+    <div class="row" onclick="location.href='/fund-account.html'">
       <div class="row-lbl">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></div>
         Fund account
@@ -466,7 +510,7 @@
   <!-- SECURITY -->
   <div class="section">
     <div class="section-h">Security &amp; Privacy</div>
-    <div class="row" onclick="location.href='security.html'">
+    <div class="row" onclick="location.href='/security.html'">
       <div class="row-ic">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       </div>
@@ -497,7 +541,7 @@
   <!-- SUPPORT -->
   <div class="section">
     <div class="section-h">Support</div>
-    <div class="row" onclick="location.href='contact.html'">
+    <div class="row" onclick="location.href='/contact.html'">
       <div class="row-lbl">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
         Help &amp; Support
@@ -524,23 +568,23 @@
 
 <!-- BOTTOM TAB NAV -->
 <nav class="tab-nav">
-  <div onclick="location.href='dashboard.html'" class="tab">
+  <div onclick="location.href='/dashboard.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span class="lbl">Home</span>
   </div>
-  <div onclick="location.href='portfolio.html'" class="tab">
+  <div onclick="location.href='/portfolio.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
     <span class="lbl">Portfolio</span>
   </div>
-  <div onclick="location.href='ipos.html'" class="tab">
+  <div onclick="location.href='/ipos.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
     <span class="lbl">IPOs</span>
   </div>
-  <div onclick="location.href='docs.html'" class="tab">
+  <div onclick="location.href='/docs.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
     <span class="lbl">Docs</span>
   </div>
-  <div onclick="location.href='account.html'" class="tab">
+  <div onclick="location.href='/account.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>
     <span class="lbl">Account</span>
   </div>
@@ -549,11 +593,9 @@
   <!-- SECURITY -->
 <script>
 (async function(){
-  if(!window.sb) await new Promise(r => document.addEventListener('sb-ready', r, { once:true }));
-  const { data: { user } } = await sb.auth.getUser();
-  if(!user) return;
-
   const profile = await window.apex.getProfile();
+  if(!profile) { window.location.href = '/login.html'; return; }
+  const user = { id: profile.id, email: profile.email };
   const fmt = n => '$' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 
   // Profile hero
@@ -578,11 +620,63 @@
 
   // Account status
   const kycEl = document.getElementById('vKyc');
-  const kyc = profile?.kyc_status || 'pending';
-  if(kyc === 'verified'){
-    kycEl.textContent = 'Verified';
-    kycEl.className = 'pill ok';
-  } else if(kyc === 'pending'){
+    // Live KYC status fetch
+    let kyc = (profile?.kyc_status || 'not_submitted').toLowerCase();
+    try {
+      const liveRes = await fetch('/api/kyc', { credentials: 'include' });
+      const liveJson = await liveRes.json();
+      if (liveJson?.kycStatus) kyc = liveJson.kycStatus.toLowerCase();
+    } catch(_) {}
+
+    if (kyc === 'approved' || kyc === 'verified') {
+      kycEl.textContent = 'Verified';
+      kycEl.className = 'pill ok';
+    } else if (kyc === 'pending') {
+      kycEl.textContent = 'Pending Review';
+      kycEl.className = 'pill warn';
+    } else if (kyc === 'rejected') {
+      kycEl.textContent = 'Rejected';
+      kycEl.className = 'pill err';
+    } else {
+      kycEl.textContent = 'Not Submitted';
+      kycEl.className = 'pill warn';
+    }
+
+    // ── Profile header KYC badge toggle ──
+    const phKyc = document.getElementById('phKycBadge');
+    const phPending = document.getElementById('phKycPending');
+    if (phKyc && phPending) {
+      if (kyc === 'approved' || kyc === 'verified') {
+        phKyc.style.display = 'inline-flex';
+        phPending.style.display = 'none';
+      } else if (kyc === 'pending') {
+        phKyc.style.display = 'none';
+        phPending.style.display = 'inline-flex';
+      } else {
+        phKyc.style.display = 'none';
+        phPending.style.display = 'none';
+      }
+    }
+
+    // ── Investor tier (based on cash balance) ──
+    const tierEl = document.getElementById('vTier');
+    const phTier = document.getElementById('phTierBadge');
+    const phTierLbl = document.getElementById('phTierLabel');
+    const cash = parseFloat(profile?.cash_balance || 0);
+    const totalDep = parseFloat(profile?.total_deposited || 0);
+    const totalEquity = Math.max(cash, totalDep);
+
+    let tier = 'New', tierClass = 'pill', showHeader = false;
+    if (totalEquity >= 100000) { tier = 'Founding'; tierClass = 'pill warn'; showHeader = true; }
+    else if (totalEquity >= 25000) { tier = 'Premium'; tierClass = 'pill ok'; showHeader = true; }
+    else if (totalEquity >= 1000)  { tier = 'Member'; tierClass = 'pill'; showHeader = false; }
+
+    if (tierEl) { tierEl.textContent = tier; tierEl.className = tierClass; }
+    if (phTier && phTierLbl) {
+      phTierLbl.textContent = tier + ' Investor';
+      phTier.style.display = showHeader ? 'inline-flex' : 'none';
+    }
+    else if(kyc === 'pending'){
     kycEl.textContent = 'Pending';
     kycEl.className = 'pill warn';
   } else {
@@ -592,29 +686,36 @@
 
   document.getElementById('vAcctTypes').textContent = (profile?.account_types || []).join(', ') || 'Individual';
 
-  if(profile?.created_at){
-    const d = new Date(profile.created_at);
+  if(profile?.createdAt || profile?.created_at){
+    const d = new Date(profile.createdAt || (profile.createdAt || profile.created_at));
     document.getElementById('vSince').textContent = d.toLocaleDateString('en-US',{month:'short',year:'numeric'});
   }
 
   // Balances
   document.getElementById('vCash').textContent = fmt(profile?.cash_balance);
 
-  const { data: allocs } = await sb.from('allocations').select('total_value').eq('user_id', user.id);
+  let allocs = [];
+  try {
+    const pRes = await fetch('/api/portfolio', { credentials:'include' });
+    if (pRes.ok) {
+      const pJson = await pRes.json();
+      allocs = (pJson.holdings || []).map(h => ({ total_value: h.currentValueUSD || h.totalInvestedUSD || 0 }));
+    }
+  } catch(e){ console.warn('alloc load:', e); }
   const committed = (allocs || []).reduce((s,a) => s + parseFloat(a.total_value || 0), 0);
   document.getElementById('vCommitted').textContent = fmt(committed);
 
   // Logout
   document.getElementById('logoutRow').addEventListener('click', async () => {
     if(!confirm('Sign out of your APEX account?')) return;
-    await sb.auth.signOut();
+    await fetch('/api/auth?action=logout', { method:'POST', credentials:'include' });
     sessionStorage.clear();
     window.location.href = 'login.html';
   });
 })();
 </script>
 
-<script src="js/bottom-nav.js?v=1"></script>
+<script src="/js/bottom-nav.js?v=1786129802"></script>
 
 <!-- ============ ACCOUNT SETTINGS MODALS ============ -->
 
@@ -713,28 +814,28 @@
   <div class="modal-box modal-wide">
     <h3>Terms &amp; Privacy</h3>
     <div class="terms-links">
-      <a class="t-link" href="terms.html" target="_blank">
+      <a class="t-link" href="/terms.html" target="_blank">
         <div>
           <strong>Terms of Service</strong>
           <span>Read our user agreement</span>
         </div>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </a>
-      <a class="t-link" href="privacy.html" target="_blank">
+      <a class="t-link" href="/privacy.html" target="_blank">
         <div>
           <strong>Privacy Policy</strong>
           <span>How we collect and protect your data</span>
         </div>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </a>
-      <a class="t-link" href="risk.html" target="_blank">
+      <a class="t-link" href="/risk.html" target="_blank">
         <div>
           <strong>Risk Disclosure</strong>
           <span>Investment risks &amp; suitability</span>
         </div>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </a>
-      <a class="t-link" href="form-crs.html" target="_blank">
+      <a class="t-link" href="/form-crs.html" target="_blank">
         <div>
           <strong>Form CRS</strong>
           <span>Client Relationship Summary</span>
@@ -772,10 +873,8 @@
   // ── 1. EDIT PROFILE ─────────────────────────
   window.openEditProfile = async function(){
     try {
-      var { data: userData } = await sb.auth.getUser();
-      if(!userData || !userData.user) return apexError('Not signed in');
-      var { data: profile, error } = await sb.from('profiles').select('*').eq('id', userData.user.id).single();
-      if(error){ apexError('Could not load profile: ' + error.message); return; }
+      var profile = await window.apex.getProfile();
+      if(!profile) return apexError('Could not load profile');
       document.getElementById('epFirst').value = profile.first_name || '';
       document.getElementById('epLast').value  = profile.last_name  || '';
       document.getElementById('epPhone').value = profile.phone      || '';
@@ -793,7 +892,6 @@
     btn.disabled = true;
     btn.textContent = 'Saving…';
     try {
-      var { data: userData } = await sb.auth.getUser();
       var updates = {
         first_name:    document.getElementById('epFirst').value.trim(),
         last_name:     document.getElementById('epLast').value.trim(),
@@ -803,8 +901,14 @@
         state:         document.getElementById('epState').value.trim(),
         zip:           document.getElementById('epZip').value.trim()
       };
-      var { error } = await sb.from('profiles').update(updates).eq('id', userData.user.id);
-      if(error){ apexError('Save failed: ' + error.message); return; }
+      var saveRes = await fetch('/api/auth?action=update-profile', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+      var saveJson = await saveRes.json();
+      if(!saveRes.ok || saveJson.error){ apexError('Save failed: ' + (saveJson.error || 'unknown error')); return; }
       apexSuccess('Profile updated');
       closeAcctModal('editProfileModal');
       var fullName = [updates.first_name, updates.last_name].filter(Boolean).join(' ') || '—';
@@ -834,7 +938,13 @@
     btn.disabled = true;
     btn.textContent = 'Updating…';
     try {
-      var { error } = await sb.auth.updateUser({ password: newPw });
+      var pwRes = await fetch('/api/auth?action=change-password', {
+        method: 'POST', credentials:'include',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({ password: newPw })
+      });
+      var pwJson = await pwRes.json();
+      var error = (pwRes.ok && !pwJson.error) ? null : { message: pwJson.error || 'Password change failed' };
       if(error){ apexError('Update failed: ' + error.message); return; }
       apexSuccess('Password updated successfully');
       closeAcctModal('changePwdModal');
@@ -847,10 +957,12 @@
 
   window.openTwoFactor = async function(){
     try {
-      var { data: userData } = await sb.auth.getUser();
+      var meRes = await fetch('/api/auth?action=me', { credentials:'include' });
+      var userData = meRes.ok ? { user: (await meRes.json()).user } : null;
       if(!userData || !userData.user) return apexError('Not signed in');
       tfState.userId = userData.user.id;
-      var { data: profile, error } = await sb.from('profiles').select('two_factor_enabled').eq('id', tfState.userId).single();
+      var profile = await window.apex.getProfile();
+      var error = profile ? null : { message: 'Profile load failed' };
       if(error){ apexError('Could not load 2FA status: ' + error.message); return; }
       tfState.enabled = !!profile.two_factor_enabled;
       renderTfState();
@@ -895,7 +1007,13 @@
     btn.disabled = true;
     btn.textContent = 'Saving…';
     try {
-      var { error } = await sb.from('profiles').update({ two_factor_enabled: newState }).eq('id', tfState.userId);
+      var tfRes = await fetch('/api/auth?action=update-profile', {
+        method: 'POST', credentials:'include',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({ two_factor_enabled: newState })
+      });
+      var tfJson = await tfRes.json();
+      var error = (tfRes.ok && !tfJson.error) ? null : { message: tfJson.error || 'Save failed' };
       if(error){ apexError('Could not update: ' + error.message); return; }
       tfState.enabled = newState;
       renderTfState();
@@ -917,7 +1035,8 @@
     var list = document.getElementById('laList');
     list.innerHTML = '<div class="la-empty">Loading…</div>';
     try {
-      var { data: userData } = await sb.auth.getUser();
+      var meRes = await fetch('/api/auth?action=me', { credentials:'include' });
+      var userData = meRes.ok ? { user: (await meRes.json()).user } : null;
       if(!userData || !userData.user) return;
       var user = userData.user;
       var items = [];
@@ -927,11 +1046,11 @@
       if(user.confirmed_at && user.confirmed_at !== user.last_sign_in_at){
         items.push({ time: user.confirmed_at, label: 'Email verified' });
       }
-      if(user.created_at){
-        items.push({ time: user.created_at, label: 'Account created' });
+      if(user.createdAt || (user.createdAt || user.created_at)){
+        items.push({ time: user.createdAt || (user.createdAt || user.created_at), label: 'Account created' });
       }
       try {
-        var { data: logs } = await sb.from('login_history').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(10);
+        var logs = []; // login_history feature pending MongoDB endpoint
         if(logs && logs.length){
           items = logs.map(function(l){ return { time: l.created_at, label: 'Sign-in', meta: l.ip_address || l.user_agent }; });
         }
@@ -956,8 +1075,8 @@
 })();
 </script>
 
-<script src="js/floating-widget.js?v=1781343118" defer></script>
-  <script src="js/user-bell.js?v=1"></script>
+<script src="/js/floating-widget.js?v=1786129802" defer></script>
+  <script src="/js/user-bell.js?v=1786129802"></script>
 
 <!-- Avatar upload + KYC CTA wiring -->
 <script>
@@ -1031,14 +1150,39 @@
       if(f.size > 3*1024*1024){ alert('Image too large (max 3MB)'); return; }
       if(!f.type.startsWith('image/')){ alert('Please select an image'); return; }
       try {
-        var ext = (f.name.split('.').pop()||'jpg').toLowerCase();
-        var path = user.id + '/avatar.' + ext;
-        var up = await sb.storage.from('avatars').upload(path, f, { upsert:true, cacheControl:'3600' });
-        if(up.error) throw up.error;
-        var pub = sb.storage.from('avatars').getPublicUrl(path);
-        var url = pub.data?.publicUrl;
+        // Step 1: Get signed Cloudinary params from our API
+        var signRes = await fetch('/api/upload?action=sign', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ purpose: 'general' })
+        });
+        var signJson = await signRes.json();
+        if(!signRes.ok || signJson.error) throw new Error(signJson.error || 'Could not sign upload');
+
+        // Step 2: Upload directly to Cloudinary using signed params
+        var cldFD = new FormData();
+        cldFD.append('file', f);
+        cldFD.append('api_key', signJson.apiKey);
+        cldFD.append('timestamp', signJson.timestamp);
+        cldFD.append('signature', signJson.signature);
+        cldFD.append('folder', signJson.folder);
+        if(signJson.uploadPreset) cldFD.append('upload_preset', signJson.uploadPreset);
+
+        var cldRes = await fetch('https://api.cloudinary.com/v1_1/' + signJson.cloudName + '/auto/upload', {
+          method: 'POST',
+          body: cldFD
+        });
+        var cldJson = await cldRes.json();
+        if(!cldRes.ok || cldJson.error) throw new Error((cldJson.error && cldJson.error.message) || 'Avatar upload failed');
+        var url = cldJson.secure_url;
         if(!url) throw new Error('Could not get public URL');
-        var r = await sb.from('profiles').update({ avatar_url: url }).eq('id', user.id);
+        var r = await fetch('/api/auth?action=update-profile', {
+          method: 'POST', credentials:'include',
+          headers: { 'Content-Type':'application/json' },
+          body: JSON.stringify({ avatar_url: url })
+        });
+        r = (r.ok ? {} : { error: { message: 'Avatar save failed' } });
         if(r.error) throw r.error;
         // Update display
         var av = document.getElementById('phAvatar');
@@ -1085,7 +1229,7 @@
   var s, c, o = window.smartsupp = function(){ o._.push(arguments); };
   o._ = [];
   window._smartsupp = window._smartsupp || {};
-  window._smartsupp.key = '7d6445f6308e329b33468a584f675c298bd2c871';
+  window._smartsupp.key = 'cfc0fb237d4a16ba3caf79dddd9f9977ba5c938c';
   window._smartsupp.offsetY = 80;
   window._smartsupp.offsetX = 10;
   s = d.getElementsByTagName('script')[0];
@@ -1099,6 +1243,6 @@
 </script>
 <!-- End Smartsupp -->
 
-  <script src="js/session-guard.js?v=3" defer></script>
+  <script src="/js/session-guard.js?v=1786129802" defer></script>
 </body>
 </html>
