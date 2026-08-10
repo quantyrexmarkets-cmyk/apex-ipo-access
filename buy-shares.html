@@ -361,21 +361,8 @@
     Projected Returns
   </div>
 
-  <div class="returns-table">
-    <div class="returns-row">
-      <div class="returns-cell">
-        <div class="period">3 Months</div>
-        <div class="pct">35–60%</div>
-      </div>
-      <div class="returns-cell">
-        <div class="period">6 Months</div>
-        <div class="pct">40–70%</div>
-      </div>
-      <div class="returns-cell">
-        <div class="period">12 Months</div>
-        <div class="pct">50–80%</div>
-      </div>
-    </div>
+  <div class="returns-table" id="returnsTable">
+    <!-- Populated by JS based on company type -->
   </div>
 
   <!-- ───────── HOLDING PERIOD ───────── -->
@@ -501,6 +488,45 @@
     return '$' + n.toFixed(0);
   }
 
+
+  // ─────────────────────────────────────────────
+  // Render returns table OR royalty structure (TFAB special-case)
+  // ─────────────────────────────────────────────
+  function renderReturnsOrRoyalty(){
+    var el = document.getElementById('returnsTable');
+    if(!el) return;
+    var isTfab = (ticker || '').toUpperCase() === 'TFAB';
+    if(isTfab){
+      el.innerHTML = ''
+        + '<div class="returns-row" style="flex-direction:column;gap:0">'
+        + '  <div class="returns-cell" style="border-right:none;border-bottom:1px solid #2e2e2e;padding:12px 14px;text-align:left">'
+        + '    <div class="period" style="color:#888;font-size:10px;letter-spacing:0.12em">BUILD PHASE · 2026–2028</div>'
+        + '    <div class="pct" style="color:#e8e8e8;font-size:14px;font-weight:600;margin-top:4px">4% / yr on wafer output royalties</div>'
+        + '  </div>'
+        + '  <div class="returns-cell" style="border-right:none;border-bottom:1px solid #2e2e2e;padding:12px 14px;text-align:left">'
+        + '    <div class="period" style="color:#888;font-size:10px;letter-spacing:0.12em">FIRST SILICON · Q4 2028</div>'
+        + '    <div class="pct" style="color:#e8e8e8;font-size:14px;font-weight:600;margin-top:4px">Convert to JV equity units</div>'
+        + '  </div>'
+        + '  <div class="returns-cell" style="border-right:none;padding:12px 14px;text-align:left">'
+        + '    <div class="period" style="color:#888;font-size:10px;letter-spacing:0.12em">PRODUCTION · 2029+</div>'
+        + '    <div class="pct" style="color:#e8e8e8;font-size:14px;font-weight:600;margin-top:4px">Ongoing royalty + JV dividends</div>'
+        + '  </div>'
+        + '</div>';
+    } else {
+      // Standard IPO: read from company.projectedReturns or fallback to defaults
+      var pr = (state.company && state.company.projectedReturns) || {};
+      var r3 = pr['3m'] || '35–60%';
+      var r6 = pr['6m'] || '40–70%';
+      var r12 = pr['12m'] || '50–80%';
+      el.innerHTML = ''
+        + '<div class="returns-row">'
+        + '  <div class="returns-cell"><div class="period">3 Months</div><div class="pct">' + r3 + '</div></div>'
+        + '  <div class="returns-cell"><div class="period">6 Months</div><div class="pct">' + r6 + '</div></div>'
+        + '  <div class="returns-cell"><div class="period">12 Months</div><div class="pct">' + r12 + '</div></div>'
+        + '</div>';
+    }
+  }
+
   // ─────────────────────────────────────────────
   // Render company info
   // ─────────────────────────────────────────────
@@ -511,6 +537,7 @@
     document.getElementById('coSector').innerHTML = state.sector;
     document.getElementById('coTicker').textContent = ticker;
     document.getElementById('coPrice').textContent = fmt(state.price);
+    renderReturnsOrRoyalty();
       // ─── Show live price + change indicator ───
       if (state.isLive && typeof state.livePrice === 'number') {
         var _coP = document.getElementById('coPrice');
@@ -751,13 +778,15 @@
         if(company){
           state.company = company;
           state.name = company.name || state.name;
-          state.price = parseFloat(company.share_price || company.price || state.price);
+          state.price = parseFloat(company.pricePerShare || company.share_price || company.price || state.price);
           state.sector = (company.sector || 'IPO') + ' · ' + (company.stage || 'IPO');
           state.valuation = company.valuation
             ? (typeof company.valuation === 'number' ? fmtCompact(company.valuation) : company.valuation)
             : state.valuation;
-          if(company.domain) state.logo = `https://icons.duckduckgo.com/ip3/${company.domain}.ico`;
+          // Prefer explicit logoUrl (from DB), then snake_case fallback, then domain favicon
+          if(company.logoUrl) state.logo = company.logoUrl;
           else if(company.logo_url) state.logo = company.logo_url;
+          else if(company.domain) state.logo = `https://icons.duckduckgo.com/ip3/${company.domain}.ico`;
         }
       } catch(e){
         console.warn('Company not found in DB, using KNOWN fallback for', ticker);
@@ -839,5 +868,39 @@ if (typeof window.toggleSidebar !== 'function') {
 }
 </script>
   <script src="/js/session-guard.js?v=1786129802" defer></script>
+
+<script>
+(function(){
+  // TFAB-specific copy adjustments — applied after DOM ready
+  var t = (new URLSearchParams(location.search).get('ticker') || '').toUpperCase();
+  if (t === 'TFAB') {
+    document.addEventListener('DOMContentLoaded', function(){
+      // Header tagline
+      var tag = document.querySelector('.logo-tagline');
+      if (tag) tag.textContent = 'FUND THE BUILD';
+      // Amount section header — find by text
+      document.querySelectorAll('.section-h').forEach(function(el){
+        var txt = (el.textContent || '').trim().toLowerCase();
+        if (txt.indexOf('amount to invest') !== -1) {
+          // Preserve icon, replace only the text
+          var svg = el.querySelector('svg');
+          el.innerHTML = '';
+          if (svg) el.appendChild(svg);
+          el.appendChild(document.createTextNode(' Contribution Amount'));
+        }
+        if (txt.indexOf('projected returns') !== -1) {
+          var svg2 = el.querySelector('svg');
+          el.innerHTML = '';
+          if (svg2) el.appendChild(svg2);
+          el.appendChild(document.createTextNode(' Royalty Structure'));
+        }
+      });
+      // Ticker chip label
+      var tickLbl = document.querySelector('.co-ticker .lbl');
+      if (tickLbl) tickLbl.textContent = 'JV';
+    });
+  }
+})();
+</script>
 </body>
 </html>
