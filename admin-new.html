@@ -653,6 +653,58 @@
 </head>
 <body>
 
+<!-- ─── TEMP: TeraFab Seed Tool (remove after use) ─── -->
+<div id="tfab-seed-tool" style="margin:16px 20px;background:linear-gradient(135deg,rgba(74,158,255,0.08),rgba(62,213,152,0.04));border:1px solid rgba(74,158,255,0.3);border-radius:12px;padding:16px">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div style="min-width:0;flex:1">
+      <div style="font-size:10px;font-weight:800;color:#4a9eff;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px">System Seed &middot; Maintenance</div>
+      <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:2px">Seed TeraFab (TFAB)</div>
+      <div style="font-size:12px;color:#8a94a3;line-height:1.5">Insert or update the TeraFab company. Safe to re-run.</div>
+    </div>
+    <button id="tfab-seed-btn" type="button" onclick="window.seedTerafab && window.seedTerafab()" style="flex-shrink:0;background:#4a9eff;color:#fff;border:none;padding:11px 18px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Seed TeraFab &rarr;</button>
+  </div>
+  <div id="tfab-seed-result" style="margin-top:12px;font-size:11px;font-family:'JetBrains Mono','SF Mono',Menlo,monospace;color:#8a94a3;line-height:1.6;white-space:pre-wrap;word-break:break-word;display:none"></div>
+</div>
+<script>
+(function(){
+  window.seedTerafab = async function() {
+    if (!confirm('Insert/update TeraFab (TFAB) in the companies collection?')) return;
+    var btn = document.getElementById('tfab-seed-btn');
+    var out = document.getElementById('tfab-seed-result');
+    btn.disabled = true; btn.textContent = 'Seeding…'; btn.style.opacity = '0.6';
+    out.style.display = 'block'; out.style.color = '#8a94a3';
+    out.textContent = 'Contacting /api/admin?resource=seed-terafab …';
+    try {
+      var r = await fetch('/api/admin?resource=seed-terafab', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' }, body: '{}'
+      });
+      var j = await r.json();
+      if (r.ok && j.ok) {
+        out.style.color = '#3ed598';
+        out.textContent = '✅ SUCCESS · ' + j.action.toUpperCase() + '\n\n' + JSON.stringify(j, null, 2);
+        btn.textContent = '✅ ' + (j.action === 'created' ? 'Created' : 'Updated');
+        btn.style.background = '#3ed598';
+        setTimeout(function(){
+          btn.disabled = false; btn.style.opacity = '1';
+          btn.textContent = 'Re-seed TeraFab →'; btn.style.background = '#4a9eff';
+        }, 5000);
+      } else {
+        out.style.color = '#ff5c5c';
+        out.textContent = '❌ ERROR ' + r.status + '\n\n' + JSON.stringify(j, null, 2);
+        btn.disabled = false; btn.style.opacity = '1'; btn.textContent = 'Retry Seed →';
+      }
+    } catch(e) {
+      out.style.color = '#ff5c5c';
+      out.textContent = '❌ NETWORK ERROR · ' + e.message;
+      btn.disabled = false; btn.style.opacity = '1'; btn.textContent = 'Retry Seed →';
+    }
+  };
+})();
+</script>
+<!-- ─── /TeraFab Seed Tool ─── -->
+
+
 <div class="backdrop" id="backdrop"></div>
 
 <div class="layout">
