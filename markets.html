@@ -101,20 +101,28 @@
   .dash-header .notif-bell-btn svg { width: 18px; height: 18px; }
   .dash-header .notif-badge { position: absolute; top: -3px; right: -3px; min-width: 18px; height: 18px; padding: 0 4px; background: #ff6a6a; color: #000; border-radius: 9px; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid #000; }
 
-  /* ── TeraFab featured construction JV card ── */
-  .tfab-featured{margin:8px 16px 20px;background:linear-gradient(135deg,rgba(74,158,255,0.14),rgba(62,213,152,0.08));border:1px solid rgba(74,158,255,0.4);border-radius:16px;padding:20px;position:relative;overflow:hidden;cursor:pointer;transition:transform .15s}
-  .tfab-featured:active{transform:scale(0.985)}
-  .tfab-featured::before{content:'';position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle,rgba(74,158,255,0.35),transparent 65%);pointer-events:none}
-  .tfab-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:rgba(255,92,92,0.15);border:1px solid rgba(255,92,92,0.4);border-radius:100px;font-size:10px;font-weight:800;color:#ff5c5c;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;position:relative;z-index:1}
-  .tfab-pill::before{content:'';width:6px;height:6px;background:#ff5c5c;border-radius:50%;box-shadow:0 0 8px #ff5c5c;animation:tfab-pulse 2s infinite}
-  @keyframes tfab-pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-  .tfab-title{font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.5px;margin-bottom:6px;position:relative;z-index:1}
-  .tfab-sub{font-size:13px;color:#b0b8c4;line-height:1.5;margin-bottom:14px;position:relative;z-index:1}
-  .tfab-sub b{color:#fff}
-  .tfab-meta{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:#8a8f99;margin-bottom:16px;position:relative;z-index:1}
-  .tfab-meta b{color:#fff;font-weight:700}
-  .tfab-cta{display:inline-flex;align-items:center;gap:6px;background:#4a9eff;color:#fff;padding:11px 18px;border-radius:10px;font-weight:700;font-size:13px;text-decoration:none;position:relative;z-index:1;border:none;cursor:pointer}
-  .tfab-cta:active{background:#3d7fd6}
+
+  /* ── TeraFab featured hero card — matches Markets palette ── */
+  .tfab-hero{margin:8px 16px 20px;background:#141414;border:1px solid #2e2e2e;border-radius:14px;padding:0;overflow:hidden;cursor:pointer;transition:transform .15s;position:relative}
+  .tfab-hero:active{transform:scale(0.985)}
+  .tfab-hero-inner{padding:16px 16px 18px;position:relative;z-index:1}
+  .tfab-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(23,224,138,0.12),transparent 70%);pointer-events:none;z-index:0}
+  .tfab-hero-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px}
+  .tfab-hero-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:#17e08a;color:#003818;border-radius:100px;font-size:10px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase}
+  .tfab-hero-pill::before{content:'';width:6px;height:6px;background:#003818;border-radius:50%}
+  .tfab-hero-tick{font-family:'JetBrains Mono','SF Mono',Menlo,monospace;font-size:11px;font-weight:700;color:#17e08a;background:rgba(23,224,138,0.1);border:1px solid rgba(23,224,138,0.25);padding:4px 8px;border-radius:6px;letter-spacing:0.06em}
+  .tfab-hero-name{font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.4px;margin-bottom:2px}
+  .tfab-hero-sector{font-size:12px;color:#8a8f99;font-weight:500;margin-bottom:12px}
+  .tfab-hero-desc{font-size:13px;color:#c8ccd4;line-height:1.55;margin-bottom:14px}
+  .tfab-hero-desc b{color:#fff;font-weight:700}
+  .tfab-hero-stats{display:flex;gap:0;padding:12px 0;border-top:1px solid #2e2e2e;border-bottom:1px solid #2e2e2e;margin-bottom:14px}
+  .tfab-hero-stat{flex:1;text-align:left;padding:0 12px;border-right:1px solid #2e2e2e}
+  .tfab-hero-stat:first-child{padding-left:0}
+  .tfab-hero-stat:last-child{border-right:none;padding-right:0}
+  .tfab-hero-stat-val{font-family:'JetBrains Mono','SF Mono',Menlo,monospace;font-size:14px;font-weight:700;color:#fff;letter-spacing:-0.2px;margin-bottom:2px}
+  .tfab-hero-stat-lbl{font-size:9px;color:#666;text-transform:uppercase;letter-spacing:0.08em;font-weight:600}
+  .tfab-hero-cta{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:#17e08a;color:#003818;padding:13px 18px;border-radius:10px;font-weight:800;font-size:14px;text-decoration:none;border:none;cursor:pointer;font-family:inherit;letter-spacing:-0.1px}
+  .tfab-hero-cta:active{background:#13c579}
 </style>
 </head>
 <body>
@@ -158,16 +166,31 @@
 
 <div id="tab-stocks" class="tab-panel">
   
-<div class="tfab-featured" onclick="location.href='/terafab.html'">
-  <div class="tfab-pill">Exclusive · Construction JV</div>
-  <div class="tfab-title">TeraFab</div>
-  <div class="tfab-sub">Fund the $16.8B captive silicon foundry being built alongside <b>Tesla</b>, <b>SpaceX</b> &amp; <b>Intel</b>. Earn wafer-output royalties during construction, convert to JV equity at first-silicon in 2028.</div>
-  <div class="tfab-meta">
-    <span><b>$125</b> / unit</span>
-    <span>Min <b>$500</b></span>
-    <span>First silicon <b>Q4 2028</b></span>
+<div class="tfab-hero" onclick="location.href='/terafab.html'">
+  <div class="tfab-hero-inner">
+    <div class="tfab-hero-top">
+      <span class="tfab-hero-pill">Exclusive</span>
+      <span class="tfab-hero-tick">TFAB</span>
+    </div>
+    <div class="tfab-hero-name">TeraFab</div>
+    <div class="tfab-hero-sector">Construction JV &middot; Semiconductor Infrastructure</div>
+    <div class="tfab-hero-desc">Fund the $16.8B captive silicon foundry being built alongside <b>Tesla</b>, <b>SpaceX</b> &amp; <b>Intel</b>. Earn wafer-output royalties, convert to JV equity at first-silicon 2028.</div>
+    <div class="tfab-hero-stats">
+      <div class="tfab-hero-stat">
+        <div class="tfab-hero-stat-val">$125</div>
+        <div class="tfab-hero-stat-lbl">Per Unit</div>
+      </div>
+      <div class="tfab-hero-stat">
+        <div class="tfab-hero-stat-val">$500</div>
+        <div class="tfab-hero-stat-lbl">Min Fund</div>
+      </div>
+      <div class="tfab-hero-stat">
+        <div class="tfab-hero-stat-val">Q4 2028</div>
+        <div class="tfab-hero-stat-lbl">First Silicon</div>
+      </div>
+    </div>
+    <button type="button" class="tfab-hero-cta" onclick="event.stopPropagation();location.href='/buy-shares.html?ticker=TFAB'">Fund TFAB Construction &rarr;</button>
   </div>
-  <a href="/terafab.html" class="tfab-cta">Fund TFAB Construction →</a>
 </div>
 
 <div class="section">
