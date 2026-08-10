@@ -100,6 +100,21 @@
   .dash-header .notif-bell-btn { position: relative; width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: #4a9eff; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
   .dash-header .notif-bell-btn svg { width: 18px; height: 18px; }
   .dash-header .notif-badge { position: absolute; top: -3px; right: -3px; min-width: 18px; height: 18px; padding: 0 4px; background: #ff6a6a; color: #000; border-radius: 9px; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid #000; }
+
+  /* ── TeraFab featured construction JV card ── */
+  .tfab-featured{margin:8px 16px 20px;background:linear-gradient(135deg,rgba(74,158,255,0.14),rgba(62,213,152,0.08));border:1px solid rgba(74,158,255,0.4);border-radius:16px;padding:20px;position:relative;overflow:hidden;cursor:pointer;transition:transform .15s}
+  .tfab-featured:active{transform:scale(0.985)}
+  .tfab-featured::before{content:'';position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle,rgba(74,158,255,0.35),transparent 65%);pointer-events:none}
+  .tfab-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:rgba(255,92,92,0.15);border:1px solid rgba(255,92,92,0.4);border-radius:100px;font-size:10px;font-weight:800;color:#ff5c5c;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;position:relative;z-index:1}
+  .tfab-pill::before{content:'';width:6px;height:6px;background:#ff5c5c;border-radius:50%;box-shadow:0 0 8px #ff5c5c;animation:tfab-pulse 2s infinite}
+  @keyframes tfab-pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+  .tfab-title{font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.5px;margin-bottom:6px;position:relative;z-index:1}
+  .tfab-sub{font-size:13px;color:#b0b8c4;line-height:1.5;margin-bottom:14px;position:relative;z-index:1}
+  .tfab-sub b{color:#fff}
+  .tfab-meta{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:#8a8f99;margin-bottom:16px;position:relative;z-index:1}
+  .tfab-meta b{color:#fff;font-weight:700}
+  .tfab-cta{display:inline-flex;align-items:center;gap:6px;background:#4a9eff;color:#fff;padding:11px 18px;border-radius:10px;font-weight:700;font-size:13px;text-decoration:none;position:relative;z-index:1;border:none;cursor:pointer}
+  .tfab-cta:active{background:#3d7fd6}
 </style>
 </head>
 <body>
@@ -142,7 +157,20 @@
 </div>
 
 <div id="tab-stocks" class="tab-panel">
-  <div class="section">
+  
+<div class="tfab-featured" onclick="location.href='/terafab.html'">
+  <div class="tfab-pill">Exclusive · Construction JV</div>
+  <div class="tfab-title">TeraFab</div>
+  <div class="tfab-sub">Fund the $16.8B captive silicon foundry being built alongside <b>Tesla</b>, <b>SpaceX</b> &amp; <b>Intel</b>. Earn wafer-output royalties during construction, convert to JV equity at first-silicon in 2028.</div>
+  <div class="tfab-meta">
+    <span><b>$125</b> / unit</span>
+    <span>Min <b>$500</b></span>
+    <span>First silicon <b>Q4 2028</b></span>
+  </div>
+  <a href="/terafab.html" class="tfab-cta">Fund TFAB Construction →</a>
+</div>
+
+<div class="section">
     <div class="section-head"><div class="section-title">The Magnificent Seven</div></div>
     <div class="row" id="row-mag7"></div>
   </div>
