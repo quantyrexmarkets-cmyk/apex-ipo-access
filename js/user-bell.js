@@ -1,15 +1,19 @@
 // ═══════════════════════════════════════════════════════════
 // USER NOTIFICATION BELL — shared across all user pages
+// MongoDB API edition (no Supabase)
 // ═══════════════════════════════════════════════════════════
 (function(){
   if(window._userBellInited) return;
   window._userBellInited = true;
 
   var userBellNotifs = [];
-  var rtSub = null;
+  var pollTimer = null;
 
   function timeAgo(iso){
-    var d = new Date(iso); var sec = Math.floor((Date.now()-d)/1000);
+    if(!iso) return '';
+    var d = new Date(iso);
+    if(isNaN(d.getTime())) return '';
+    var sec = Math.floor((Date.now()-d)/1000);
     if(sec<60) return 'just now';
     if(sec<3600) return Math.floor(sec/60)+'m ago';
     if(sec<86400) return Math.floor(sec/3600)+'h ago';
@@ -52,6 +56,18 @@
     if(has('warn') || has('suspend')) return {svg: icons.warning.svg, cls: 'amber'};
     if(has('error') || has('fail') || has('reject')) return {svg: icons.error.svg, cls: 'red'};
     return {svg: icons.bell.svg, cls: 'blue'};
+  }
+
+  // Normalize MongoDB / legacy notifications into single shape
+  function norm(n){
+    return {
+      id:       n._id || n.id,
+      title:    n.title || n.subject || 'Notification',
+      message:  n.message || n.body || '',
+      type:     n.type || n.kind || '',
+      isRead:   typeof n.read !== 'undefined' ? !!n.read : !!n.is_read,
+      created:  n.createdAt || n.created_at
+    };
   }
 
   function injectStyles(){
@@ -108,14 +124,11 @@
 
   async function loadNotifications(){
     try {
-      var user = await window.apex.getUser();
-      if(!user) return;
-      var { data } = await sb.from('notifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at',{ascending:false})
-        .limit(50);
-      userBellNotifs = data || [];
+      var r = await fetch('/api/notifications', { credentials:'include' });
+      if(!r.ok){ return; }
+      var payload = await r.json();
+      var list = payload.notifications || [];
+      userBellNotifs = list.map(norm);
       renderList();
       updateBadge();
     } catch(e){ console.warn('user bell load err', e); }
@@ -129,13 +142,14 @@
       return;
     }
     list.innerHTML = userBellNotifs.map(function(n){
-      var cls = n.is_read ? 'read' : 'unread';
+      var cls = n.isRead ? 'read' : 'unread';
+      var _i = iconFor(n.type, n.title);
       return '<div class="ub-item '+cls+'" data-id="'+n.id+'">' +
-        (function(){var _i=iconFor(n.type||n.kind, n.title||n.subject); return '<div class="ub-icon ub-icon-'+_i.cls+'">'+_i.svg+'</div>';})() +
+        '<div class="ub-icon ub-icon-'+_i.cls+'">'+_i.svg+'</div>' +
         '<div class="ub-body">' +
-          '<div class="ub-title">'+stripEmoji(n.title||n.subject||'Notification')+'</div>' +
-          '<div class="ub-msg">'+(n.message||n.body||'')+'</div>' +
-          '<div class="ub-time">'+timeAgo(n.created_at)+'</div>' +
+          '<div class="ub-title">'+stripEmoji(n.title)+'</div>' +
+          '<div class="ub-msg">'+(n.message||'')+'</div>' +
+          '<div class="ub-time">'+timeAgo(n.created)+'</div>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -143,9 +157,15 @@
     list.querySelectorAll('.ub-item').forEach(function(el){
       el.addEventListener('click', async function(){
         var id = el.dataset.id;
-        await sb.from('notifications').update({is_read:true}).eq('id', id);
+        try {
+          await fetch('/api/notifications', {
+            method:'POST', credentials:'include',
+            headers:{ 'Content-Type':'application/json' },
+            body: JSON.stringify({ id: id })
+          });
+        } catch(e){ /* silent */ }
         var n = userBellNotifs.find(function(x){return x.id===id});
-        if(n) n.is_read = true;
+        if(n) n.isRead = true;
         el.classList.remove('unread'); el.classList.add('read');
         updateBadge();
       });
@@ -153,7 +173,7 @@
   }
 
   function updateBadge(){
-    var unread = userBellNotifs.filter(function(n){return !n.is_read}).length;
+    var unread = userBellNotifs.filter(function(n){return !n.isRead}).length;
     document.querySelectorAll('.icon-btn[aria-label="Notifications"]').forEach(function(btn){
       btn.style.position = 'relative';
       var b = btn.querySelector('.ub-badge');
@@ -171,11 +191,16 @@
   }
 
   async function markAllRead(){
-    var unread = userBellNotifs.filter(function(n){return !n.is_read});
+    var unread = userBellNotifs.filter(function(n){return !n.isRead});
     if(!unread.length) return;
-    var ids = unread.map(function(n){return n.id});
-    await sb.from('notifications').update({is_read:true}).in('id', ids);
-    userBellNotifs.forEach(function(n){n.is_read=true});
+    try {
+      await fetch('/api/notifications', {
+        method:'POST', credentials:'include',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({ all: true })
+      });
+    } catch(e){ console.warn('markAllRead:', e); }
+    userBellNotifs.forEach(function(n){ n.isRead = true; });
     renderList(); updateBadge();
   }
 
@@ -195,7 +220,6 @@
 
   function attachBellButtons(){
     document.querySelectorAll('.icon-btn[aria-label="Notifications"]').forEach(function(btn){
-      // Remove the "coming soon" onclick
       btn.removeAttribute('onclick');
       btn.addEventListener('click', function(e){
         e.preventDefault();
@@ -205,43 +229,45 @@
     });
   }
 
-  async function startRealtime(){
-    try {
-      var user = await window.apex.getUser();
-      if(!user) return;
-      rtSub = sb.channel('user_notif_rt_'+user.id)
-        .on('postgres_changes', {event:'INSERT', schema:'public', table:'notifications', filter:'user_id=eq.'+user.id},
-          function(payload){
-            userBellNotifs.unshift(payload.new);
-            if(userBellNotifs.length>50) userBellNotifs.pop();
-            updateBadge();
-            var ov = document.getElementById('ubOverlay');
-            if(ov && ov.classList.contains('open')) renderList();
-          })
-        .subscribe();
-    } catch(e){ console.warn('rt sub failed', e); }
+  function startPolling(){
+    // Replaces Supabase realtime subscription — simple 30s polling
+    if(pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(loadNotifications, 30000);
   }
 
+  // ── Init ─────────────────────────────────────────────────
   function init(){
     injectStyles();
     buildOverlay();
     attachBellButtons();
-    // Initial badge load (without opening)
     loadNotifications();
-    startRealtime();
-  }
-
-  // Boot when ready
-  function tryInit(){
-    if(typeof sb === 'undefined' || typeof window.apex === 'undefined'){
-      setTimeout(tryInit, 500); return;
-    }
-    init();
+    startPolling();
   }
 
   if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){ setTimeout(tryInit, 300); });
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    setTimeout(tryInit, 300);
+    init();
   }
+
+  // Re-attach if bell buttons appear later (lazy-loaded headers)
+  var moAttached = false;
+  function watchForBells(){
+    if(moAttached) return;
+    moAttached = true;
+    var mo = new MutationObserver(function(){
+      if(document.querySelector('.icon-btn[aria-label="Notifications"]:not([data-ub-bound])')){
+        attachBellButtons();
+        document.querySelectorAll('.icon-btn[aria-label="Notifications"]').forEach(function(b){
+          b.setAttribute('data-ub-bound','1');
+        });
+      }
+    });
+    mo.observe(document.body, { childList:true, subtree:true });
+  }
+  if(document.body) watchForBells();
+  else document.addEventListener('DOMContentLoaded', watchForBells);
+
+  // Expose for debugging
+  window.userBell = { open: openBell, close: closeBell, reload: loadNotifications };
 })();

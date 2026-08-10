@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 <meta charset="UTF-8">
 <meta name="robots" content="noindex, nofollow">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Access | Apex IPO Access</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-<script src="js/apex-api.js?v=1"></script>
-<script src="js/supabase.js?v=1781643381"></script>
-<script src="js/notify.js?v=1781643381"></script>
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script src="/js/supabase.js?v=1786129802"></script>
+<script src="/js/notify.js?v=1786129802"></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{
@@ -167,7 +168,7 @@
       <label>Admin Email <span class="req">*</span></label>
       <div class="input-wrap">
         <svg class="lead" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        <input type="email" id="email" name="admin_email" placeholder="admin@apexipoaccess.com" autocomplete="username">
+        <input type="email" id="email" name="admin_email" placeholder="admin@apexipoholdings.com" autocomplete="username">
       </div>
     </div>
 
@@ -195,7 +196,7 @@
     </div>
 
     <div class="foot">
-      <a href="login.html">← User Login</a>
+      <a href="/login.html">← User Login</a>
       <span>v1.0</span>
     </div>
 
@@ -220,59 +221,70 @@
   });
 
   // Redirect if already logged in as admin
-  document.addEventListener('sb-ready', async function(){
-    var { data } = await sb.auth.getUser();
-    if(data && data.user){
-      var { data: profile } = await sb.from('profiles').select('is_admin').eq('id', data.user.id).single();
-      if(profile && profile.is_admin){
-        window.location.href = 'admin.html';
+  (async function(){
+    try {
+      const me = await ApexAPI.auth.me();
+      if(me && me.user && me.user.role === 'admin'){
+        console.log('[admin-login] Already logged in as admin, redirecting');
+        window.location.replace('/adminprivate');
+        return;
       }
+      if(me && me.user && me.user.role !== 'admin'){
+        console.log('[admin-login] Logged in but not admin, logging out');
+        await ApexAPI.auth.logout().catch(()=>{});
+      }
+    } catch(e){
+      console.log('[admin-login] Not logged in (expected):', e.message); window._dbg && window._dbg('Not logged in (expected):');
     }
-  });
+  })();
 
   document.getElementById('adminLoginForm').addEventListener('submit', async function(e){
     e.preventDefault();
+    e.stopPropagation();
+    
     var email = emailIn.value.trim();
     var pwd = pwdIn.value;
-
-    if(!email){ apexError('Enter admin email'); emailIn.focus(); return; }
-    if(!pwd){ apexError('Enter password'); pwdIn.focus(); return; }
-
+    
+    if(!email){ apexError('Enter admin email'); emailIn.focus(); return false; }
+    if(!pwd){ apexError('Enter password'); pwdIn.focus(); return false; }
+    
     btn.disabled = true;
     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" opacity="0.3"/><path d="M22 12a10 10 0 0 1-10 10"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite"/></path></svg> Verifying...';
-
+    
+    console.log('[admin-login] Calling ApexAPI.auth.login...');
+    
     try {
-      var { data, error } = await sb.auth.signInWithPassword({ email: email, password: pwd });
-      if(error) throw error;
-
-      // Check admin flag
-      var { data: profile, error: profErr } = await sb.from('profiles').select('is_admin').eq('id', data.user.id).single();
-      if(profErr) throw profErr;
-
-      if(!profile || !profile.is_admin){
-        // Sign out non-admin immediately
-        await sb.auth.signOut();
+      if(typeof ApexAPI === 'undefined' || !ApexAPI.auth || !ApexAPI.auth.login){
+        throw new Error('ApexAPI not loaded — refresh the page');
+      }
+      
+      const res = await ApexAPI.auth.login(email, pwd);
+      console.log('[admin-login] Login response:', res);
+      
+      if(!res || !res.ok || !res.user){
+        throw new Error('Login failed: invalid response');
+      }
+      if(res.user.role !== 'admin'){
+        await ApexAPI.auth.logout().catch(()=>{});
         throw new Error('Access denied. This account is not authorized for admin access.');
       }
-
-      // Fetch admin's name for personalized welcome
-      var nameRes = await sb.from('profiles').select('first_name,last_name,email').eq('id', data.user.id).single();
-      var adminName = 'Admin';
-      if(nameRes && nameRes.data){
-        var fn = (nameRes.data.first_name || '').trim();
-        var ln = (nameRes.data.last_name || '').trim();
-        if(fn || ln) adminName = (fn + ' ' + ln).trim();
-        else if(nameRes.data.email) adminName = nameRes.data.email.split('@')[0];
-      }
+      
+      var adminName = res.user.fullName || (res.user.email || 'Admin').split('@')[0];
       apexSuccess('Welcome back ' + adminName);
-      setTimeout(function(){ window.location.href = 'admin.html'; }, 1400);
-
-    } catch(e){
-      console.error(e);
-      apexError(e.message || 'Login failed');
+      
+      console.log('[admin-login] Success, redirecting in 800ms');
+      setTimeout(function(){
+        window.location.replace('/adminprivate');
+      }, 800);
+      
+    } catch(err){
+      console.error('[admin-login] FAILED:', err); window._dbg && window._dbg('ERR: FAILED: ' + (err && err.message || err));
+      apexError(err.message || 'Login failed');
       btn.disabled = false;
       btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Sign In to Admin Panel';
     }
+    
+    return false;
   });
 </script>
 
@@ -301,7 +313,7 @@
   var s, c, o = window.smartsupp = function(){ o._.push(arguments); };
   o._ = [];
   window._smartsupp = window._smartsupp || {};
-  window._smartsupp.key = '7d6445f6308e329b33468a584f675c298bd2c871';
+  window._smartsupp.key = 'cfc0fb237d4a16ba3caf79dddd9f9977ba5c938c';
   window._smartsupp.offsetY = 80;
   window._smartsupp.offsetX = 10;
   s = d.getElementsByTagName('script')[0];

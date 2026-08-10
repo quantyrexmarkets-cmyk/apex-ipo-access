@@ -73,11 +73,13 @@ module.exports = async (req, res) => {
         status: 'pending',
       });
 
+      const _fmt = (n) => Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+      const _methodLabel = method === 'crypto' ? `${asset} withdrawal` : (method === 'wire' ? 'wire withdrawal' : (method === 'ach' ? 'ACH withdrawal' : (method === 'bank' ? 'bank withdrawal' : `${method} withdrawal`)));
       await Notification.create({
         userId: user._id,
         type: 'withdrawal',
-        title: 'Withdrawal submitted',
-        message: `Your ${method} withdrawal of $${amountUSD} is pending review.`,
+        title: 'Withdrawal initiated',
+        message: `$${_fmt(amountUSD)} ${_methodLabel} is being processed.`,
         link: '/activity',
       });
 

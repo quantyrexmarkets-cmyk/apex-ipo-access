@@ -48,7 +48,11 @@ module.exports = async (req, res) => {
 
       const folder = folderMap[purpose] || folderMap.general;
       const timestamp = Math.round(Date.now() / 1000);
+      const uploadPreset = process.env.CLOUDINARY_UPLOAD_PRESET || '';
+
       const paramsToSign = { timestamp, folder };
+      if (uploadPreset) paramsToSign.upload_preset = uploadPreset;
+
       const signature = cloudinary.utils.api_sign_request(paramsToSign, process.env.CLOUDINARY_API_SECRET);
 
       return res.status(200).json({
@@ -56,6 +60,7 @@ module.exports = async (req, res) => {
         signature, timestamp, folder,
         cloudName: process.env.CLOUDINARY_CLOUD_NAME,
         apiKey: process.env.CLOUDINARY_API_KEY,
+        uploadPreset: uploadPreset || undefined,
       });
     }
 

@@ -46,6 +46,19 @@ const HoldingSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    lockedUntil: {
+      type: Date,
+      default: null,
+    },
+    lockupDays: {
+      type: Number,
+      default: 0,
+    },
+    notes: {
+      type: String,
+      default: '',
+      trim: true,
+    },
   },
   {
     timestamps: true,

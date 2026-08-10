@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="/js/loader.js?v=1786129802"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>User Detail · Apex IPO Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#000;
+    --bg-1:#0a0a0a;
+    --bg-2:#0f0f0f;
+    --bg-3:#161616;
+    --border:#1a1a1a;
+    --border-2:#222;
+    --text:#fff;
+    --text-2:#a0a0a0;
+    --text-3:#666;
+    --accent:#f5a524;
+    --accent-2:#e09612;
+    --green:#22c55e;
+    --green-bg:rgba(34,197,94,.12);
+    --red:#ef4444;
+    --red-bg:rgba(239,68,68,.12);
+    --orange:#f59e0b;
+    --orange-bg:rgba(245,158,11,.12);
+    --blue:#3b82f6;
+    --blue-bg:rgba(59,130,246,.12);
+    --purple:#a855f7;
+    --purple-bg:rgba(168,85,247,.15);
+    --cyan-grad:linear-gradient(135deg,#22d3ee,#06b6d4);
+    --r:14px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--text);font-family:'Montserrat',-apple-system,BlinkMacSystemFont,sans-serif;min-height:100vh;-webkit-tap-highlight-color:transparent}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit}
+
+  /* ───── Top bar ───── */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:var(--bg);
+    border-bottom:1px solid var(--border);
+    padding:14px 16px;
+    display:flex;align-items:center;gap:12px;
+  }
+  .icon-btn{
+    width:42px;height:42px;border-radius:12px;
+    background:transparent;border:1px solid var(--border-2);
+    display:grid;place-items:center;
+    color:var(--text);cursor:pointer;
+    transition:.15s;
+  }
+  .icon-btn:active{background:var(--bg-3)}
+  .topbar-title{flex:1;min-width:0}
+  .topbar-title h1{font-size:16px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .topbar-title p{font-size:12px;color:var(--text-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* ───── Page wrap ───── */
+  .wrap{padding:16px;padding-bottom:80px;max-width:720px;margin:0 auto}
+
+  /* ───── States ───── */
+  .state{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--text-2);text-align:center;padding:20px}
+  .spinner{width:38px;height:38px;border:3px solid var(--border-2);border-top-color:var(--accent);border-radius:50%;animation:sp .8s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  /* ───── Profile header ───── */
+  .profile{
+    background:var(--bg-2);
+    border:1px solid var(--border);
+    border-radius:var(--r);
+    padding:20px;
+    display:flex;align-items:center;gap:14px;
+    margin-bottom:14px;
+  }
+  .avatar{
+    width:56px;height:56px;border-radius:50%;
+    background:var(--cyan-grad);
+    display:grid;place-items:center;
+    font-size:22px;font-weight:700;color:#fff;
+    flex-shrink:0;
+  }
+  .avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+  .p-info{flex:1;min-width:0}
+  .p-name{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .p-name h2{font-size:16px;font-weight:600;line-height:1.3;letter-spacing:-.2px}
+  .p-email{font-size:13px;color:var(--text-2);margin-top:3px;word-break:break-all}
+
+  /* ───── Badges ───── */
+  .pill{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:3px 10px;border-radius:20px;
+    font-size:11px;font-weight:600;
+    text-transform:capitalize;
+  }
+  .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+  .pill.green{background:var(--green-bg);color:var(--green)}
+  .pill.orange{background:var(--orange-bg);color:var(--orange)}
+  .pill.red{background:var(--red-bg);color:var(--red)}
+  .pill.blue{background:var(--blue-bg);color:var(--blue)}
+  .pill.purple{background:var(--purple-bg);color:var(--purple)}
+
+  /* ───── Stat grid ───── */
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+  .stat{
+    background:var(--bg-2);
+    border:1px solid var(--border);
+    border-radius:var(--r);
+    padding:16px;
+    display:flex;align-items:flex-start;gap:12px;
+  }
+  .stat-icon{
+    width:42px;height:42px;border-radius:12px;
+    display:grid;place-items:center;flex-shrink:0;
+  }
+  .stat-icon.green{background:var(--green-bg);color:var(--green)}
+  .stat-icon.orange{background:var(--orange-bg);color:var(--orange)}
+  .stat-icon.red{background:var(--red-bg);color:var(--red)}
+  .stat-icon.blue{background:var(--blue-bg);color:var(--blue)}
+  .stat-text{min-width:0;flex:1}
+  .stat-label{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;font-weight:600}
+  .stat-val{font-size:18px;font-weight:700;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .stat-sub{font-size:11px;color:var(--text-3);margin-top:2px}
+
+  /* ───── Card sections ───── */
+  .card{
+    background:var(--bg-2);
+    border:1px solid var(--border);
+    border-radius:var(--r);
+    margin-bottom:14px;
+    overflow:hidden;
+  }
+  .card-head{
+    padding:16px 18px;
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  .card-head h3{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+  .card-head .count{font-size:11px;color:var(--text-3);background:var(--bg-3);padding:3px 8px;border-radius:20px}
+  .card-body{padding:18px}
+
+  /* ───── Forms ───── */
+  .field{margin-bottom:14px}
+  .field:last-child{margin-bottom:0}
+  .field label{display:block;font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:6px}
+  .field input,.field select,.field textarea{
+    width:100%;
+    background:var(--bg-1);
+    border:1px solid var(--border-2);
+    border-radius:10px;
+    color:var(--text);
+    font-size:14px;padding:11px 14px;
+    outline:none;transition:.15s;font-family:inherit;
+  }
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+  .field input[readonly]{color:var(--text-2);background:var(--bg)}
+  .field textarea{resize:vertical;min-height:80px}
+
+  .row-2{display:flex;gap:8px;align-items:flex-end}
+  .row-2 .field{flex:1;margin:0}
+
+  /* ───── Buttons ───── */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    padding:11px 18px;border-radius:10px;
+    font-size:14px;font-weight:600;cursor:pointer;
+    border:1px solid transparent;transition:.15s;
+    white-space:nowrap;
+  }
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn-primary{background:var(--accent);color:#000}
+  .btn-primary:active{background:var(--accent-2)}
+  .btn-ghost{background:var(--bg-3);color:var(--text);border-color:var(--border-2)}
+  .btn-ghost:active{background:var(--border-2)}
+  .btn-danger{background:var(--red-bg);color:var(--red);border-color:rgba(239,68,68,.3)}
+  .btn-danger:active{background:var(--red);color:#fff}
+  .btn-success{background:var(--green-bg);color:var(--green);border-color:rgba(34,197,94,.3)}
+  .btn-success:active{background:var(--green);color:#fff}
+  .btn-sm{padding:7px 12px;font-size:12px}
+  .btn-block{width:100%}
+
+  /* ───── Sticky action footer ───── */
+  .action-bar{
+    background:var(--bg-2);
+    border:1px solid var(--border);
+    border-radius:var(--r);
+    padding:14px;
+    display:flex;gap:10px;flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .action-bar .btn{flex:1;min-width:130px}
+
+  /* ───── Lists (deposits/withdrawals/holdings) ───── */
+  .list{display:flex;flex-direction:column}
+  .list-row{
+    padding:14px 18px;
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:12px;
+  }
+  .list-row:last-child{border-bottom:none}
+  .list-icon{
+    width:38px;height:38px;border-radius:10px;
+    display:grid;place-items:center;flex-shrink:0;
+  }
+  .list-icon.green{background:var(--green-bg);color:var(--green)}
+  .list-icon.red{background:var(--red-bg);color:var(--red)}
+  .list-icon.blue{background:var(--blue-bg);color:var(--blue)}
+  .list-main{flex:1;min-width:0}
+  .list-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .list-sub{font-size:12px;color:var(--text-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .list-amount{font-size:14px;font-weight:700;text-align:right;white-space:nowrap}
+  .list-amount.pos{color:var(--green)}
+  .list-amount.neg{color:var(--red)}
+
+  .empty{padding:32px 18px;text-align:center;color:var(--text-3);font-size:13px}
+
+  /* ───── KYC ───── */
+  .kyc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+  .kyc-doc{
+    background:var(--bg-1);border:1px solid var(--border-2);
+    border-radius:10px;padding:12px;text-align:center;
+    display:flex;flex-direction:column;gap:8px;align-items:center;
+  }
+  .kyc-doc img{width:100%;height:90px;object-fit:cover;border-radius:6px}
+  .kyc-doc .type{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px}
+  .kyc-doc .name{font-size:12px;color:var(--text);word-break:break-all;line-height:1.3}
+  .kyc-doc a{font-size:11px;color:var(--accent)}
+
+  /* ───── Toast ───── */
+  #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;width:calc(100% - 32px);max-width:360px}
+  .t-msg{padding:12px 16px;border-radius:10px;font-size:13px;font-weight:500;text-align:center;animation:slideUp .3s ease,fadeOut .4s ease 2.6s forwards;pointer-events:auto;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  .t-msg.success{background:var(--green);color:#fff}
+  .t-msg.error{background:var(--red);color:#fff}
+  .t-msg.info{background:var(--blue);color:#fff}
+  @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+  @keyframes fadeOut{to{opacity:0;transform:translateY(20px)}}
+
+  /* ───── Responsive tweaks ───── */
+  @media (max-width:380px){
+    .stat-grid{grid-template-columns:1fr}
+    .stat-val{font-size:16px}
+    .topbar-title h1{font-size:17px}
+  }
+  @media (min-width:720px){
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .form-grid .field{margin-bottom:0}
+  }
+</style>
+<style>
+/* Admin user form field polish */
+#fPhone, #fDob, #fAddr1, #fAddr2, #fCity, #fState, #fZip, #fCountry,
+#fCitizenship, #fIdType, #fIdNumber, #fOccupation, #fEmployer {
+  background: rgba(255,255,255,0.04) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  border-radius: 8px !important;
+  padding: 10px 12px !important;
+  color: var(--text-1) !important;
+  font-family: 'Montserrat',sans-serif !important;
+  font-size: 13px !important;
+  width: 100% !important;
+  transition: border-color .15s, background .15s;
+}
+#fPhone:focus, #fDob:focus, #fAddr1:focus, #fAddr2:focus, #fCity:focus,
+#fState:focus, #fZip:focus, #fCountry:focus, #fCitizenship:focus,
+#fIdType:focus, #fIdNumber:focus, #fOccupation:focus, #fEmployer:focus {
+  outline: none;
+  border-color: #4a9eff !important;
+  background: rgba(74,158,255,0.05) !important;
+}
+.form-grid .field label {
+  display:block;
+  font-size:10px;
+  font-weight:600;
+  color:var(--text-3);
+  text-transform:uppercase;
+  letter-spacing:0.6px;
+  margin-bottom:6px;
+  font-family:'Montserrat',sans-serif;
+}
+@media(max-width:560px){
+  .form-grid{grid-template-columns:1fr !important}
+}
+</style>
+</head>
+<body>
+
+<!-- ICONS (inline SVG sprite) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></symbol>
+    <symbol id="i-ban" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+    <symbol id="i-dollar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></symbol>
+    <symbol id="i-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
+    <symbol id="i-arrow-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></symbol>
+    <symbol id="i-pie" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+  </defs>
+</svg>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <a href="/adminprivate" class="icon-btn" aria-label="Back"><svg width="20" height="20"><use href="#i-back"/></svg></a>
+  <div class="topbar-title">
+    <h1 id="tbName">User Detail</h1>
+    <p id="tbEmail">Loading…</p>
+  </div>
+  <button onclick="loginAsUser()" title="Login as this user" style="background:rgba(255,184,11,0.12);border:1px solid rgba(255,184,11,0.35);color:#ffb80b;padding:8px 14px;border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px;margin-right:8px">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+  Login as User
+</button><button class="icon-btn" onclick="reload()" aria-label="Refresh"><svg width="18" height="18"><use href="#i-refresh"/></svg></button>
+</header>
+
+<div id="toast"></div>
+
+<main class="wrap">
+
+  <!-- LOADING -->
+  <div class="state" id="loadingState">
+    <div class="spinner"></div>
+    <p>Loading user data…</p>
+  </div>
+
+  <!-- ERROR -->
+  <div class="state" id="errorState" style="display:none">
+    <div style="width:60px;height:60px;border-radius:50%;background:var(--red-bg);display:grid;place-items:center;color:var(--red)">
+      <svg width="28" height="28"><use href="#i-alert"/></svg>
+    </div>
+    <p id="errorMsg" style="color:var(--text)">Failed to load user.</p>
+    <a href="/adminprivate" class="btn btn-ghost"><svg width="14" height="14"><use href="#i-back"/></svg> Back to Users</a>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="content" style="display:none">
+
+    <!-- Profile card -->
+    <section class="profile">
+      <div class="avatar" id="avatar">?</div>
+      <div class="p-info">
+        <div class="p-name">
+          <h2 id="pName">—</h2>
+          <span class="pill purple" id="pRole" style="display:none">Admin</span>
+        </div>
+        <p class="p-email" id="pEmail">—</p>
+        <div style="margin-top:8px"><span class="pill orange" id="pStatus">pending</span></div>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="stat-grid">
+      <div class="stat">
+        <div class="stat-icon green"><svg width="20" height="20"><use href="#i-dollar"/></svg></div>
+        <div class="stat-text">
+          <div class="stat-label">Balance</div>
+          <div class="stat-val" id="sBalance">$0.00</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon blue"><svg width="20" height="20"><use href="#i-arrow-down"/></svg></div>
+        <div class="stat-text">
+          <div class="stat-label">Deposited</div>
+          <div class="stat-val" id="sDeposited">$0.00</div>
+          <div class="stat-sub" id="sDepCount">0 records</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon red"><svg width="20" height="20"><use href="#i-arrow-up"/></svg></div>
+        <div class="stat-text">
+          <div class="stat-label">Withdrawn</div>
+          <div class="stat-val" id="sWithdrawn">$0.00</div>
+          <div class="stat-sub" id="sWdCount">0 records</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon orange"><svg width="20" height="20"><use href="#i-pie"/></svg></div>
+        <div class="stat-text">
+          <div class="stat-label">Holdings</div>
+          <div class="stat-val" id="sHoldings">0</div>
+          <div class="stat-sub">Active positions</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick actions -->
+    <section class="action-bar">
+<!-- Extended profile fields -->
+<div style="margin-top:24px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08)">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:4px">
+    <div>
+      <h3 style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;color:var(--text-1);text-transform:uppercase;letter-spacing:1.2px;margin:0;display:flex;align-items:center;gap:8px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Personal Information
+      </h3>
+      <p style="font-size:11px;color:var(--text-3);margin:4px 0 0 0">Submitted during signup &amp; KYC</p>
+    </div>
+    <button type="button" id="piToggleBtn" onclick="togglePersonalInfo()" style="background:rgba(74,158,255,0.12);border:1px solid rgba(74,158,255,0.3);color:#4a9eff;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;font-family:'Montserrat',sans-serif;display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0">
+      <svg id="piToggleIcon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .2s"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span id="piToggleLabel">View / Manage</span>
+    </button>
+  </div>
+  <div id="personalInfoPanel" style="display:none;margin-top:14px">
+<div class="form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+  <div class="field"><label>Phone</label><input id="fPhone" type="tel" placeholder="(555) 123-4567"></div>
+  <div class="field"><label>Date of Birth</label><input id="fDob" type="date"></div>
+  <div class="field" style="grid-column:1/-1"><label>Address Line 1</label><input id="fAddr1" type="text"></div>
+  <div class="field" style="grid-column:1/-1"><label>Address Line 2</label><input id="fAddr2" type="text"></div>
+  <div class="field"><label>City</label><input id="fCity" type="text"></div>
+  <div class="field"><label>State / Province</label><input id="fState" type="text"></div>
+  <div class="field"><label>ZIP / Postal</label><input id="fZip" type="text"></div>
+  <div class="field"><label>Country</label><input id="fCountry" type="text"></div>
+  <div class="field"><label>Citizenship</label><input id="fCitizenship" type="text"></div>
+  <div class="field"><label>ID Type</label>
+    <select id="fIdType">
+      <option value="">—</option>
+      <option value="ssn">SSN</option>
+      <option value="itin">ITIN</option>
+      <option value="passport">Passport</option>
+      <option value="national_id">National ID</option>
+      <option value="drivers_license">Driver's License</option>
+    </select>
+  </div>
+  <div class="field"><label>ID / SSN Number</label><input id="fIdNumber" type="text" placeholder="XXX-XX-XXXX or passport #"></div>
+  <div class="field"><label>Occupation</label><input id="fOccupation" type="text"></div>
+  <div class="field"><label>Employer</label><input id="fEmployer" type="text"></div>
+</div>
+  </div>
+</div>
+<!-- /extended -->
+      <button class="btn btn-primary" id="saveBtn" onclick="saveProfileInfo()">
+        <svg width="16" height="16"><use href="#i-save"/></svg> Save Profile Information
+      </button>
+      <button class="btn btn-danger btn-sm" id="suspendBtn" onclick="confirmSuspend()">
+        <svg width="14" height="14"><use href="#i-ban"/></svg> Suspend
+      </button>
+      <button class="btn btn-danger btn-sm" onclick="confirmDelete()">
+        <svg width="14" height="14"><use href="#i-trash"/></svg> Delete
+      </button>
+    </section>
+
+    <!-- Account settings -->
+    <section class="card">
+      <div class="card-head">
+        <h3><svg width="16" height="16"><use href="#i-settings"/></svg> Account Settings</h3>
+      </div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="field">
+            <label>Full Name</label>
+            <input type="text" id="fName" placeholder="Full name" />
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input type="email" id="fEmail" placeholder="Email" />
+          </div>
+          <div class="field">
+            <label>Account Status</label>
+            <select id="fStatus">
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Role</label>
+            <select id="fRole">
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="saveAccountSettings()" style="margin-top:6px">
+        <svg width="14" height="14"><use href="#i-save"/></svg> Save Account Settings
+      </button>
+    </section>
+
+    <!-- Balance + KYC -->
+    <section class="card">
+      <div class="card-head">
+        <h3><svg width="16" height="16"><use href="#i-dollar"/></svg> Balance</h3>
+      </div>
+      <div class="card-body">
+        <div class="field">
+          <label>Current Balance (USD)</label>
+          <input type="number" id="fBalance" step="0.01" min="0" placeholder="0.00" readonly style="background:rgba(255,255,255,0.03);cursor:not-allowed" />
+          <div style="font-size:11px;color:#6a7585;margin-top:4px">Use Adjust Balance below to change</div>
+        </div>
+        <div class="field">
+          <label>Adjust Balance (+ credit / − debit)</label>
+          <input type="number" id="fAdjust" placeholder="e.g. 500 or -200" step="0.01" />
+        </div>
+        <div class="field">
+          <label>Reference / Note (shown in user email)</label>
+          <input type="text" id="fAdjustNote" placeholder="Optional — e.g. Wire ref #12345" />
+        </div>
+        <button class="btn btn-primary btn-block" onclick="adjustBalance()">
+          <svg width="14" height="14"><use href="#i-dollar"/></svg> Apply Balance Adjustment
+        </button>
+      </div>
+    </section>
+
+    <!-- Verification (KYC) -->
+    <section class="card">
+      <div class="card-head">
+        <h3><svg width="16" height="16"><use href="#i-shield"/></svg> Verification</h3>
+      </div>
+      <div class="card-body">
+        <div class="field">
+          <label>KYC Status</label>
+          <select id="fKyc">
+            <option value="not_submitted">Not Submitted</option>
+            <option value="pending">Pending Review</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-block" onclick="saveKycStatus()" style="margin-top:6px">
+          <svg width="14" height="14"><use href="#i-save"/></svg> Save Verification Status
+        </button>
+      </div>
+    </section>
+
+    <!-- Deposits -->
+    <section class="card">
+      <div class="card-head">
+        <h3><svg width="16" height="16"><use href="#i-arrow-down"/></svg> Deposits</h3>
+        <span class="count" id="cDeposits">0</span>
+      </div>
+      <div class="list" id="depositsList">
+        <div class="empty">No deposits found</div>
+      </div>
+    </section>
+
+    <!-- Withdrawals -->
+    <section class="card">
+      <div class="card-head">
+        <h3><svg width="16" height="16"><use href="#i-arrow-up"/></svg> Withdrawals</h3>
+        <span class="count" id="cWithdrawals">0</span>
+      </div>
+      <div class="list" id="withdrawalsList">
+        <div class="empty">No withdrawals found</div>
+      </div>
+    </section>
+
+    <!-- Holdings -->
+    <section class="card">
+      <div class="card-head">
+        <h3><svg width="16" height="16"><use href="#i-pie"/></svg> Holdings</h3>
+        <span class="count" id="cHoldings">0</span>
+      </div>
+      <div class="list" id="holdingsList">
+        <div class="empty">No holdings found</div>
+      </div>
+    </section>
+
+    <!-- KYC docs -->
+    <section class="card">
+      <div class="card-head">
+        <h3><svg width="16" height="16"><use href="#i-shield"/></svg> KYC Documents</h3>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-success btn-sm" onclick="approveKyc()"><svg width="12" height="12"><use href="#i-check"/></svg></button>
+          <button class="btn btn-danger btn-sm" onclick="rejectKyc()"><svg width="12" height="12"><use href="#i-x"/></svg></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="kyc-grid" id="kycGrid">
+          <div class="empty" style="grid-column:1/-1">No documents uploaded</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script>
+const $=id=>document.getElementById(id);
+const params=new URLSearchParams(location.search);
+const userId=params.get('id');
+
+let U=null,DEP=[],WD=[],HLD=[],KYC=[];
+
+function toast(msg,type='info'){
+  const t=document.createElement('div');
+  t.className='t-msg '+type;t.textContent=msg;
+  $('toast').appendChild(t);setTimeout(()=>t.remove(),3200);
+}
+function fmt$(n){return '$'+Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}
+function statusPill(s){
+  const v=(s||'').toLowerCase();
+  if(['approved','active','completed','success'].includes(v))return 'green';
+  if(['pending','review','processing'].includes(v))return 'orange';
+  if(['rejected','failed','suspended','disabled'].includes(v))return 'red';
+  return 'blue';
+}
+function pillHTML(s){return `<span class="pill ${statusPill(s)}">${s||'—'}</span>`}
+
+if(!userId){showError('No user ID in URL')}else{loadUser()}
+
+async function loadUser(){
+  $('loadingState').style.display='flex';
+  $('content').style.display='none';
+  $('errorState').style.display='none';
+  try{
+    if(!window.ApexAPI||!ApexAPI.admin||!ApexAPI.admin.getUser){
+      throw new Error('ApexAPI.admin.getUser missing — check apex-api.js patch');
+    }
+    const res=await ApexAPI.admin.getUser(userId);
+    if(!res.success)throw new Error(res.error||'Failed to load');
+    U=res.user;DEP=res.deposits||[];WD=res.withdrawals||[];HLD=res.holdings||[];KYC=res.kycDocuments||[];
+    render();
+    $('loadingState').style.display='none';
+    $('content').style.display='block';
+  }catch(e){showError(e.message)}
+}
+
+function reload(){loadUser();toast('Refreshing…','info')}
+
+function render(){
+  // header
+  const name=U.fullName||U.name||'Unknown';
+  const initials=(name.split(' ').map(w=>w[0]||'').join('').toUpperCase()||'?').slice(0,2);
+  $('tbName').textContent=name;
+  $('tbEmail').textContent=U.email||'—';
+  $('avatar').textContent=initials;
+  if(U.avatarUrl)$('avatar').innerHTML=`<img src="${U.avatarUrl}" alt="">`;
+  $('pName').textContent=name;
+  $('pEmail').textContent=U.email||'—';
+  if(U.role==='admin')$('pRole').style.display='inline-flex';
+  const ps=$('pStatus');
+  ps.textContent=U.accountStatus||'pending';
+  ps.className='pill '+statusPill(U.accountStatus);
+
+  // stats
+  const depTotal=DEP.filter(d=>['approved','completed'].includes(d.status)).reduce((s,d)=>s+(d.amount||d.amountUSD||0),0);
+  const wdTotal=WD.filter(w=>['approved','completed'].includes(w.status)).reduce((s,w)=>s+(w.amount||w.amountUSD||0),0);
+  $('sBalance').textContent=fmt$(U.balance||U.balanceUSD||0);
+  $('sDeposited').textContent=fmt$(depTotal);
+  $('sWithdrawn').textContent=fmt$(wdTotal);
+  $('sHoldings').textContent=HLD.length;
+  $('sDepCount').textContent=DEP.length+' record'+(DEP.length!==1?'s':'');
+  $('sWdCount').textContent=WD.length+' record'+(WD.length!==1?'s':'');
+
+  // form
+  $('fName').value=name==='Unknown'?'':name;
+  $('fEmail').value=U.email||'';
+  $('fBalance').value=U.balance||U.balanceUSD||0;
+  [['fStatus',U.accountStatus||'pending'],['fRole',U.role||'user'],['fKyc',U.kycStatus||'not_submitted']]
+    .forEach(([id,val])=>{[...$(id).options].forEach(o=>o.selected=o.value===val)});
+
+  // populate extended fields
+  const setVal = (id,v)=>{ const el=$(id); if(el) el.value=(v==null?'':v); };
+  setVal('fPhone',U.phone);
+  setVal('fAddr1',U.addressLine1);
+  setVal('fAddr2',U.addressLine2);
+  setVal('fCity',U.city);
+  setVal('fState',U.state);
+  setVal('fZip',U.zip);
+  setVal('fCountry',U.country);
+  setVal('fCitizenship',U.citizenship);
+  setVal('fIdNumber',U.idNumber);
+  setVal('fOccupation',U.occupation);
+  setVal('fEmployer',U.employer);
+  if(U.dob){ try{ setVal('fDob', new Date(U.dob).toISOString().slice(0,10)); }catch(_){} }
+  const idTypeSel = $('fIdType');
+  if(idTypeSel){ [...idTypeSel.options].forEach(o=>o.selected=o.value===(U.idType||'')); }
+
+  if(U.accountStatus==='rejected'||U.status==='disabled'){
+    $('suspendBtn').innerHTML='<svg width="14" height="14"><use href="#i-check"/></svg> Activate';
+  }
+
+  // deposits
+  $('cDeposits').textContent=DEP.length;
+  $('depositsList').innerHTML=DEP.length?DEP.map(d=>`
+    <div class="list-row">
+      <div class="list-icon green"><svg width="18" height="18"><use href="#i-arrow-down"/></svg></div>
+      <div class="list-main">
+        <div class="list-title">${d.method||'Deposit'} ${pillHTML(d.status)}</div>
+        <div class="list-sub">${fmtDate(d.createdAt)} · ${d.reference||d.txHash||'—'}</div>
+      </div>
+      <div class="list-amount pos">+${fmt$(d.amount||d.amountUSD)}</div>
+    </div>`).join(''):'<div class="empty">No deposits found</div>';
+
+  // withdrawals
+  $('cWithdrawals').textContent=WD.length;
+  $('withdrawalsList').innerHTML=WD.length?WD.map(w=>`
+    <div class="list-row">
+      <div class="list-icon red"><svg width="18" height="18"><use href="#i-arrow-up"/></svg></div>
+      <div class="list-main">
+        <div class="list-title">${w.method||'Withdrawal'} ${pillHTML(w.status)}</div>
+        <div class="list-sub">${fmtDate(w.createdAt)} · ${w.destination||w.walletAddress||'—'}</div>
+      </div>
+      <div class="list-amount neg">−${fmt$(w.amount||w.amountUSD)}</div>
+    </div>`).join(''):'<div class="empty">No withdrawals found</div>';
+
+  // holdings
+  $('cHoldings').textContent=HLD.length;
+  $('holdingsList').innerHTML=HLD.length?HLD.map(h=>`
+    <div class="list-row">
+      <div class="list-icon blue"><svg width="18" height="18"><use href="#i-pie"/></svg></div>
+      <div class="list-main">
+        <div class="list-title">${h.company||h.ticker||'—'}</div>
+        <div class="list-sub">${(h.shares||0).toLocaleString()} shares @ ${fmt$(h.pricePerShare||h.avgPrice)}</div>
+      </div>
+      <div class="list-amount">${fmt$((h.shares||0)*(h.currentPrice||h.pricePerShare||0))}</div>
+    </div>`).join(''):'<div class="empty">No holdings found</div>';
+
+  // kyc
+  $('kycGrid').innerHTML=KYC.length?KYC.map(d=>{
+    const img=/\.(jpg|jpeg|png|webp|gif)$/i.test(d.url||'');
+    return `<div class="kyc-doc">
+      ${img?`<img src="${d.url}" onerror="this.style.display='none'">`:`<svg width="32" height="32" style="color:var(--text-2)"><use href="#i-file"/></svg>`}
+      <div class="type">${d.type||'Document'}</div>
+      <div class="name">${d.fileName||'File'}</div>
+      <a href="${d.url}" target="_blank" rel="noopener">View →</a>
+    </div>`;
+  }).join(''):'<div class="empty" style="grid-column:1/-1">No documents uploaded</div>';
+}
+
+// Generic save helper — sends only specified fields
+async function _saveFields(fields, successMsg, btnId){
+  const btn = btnId ? $(btnId) : null;
+  let orig;
+  if(btn){ orig=btn.innerHTML; btn.disabled=true; btn.innerHTML='Saving…'; }
+  try{
+    const res = await ApexAPI.admin.updateUser(userId, fields);
+    if(res && res.error) throw new Error(res.error); if(!res || (res.success === false) || (res.success === undefined && res.ok === false)) throw new Error('Save failed');
+    Object.assign(U, fields);
+    if(fields.accountStatus !== undefined) U.accountStatus = fields.accountStatus;
+    if(fields.kycStatus !== undefined) U.kycStatus = fields.kycStatus;
+    render();
+    toast(successMsg || 'Saved', 'success');
+  }catch(e){
+    toast(e.message||'Save failed','error');
+  }finally{
+    if(btn){ btn.disabled=false; btn.innerHTML=orig; }
+  }
+}
+
+// Card 1 — Account Settings
+async function saveAccountSettings(){
+  await _saveFields({
+    fullName:$('fName').value.trim(),
+    email:$('fEmail').value.trim(),
+    accountStatus:$('fStatus').value,
+    role:$('fRole').value
+  }, 'Account settings saved');
+}
+
+// Card 3 — Verification (KYC only)
+async function saveKycStatus(){
+  await _saveFields({
+    kycStatus:$('fKyc').value
+  }, 'Verification status saved');
+}
+
+// Card 4 — Profile Information (extended)
+async function saveProfileInfo(){
+  await _saveFields({
+    phone:$('fPhone')?.value.trim()||'',
+    addressLine1:$('fAddr1')?.value.trim()||'',
+    addressLine2:$('fAddr2')?.value.trim()||'',
+    city:$('fCity')?.value.trim()||'',
+    state:$('fState')?.value.trim()||'',
+    zip:$('fZip')?.value.trim()||'',
+    country:$('fCountry')?.value.trim()||'',
+    citizenship:$('fCitizenship')?.value.trim()||'',
+    idNumber:$('fIdNumber')?.value.trim()||'',
+    idType:$('fIdType')?.value||'',
+    occupation:$('fOccupation')?.value.trim()||'',
+    employer:$('fEmployer')?.value.trim()||'',
+    dob:$('fDob')?.value||null
+  }, 'Profile information saved', 'saveBtn');
+}
+async function adjustBalance(){
+  const adj=parseFloat($('fAdjust').value);
+  if(isNaN(adj)||adj===0)return toast('Enter a non-zero amount','error');
+  const note=($('fAdjustNote')?.value||'').trim();
+  const action=adj>=0?'credit':'debit';
+  const label=adj>=0?'Credit':'Debit';
+  if(!confirm(label+' '+fmt$(Math.abs(adj))+' to this account?\n\nA notification email will be sent to the user.'))return;
+  try{
+    const res=await ApexAPI.admin.adjustBalance(userId, adj, note, 'adjust');
+    if(res&&res.error)throw new Error(res.error);
+    const cur=parseFloat($('fBalance').value)||0;
+    const next=cur+adj;
+    $('fBalance').value=next.toFixed(2);
+    U.balanceUSD=next;
+    $('fAdjust').value='';
+    if($('fAdjustNote'))$('fAdjustNote').value='';
+    render();
+    toast(label+' of '+fmt$(Math.abs(adj))+' applied','success');
+  }catch(e){toast(e.message||'Adjustment failed','error')}
+}
+async function approveKyc(){$('fKyc').value='approved';await saveKycStatus()}
+async function rejectKyc(){$('fKyc').value='rejected';await saveKycStatus()}
+function confirmSuspend(){
+  const s=U.accountStatus;
+  const isOff=s==='rejected'||s==='suspended';
+  if(!confirm(isOff?'Activate this user?':'Suspend this user?'))return;
+  $('fStatus').value=isOff?'approved':'rejected';
+  saveAccountSettings();
+}
+async function confirmDelete(){
+  const n=U.fullName||U.email;
+  if(!confirm('Permanently delete "'+n+'"?\nThis cannot be undone.'))return;
+  if(!confirm('Confirm again: DELETE "'+n+'"?'))return;
+  try{
+    const res=await ApexAPI.admin.deleteUser(userId);
+    if(!res.success)throw new Error(res.error||'Delete failed');
+    toast('User deleted','success');
+    setTimeout(()=>location.href='/adminprivate',1200);
+  }catch(e){toast(e.message,'error')}
+}
+function showError(msg){
+  $('loadingState').style.display='none';
+  $('content').style.display='none';
+  $('errorState').style.display='flex';
+  $('errorMsg').textContent=msg;
+}
+
+
+async function loginAsUser(){
+  if(!U || !U._id && !U.id){ toast('User not loaded','error'); return; }
+  const uid = U._id || U.id;
+  const email = U.email || 'this user';
+  if(!confirm('⚠️ Login as ' + email + '?\n\nYou will see their account exactly as they do.\nA banner will let you return to admin anytime.')) return;
+  try{
+    const res = await ApexAPI.admin.impersonate(uid);
+    if(!res || res.success===false) throw new Error(res?.error||'Failed');
+    toast('Logged in as ' + email + '. Redirecting...','success');
+    setTimeout(()=>{ window.location.href = res.redirect || '/dashboard'; }, 700);
+  }catch(e){ toast(e.message,'error'); }
+}
+window.loginAsUser = loginAsUser;
+
+function togglePersonalInfo(){
+  const panel = document.getElementById('personalInfoPanel');
+  const label = document.getElementById('piToggleLabel');
+  const icon  = document.getElementById('piToggleIcon');
+  if(!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if(label) label.textContent = isOpen ? 'View / Manage' : 'Hide';
+  if(icon)  icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+window.togglePersonalInfo = togglePersonalInfo;
+
+</script>
+</body>
+</html>

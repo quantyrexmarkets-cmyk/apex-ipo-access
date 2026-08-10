@@ -51,10 +51,10 @@ const ApexAPI = (() => {
 
   // --- AUTH ---
   const auth = {
-    register: (email, password, fullName) =>
+    register: (email, password, fullName, extra) =>
       request('/api/auth?action=register', {
         method: 'POST',
-        body: { email, password, fullName },
+        body: Object.assign({ email, password, fullName }, extra || {}),
       }),
 
     login: (email, password) =>
@@ -228,6 +228,7 @@ const ApexAPI = (() => {
       formData.append('timestamp', sig.timestamp);
       formData.append('signature', sig.signature);
       formData.append('folder', sig.folder);
+      if (sig.uploadPreset) formData.append('upload_preset', sig.uploadPreset);
 
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
@@ -254,7 +255,19 @@ const ApexAPI = (() => {
           }
         };
 
-        xhr.onerror = () => reject(new Error('Upload network error'));
+        xhr.onerror = () => {
+          console.error('[Cloudinary upload failed]', {
+            status: xhr.status,
+            response: xhr.responseText,
+            url: xhr.responseURL
+          });
+          reject(new Error('Upload network error (status: ' + xhr.status + ') — check Cloudinary settings'));
+        };
+        xhr.onloadend = () => {
+          if (xhr.status >= 400) {
+            console.error('[Cloudinary rejected]', xhr.status, xhr.responseText);
+          }
+        };
         xhr.send(formData);
       });
     },
@@ -294,3 +307,239 @@ const ApexAPI = (() => {
 
 // Expose globally
 window.ApexAPI = ApexAPI;
+
+
+// ─────────────────────────────────────────────────────────────
+// ADMIN USER DETAIL METHODS — added for admin-user.html page
+// ─────────────────────────────────────────────────────────────
+(function() {
+  if (!window.ApexAPI) window.ApexAPI = {};
+  if (!window.ApexAPI.admin) window.ApexAPI.admin = {};
+
+  async function adminFetch(url, options = {}) {
+    const res = await fetch(url, {
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+      ...options
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.error) {
+      return { success: false, error: data.error || ('Request failed (' + res.status + ')') };
+    }
+    return { success: true, ...data };
+  }
+
+  // GET full user detail
+  window.ApexAPI.admin.getUser = async function(id) {
+    const res = await adminFetch('/api/admin?resource=user&id=' + encodeURIComponent(id));
+    if (!res.success) return res;
+    if (res.user) {
+      res.user._id     = res.user._id     || res.user.id;
+      res.user.balance = (res.user.balance !== undefined) ? res.user.balance : (res.user.balanceUSD || 0);
+      res.user.status  = res.user.status  || res.user.accountStatus;
+    }
+    return res;
+  };
+
+  // PUT update user
+  window.ApexAPI.admin.updateUser = async function(id, data) {
+    const payload = { id };
+    // Pass through everything the API accepts (camelCase + legacy mappings)
+    if (data.fullName !== undefined)      payload.fullName = data.fullName;
+    if (data.email !== undefined)         payload.email = data.email;
+    if (data.accountStatus !== undefined) payload.accountStatus = data.accountStatus;
+    if (data.status !== undefined && data.accountStatus === undefined) payload.accountStatus = data.status;
+    if (data.role !== undefined)          payload.role = data.role;
+    if (data.kycStatus !== undefined)     payload.kycStatus = data.kycStatus;
+    if (data.emailVerified !== undefined) payload.emailVerified = data.emailVerified;
+    if (data.avatarUrl !== undefined)     payload.avatarUrl = data.avatarUrl;
+    ['phone','addressLine1','addressLine2','city','state','zip','country','citizenship','dob','idNumber','idType','occupation','employer'].forEach(k => {
+      if (data[k] !== undefined) payload[k] = data[k];
+    });
+
+    const userRes = await adminFetch('/api/admin?resource=user', {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    });
+
+    // Normalize the response shape — API returns { ok, user } — caller may check .success
+    if (userRes && userRes.ok && userRes.success === undefined) userRes.success = true;
+
+    // NOTE: balance changes go through ApexAPI.admin.adjustBalance() directly.
+    // updateUser() never writes balance — prevents accidental $0 emails.
+    return userRes;
+  };
+
+  // DELETE user
+  window.ApexAPI.admin.deleteUser = async function(id) {
+    return adminFetch('/api/admin?resource=user&id=' + encodeURIComponent(id), {
+      method: 'DELETE'
+    });
+  };
+
+  
+
+
+// Companies (IPO catalog) admin CRUD
+window.ApexAPI.admin.listCompanies = async function() {
+  return adminFetch('/api/admin?resource=companies');
+};
+window.ApexAPI.admin.getCompany = async function(ticker) {
+  return adminFetch('/api/admin?resource=companies&ticker=' + encodeURIComponent(ticker));
+};
+window.ApexAPI.admin.createCompany = async function(data) {
+  return adminFetch('/api/admin?resource=companies', { method: 'POST', body: JSON.stringify(data) });
+};
+window.ApexAPI.admin.updateCompany = async function(id, data) {
+  return adminFetch('/api/admin?resource=companies', { method: 'PUT', body: JSON.stringify({ id, ...data }) });
+};
+window.ApexAPI.admin.deleteCompany = async function(id) {
+  return adminFetch('/api/admin?resource=companies&id=' + encodeURIComponent(id), { method: 'DELETE' });
+};
+
+// Admin self-profile
+window.ApexAPI.admin.getMe = async function() {
+  return adminFetch('/api/admin?resource=me');
+};
+window.ApexAPI.admin.updateMe = async function(data) {
+  return adminFetch('/api/admin?resource=me', {
+    method: 'PATCH',
+    body: JSON.stringify(data || {})
+  });
+};
+
+// Impersonation
+window.ApexAPI.admin.impersonate = async function(userId) {
+  return adminFetch('/api/admin?resource=impersonate', {
+    method: 'POST',
+    body: JSON.stringify({ userId })
+  });
+};
+window.ApexAPI.admin.unimpersonate = async function() {
+  return adminFetch('/api/admin?resource=unimpersonate', {
+    method: 'POST',
+    body: '{}'
+  });
+};
+
+
+  // ── Public companies list (cached 60s in-memory) ──
+  if (!window.ApexAPI.companies) window.ApexAPI.companies = {};
+  window.ApexAPI.companies.list = async function(force) {
+    if (!force && window.__apexCompCache && (Date.now() - window.__apexCompTs) < 60000) {
+      return { ok: true, companies: window.__apexCompCache, cached: true };
+    }
+    try {
+      const r = await fetch('/api/companies', { credentials: 'omit' });
+      const j = await r.json();
+      if (j && j.ok && Array.isArray(j.companies)) {
+        window.__apexCompCache = j.companies;
+        window.__apexCompTs = Date.now();
+      }
+      return j;
+    } catch (e) {
+      return { ok: false, error: e.message, companies: window.__apexCompCache || [] };
+    }
+  };
+  window.ApexAPI.companies.get = async function(ticker) {
+    const r = await window.ApexAPI.companies.list();
+    if (!r.ok) return r;
+    const c = (r.companies || []).find(x => String(x.ticker).toUpperCase() === String(ticker).toUpperCase());
+    return { ok: !!c, company: c || null };
+  };
+  window.ApexAPI.companies.invalidate = function() {
+    window.__apexCompCache = null;
+    window.__apexCompTs = 0;
+  };
+  window.ApexAPI.admin.listLogs = async function(opts) {
+    opts = opts || {};
+    const params = new URLSearchParams({ resource: 'logs' });
+    if (opts.page) params.set('page', opts.page);
+    if (opts.limit) params.set('limit', opts.limit);
+    if (opts.action) params.set('action', opts.action);
+    if (opts.targetType) params.set('targetType', opts.targetType);
+    if (opts.search) params.set('search', opts.search);
+    if (opts.from) params.set('from', opts.from);
+    if (opts.to) params.set('to', opts.to);
+    return adminFetch('/api/admin?' + params.toString());
+  };
+
+    window.ApexAPI.admin.previewBroadcast = async function(target) {
+    const params = new URLSearchParams({ resource: 'broadcast' });
+    if (target?.type) params.set('targetType', target.type);
+    if (target?.emails?.length) params.set('emails', target.emails.join(','));
+    if (target?.from) params.set('from', target.from);
+    if (target?.to) params.set('to', target.to);
+    return adminFetch('/api/admin?' + params.toString());
+  };
+  window.ApexAPI.admin.sendBroadcast = async function(data) {
+    return adminFetch('/api/admin?resource=broadcast', {
+      method: 'POST',
+      body: JSON.stringify(data || {})
+    });
+  };
+
+    window.ApexAPI.admin.getSettings = async function() {
+    return adminFetch('/api/admin?resource=settings');
+  };
+  window.ApexAPI.admin.updateSettings = async function(data) {
+    return adminFetch('/api/admin?resource=settings', {
+      method: 'PATCH',
+      body: JSON.stringify(data || {})
+    });
+  };
+
+    window.ApexAPI.admin.listHoldings = async function() {
+    return adminFetch('/api/admin?resource=holdings');
+  };
+
+    console.log('[apex-api] companies.list / get / invalidate loaded');
+
+  // ── Smart navigation helper (shared back-button logic) ──
+  if (!window.ApexAPI.nav) window.ApexAPI.nav = {};
+  window.ApexAPI.nav.smartBack = function(fallback) {
+    fallback = fallback || '/adminprivate';
+    // 1. URL param ?from= takes priority (explicit return path)
+    try {
+      const params = new URLSearchParams(location.search);
+      const from = params.get('from');
+      if (from && from.startsWith('/')) {
+        location.href = from;
+        return;
+      }
+    } catch(e) {}
+    // 2. If we have history AND came from same origin, go back
+    if (window.history.length > 1 && document.referrer) {
+      try {
+        const ref = new URL(document.referrer);
+        if (ref.origin === location.origin && ref.pathname !== location.pathname) {
+          history.back();
+          return;
+        }
+      } catch(e) {}
+    }
+    // 3. Fallback
+    location.href = fallback;
+  };
+  // Auto-wire any <a data-smart-back href="..."> link
+  window.ApexAPI.nav.wireBackButtons = function() {
+    document.querySelectorAll('[data-smart-back]').forEach(el => {
+      if (el.__wired) return;
+      el.__wired = true;
+      el.addEventListener('click', e => {
+        e.preventDefault();
+        const fallback = el.getAttribute('href') || '/adminprivate';
+        window.ApexAPI.nav.smartBack(fallback);
+      });
+    });
+  };
+  // Auto-wire on load
+  if (document.readyState !== 'loading') {
+    setTimeout(() => window.ApexAPI.nav.wireBackButtons(), 0);
+  } else {
+    document.addEventListener('DOMContentLoaded', () => window.ApexAPI.nav.wireBackButtons());
+  }
+  console.log('[apex-api] nav.smartBack loaded');
+
+    console.log('[apex-api] admin.getUser / updateUser / deleteUser / impersonate loaded');
+})();

@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Apex IPO Access — Initial Public Offering Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="/css/style.css"/>
 </head>
 <body>
 <header class="nav">
@@ -28,17 +29,17 @@
 </header>
 
 <main class="how-page">
-  <a href="index.html" class="how-back">&larr; Back to Apex IPO Access</a>
+  <a href="/index.html" class="how-back">&larr; Back to Apex IPO Access</a>
 
   <section class="how-it-works" id="how">
     <div class="how-inner">
 
       <h2 class="how-title">How participation works on APEX IPO ACCESS for the SpaceX IPO<sup>1</sup></h2>
-      <p>Apex IPO Access connects qualified investors worldwide with curated pre-IPO opportunities in the most sought-after late-stage private companies &mdash; SpaceX, Stripe, OpenAI, Anthropic, and others.</p>
+      <p>Apex IPO Access connects qualified investors worldwide with curated IPO opportunities in the most sought-after late-stage private companies &mdash; SpaceX, Stripe, OpenAI, Anthropic, and others.</p>
 
       <h3 class="how-step-title">1) Apply for Access</h3>
       <ol class="how-list">
-        <li>Create your account at <a href="signup.html" class="how-link">apexipoaccess.com</a> and submit your personal, contact, and investor profile information.</li>
+        <li>Create your account at <a href="/signup.html" class="how-link">apexipoholdings.com</a> and submit your personal, contact, and investor profile information.</li>
         <li>Choose your account type &mdash; Individual, Joint, IRA, or Trust.</li>
         <li>Submit your application for compliance review.</li>
       </ol>
@@ -64,7 +65,7 @@
               </ol>
 
       <h3 class="how-step-title">5) Choose Your Investment Plan</h3>
-      <p>Each investment is held for a fixed tenure with a defined target return range based on historical performance of comparable pre-IPO transactions:</p>
+      <p>Each investment is held for a fixed tenure with a defined target return range based on historical performance of comparable IPO transactions:</p>
       <table class="how-plans" style="width:100%;border-collapse:collapse;margin:18px 0">
         <thead>
           <tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
@@ -102,7 +103,7 @@
         <li>Re-invest at any time to compound returns.</li>
       </ol>
 
-      <p class="how-disclaimer"><sup>1</sup> Apex IPO Access provides access to pre-IPO investment opportunities. Target return ranges are based on historical performance of comparable transactions and are <strong>not guaranteed</strong>. All investments carry risk including possible loss of principal. Pre-IPO and private placement investments are illiquid and locked for the chosen tenure. Apex IPO Access is open to qualified investors globally; specific opportunities may be restricted by jurisdiction. Past performance does not guarantee future results. Please review all offering documents before investing.</p>
+      <p class="how-disclaimer"><sup>1</sup> Apex IPO Access provides access to IPO investment opportunities. Target return ranges are based on historical performance of comparable transactions and are <strong>not guaranteed</strong>. All investments carry risk including possible loss of principal. IPO and private placement investments are illiquid and locked for the chosen tenure. Apex IPO Access is open to qualified investors globally; specific opportunities may be restricted by jurisdiction. Past performance does not guarantee future results. Please review all offering documents before investing.</p>
 
     </div>
   </section>
@@ -133,7 +134,7 @@
   var s, c, o = window.smartsupp = function(){ o._.push(arguments); };
   o._ = [];
   window._smartsupp = window._smartsupp || {};
-  window._smartsupp.key = '7d6445f6308e329b33468a584f675c298bd2c871';
+  window._smartsupp.key = 'cfc0fb237d4a16ba3caf79dddd9f9977ba5c938c';
   window._smartsupp.offsetY = 80;
   window._smartsupp.offsetX = 10;
   s = d.getElementsByTagName('script')[0];
@@ -148,8 +149,8 @@
 <!-- End Smartsupp -->
 
 
-<script src="js/apex-api.js?v=1"></script>
-<script src="js/supabase.js?v=1781242485"></script>
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script src="/js/supabase.js?v=1786129802"></script>
 <script>
 // Logged-in user UX v3: hide marketing CTAs + footer, swap hamburger -> Dashboard, fix Back link
 (async function(){
@@ -159,8 +160,8 @@
 
     // Hide marketing-only auth links
     var hideSelectors = [
-      'a[href="signup.html"]',
-      'a[href="login.html"]',
+      'a[href="/signup.html"]',
+      'a[href="/login.html"]',
       'a[href="#signin"]',
       '.signin','.btn-signin',
       'footer','.site-footer','.footer','.footer-grid','.footer-bottom'

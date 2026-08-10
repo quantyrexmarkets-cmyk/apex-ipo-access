@@ -15,7 +15,7 @@ const AdminLogSchema = new mongoose.Schema(
     },
     targetType: {
       type: String,
-      enum: ['user', 'deposit', 'withdrawal', 'kyc', 'wallet', 'holding', 'system'],
+      enum: ['user', 'deposit', 'withdrawal', 'kyc', 'wallet', 'holding', 'system', 'trade', 'order', 'cash'],
       required: true,
     },
     targetId: {

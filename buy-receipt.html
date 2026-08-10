@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Order Confirmed | Apex IPO Access</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
-<script src="js/apex-api.js?v=1"></script>
-<script src="js/supabase.js?v=1781643381"></script>
-<script src="js/notify.js?v=1781643381"></script>
-<script src="js/sidebar.js?v=2"></script>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script src="/js/supabase.js?v=1786129802"></script>
+<script src="/js/notify.js?v=1786129802"></script>
+<script src="/js/sidebar.js?v=1786129802"></script>
 <script>
-  document.addEventListener('sb-ready', async () => {
+  (async () => {
     const { data } = await sb.auth.getUser();
     if(!data.user) window.location.href = 'login.html';
   });
@@ -233,6 +234,43 @@
 </style>
 </head>
 <body>
+<!-- Admin impersonation banner -->
+<div id="impersonationBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(90deg,#ff9500,#ffb80b);color:#1a1a1a;padding:8px 12px;font-family:'Montserrat',-apple-system,sans-serif;font-size:12px;font-weight:600;box-shadow:0 2px 10px rgba(0,0,0,0.35);align-items:center;justify-content:space-between;gap:10px">
+  <span style="display:flex;align-items:center;gap:6px;min-width:0;flex:1;overflow:hidden">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">Admin viewing <span id="impEmail" style="font-weight:700">user</span></span>
+  </span>
+  <button onclick="returnToAdmin()" style="background:#1a1a1a;color:#ffb80b;border:none;padding:5px 11px;border-radius:6px;cursor:pointer;font-weight:700;font-size:11px;font-family:'Montserrat',sans-serif;white-space:nowrap;flex-shrink:0">← Admin</button>
+</div>
+<script>
+(function(){
+  function getCookie(n){const m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):'';}
+  if(getCookie('apex_impersonating')==='1'){
+    const b=document.getElementById('impersonationBanner');
+    if(b){
+      b.style.display='flex';
+      const spacer=document.createElement('div');
+      spacer.id='impBannerSpacer';
+      spacer.style.height='38px';
+      spacer.style.width='100%';
+      document.body.insertBefore(spacer, document.body.firstChild);
+      let raw=getCookie('apex_impersonating_email');
+      try{ raw=decodeURIComponent(raw); }catch(_){}
+      const e=document.getElementById('impEmail');
+      if(e&&raw) e.textContent=raw;
+    }
+  }
+  window.returnToAdmin=async function(){
+    try{
+      const res=await fetch('/api/admin?resource=unimpersonate',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:'{}'});
+      const data=await res.json();
+      if(data.ok){ window.location.href = data.redirect || '/adminprivate'; }
+      else alert(data.error||'Failed to return');
+    }catch(e){ alert(e.message); }
+  };
+})();
+</script>
+<!-- /impersonation banner -->
 
 <header class="top-bar">
   <div class="top-title">Order Confirmation</div>
@@ -249,7 +287,7 @@
 </div>
 
 <div class="cta-bar">
-  <a href="dashboard.html" class="btn btn-secondary">View Dashboard</a>
+  <a href="/dashboard.html" class="btn btn-secondary">View Dashboard</a>
   <a href="buy-shares.html?ticker=SPCX" class="btn btn-primary">Make Another Order</a>
 </div>
 
@@ -257,7 +295,7 @@
 (function(){
   const order = JSON.parse(sessionStorage.getItem('apex_last_allocation') || 'null');
   if(!order){
-    document.getElementById('content').innerHTML = '<p style="text-align:center;color:#8a94a3;padding:60px 0">No recent order found. <a href="dashboard.html" style="color:#4a9eff">Return to dashboard</a></p>';
+    document.getElementById('content').innerHTML = '<p style="text-align:center;color:#8a94a3;padding:60px 0">No recent order found. <a href="/dashboard.html" style="color:#4a9eff">Return to dashboard</a></p>';
     return;
   }
 
@@ -280,8 +318,8 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <div class="success-lede">Order Confirmed</div>
-      <h1>Your <span class="h1-name">${order.company_name}</span><br>allocation is reserved</h1>
-      <p class="subtitle">Save this confirmation for your records. Your position will settle automatically once the funding process completes.</p>
+      <h1>Your <span class="h1-name">${order.company_name}</span><br>purchase is complete</h1>
+      <p class="subtitle">Your investment is now active. Returns will be calculated based on IPO performance and credited to your balance when your ${order.hold_period_label || 'holding'} period matures.</p>
     </div>
 
     <!-- Main receipt -->
@@ -291,7 +329,7 @@
           <div class="lbl">Confirmation</div>
           <div class="ref">${ref}</div>
         </div>
-        <div class="status-pill"><span class="dot"></span>${({reserved:'Reserved',pending_funding:'Pending Funding',active:'Active',matured:'Matured'}[order.status] || 'Reserved')}</div>
+        <div class="status-pill"><span class="dot"></span>${({reserved:'Active',pending_funding:'Active',active:'Active',matured:'Matured',confirmed:'Active'}[order.status] || 'Active')}</div>
       </div>
 
       <div class="co-row">
@@ -303,7 +341,7 @@
       </div>
 
       <div class="lines">
-        <div class="line"><span>Shares reserved</span><span class="v">${fmtInt(order.shares)}</span></div>
+        <div class="line"><span>Shares purchased</span><span class="v">${fmtInt(order.shares)}</span></div>
         <div class="line"><span>Price per share</span><span class="v">${fmt(order.price_per_share)}</span></div>
         <div class="line"><span>Allocation tier</span><span class="v">${tierName} · Tier ${order.tier}</span></div>
         <div class="line"><span>Settlement</span><span class="v">${settlement} after IPO</span></div>
@@ -390,16 +428,16 @@
       </div>
       <div class="ns-item">
         <div class="ns-num">3</div>
-        <div>Shares settle ${settlement} after IPO date and become tradeable after the ${order.lockup_days || 180}-day lock-up period.</div>
+        <div>Your principal and earned returns become withdrawable once the ${order.hold_period_label || 'holding'} period matures. Final returns are calculated based on IPO performance within the period.</div>
       </div>
     </div>
   `;
 })();
 </script>
 
-<script src="js/bottom-nav.js?v=1"></script>
-<script src="js/floating-widget.js?v=1781343118" defer></script>
-  <script src="js/user-bell.js?v=1"></script>
-  <script src="js/session-guard.js?v=3" defer></script>
+<script src="/js/bottom-nav.js?v=1786129802"></script>
+<script src="/js/floating-widget.js?v=1786129802" defer></script>
+  <script src="/js/user-bell.js?v=1786129802"></script>
+  <script src="/js/session-guard.js?v=1786129802" defer></script>
 </body>
 </html>

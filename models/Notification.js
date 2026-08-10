@@ -10,7 +10,7 @@ const NotificationSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ['deposit', 'withdrawal', 'kyc', 'trade', 'system', 'admin'],
+      enum: ['deposit', 'withdrawal', 'kyc', 'trade', 'system', 'admin', 'holding', 'order', 'error', 'warning', 'promo'],
       required: true,
     },
     title: {

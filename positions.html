@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="/js/loader.js?v=1786129802"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Positions - APEX IPO</title>
+<link rel="icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0a; --bg-elev:#141821; --bg-elev-2:#181b24;
+    --border:rgba(255,255,255,0.06); --border-strong:rgba(255,255,255,0.12);
+    --text:#fff; --text-dim:#8590a1; --text-mute:#5a5f72;
+    --up:#17e08a; --down:#ff5c5c; --accent:#4a9eff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; overscroll-behavior: none; -webkit-font-smoothing: antialiased; }
+  body { padding-bottom: 100px; min-height: 100vh; }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-feature-settings: "tnum" 1; }
+
+  .p-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 10px; }
+  .back-btn { background: transparent; border: none; color: var(--accent); font-size: 14px; font-weight: 600; cursor: pointer; padding: 6px 10px; font-family: inherit; }
+  .p-title { font-size: 16px; font-weight: 700; }
+  .p-header-right { width: 60px; text-align: right; }
+
+  .summary { margin: 8px 16px 16px; padding: 22px 20px; background: linear-gradient(135deg, #141821 0%, #0f1219 100%); border: 1px solid #232833; border-radius: 18px; }
+  .sum-label { font-size: 10px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+  .sum-value { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; font-family: 'JetBrains Mono', monospace; font-feature-settings: "tnum" 1; }
+  .sum-pnl { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; margin-top: 8px; padding: 4px 10px; border-radius: 8px; width: fit-content; font-family: 'JetBrains Mono', monospace; }
+  .pnl-up { color: var(--up); background: rgba(23,224,138,0.10); }
+  .pnl-dn { color: var(--down); background: rgba(255,92,92,0.10); }
+  .pnl-neu { color: var(--text-dim); background: rgba(139,144,163,0.10); }
+  .live-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; animation: pulse 1.8s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.35 } }
+
+  .sum-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 18px 0 14px; }
+  .sum-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .sum-cell { display: flex; flex-direction: column; gap: 2px; }
+  .sum-cell .k-label { font-size: 10px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+  .sum-cell .k-val { font-size: 14px; font-weight: 700; color: var(--text); font-family: 'JetBrains Mono', monospace; font-feature-settings: "tnum" 1; margin-top: 3px; }
+
+  .tabs { display: flex; gap: 8px; padding: 4px 16px 14px; }
+  .tab-btn { flex: 1; background: var(--bg-elev); border: 1px solid #232833; color: var(--text-dim); padding: 11px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: .15s; }
+  .tab-btn:active { transform: scale(0.98); }
+  .tab-btn.active { background: var(--accent); color: #001a3a; border-color: var(--accent); }
+
+  .pos-list { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+  .pos-card { background: var(--bg-elev); border: 1px solid #232833; border-radius: 14px; padding: 14px; position: relative; transition: border-color .15s; }
+  .pos-card:hover { border-color: rgba(74,158,255,0.25); }
+
+  .pos-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .pos-logo { width: 40px; height: 40px; border-radius: 11px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; font-weight: 800; font-size: 15px; color: #000; flex-shrink: 0; padding: 5px; }
+  .pos-logo img { width: 100%; height: 100%; object-fit: contain; }
+  .pos-name-wrap { flex: 1; min-width: 0; }
+  .pos-name { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pos-sub { font-size: 11px; color: var(--text-dim); font-weight: 600; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'JetBrains Mono', monospace; }
+  .pos-value { text-align: right; flex-shrink: 0; }
+  .pos-value .mv { font-size: 15px; font-weight: 700; font-family: 'JetBrains Mono', monospace; font-feature-settings: "tnum" 1; }
+  .pos-value .mv-label { font-size: 9px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-top: 2px; }
+
+  .pos-pnl-row { display: flex; align-items: baseline; justify-content: space-between; padding: 10px 0 12px; border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.04); margin-bottom: 12px; }
+  .pos-pnl-usd { font-size: 20px; font-weight: 800; font-family: 'JetBrains Mono', monospace; font-feature-settings: "tnum" 1; letter-spacing: -0.01em; }
+  .pos-pnl-pct { font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace; padding: 4px 8px; border-radius: 6px; }
+
+  .pos-details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; margin-bottom: 14px; }
+  .pos-d { display: flex; flex-direction: column; gap: 2px; }
+  .pos-d-label { font-size: 10px; color: var(--text-mute); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+  .pos-d-val { font-size: 13px; font-weight: 700; color: var(--text); font-family: 'JetBrains Mono', monospace; font-feature-settings: "tnum" 1; }
+  .pos-d-val .live-chg { font-size: 11px; margin-left: 4px; font-weight: 600; }
+
+  .pos-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .pos-btn { padding: 11px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: .15s; border: 1px solid; }
+  .pos-btn:active { transform: scale(0.97); }
+  .pos-btn.trade { background: rgba(74,158,255,0.10); color: var(--accent); border-color: rgba(74,158,255,0.25); }
+  .pos-btn.close { background: transparent; color: var(--down); border-color: rgba(255,92,92,0.28); }
+  .pos-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .pos-card.closed .pos-actions { display: none; }
+
+  .empty { padding: 60px 20px; text-align: center; }
+  .empty svg { width: 56px; height: 56px; opacity: 0.25; margin-bottom: 16px; }
+  .empty-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .empty-sub { font-size: 13px; color: var(--text-dim); margin-bottom: 20px; line-height: 1.5; }
+  .empty-btn { display: inline-block; padding: 12px 24px; background: var(--accent); color: #001a3a; border-radius: 12px; font-size: 14px; font-weight: 700; text-decoration: none; }
+
+  .tab-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #0f0f0f; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-around; padding: 10px 4px 22px; z-index: 100; }
+  .tab-nav .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6a7585; font-size: 11px; font-weight: 600; cursor: pointer; background: none; border: none; padding: 4px; text-decoration: none; }
+  .tab-nav .tab svg { width: 22px; height: 22px; }
+  .tab-nav .tab.active { color: #fff; }
+
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 200; padding: 20px; backdrop-filter: blur(6px); }
+  .modal-bg.show { display: flex; }
+  .modal { background: var(--bg-elev); border: 1px solid var(--border-strong); border-radius: 18px; padding: 22px; max-width: 340px; width: 100%; }
+  .modal h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .modal p { font-size: 14px; color: var(--text-dim); margin-bottom: 18px; line-height: 1.5; }
+  .modal p strong { color: var(--text); font-family: 'JetBrains Mono', monospace; }
+  .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .modal-btn { padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; border: 1px solid; }
+  .modal-btn.cancel { background: transparent; color: var(--text-dim); border-color: var(--border-strong); }
+  .modal-btn.confirm { background: var(--down); color: #fff; border-color: var(--down); }
+
+  .toast { position: fixed; left: 50%; bottom: 110px; transform: translateX(-50%) translateY(20px); padding: 12px 20px; border-radius: 12px; font-size: 14px; font-weight: 600; background: var(--bg-elev-2); border: 1px solid var(--border-strong); opacity: 0; pointer-events: none; transition: .3s; z-index: 300; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.success { color: var(--up); border-color: rgba(23,224,138,0.4); }
+  .toast.error { color: var(--down); border-color: rgba(255,92,92,0.4); }
+
+  @media (min-width: 768px) {
+    body { max-width: 480px; margin: 0 auto; border-left: 1px solid #1a1a1a; border-right: 1px solid #1a1a1a; }
+  }
+
+  .pos-pnl-wrap { padding: 10px 0 12px; border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.04); margin-bottom: 12px; }
+  .pos-pnl-label { font-size: 10px; color: var(--text-mute); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .pos-pnl-row { display: flex; align-items: baseline; justify-content: space-between; padding: 0; border: none; margin: 0; }
+  .pos-pnl-usd { font-size: 24px; font-weight: 800; font-family: 'JetBrains Mono', monospace; font-feature-settings: "tnum" 1; letter-spacing: -0.01em; }
+  .pos-pnl-pct { font-size: 13px; font-weight: 700; font-family: 'JetBrains Mono', monospace; padding: 5px 10px; border-radius: 8px; }
+
+</style>
+</head>
+<body>
+
+<div class="p-header">
+  <button class="back-btn" onclick="location.href='/dashboard'">← Home</button>
+  <div class="p-title">Positions</div>
+  <div class="p-header-right"></div>
+</div>
+
+<div class="summary">
+  <div class="sum-label">Total Equity</div>
+  <div class="sum-value" id="sumValue">$0.00</div>
+  <div class="sum-pnl pnl-neu" id="sumPnl"><span class="live-dot"></span>—</div>
+  <div class="sum-divider"></div>
+  <div class="sum-row">
+    <div class="sum-cell"><span class="k-label">Cash</span><span class="k-val" id="sumCash">$0.00</span></div>
+    <div class="sum-cell"><span class="k-label">Invested</span><span class="k-val" id="sumCost">$0.00</span></div>
+    <div class="sum-cell"><span class="k-label">Positions</span><span class="k-val" id="sumCount">0</span></div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="open">Open Positions</button>
+  <button class="tab-btn" data-tab="closed">History</button>
+</div>
+
+<div id="posList" class="pos-list"></div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3 id="modalTitle">Close Position?</h3>
+    <p id="modalBody">Sell <strong id="modalQty"></strong> at market. You'll receive approximately <strong id="modalProceeds"></strong>.</p>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn confirm" id="modalConfirm">Close Position</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+(function(){
+  const fmt = n => Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmtQty = (n, isCrypto) => Number(n||0).toFixed(isCrypto ? 6 : 4);
+  const fmtPct = n => { const s = n>=0 ? '+' : ''; return s + Number(n||0).toFixed(2) + '%'; };
+
+  const state = { tab: 'open', positions: [], summary: {}, cash: 0 };
+
+  function toast(msg, kind){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + (kind || '');
+    setTimeout(()=>{ t.className = 'toast'; }, 2600);
+  }
+
+  async function loadPositions(){
+    try {
+      const r = await fetch('/api/portfolio?type=positions&status=' + state.tab);
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.error || 'Load failed');
+      state.positions = j.positions || [];
+      state.summary   = j.summary || {};
+      state.cash      = j.cashBalanceUSD || 0;
+      renderSummary();
+      renderList();
+    } catch(e) {
+      console.error('loadPositions', e);
+      document.getElementById('posList').innerHTML =
+        '<div class="empty"><div class="empty-title" style="color:var(--down)">Failed to load</div><div class="empty-sub">' + e.message + '</div></div>';
+    }
+  }
+
+  function renderSummary(){
+    const s = state.summary;
+    const value = s.totalCurrentValue || 0;
+    const equity = state.cash + value;
+    document.getElementById('sumValue').textContent = '$' + fmt(equity);
+    document.getElementById('sumCost').textContent  = '$' + fmt(value);
+    document.getElementById('sumCash').textContent  = '$' + fmt(state.cash);
+    document.getElementById('sumCount').textContent = s.openCount || 0;
+
+    const pnl = s.totalUnrealizedPnl || 0;
+    const pnlPct = s.totalUnrealizedPnlPct || 0;
+    const el = document.getElementById('sumPnl');
+    if (state.tab === 'open' && (s.openCount || 0) > 0) {
+      const cls = pnl >= 0 ? 'pnl-up' : (pnl < 0 ? 'pnl-dn' : 'pnl-neu');
+      const sign = pnl >= 0 ? '+' : '';
+      el.className = 'sum-pnl ' + cls;
+      el.innerHTML = '<span class="live-dot"></span>' + sign + '$' + fmt(Math.abs(pnl)) + ' &nbsp;·&nbsp; ' + fmtPct(pnlPct) + ' &nbsp;·&nbsp; LIVE';
+    } else if (state.tab === 'closed') {
+      el.className = 'sum-pnl pnl-neu';
+      el.innerHTML = 'Realized P&L history';
+    } else {
+      el.className = 'sum-pnl pnl-neu';
+      el.innerHTML = 'No open positions';
+    }
+  }
+
+  function logoHTML(p, initial) {
+    const t = (p.ticker || '').toLowerCase();
+    const local = '/images/logos/' + t + '.png';
+    const dom = p.domain || '';
+    const clearbit = dom ? 'https://logo.clearbit.com/' + dom + '?size=128' : '';
+    const gfav = dom ? 'https://www.google.com/s2/favicons?domain=' + dom + '&sz=128' : '';
+    const saved = (p.logoUrl && p.logoUrl.indexOf('duckduckgo') === -1) ? p.logoUrl : local;
+    return '<img src="' + saved + '" alt="" '
+      + 'onerror="if(!this.dataset.f1){this.dataset.f1=1;this.src=\'' + local + '\'}'
+      + 'else if(!this.dataset.f2){this.dataset.f2=1;this.src=\'' + clearbit + '\'}'
+      + 'else if(!this.dataset.f3){this.dataset.f3=1;this.src=\'' + gfav + '\'}'
+      + 'else{this.parentNode.textContent=\'' + initial + '\'}">';
+  }
+
+  function renderList(){
+    const el = document.getElementById('posList');
+    if (!state.positions.length) {
+      el.innerHTML = '<div class="empty">'
+        + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 6-6"/></svg>'
+        + '<div class="empty-title">' + (state.tab === 'open' ? 'No open positions yet' : 'No closed positions') + '</div>'
+        + '<div class="empty-sub">' + (state.tab === 'open' ? 'Start trading to see your portfolio come to life.' : 'Positions you close will appear here.') + '</div>'
+        + (state.tab === 'open' ? '<a href="/trade" class="empty-btn">Start Trading</a>' : '')
+        + '</div>';
+      return;
+    }
+
+    el.innerHTML = state.positions.map(function(p){
+      const isCrypto = p.assetType === 'crypto';
+      const isClosed = p.status === 'closed';
+      const pnl = p.unrealizedPnl || 0;
+      const pnlPct = p.unrealizedPnlPct || 0;
+      const cls = pnl >= 0 ? 'pnl-up' : (pnl < 0 ? 'pnl-dn' : 'pnl-neu');
+      const sign = pnl >= 0 ? '+' : '';
+      const initial = (p.companyName || p.ticker || '?')[0];
+      const changePct = p.changePct || 0;
+      const liveSign = changePct >= 0 ? '+' : '';
+      const mv = p.currentValue || 0;
+      const qtyStr = fmtQty(p.quantity, isCrypto) + (isCrypto ? '' : ' sh');
+      const pnlColor = pnl >= 0 ? 'var(--up)' : (pnl < 0 ? 'var(--down)' : 'var(--text-dim)');
+      const liveColor = changePct >= 0 ? 'var(--up)' : 'var(--down)';
+
+      return '<div class="pos-card' + (isClosed ? ' closed' : '') + '" data-id="' + p.id + '">'
+        + '<div class="pos-head">'
+          + '<div class="pos-logo">' + logoHTML(p, initial) + '</div>'
+          + '<div class="pos-name-wrap">'
+            + '<div class="pos-name">' + (p.companyName || p.ticker) + '</div>'
+            + '<div class="pos-sub">' + p.ticker + ' · ' + (p.assetType||'').toUpperCase() + '</div>'
+          + '</div>'
+          + '<div class="pos-value">'
+            + '<div class="mv">$' + fmt(mv) + '</div>'
+            + '<div class="mv-label">' + (isClosed ? 'PROCEEDS' : 'MKT VALUE') + '</div>'
+          + '</div>'
+        + '</div>'
+
+        + '<div class="pos-pnl-row">'
+          + '<div class="pos-pnl-usd" style="color:' + pnlColor + '">' + sign + '$' + fmt(Math.abs(pnl)) + '</div>'
+          + '<div class="pos-pnl-pct ' + cls + '">' + fmtPct(pnlPct) + '</div>'
+        + '</div>'
+
+        + '<div class="pos-details">'
+          + '<div class="pos-d"><div class="pos-d-label">Quantity</div><div class="pos-d-val">' + qtyStr + '</div></div>'
+          + '<div class="pos-d"><div class="pos-d-label">Entry Price</div><div class="pos-d-val">$' + fmt(p.entryPrice) + '</div></div>'
+          + (isClosed
+              ? '<div class="pos-d"><div class="pos-d-label">Exit Price</div><div class="pos-d-val">$' + fmt(p.exitPrice) + '</div></div>'
+                + '<div class="pos-d"><div class="pos-d-label">Cost Basis</div><div class="pos-d-val">$' + fmt(p.costBasis) + '</div></div>'
+              : '<div class="pos-d"><div class="pos-d-label">Live Price</div><div class="pos-d-val">$' + fmt(p.currentPrice) + '<span class="live-chg" style="color:' + liveColor + '">' + liveSign + Number(changePct||0).toFixed(2) + '%</span></div></div>'
+                + '<div class="pos-d"><div class="pos-d-label">Cost Basis</div><div class="pos-d-val">$' + fmt(p.costBasis) + '</div></div>'
+            )
+        + '</div>'
+
+        + (isClosed ? '' :
+            '<div class="pos-actions">'
+              + '<button class="pos-btn trade" onclick="location.href=\'/trade?ticker=' + p.ticker + '\'">Trade</button>'
+              + '<button class="pos-btn close" onclick="confirmClose(\'' + p.id + '\')">Close</button>'
+            + '</div>'
+          )
+      + '</div>';
+    }).join('');
+  }
+
+  let pendingClose = null;
+  window.confirmClose = function(id){
+    const p = state.positions.find(x => x.id === id);
+    if (!p) return;
+    pendingClose = p;
+    const isCrypto = p.assetType === 'crypto';
+    document.getElementById('modalTitle').textContent = 'Close ' + p.ticker + '?';
+    document.getElementById('modalQty').textContent = fmtQty(p.quantity, isCrypto) + ' ' + p.ticker;
+    document.getElementById('modalProceeds').textContent = '$' + fmt(p.currentValue || 0);
+    document.getElementById('modalBg').classList.add('show');
+  };
+  window.closeModal = function(){
+    document.getElementById('modalBg').classList.remove('show');
+    pendingClose = null;
+  };
+
+  document.getElementById('modalConfirm').addEventListener('click', async function(){
+    if (!pendingClose) return;
+    const btn = this;
+    btn.disabled = true;
+    btn.textContent = 'Closing…';
+    try {
+      const r = await fetch('/api/buy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'trade-close', positionId: pendingClose.id })
+      });
+      const j = await r.json();
+      if (j.error) throw new Error(j.error);
+      const pnl = j.realizedPnl || 0;
+      const pnlStr = (pnl >= 0 ? '+$' : '-$') + fmt(Math.abs(pnl));
+      toast('Closed · P&L ' + pnlStr, pnl >= 0 ? 'success' : 'error');
+      closeModal();
+      setTimeout(loadPositions, 400);
+    } catch(e) {
+      toast('Failed: ' + e.message, 'error');
+      btn.disabled = false;
+      btn.textContent = 'Close Position';
+    }
+  });
+
+  document.getElementById('modalBg').addEventListener('click', function(e){
+    if (e.target === this) closeModal();
+  });
+
+  document.querySelectorAll('.tab-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      state.tab = btn.dataset.tab;
+      document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.toggle('active', b === btn); });
+      loadPositions();
+    });
+  });
+
+  loadPositions();
+  setInterval(function(){ if (!document.hidden && state.tab === 'open') loadPositions(); }, 20000);
+})();
+</script>
+
+<nav class="tab-nav">
+  <a class="tab" href="/dashboard">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>
+    Home
+  </a>
+  <a class="tab active" href="/positions">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="4" height="10"/><rect x="10" y="6" width="4" height="14"/><rect x="16" y="13" width="4" height="7"/></svg>
+    Positions
+  </a>
+  <a class="tab" href="/trade">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>
+    Trade
+  </a>
+  <a class="tab" href="/ipos.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+    IPOs
+  </a>
+  <a class="tab" href="/account.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+    Account
+  </a>
+</nav>
+
+</body>
+</html>

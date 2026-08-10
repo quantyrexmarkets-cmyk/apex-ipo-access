@@ -2,15 +2,16 @@
 <!-- BUILD: 1781545021 -->
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 <meta charset="UTF-8">
 <meta name="robots" content="noindex, nofollow">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="cache-control" content="no-cache, must-revalidate"><meta http-equiv="pragma" content="no-cache"><title>Admin Panel | Apex IPO Access</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-<script src="js/apex-api.js?v=1"></script>
-<script src="js/supabase.js?v=1781643381"></script>
-<script src="js/notify.js?v=1781643381"></script>
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script src="/js/supabase.js?v=1786129802"></script>
+<script src="/js/notify.js?v=1786129802"></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
@@ -2655,7 +2656,7 @@ window._quickChangePassword = async function(){
     var { error } = await sb.from('profiles').update({ kyc_status: newStatus }).eq('id', currentUser.id);
     if(error){ apexError(error.message); return; }
     if(newStatus==='verified'){
-      await notifyUser(currentUser.id, '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:6px"><polyline points="20 6 9 17 4 12"/></svg> Account Approved', 'Welcome to Apex IPO Access. Your account has been verified and you now have full access to invest in pre-IPO opportunities.', 'success');
+      await notifyUser(currentUser.id, '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:6px"><polyline points="20 6 9 17 4 12"/></svg> Account Approved', 'Welcome to Apex IPO Access. Your account has been verified and you now have full access to invest in IPO opportunities.', 'success');
     } else {
       await notifyUser(currentUser.id, '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:6px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Account Status Changed', 'Your KYC verification has been revoked. Please contact support for details.', 'warning');
     }
@@ -3199,6 +3200,6 @@ window._openAddUser = async function(){
 };
 </script>
 
-  <script src="js/session-guard.js?v=3" defer></script>
+  <script src="/js/session-guard.js?v=1786129802" defer></script>
 </body>
 </html>

@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Panel | Apex IPO Access</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
-<script src="js/apex-api.js?v=1"></script>
-<script src="js/supabase.js?v=1781643381"></script>
-<script src="js/notify.js?v=1781643381"></script>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script src="/js/supabase.js?v=1786129802"></script>
+<script src="/js/notify.js?v=1786129802"></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{background:#0a0a0f;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
@@ -382,7 +383,7 @@
 
   document.addEventListener('sb-ready', async function(){
     var { data: userData } = await sb.auth.getUser();
-    if(!userData || !userData.user){ window.location.href='admin-login.html'; return; }
+    if(!userData || !userData.user){ window.location.href='/admin-login.html'; return; }
     state.user = userData.user;
 
     var { data: profile } = await sb.from('profiles').select('is_admin,email').eq('id', state.user.id).single();
@@ -687,6 +688,6 @@
 })();
 </script>
 
-<script src="js/floating-widget.js?v=1781343118" defer></script>
+<script src="/js/floating-widget.js?v=1786129802" defer></script>
 </body>
 </html>

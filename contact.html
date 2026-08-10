@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Help & Support | Apex IPO Access</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
-<script src="js/apex-api.js?v=1"></script>
-<script src="js/supabase.js?v=1781643381"></script>
-<script src="js/notify.js?v=1781643381"></script>
-<script src="js/sidebar.js?v=2" defer></script>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script src="/js/notify.js?v=1786129802"></script>
+<script src="/js/sidebar.js?v=1786129802" defer></script>
 <script>
-  document.addEventListener('sb-ready', async () => {
-    const { data } = await sb.auth.getUser();
-    if(!data.user) window.location.href = 'login.html';
-  });
+  (async () => {
+    try {
+      const r = await fetch('/api/auth?action=me', { credentials: 'include' });
+      const j = await r.json();
+      if (!j.ok || !j.user) window.location.href = 'login.html';
+    } catch(e) { window.location.href = 'login.html'; }
+  })();
 </script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
@@ -154,7 +157,7 @@
   <p class="page-sub">Get answers fast — chat with our team, browse FAQs, or send a support request.</p>
 
   <div class="quick-grid">
-    <div class="quick-tile" onclick="window.location.href='mailto:support@apexipoaccess.com'">
+    <div class="quick-tile" onclick="window.location.href='mailto:support@apexipoholdings.com'">
       <div class="ic">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
@@ -186,7 +189,7 @@
       <div class="desc">Common questions answered</div>
     </div>
 
-    <div class="quick-tile purple" onclick="window.location.href='docs.html'">
+    <div class="quick-tile purple" onclick="window.location.href='/docs.html'">
       <div class="ic">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -226,7 +229,7 @@
       How do I fund my account?
       <svg class="chev" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     </div>
-    <div class="faq-a"><div class="faq-a-inner">Go to <a href="fund-account.html" style="color:#4a9eff">Fund Account</a> and choose either Wire Transfer or Crypto. You'll see complete instructions and a unique reference code for tracking.</div></div>
+    <div class="faq-a"><div class="faq-a-inner">Go to <a href="/fund-account.html" style="color:#4a9eff">Fund Account</a> and choose either Wire Transfer or Crypto. You'll see complete instructions and a unique reference code for tracking.</div></div>
   </div>
 
   <div class="faq-item">
@@ -234,15 +237,15 @@
       How long does verification (KYC) take?
       <svg class="chev" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     </div>
-    <div class="faq-a"><div class="faq-a-inner">Most accounts are verified within 1–2 business days. We'll email you as soon as your account is approved. Check status on the <a href="account.html" style="color:#4a9eff">Account</a> page.</div></div>
+    <div class="faq-a"><div class="faq-a-inner">Most accounts are verified within 1–2 business days. We'll email you as soon as your account is approved. Check status on the <a href="/account.html" style="color:#4a9eff">Account</a> page.</div></div>
   </div>
 
   <div class="faq-item">
     <div class="faq-q">
-      When can I invest in a pre-IPO opportunity?
+      When can I invest in a IPO opportunity?
       <svg class="chev" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     </div>
-    <div class="faq-a"><div class="faq-a-inner">Pre-IPO allocations open in defined windows. Browse current opportunities on the <a href="ipos.html" style="color:#4a9eff">IPOs</a> page — you'll see a countdown timer for each round.</div></div>
+    <div class="faq-a"><div class="faq-a-inner">IPO allocations open in defined windows. Browse current opportunities on the <a href="/ipos.html" style="color:#4a9eff">IPOs</a> page — you'll see a countdown timer for each round.</div></div>
   </div>
 
   <div class="faq-item">
@@ -258,7 +261,7 @@
       How do I enable two-factor authentication?
       <svg class="chev" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     </div>
-    <div class="faq-a"><div class="faq-a-inner">Open your <a href="account.html" style="color:#4a9eff">Account</a> page and toggle the "Two-factor authentication" switch. We'll email a 5-digit code each time you sign in.</div></div>
+    <div class="faq-a"><div class="faq-a-inner">Open your <a href="/account.html" style="color:#4a9eff">Account</a> page and toggle the "Two-factor authentication" switch. We'll email a 5-digit code each time you sign in.</div></div>
   </div>
 
   <div class="faq-item">
@@ -266,28 +269,28 @@
       Can I withdraw my funds at any time?
       <svg class="chev" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     </div>
-    <div class="faq-a"><div class="faq-a-inner">Yes — uninvested cash can be withdrawn at any time via wire. Pre-IPO allocations remain locked until the company's IPO event, per the offering terms.</div></div>
+    <div class="faq-a"><div class="faq-a-inner">Yes — uninvested cash can be withdrawn at any time via wire. IPO allocations remain locked until the company's IPO event, per the offering terms.</div></div>
   </div>
 </main>
 
 <nav class="tab-nav">
-  <div onclick="location.href='dashboard.html'" class="tab">
+  <div onclick="location.href='/dashboard.html'" class="tab">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
     <span class="lbl">Home</span>
   </div>
-  <div onclick="location.href='portfolio.html'" class="tab">
+  <div onclick="location.href='/portfolio.html'" class="tab">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18M7 14l4-4 4 4 6-6"/></svg>
     <span class="lbl">Portfolio</span>
   </div>
-  <div onclick="location.href='ipos.html'" class="tab">
+  <div onclick="location.href='/ipos.html'" class="tab">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
     <span class="lbl">IPOs</span>
   </div>
-  <div onclick="location.href='docs.html'" class="tab">
+  <div onclick="location.href='/docs.html'" class="tab">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
     <span class="lbl">Docs</span>
   </div>
-  <div onclick="location.href='account.html'" class="tab">
+  <div onclick="location.href='/account.html'" class="tab">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg>
     <span class="lbl">Account</span>
   </div>
@@ -320,31 +323,28 @@
     msg.textContent = '';
 
     try {
-      var { data: userData } = await sb.auth.getUser();
-      var user = userData?.user;
-      var userEmail = user?.email || 'unknown';
-      var userId = user?.id || '';
-
-      // Try insert into support_tickets table (silently fail if table doesn't exist)
+      var userEmail = 'unknown';
+      var userId = '';
       try {
-        await sb.from('support_tickets').insert({
-          user_id: userId,
-          email: userEmail,
-          topic: topic,
-          message: message,
-          status: 'open'
-        });
-      } catch(e) { console.warn('support_tickets table not found, falling back to mailto'); }
+        const _r = await fetch('/api/auth?action=me', { credentials: 'include' });
+        const _j = await _r.json();
+        if (_j.ok && _j.user) {
+          userEmail = _j.user.email || 'unknown';
+          userId = _j.user._id || _j.user.id || '';
+        }
+      } catch(e) {}
+
+      // Support tickets handled via email (mailto)
 
       // Always open mailto as backup
       var body = 'Topic: ' + topic + '\n\n' + message + '\n\n---\nFrom: ' + userEmail + '\nUser ID: ' + userId;
-      window.location.href = 'mailto:support@apexipoaccess.com?subject=' + encodeURIComponent('[Support] ' + topic) + '&body=' + encodeURIComponent(body);
+      window.location.href = 'mailto:support@apexipoholdings.com?subject=' + encodeURIComponent('[Support] ' + topic) + '&body=' + encodeURIComponent(body);
 
       msg.textContent = '✓ Opening your email client…';
       msg.className = 'form-msg ok';
       document.getElementById('supportForm').reset();
     } catch(err) {
-      msg.textContent = 'Could not send. Please email support@apexipoaccess.com directly.';
+      msg.textContent = 'Could not send. Please email support@apexipoholdings.com directly.';
       msg.className = 'form-msg err';
     } finally {
       btn.disabled = false;
@@ -360,9 +360,9 @@
   }
 </script>
 
-<script src="js/floating-widget.js?v=1781343118" defer></script>
+<script src="/js/floating-widget.js?v=1786129802" defer></script>
 
-<script src="js/bottom-nav.js?v=1"></script>
+<script src="/js/bottom-nav.js?v=1786129802"></script>
 
 <!-- Smartsupp Live Chat -->
 <style>
@@ -388,7 +388,7 @@
   var s, c, o = window.smartsupp = function(){ o._.push(arguments); };
   o._ = [];
   window._smartsupp = window._smartsupp || {};
-  window._smartsupp.key = '7d6445f6308e329b33468a584f675c298bd2c871';
+  window._smartsupp.key = 'cfc0fb237d4a16ba3caf79dddd9f9977ba5c938c';
   window._smartsupp.offsetY = 80;
   window._smartsupp.offsetX = 10;
   s = d.getElementsByTagName('script')[0];

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="/js/loader.js?v=1786129802"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Manage Company · APEX Admin</title>
+<link rel="icon" href="/assets/spacex-logo.png">
+<style>
+:root{
+  --bg:#000000;--bg-2:#0a0a0a;--bg-3:#141414;
+  --text-1:#ffffff;--text-2:#a3a3a3;--text-3:#737373;
+  --accent:#ffffff;--success:#ffffff;--warn:#a3a3a3;--danger:#ef4444;
+  --border:#1f1f1f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text-1);font-family:'Montserrat',-apple-system,sans-serif;font-size:14px;min-height:100vh}
+.shell{max-width:980px;margin:0 auto;padding:20px 16px 80px}
+
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.back-btn{background:transparent;border:1px solid #1f1f1f;color:#a3a3a3;padding:9px 14px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s}
+.back-btn:hover{border-color:#fff;color:#fff}
+.topbar h1{font-size:20px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.preview{background:#0a0a0a;border:1px solid #1f1f1f;border-radius:14px;padding:18px;display:flex;align-items:center;gap:14px;margin-bottom:24px;transition:border-color .15s}.preview:hover{border-color:#fff}
+.preview-logo{width:54px;height:54px;border-radius:12px;background:#1f1f1f;border:1px solid #2a2a2a;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px;overflow:hidden;flex-shrink:0}
+.preview-logo img{width:100%;height:100%;object-fit:contain;padding:4px}
+.preview-name{font-size:16px;font-weight:700;color:var(--text-1)}
+.preview-meta{font-size:11px;color:var(--text-3);margin-top:3px;font-weight:600;letter-spacing:0.5px}
+.preview-price{margin-left:auto;text-align:right}
+.preview-price .num{font-size:20px;font-weight:700}
+.preview-price .lbl{font-size:9px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.8px;margin-top:2px}
+
+.card{background:#0a0a0a;border:1px solid #1f1f1f;border-radius:14px;padding:22px;margin-bottom:14px;transition:border-color .15s}.card:hover{border-color:#2a2a2a}
+.card-head{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.card-head svg{width:16px;height:16px;color:#fff}
+.card-head h2{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid.cols-3{grid-template-columns:1fr 1fr 1fr}
+.full{grid-column:1/-1}
+@media(max-width:600px){.grid,.grid.cols-3{grid-template-columns:1fr}}
+
+.field label{display:block;font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px}
+.field label .req{color:var(--danger);margin-left:2px}
+.field input,.field select,.field textarea{width:100%;background:#000000;border:1px solid #1f1f1f;border-radius:8px;padding:11px 13px;color:#fff;font-family:inherit;font-size:13px;transition:border-color .15s,background .15s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#fff;background:#000}
+.field input:disabled{opacity:0.5;cursor:not-allowed}
+.field textarea{resize:vertical;min-height:80px;font-family:inherit}
+.field-hint{font-size:10px;color:var(--text-3);margin-top:5px}
+
+.footbar{position:sticky;bottom:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(14px);border-top:1px solid #1f1f1f;margin:24px -16px -80px;padding:16px;display:flex;gap:10px;z-index:10}
+.btn{padding:11px 18px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s}
+.btn-primary{background:#fff;color:#000}
+.btn-primary:hover{opacity:.85}
+.btn-success{background:#fff;color:#000}
+.btn-success:hover{opacity:.85}
+.btn-ghost{background:rgba(255,255,255,0.04);color:var(--text-1);border:1px solid var(--border)}
+.btn-ghost:hover{background:rgba(255,255,255,0.08)}
+.btn-danger{background:rgba(239,68,68,0.12);color:var(--danger);border:1px solid rgba(239,68,68,0.3)}
+.btn-danger:hover{background:rgba(239,68,68,0.2)}
+.btn:disabled{opacity:0.6;cursor:not-allowed}
+
+.toast{position:fixed;top:20px;right:20px;background:var(--bg-3);border:1px solid var(--border);padding:12px 16px;border-radius:10px;font-size:13px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.4);max-width:320px;animation:slideIn .2s}
+.toast.success{border-color:var(--success);color:var(--success)}
+.toast.error{border-color:var(--danger);color:var(--danger)}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+.loading{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--text-3)}
+.spinner{width:24px;height:24px;border:2px solid #1f1f1f;border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;margin-right:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div id="loadingState" class="loading"><div class="spinner"></div>Loading…</div>
+
+<div class="shell" id="shell" style="display:none">
+  <div class="topbar">
+    <a href="/adminprivate#companies" class="back-btn" data-smart-back>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </a>
+    <h1 id="pageTitle">New Company</h1>
+  </div>
+
+  <!-- Live preview -->
+  <div class="preview">
+    <div class="preview-logo" id="pvLogo">?</div>
+    <div style="flex:1;min-width:0">
+      <div class="preview-name" id="pvName">Company Name</div>
+      <div class="preview-meta" id="pvMeta">TICKER · SECTOR</div>
+    </div>
+    <div class="preview-price">
+      <div class="num" id="pvPrice">$0.00</div>
+      <div class="lbl">per share</div>
+    </div>
+  </div>
+
+  <!-- BASIC INFO -->
+  <div class="card">
+    <div class="card-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <h2>Basic Information</h2>
+    </div>
+    <div class="grid">
+      <div class="field"><label>Ticker <span class="req">*</span></label><input id="fTicker" type="text" maxlength="10" placeholder="SPCX"><div class="field-hint">Uppercase, max 10 chars. Cannot be changed after creation.</div></div>
+      <div class="field"><label>Company Name <span class="req">*</span></label><input id="fName" type="text" placeholder="SpaceX"></div>
+      <div class="field"><label>Sector</label><input id="fSector" type="text" placeholder="Aerospace"></div>
+      <div class="field"><label>Stage</label>
+        <select id="fStage">
+          <option value="IPO">IPO</option>
+          <option value="Live IPO">Live IPO</option>
+          <option value="Public">Public</option>
+          <option value="Closed">Closed</option>
+        </select>
+      </div>
+      <div class="field"><label>Status</label>
+        <select id="fStatus">
+          <option value="active">Active</option>
+          <option value="paused">Paused</option>
+          <option value="closed">Closed</option>
+        </select>
+        <div class="field-hint">Paused = visible but cannot buy. Closed = hidden.</div>
+      </div>
+      <div class="field"><label>Founded Year</label><input id="fFounded" type="number" min="1800" max="2100" placeholder="2002"></div>
+      <div class="field"><label>Headquarters</label><input id="fHq" type="text" placeholder="Hawthorne, CA"></div>
+      <div class="field full"><label>Description</label><textarea id="fDesc" rows="3" placeholder="What does this company do?"></textarea></div>
+    </div>
+  </div>
+
+  <!-- PRICING -->
+  <div class="card">
+    <div class="card-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <h2>Pricing &amp; Valuation</h2>
+    </div>
+    <div class="grid">
+      <div class="field"><label>Price / Share (USD) <span class="req">*</span></label><input id="fPrice" type="number" step="0.01" min="0" placeholder="135.00"></div>
+      <div class="field"><label>Valuation</label><input id="fValuation" type="text" placeholder="$400B"></div>
+      <div class="field"><label>Expected Return</label><input id="fReturn" type="text" placeholder="+40% to +70%"></div>
+      <div class="field"><label>Growth YoY</label><input id="fGrowth" type="text" placeholder="+45%"></div>
+      <div class="field"><label>Success Rate (%)</label><input id="fSuccess" type="number" min="0" max="100" placeholder="92"></div>
+      <div class="field"><label>IPO Window</label><input id="fIpoWindow" type="text" placeholder="Q1 2026"></div>
+    </div>
+  </div>
+
+  <!-- INVESTMENT CAPS -->
+  <div class="card">
+    <div class="card-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      <h2>Investment &amp; Shares</h2>
+    </div>
+    <div class="grid">
+      <div class="field"><label>Min Investment ($)</label><input id="fMinInv" type="number" step="0.01" min="0" placeholder="0"><div class="field-hint">0 = no minimum</div></div>
+      <div class="field"><label>Max Investment ($)</label><input id="fMaxInv" type="number" step="0.01" min="0" placeholder="0"><div class="field-hint">0 = no maximum</div></div>
+      <div class="field"><label>Available Shares</label><input id="fAvail" type="number" min="0" placeholder="100000"></div>
+      <div class="field"><label>Reserved Shares</label><input id="fReserved" type="number" min="0" placeholder="0"></div>
+    </div>
+  </div>
+
+  <!-- MEDIA & VISIBILITY -->
+  <div class="card">
+    <div class="card-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <h2>Media &amp; Visibility</h2>
+    </div>
+    <div class="grid">
+      <div class="field"><label>Domain</label><input id="fDomain" type="text" placeholder="spacex.com"><div class="field-hint">Used for auto-generated favicon logo</div></div>
+      <div class="field"><label>Custom Logo URL</label><input id="fLogo" type="text" placeholder="https://..."><div class="field-hint">Overrides favicon. Use Cloudinary or any image URL.</div></div>
+      <div class="field"><label>Sort Order</label><input id="fSort" type="number" min="0" placeholder="0"><div class="field-hint">Lower = appears first</div></div>
+      <div class="field"><label>Show on Homepage</label>
+        <select id="fShow">
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTION BAR -->
+  <div class="footbar">
+    <button class="btn btn-danger" id="deleteBtn" onclick="deleteCompany()" style="display:none">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+      Delete
+    </button>
+    <a href="/adminprivate#companies" class="btn btn-ghost" style="margin-left:auto;text-decoration:none">Cancel</a>
+    <button class="btn btn-success" id="saveBtn" onclick="saveCompany()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      <span id="saveBtnLabel">Save Company</span>
+    </button>
+  </div>
+</div>
+
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script src="/js/supabase.js?v=1786129802"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const editTicker = (params.get('ticker') || '').toUpperCase().trim();
+const isEdit = !!editTicker;
+let __companyId = null;
+
+function $(id){ return document.getElementById(id); }
+function toast(msg, type='success'){
+  const t=document.createElement('div');
+  t.className='toast '+type;
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateX(20px)'; t.style.transition='all .2s'; setTimeout(()=>t.remove(),200); }, 3000);
+}
+
+async function init(){
+  // Auth check
+  try{
+    const me = await ApexAPI.auth.check();
+    if(!me || me.role !== 'admin'){
+      window.location.href = '/admin-login';
+      return;
+    }
+  }catch{ window.location.href = '/admin-login'; return; }
+
+  $('pageTitle').textContent = isEdit ? 'Edit Company' : 'Add New Company';
+  $('saveBtnLabel').textContent = isEdit ? 'Save Changes' : 'Create Company';
+
+  if(isEdit){
+    try{
+      const res = await ApexAPI.admin.getCompany(editTicker);
+      if(!res?.ok) throw new Error(res?.error||'Failed to load');
+      populate(res.company);
+      __companyId = res.company._id;
+      $('deleteBtn').style.display = 'inline-flex';
+      $('fTicker').disabled = true;
+    }catch(e){
+      toast('Failed: '+e.message, 'error');
+      setTimeout(()=>{ window.location.href = '/adminprivate#companies'; }, 1500);
+      return;
+    }
+  }
+
+  $('loadingState').style.display='none';
+  $('shell').style.display='block';
+  attachPreview();
+}
+
+function populate(c){
+  $('fTicker').value = c.ticker || '';
+  $('fName').value = c.name || '';
+  $('fSector').value = c.sector || '';
+  $('fStage').value = c.stage || 'IPO';
+  $('fStatus').value = c.status || 'active';
+  $('fFounded').value = c.foundedYear || '';
+  $('fHq').value = c.hq || '';
+  $('fDesc').value = c.description || '';
+  $('fPrice').value = c.pricePerShare || 0;
+  $('fValuation').value = c.valuation || '';
+  $('fReturn').value = c.expectedReturn || '';
+  $('fGrowth').value = c.growthYoY || '';
+  $('fSuccess').value = c.successRate || '';
+  $('fIpoWindow').value = c.ipoWindow || '';
+  $('fMinInv').value = c.minInvestment || 0;
+  $('fMaxInv').value = c.maxInvestment || 0;
+  $('fAvail').value = c.availableShares || 0;
+  $('fReserved').value = c.reservedShares || 0;
+  $('fDomain').value = c.domain || '';
+  $('fLogo').value = c.logoUrl || '';
+  $('fSort').value = c.sortOrder || 0;
+  $('fShow').value = String(c.showOnHomepage !== false);
+  updatePreview();
+}
+
+function updatePreview(){
+  const name = $('fName').value.trim() || 'Company Name';
+  const ticker = $('fTicker').value.trim().toUpperCase() || 'TICKER';
+  const sector = $('fSector').value.trim() || 'SECTOR';
+  const price = parseFloat($('fPrice').value) || 0;
+  const domain = $('fDomain').value.trim();
+  const logoUrl = $('fLogo').value.trim();
+
+  $('pvName').textContent = name;
+  $('pvMeta').textContent = ticker + ' · ' + sector.toUpperCase();
+  $('pvPrice').textContent = '$' + price.toFixed(2);
+
+  const initial = name.charAt(0).toUpperCase();
+  const pv = $('pvLogo');
+  let src = '';
+  if(logoUrl) src = logoUrl;
+  else if(domain) src = 'https://icons.duckduckgo.com/ip3/'+domain+'.ico';
+
+  if(src){
+    pv.innerHTML = '<img src="'+src+'" alt="" onerror="this.parentElement.textContent=\''+initial+'\'">';
+  } else {
+    pv.textContent = initial;
+  }
+}
+
+function attachPreview(){
+  ['fName','fTicker','fSector','fPrice','fDomain','fLogo'].forEach(id => {
+    $(id).addEventListener('input', updatePreview);
+  });
+}
+
+async function saveCompany(){
+  const btn = $('saveBtn');
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;margin:0"></div>Saving…';
+  try{
+    const data = {
+      ticker: $('fTicker').value.trim().toUpperCase(),
+      name: $('fName').value.trim(),
+      sector: $('fSector').value.trim(),
+      stage: $('fStage').value,
+      status: $('fStatus').value,
+      foundedYear: parseInt($('fFounded').value)||null,
+      hq: $('fHq').value.trim(),
+      description: $('fDesc').value.trim(),
+      pricePerShare: parseFloat($('fPrice').value)||0,
+      valuation: $('fValuation').value.trim(),
+      expectedReturn: $('fReturn').value.trim(),
+      growthYoY: $('fGrowth').value.trim(),
+      successRate: parseInt($('fSuccess').value)||0,
+      ipoWindow: $('fIpoWindow').value.trim(),
+      minInvestment: parseFloat($('fMinInv').value)||0,
+      maxInvestment: parseFloat($('fMaxInv').value)||0,
+      availableShares: parseInt($('fAvail').value)||0,
+      reservedShares: parseInt($('fReserved').value)||0,
+      domain: $('fDomain').value.trim(),
+      logoUrl: $('fLogo').value.trim(),
+      sortOrder: parseInt($('fSort').value)||0,
+      showOnHomepage: $('fShow').value === 'true',
+    };
+    if(!data.ticker || !data.name){
+      throw new Error('Ticker and Name are required');
+    }
+    if(!data.pricePerShare || data.pricePerShare <= 0){
+      throw new Error('Price per share must be greater than zero');
+    }
+    const res = isEdit
+      ? await ApexAPI.admin.updateCompany(__companyId, data)
+      : await ApexAPI.admin.createCompany(data);
+    if(!res?.ok) throw new Error(res?.error || 'Save failed');
+    toast(isEdit ? 'Changes saved' : 'Company created', 'success');
+    setTimeout(()=>{ window.location.href = '/adminprivate#companies'; }, 800);
+  }catch(e){
+    toast(e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = orig;
+  }
+}
+
+async function deleteCompany(){
+  if(!__companyId) return;
+  const name = $('fName').value || 'this company';
+  if(!confirm('Delete '+name+'?\\n\\nThis cannot be undone.')) return;
+  try{
+    const res = await ApexAPI.admin.deleteCompany(__companyId);
+    if(!res?.ok) throw new Error(res?.error||'Delete failed');
+    toast('Company deleted', 'success');
+    setTimeout(()=>{ window.location.href = '/adminprivate#companies'; }, 800);
+  }catch(e){ toast(e.message, 'error'); }
+}
+
+window.saveCompany = saveCompany;
+window.deleteCompany = deleteCompany;
+
+init();
+</script>
+</body>
+</html>

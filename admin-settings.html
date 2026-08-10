@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="/js/loader.js?v=1786129802"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Settings — APEX Admin</title>
+<link rel="icon" href="/assets/spacex-logo.png">
+<style>
+:root{--bg:#000;--bg-2:#0a0a0a;--bg-3:#141414;--text-1:#fff;--text-2:#a3a3a3;--text-3:#737373;--border:#1f1f1f;--danger:#ef4444}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text-1);font-family:'Montserrat',-apple-system,sans-serif;font-size:14px;min-height:100vh;-webkit-font-smoothing:antialiased}
+.shell{max-width:780px;margin:0 auto;padding:20px 16px 100px}
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.back-btn{background:transparent;border:1px solid var(--border);color:var(--text-2);padding:9px 14px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s}
+.back-btn:hover{border-color:#fff;color:#fff}
+.topbar h1{font-size:22px;font-weight:700;letter-spacing:-0.3px;flex:1}
+
+.card{background:var(--bg-2);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:14px;transition:border-color .15s}
+.card:hover{border-color:#2a2a2a}
+.card-head{display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.card-head svg{width:16px;height:16px;color:#fff}
+.card-head h2{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.card-head p{margin-left:auto;font-size:11px;color:var(--text-3)}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.full{grid-column:1/-1}
+.field label{display:block;font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px}
+.field input,.field textarea{width:100%;background:#000;border:1px solid var(--border);border-radius:8px;padding:11px 13px;color:#fff;font-family:inherit;font-size:13px;transition:border-color .15s}
+.field input:focus,.field textarea:focus{outline:none;border-color:#fff}
+.field textarea{resize:vertical;min-height:90px;font-family:inherit}
+.field .hint{font-size:10px;color:var(--text-3);margin-top:5px}
+
+.footbar{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(14px);border-top:1px solid var(--border);padding:14px 16px;display:flex;gap:10px;z-index:10;justify-content:center}
+.footbar-inner{max-width:780px;width:100%;display:flex;gap:10px}
+.btn{padding:11px 18px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s}
+.btn-primary{background:#fff;color:#000;flex:1}
+.btn-primary:hover{opacity:.85}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--text-2);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:#fff;color:#fff}
+
+.toast{position:fixed;top:20px;right:20px;background:var(--bg-3);border:1px solid var(--border);padding:12px 16px;border-radius:8px;font-size:13px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.4);max-width:320px;animation:slideIn .2s}
+.toast.success{border-color:#fff}
+.toast.error{border-color:var(--danger);color:var(--danger)}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+.loading{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--text-3)}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;margin-right:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:560px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="loadingState" class="loading"><div class="spinner"></div>Loading…</div>
+
+<div class="shell" id="shell" style="display:none">
+  <div class="topbar">
+    <a href="/adminprivate" class="back-btn" data-smart-back>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </a>
+    <h1>Settings</h1>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M2 10h20"/></svg>
+      <h2>Bank Wire Information</h2>
+      <p>Shown to users for wire deposits</p>
+    </div>
+    <div class="grid">
+      <div class="field full"><label>Bank Name</label><input id="bankName" type="text" placeholder="e.g. Chase Bank"></div>
+      <div class="field full"><label>Account Holder Name</label><input id="accountHolder" type="text" placeholder="e.g. APEX IPO Access LLC"></div>
+      <div class="field"><label>Account Number</label><input id="accountNumber" type="text" placeholder="000123456789"></div>
+      <div class="field"><label>Routing Number (US ACH)</label><input id="routingNumber" type="text" placeholder="021000021"></div>
+      <div class="field"><label>SWIFT / BIC</label><input id="swiftCode" type="text" placeholder="CHASUS33"></div>
+      <div class="field"><label>IBAN (International)</label><input id="iban" type="text" placeholder="GB29 NWBK 6016..."></div>
+      <div class="field full"><label>Bank Address</label><input id="bankAddress" type="text" placeholder="270 Park Avenue, New York, NY 10017"></div>
+      <div class="field full"><label>Beneficiary Address</label><input id="beneficiaryAddress" type="text" placeholder="Company HQ address"></div>
+      <div class="field full">
+        <label>Wire Instructions (shown to user)</label>
+        <textarea id="instructions" placeholder="Include reference code in memo field. Wires typically clear within 1-2 business days…"></textarea>
+      </div>
+      <div class="field full">
+        <label>Reference Format</label>
+        <input id="referenceFormat" type="text" placeholder="APEX-{userId}">
+        <div class="hint">{userId} will be replaced with the user's ID. Used as wire memo reference.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footbar" id="footbar" style="display:none">
+  <div class="footbar-inner">
+    <a href="/adminprivate" class="btn btn-ghost">Cancel</a>
+    <button class="btn btn-primary" id="saveBtn" onclick="save()">Save Settings</button>
+  </div>
+</div>
+
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script>
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg, type){
+  const t = document.createElement('div');
+  t.className = 'toast ' + (type || 'success');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+async function init(){
+  try{
+    const me = await ApexAPI.admin.getMe();
+    if(!me || me.error){ location.href = '/adminprivate/login'; return; }
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('shell').style.display = 'block';
+    document.getElementById('footbar').style.display = 'flex';
+    await load();
+  }catch(e){
+    document.getElementById('loadingState').innerHTML = 'Error: ' + esc(e.message);
+  }
+}
+
+async function load(){
+  try{
+    const res = await ApexAPI.admin.getSettings();
+    if(!res?.success) throw new Error(res?.error || 'Failed to load');
+    const b = res.settings?.bank || {};
+    document.getElementById('bankName').value = b.bankName || '';
+    document.getElementById('accountHolder').value = b.accountHolder || '';
+    document.getElementById('accountNumber').value = b.accountNumber || '';
+    document.getElementById('routingNumber').value = b.routingNumber || '';
+    document.getElementById('swiftCode').value = b.swiftCode || '';
+    document.getElementById('iban').value = b.iban || '';
+    document.getElementById('bankAddress').value = b.bankAddress || '';
+    document.getElementById('beneficiaryAddress').value = b.beneficiaryAddress || '';
+    document.getElementById('instructions').value = b.instructions || '';
+    document.getElementById('referenceFormat').value = b.referenceFormat || 'APEX-{userId}';
+  }catch(e){
+    toast(e.message, 'error');
+  }
+}
+
+async function save(){
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  const orig = btn.textContent;
+  btn.textContent = 'Saving…';
+  try{
+    const bank = {
+      bankName: document.getElementById('bankName').value.trim(),
+      accountHolder: document.getElementById('accountHolder').value.trim(),
+      accountNumber: document.getElementById('accountNumber').value.trim(),
+      routingNumber: document.getElementById('routingNumber').value.trim(),
+      swiftCode: document.getElementById('swiftCode').value.trim(),
+      iban: document.getElementById('iban').value.trim(),
+      bankAddress: document.getElementById('bankAddress').value.trim(),
+      beneficiaryAddress: document.getElementById('beneficiaryAddress').value.trim(),
+      instructions: document.getElementById('instructions').value.trim(),
+      referenceFormat: document.getElementById('referenceFormat').value.trim() || 'APEX-{userId}',
+    };
+    const res = await ApexAPI.admin.updateSettings({ bank });
+    if(!res?.success) throw new Error(res?.error || 'Save failed');
+    toast('Settings saved', 'success');
+  }catch(e){
+    toast(e.message, 'error');
+  }finally{
+    btn.disabled = false;
+    btn.textContent = orig;
+  }
+}
+
+init();
+</script>
+</body>
+</html>

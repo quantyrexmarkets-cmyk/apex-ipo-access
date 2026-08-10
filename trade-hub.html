@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="/js/loader.js?v=1786129802"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Trade · APEX IPO</title>
+<link rel="icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { background: #0a0a0a; color: #fff; font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; overscroll-behavior: none; }
+  body { padding-bottom: 100px; min-height: 100vh; }
+
+  .th-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; }
+  .back-btn { background: transparent; border: none; color: #4a9eff; font-size: 14px; font-weight: 600; cursor: pointer; padding: 6px 10px; }
+  .th-title { font-size: 16px; font-weight: 700; }
+  .th-header-right { width: 60px; }
+
+  .intro { padding: 8px 20px 16px; }
+  .intro h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+  .intro p { font-size: 13px; color: #8590a1; }
+
+  .tabs { display: flex; gap: 8px; padding: 4px 16px 16px; overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab-btn { flex-shrink: 0; background: #141821; border: 1px solid #232833; color: #cfd8e8; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 8px; }
+  .tab-btn.active { background: #4a9eff; color: #001a3a; border-color: #4a9eff; }
+  .tab-btn svg { width: 15px; height: 15px; }
+
+  .asset-list { padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
+  .asset-card { display: flex; align-items: center; gap: 14px; padding: 14px 14px; background: #12141b; border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; cursor: pointer; transition: transform .12s ease, border-color .15s, background .15s; }
+  .asset-card:active { transform: scale(0.985); background: #181b24; }
+  .asset-card:hover { border-color: rgba(91,140,255,0.35); }
+  .asset-logo { width: 46px; height: 46px; border-radius: 12px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; font-weight: 800; font-size: 17px; color: #000; flex-shrink: 0; padding: 6px; box-sizing: border-box; }
+  .asset-logo img { width: 100%; height: 100%; object-fit: contain; }
+  .asset-info { flex: 1; min-width: 0; }
+  .asset-name { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .asset-ticker { font-size: 11px; color: #8590a1; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .asset-price { text-align: right; flex-shrink: 0; }
+  .asset-price .price { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .asset-price .change { font-size: 12px; font-weight: 600; }
+  .chg-up { color: #17e08a; }
+  .chg-dn { color: #ff5c5c; }
+  .chg-neu { color: #8590a1; }
+  .skel { display: inline-block; width: 50px; height: 12px; background: linear-gradient(90deg, #1a1a1a, #232833, #1a1a1a); background-size: 400px 100%; animation: shimmer 1.2s infinite; border-radius: 4px; }
+  @keyframes shimmer { 0%{background-position:-200px 0} 100%{background-position:200px 0} }
+  .live-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #17e08a; animation: pulse 1.5s infinite; margin-right: 4px; vertical-align: middle; }
+  @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.4 } }
+
+  .section-title { font-size: 12px; color: #8590a1; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; padding: 20px 16px 10px; }
+
+  .tab-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #0f0f0f; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-around; padding: 10px 4px 22px; z-index: 100; }
+  .tab-nav .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6a7585; font-size: 11px; font-weight: 600; cursor: pointer; background: none; border: none; padding: 4px; }
+  .tab-nav .tab svg { width: 22px; height: 22px; }
+  .tab-nav .tab.active { color: #fff; }
+
+  @media (min-width: 768px) {
+    body { max-width: 480px; margin: 0 auto; border-left: 1px solid #1a1a1a; border-right: 1px solid #1a1a1a; }
+  }
+
+  /* Upgraded trade-hub styles */
+  .search-wrap { padding: 4px 16px 12px; }
+  .search-box { display: flex; align-items: center; gap: 10px; background: #12141b; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 11px 14px; }
+  .search-box svg { width: 16px; height: 16px; color: #6a7585; flex-shrink: 0; }
+  .search-box input { flex: 1; background: transparent; border: none; outline: none; color: #f5f6fa; font-family: inherit; font-size: 14px; }
+  .search-box input::placeholder { color: #5a5f72; }
+  .intro h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 6px; }
+  .intro p { font-size: 13px; color: #8590a1; }
+  .tabs { padding: 6px 16px 10px; }
+  .tab-btn { transition: .15s; }
+  .tab-btn:active { transform: scale(0.96); }
+  .chg-up, .chg-dn { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 6px; font-size: 11px; }
+  .chg-up { background: rgba(23,224,138,0.12); }
+  .chg-dn { background: rgba(255,92,92,0.12); }
+
+</style>
+<script>
+// Forward compatibility: if ticker param is present, go to trade page
+(function(){
+  var t = new URLSearchParams(location.search).get('ticker');
+  if (t) { location.replace('/trade.html?ticker=' + encodeURIComponent(t)); }
+})();
+</script>
+</head>
+<body>
+
+<div class="th-header">
+  <button class="back-btn" onclick="location.href='/dashboard'">← Home</button>
+  <div class="th-title">Trade</div>
+  <div class="th-header-right"></div>
+</div>
+
+<div class="intro">
+  <h1>What do you want to trade?</h1>
+  <p>Live market prices · Real-time execution · Fractional shares</p>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="stocks">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="8" y1="17" x2="8" y2="12"/><line x1="12" y1="17" x2="12" y2="7"/><line x1="16" y1="17" x2="16" y2="14"/></svg>
+    Stocks
+  </button>
+  <button class="tab-btn" data-tab="crypto">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 8h5a3 3 0 010 6H9zm0 6h6a3 3 0 010 6H9z"/></svg>
+    Crypto
+  </button>
+</div>
+
+
+  <div class="search-wrap">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="assetSearch" type="text" placeholder="Search stocks, crypto…" autocomplete="off">
+    </div>
+  </div>
+
+  <div id="assetList" class="asset-list">
+  <div style="text-align:center;padding:40px 20px;color:#8590a1;font-size:13px">Loading…</div>
+</div>
+
+<nav class="tab-nav">
+  <div onclick="location.href='/dashboard.html'" class="tab">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span class="lbl">Home</span>
+  </div>
+  <div onclick="location.href='/positions'" class="tab">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span class="lbl">Positions</span>
+  </div>
+  <div class="tab active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 3 5-8"/></svg>
+    <span class="lbl">Trade</span>
+  </div>
+  <div onclick="location.href='/ipos.html'" class="tab">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+    <span class="lbl">IPOs</span>
+  </div>
+  <div onclick="location.href='/account.html'" class="tab">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>
+    <span class="lbl">Account</span>
+  </div>
+</nav>
+<script>
+(function(){
+  const PUBLIC_STAGES = ['public', 'crypto'];
+  const state = { tab: 'stocks', companies: [], quotes: {} };
+
+  // DB ticker -> Finnhub symbol
+  const PUBLIC_MAP = {
+    TESLA:'TSLA', AAPL:'AAPL', MSFT:'MSFT', GOOGL:'GOOGL', AMZN:'AMZN',
+    META:'META',  NVDA:'NVDA', V:'V',       NXPI:'NXPI',   UBS:'UBS',
+    JPM:'JPM',    BAC:'BAC',   NFLX:'NFLX', PLTR:'PLTR',
+  };
+  const CRYPTO_MAP = {
+    BTC:'BINANCE:BTCUSDT', ETH:'BINANCE:ETHUSDT',
+    SOL:'BINANCE:SOLUSDT', XRP:'BINANCE:XRPUSDT',
+    BNB:'BINANCE:BNBUSDT', ADA:'BINANCE:ADAUSDT',
+  };
+
+  function fmt(n) { return '$' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+  async function loadCompanies() {
+    try {
+      const r = await fetch('/api/companies');
+      const j = await r.json();
+      if (!j.ok) throw new Error();
+      state.companies = (j.companies || []).filter(function(c){
+        return PUBLIC_STAGES.indexOf((c.stage||'').toLowerCase()) >= 0;
+      });
+      render();
+      loadQuotes();
+    } catch(e) {
+      document.getElementById('assetList').innerHTML = '<div style="text-align:center;padding:40px 20px;color:#ff5c5c;font-size:13px">Failed to load. ' + e.message + '</div>';
+    }
+  }
+
+  async function loadQuotes() {
+    const list = state.companies
+      .filter(function(c){ return state.tab === 'crypto' ? c.stage.toLowerCase() === 'crypto' : c.stage.toLowerCase() === 'public'; })
+      .map(function(c){
+        const t = (c.ticker || '').toUpperCase();
+        return { db: t, live: PUBLIC_MAP[t] || CRYPTO_MAP[t] };
+      })
+      .filter(function(x){ return x.live; });
+
+    if (!list.length) return;
+
+    try {
+      const syms = list.map(function(x){ return x.live; }).join(',');
+      const r = await fetch('/api/companies?live=' + encodeURIComponent(syms));
+      const j = await r.json();
+      if (!j.ok) return;
+      const bySym = {};
+      (j.quotes || []).forEach(function(q){ bySym[q.symbol] = q; });
+      list.forEach(function(x){ if (bySym[x.live]) state.quotes[x.db] = bySym[x.live]; });
+      render();
+    } catch(e) {}
+  }
+
+  function render() {
+    const el = document.getElementById('assetList');
+    const filter = state.tab === 'crypto' ? 'crypto' : 'public';
+    const list = state.companies.filter(function(c){
+      if ((c.stage||'').toLowerCase() !== filter) return false;
+      if (searchFilter) {
+        const hay = ((c.name||'') + ' ' + (c.ticker||'')).toLowerCase();
+        if (hay.indexOf(searchFilter) === -1) return false;
+      }
+      return true;
+    });
+
+    if (!list.length) {
+      el.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#8590a1;font-size:13px">No assets available in this category.</div>';
+      return;
+    }
+
+    el.innerHTML = list.map(function(c){
+      const ticker = c.ticker || '';
+      const tickerU = ticker.toUpperCase();
+      const initial = (c.name || '?')[0];
+      // Logo chain: local /images/logos/{ticker}.png → Clearbit @ 128px → Google favicon → letter
+      const localLogo = '/images/logos/' + ticker.toLowerCase() + '.png';
+      const clearbit  = c.domain ? 'https://logo.clearbit.com/' + c.domain + '?size=128' : '';
+      const gfav      = c.domain ? 'https://www.google.com/s2/favicons?domain=' + c.domain + '&sz=128' : '';
+      const primary   = c.logoUrl || localLogo;
+      const fallback1 = clearbit || gfav;
+      const fallback2 = gfav;
+      const logoHTML  = '<img src="' + primary + '" alt="" '
+        + 'onerror="if(!this.dataset.f1){this.dataset.f1=1;this.src=\'' + fallback1 + '\'}'
+        + 'else if(!this.dataset.f2){this.dataset.f2=1;this.src=\'' + fallback2 + '\'}'
+        + 'else{this.parentNode.textContent=\'' + initial + '\'}">';
+
+      const q = state.quotes[tickerU];
+      let priceHTML, changeHTML;
+      if (q && typeof q.price === 'number') {
+        priceHTML = fmt(q.price);
+        const cls = q.changePercent >= 0 ? 'chg-up' : 'chg-dn';
+        const sign = q.changePercent >= 0 ? '+' : '';
+        changeHTML = '<div class="change ' + cls + '"><span class="live-dot"></span>' + sign + q.changePercent.toFixed(2) + '%</div>';
+      } else {
+        priceHTML = '<span class="skel"></span>';
+        changeHTML = '<div class="change chg-neu">Loading…</div>';
+      }
+
+      const typeLabel = filter === 'crypto' ? 'CRYPTO' : 'STOCK';
+
+      return ''
+        + '<div class="asset-card" onclick="location.href=\'/trade?ticker=' + encodeURIComponent(ticker) + '\'">'
+        +   '<div class="asset-logo">' + logoHTML + '</div>'
+        +   '<div class="asset-info">'
+        +     '<div class="asset-name">' + c.name + '</div>'
+        +     '<div class="asset-ticker">' + ticker + ' · ' + typeLabel + '</div>'
+        +   '</div>'
+        +   '<div class="asset-price"><div class="price">' + priceHTML + '</div>' + changeHTML + '</div>'
+        + '</div>';
+    }).join('');
+  }
+
+  document.querySelectorAll('.tab-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      state.tab = btn.dataset.tab;
+      document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.toggle('active', b === btn); });
+      render();
+      loadQuotes();
+    });
+  });
+
+  
+  var searchFilter = '';
+  var _si = document.getElementById('assetSearch');
+  if (_si) _si.addEventListener('input', function(e){ searchFilter = e.target.value.trim().toLowerCase(); render(); });
+
+  loadCompanies();
+  setInterval(function(){ if (!document.hidden) loadQuotes(); }, 30000);
+})();
+</script>
+
+</body>
+</html>

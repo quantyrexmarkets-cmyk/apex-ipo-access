@@ -56,11 +56,13 @@ module.exports = async (req, res) => {
       });
 
       // Notify user
+      const _fmt = (n) => Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+      const _methodLabel = method === 'crypto' ? `${asset} deposit` : (method === 'wire' ? 'wire deposit' : `${method} deposit`);
       await Notification.create({
         userId: user._id,
         type: 'deposit',
-        title: 'Deposit submitted',
-        message: `Your ${method} deposit of $${amountUSD} is pending review.`,
+        title: 'Deposit received',
+        message: `$${_fmt(amountUSD)} ${_methodLabel} is pending verification. Funds will reflect in your balance once confirmed.`,
         link: '/activity',
       });
 

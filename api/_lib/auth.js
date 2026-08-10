@@ -7,7 +7,7 @@ function signToken(user) {
   return jwt.sign(
     { sub: user._id.toString(), email: user.email, role: user.role },
     process.env.JWT_SECRET,
-    { expiresIn: '7d' }
+    { expiresIn: '1h' }
   );
 }
 
@@ -22,7 +22,7 @@ function setAuthCookie(res, token) {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: 60 * 60, // 1 hour — sliding window via requireAuth
   });
   res.setHeader('Set-Cookie', cookie);
 }
@@ -59,6 +59,14 @@ async function requireAuth(req, res, Profile) {
     res.status(401).json({ error: 'User not found' });
     return null;
   }
+
+  // Sliding refresh: re-issue a fresh 1h cookie on every authenticated request.
+  // User active = cookie keeps renewing. User idle 1h = cookie expires.
+  try {
+    const freshToken = signToken(user);
+    setAuthCookie(res, freshToken);
+  } catch (e) { /* don't fail the request if refresh hiccups */ }
+
   return user;
 }
 

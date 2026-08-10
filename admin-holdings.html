@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="/js/loader.js?v=1786129802"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>All Holdings — APEX Admin</title>
+<link rel="icon" href="/assets/spacex-logo.png">
+<style>
+:root{
+  --bg:#000;--bg-2:#0a0a0a;--bg-3:#141414;
+  --text-1:#fff;--text-2:#a3a3a3;--text-3:#737373;
+  --border:#1f1f1f;--danger:#ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text-1);font-family:'Montserrat',-apple-system,sans-serif;font-size:14px;min-height:100vh;-webkit-font-smoothing:antialiased}
+.shell{max-width:1200px;margin:0 auto;padding:20px 16px 80px}
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.back-btn{background:transparent;border:1px solid var(--border);color:var(--text-2);padding:9px 14px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s}
+.back-btn:hover{border-color:#fff;color:#fff}
+.topbar h1{font-size:22px;font-weight:700;letter-spacing:-0.3px;flex:1}
+
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:16px;transition:border-color .15s}
+.stat-card:hover{border-color:#2a2a2a}
+.stat-label{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:6px}
+.stat-value{font-size:22px;font-weight:700;font-family:'JetBrains Mono',Menlo,monospace;font-variant-numeric:tabular-nums;color:#fff}
+
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.search{position:relative;flex:1;min-width:200px;max-width:400px}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-3);pointer-events:none}
+.search input{width:100%;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:10px 12px 10px 34px;color:#fff;font-family:inherit;font-size:13px;transition:border-color .15s}
+.search input::placeholder{color:#525252}
+.search input:focus{outline:none;border-color:#fff}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:transparent;border:1px solid var(--border);color:var(--text-3);padding:8px 14px;border-radius:8px;font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+.chip:hover{border-color:#404040;color:var(--text-2)}
+.chip.active{background:#fff;border-color:#fff;color:#000;font-weight:600}
+
+.table-wrap{background:var(--bg-2);border:1px solid var(--border);border-radius:12px;overflow:hidden;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
+thead{background:#0f0f0f;border-bottom:1px solid var(--border)}
+th{text-align:left;padding:14px 16px;color:var(--text-3);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px}
+td{padding:14px 16px;border-bottom:1px solid #141414;color:#e5e5e5}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:#0f0f0f}
+tbody tr:last-child td{border-bottom:none}
+.user-cell{display:flex;flex-direction:column;gap:2px}
+.user-email{font-size:13px;color:#fff;font-weight:500}
+.user-name{font-size:11px;color:var(--text-3)}
+.ticker{font-family:'JetBrains Mono',Menlo,monospace;font-size:12px;font-weight:700;color:#fff;letter-spacing:0.8px}
+.num{font-family:'JetBrains Mono',Menlo,monospace;font-variant-numeric:tabular-nums;color:#fff}
+.value{font-family:'JetBrains Mono',Menlo,monospace;font-variant-numeric:tabular-nums;color:#fff;font-weight:700}
+.date{color:var(--text-3);font-size:11px;font-family:'JetBrains Mono',Menlo,monospace}
+.empty{padding:60px 20px;text-align:center;color:#525252;font-size:13px}
+
+.loading{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--text-3)}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;margin-right:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:560px){
+  .toolbar{flex-direction:column;align-items:stretch}
+  .search{max-width:100%}
+  .chips{justify-content:flex-start;overflow-x:auto}
+  th,td{padding:10px 12px;font-size:12px}
+}
+
+  /* ── Admin holding manager ── */
+  .row-clickable{cursor:pointer;transition:background .12s}
+  .row-clickable:hover{background:#161616}
+  .row-clickable td{transition:background .12s}
+  .pnl-cell{font-family:'JetBrains Mono',Menlo,monospace;font-weight:700}
+  .pnl-cell.up{color:#3ed598}
+  .pnl-cell.dn{color:#ef4444}
+
+  .mh-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.78);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center;z-index:200}
+  .mh-modal-bg.show{display:flex}
+  .mh-modal{background:#0a0a0a;border-top:1px solid #2a2a2a;border-radius:16px 16px 0 0;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;padding:0;animation:slideUp .25s cubic-bezier(0.16,1,0.3,1)}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  @media (min-width:768px){.mh-modal-bg{align-items:center}.mh-modal{border-radius:16px;border:1px solid #2a2a2a}}
+
+  .mh-header{position:sticky;top:0;background:rgba(10,10,10,0.95);backdrop-filter:blur(20px);padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+  .mh-header-logo{width:40px;height:40px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:5px;font-weight:800;color:#000;flex-shrink:0}
+  .mh-header-logo img{width:100%;height:100%;object-fit:contain}
+  .mh-header-info{flex:1;min-width:0}
+  .mh-header-title{font-size:16px;font-weight:700;letter-spacing:-0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mh-header-sub{font-size:11px;color:var(--text-3);margin-top:2px;text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mh-close{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .mh-close:hover{background:rgba(255,255,255,0.12)}
+
+  .mh-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:16px 20px;border-bottom:1px solid var(--border)}
+  .mh-sum-cell{background:#141414;border:1px solid var(--border);border-radius:10px;padding:10px}
+  .mh-sum-label{font-size:9px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-bottom:4px}
+  .mh-sum-val{font-size:13px;font-weight:700;font-family:'JetBrains Mono',Menlo,monospace}
+  .mh-sum-val.up{color:#3ed598}
+  .mh-sum-val.dn{color:#ef4444}
+
+  .mh-tabs{display:flex;gap:2px;padding:12px 20px 0;overflow-x:auto;scrollbar-width:none}
+  .mh-tabs::-webkit-scrollbar{display:none}
+  .mh-tab{flex-shrink:0;background:transparent;border:none;color:var(--text-3);padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;transition:.15s;letter-spacing:0.02em}
+  .mh-tab.active{color:#fff;border-bottom-color:#fff}
+  .mh-tab-panel{display:none;padding:18px 20px 24px}
+  .mh-tab-panel.active{display:block}
+
+  .mh-field{margin-bottom:14px}
+  .mh-field label{display:block;font-size:11px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
+  .mh-field input,.mh-field textarea,.mh-field select{width:100%;background:#141414;border:1px solid var(--border);border-radius:9px;padding:11px 12px;color:#fff;font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
+  .mh-field input:focus,.mh-field textarea:focus{border-color:#fff}
+  .mh-field textarea{resize:vertical;min-height:60px;font-family:inherit}
+  .mh-field-hint{font-size:11px;color:var(--text-3);margin-top:4px}
+
+  .mh-two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+  .mh-checkbox{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-2);margin-bottom:14px;cursor:pointer;padding:10px 12px;background:#141414;border:1px solid var(--border);border-radius:9px}
+  .mh-checkbox input{width:auto;margin:0;cursor:pointer}
+
+  .mh-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+  .mh-btn{padding:12px;border-radius:10px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;border:1px solid;transition:.15s}
+  .mh-btn:active{transform:scale(0.97)}
+  .mh-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+  .mh-btn.cancel{background:transparent;color:var(--text-3);border-color:var(--border)}
+  .mh-btn.primary{background:#fff;color:#000;border-color:#fff}
+  .mh-btn.warn{background:#ffb800;color:#000;border-color:#ffb800}
+  .mh-btn.danger{background:var(--danger);color:#fff;border-color:var(--danger)}
+
+  .mh-warning{background:rgba(255,184,0,0.10);border:1px solid rgba(255,184,0,0.3);border-radius:9px;padding:12px;font-size:12px;color:#ffb800;margin-bottom:14px;line-height:1.5}
+  .mh-danger-box{background:rgba(239,68,68,0.10);border:1px solid rgba(239,68,68,0.3);border-radius:9px;padding:12px;font-size:12px;color:#ef4444;margin-bottom:14px;line-height:1.5}
+
+  .mh-preview{padding:12px;background:#141414;border:1px solid var(--border);border-radius:9px;margin:8px 0 14px;font-size:12px;color:var(--text-2);line-height:1.6}
+  .mh-preview b{color:#fff;font-family:'JetBrains Mono',Menlo,monospace}
+
+  .mh-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);padding:12px 22px;border-radius:12px;font-size:14px;font-weight:600;background:#171717;border:1px solid #2a2a2a;opacity:0;pointer-events:none;transition:.3s;z-index:300;max-width:90vw;text-align:center}
+  .mh-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .mh-toast.success{color:#3ed598;border-color:rgba(62,213,152,0.4)}
+  .mh-toast.error{color:#ef4444;border-color:rgba(239,68,68,0.4)}
+
+  /* Create button in toolbar */
+  .create-btn{background:#fff;color:#000;border:1px solid #fff;padding:9px 14px;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:.15s}
+  .create-btn:active{transform:scale(0.97)}
+
+
+  /* Adjust Value tab elements */
+  .pv-state{background:#141414;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px}
+  .pv-state-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .pv-state-cell{}
+  .pv-state-label{font-size:9px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-bottom:4px}
+  .pv-state-val{font-size:15px;font-weight:700}
+  .pv-state-val.up{color:#3ed598}
+  .pv-state-val.dn{color:#ef4444}
+
+  .pv-quick{display:flex;gap:6px;flex-wrap:wrap}
+  .pv-chip{background:#141414;border:1px solid var(--border);color:#fff;padding:8px 12px;border-radius:8px;font-family:'JetBrains Mono',Menlo,monospace;font-size:12px;font-weight:700;cursor:pointer;transition:.12s;flex:1;min-width:56px}
+  .pv-chip:active{transform:scale(0.94)}
+  .pv-chip.up{color:#3ed598;border-color:rgba(62,213,152,0.3)}
+  .pv-chip.up:hover{background:rgba(62,213,152,0.10)}
+  .pv-chip.dn{color:#ef4444;border-color:rgba(239,68,68,0.3)}
+  .pv-chip.dn:hover{background:rgba(239,68,68,0.10)}
+  .pv-chip.selected{background:#fff;color:#000;border-color:#fff}
+
+  .pv-preview{background:#0a0a0a;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
+  .pv-preview-label{font-size:9px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-bottom:8px}
+  .pv-preview-body{font-size:13px;color:var(--text-2);line-height:1.6}
+  .pv-preview-body b{font-family:'JetBrains Mono',Menlo,monospace}
+  .pv-delta{display:inline-block;padding:3px 8px;border-radius:6px;font-family:'JetBrains Mono',Menlo,monospace;font-weight:700;font-size:12px;margin-left:6px}
+  .pv-delta.up{background:rgba(62,213,152,0.14);color:#3ed598}
+  .pv-delta.dn{background:rgba(239,68,68,0.14);color:#ef4444}
+
+
+  /* History tab */
+  .hist-summary{background:#141414;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px;font-size:12px;color:var(--text-2);line-height:1.6}
+  .hist-summary b{color:#fff;font-family:'JetBrains Mono',Menlo,monospace}
+  .hist-chart-wrap{background:#0a0a0a;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px;height:160px}
+  #histChart{width:100%;height:100%;display:block}
+  .hist-timeline{max-height:300px;overflow-y:auto;background:#0a0a0a;border:1px solid var(--border);border-radius:10px}
+  .hist-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.04)}
+  .hist-row:last-child{border-bottom:none}
+  .hist-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .hist-dot.up{background:#3ed598}
+  .hist-dot.dn{background:#ef4444}
+  .hist-dot.neu{background:#737373}
+  .hist-body{flex:1;min-width:0}
+  .hist-price{font-size:12px;font-weight:700;font-family:'JetBrains Mono',Menlo,monospace}
+  .hist-reason{font-size:11px;color:var(--text-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hist-delta{font-size:11px;font-weight:700;font-family:'JetBrains Mono',Menlo,monospace;padding:3px 7px;border-radius:5px;flex-shrink:0}
+  .hist-delta.up{background:rgba(62,213,152,0.14);color:#3ed598}
+  .hist-delta.dn{background:rgba(239,68,68,0.14);color:#ef4444}
+  .hist-date{font-size:10px;color:var(--text-3);flex-shrink:0}
+
+  /* Lock-up tab */
+  .lock-status{background:#141414;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px;text-align:center}
+  .lock-status.locked{border-color:rgba(255,184,0,0.4);background:rgba(255,184,0,0.06)}
+  .lock-status.unlocked{border-color:rgba(62,213,152,0.4);background:rgba(62,213,152,0.06)}
+  .lock-status-icon{font-size:22px;margin-bottom:6px}
+  .lock-status-title{font-size:13px;font-weight:700;margin-bottom:4px}
+  .lock-status-sub{font-size:11px;color:var(--text-3);font-family:'JetBrains Mono',Menlo,monospace}
+
+
+  /* Tab icons */
+  .mh-tab{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+  .tab-ico{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;flex-shrink:0}
+  .tab-ico svg{width:100%;height:100%;display:block}
+
+  /* Status card icons — replace lock emoji with SVG */
+  .lock-status-icon-svg{display:inline-flex;width:26px;height:26px;margin-bottom:6px}
+  .lock-status-icon-svg svg{width:100%;height:100%}
+  .lock-status.locked .lock-status-icon-svg{color:#ffb800}
+  .lock-status.unlocked .lock-status-icon-svg{color:#3ed598}
+
+</style>
+</head>
+<body>
+<div id="loadingState" class="loading"><div class="spinner"></div>Loading…</div>
+
+<div class="shell" id="shell" style="display:none">
+  <div class="topbar">
+    <a href="/adminprivate" class="back-btn" data-smart-back>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </a>
+    <h1>All Holdings</h1>
+  </div>
+
+  <div class="summary">
+    <div class="stat-card">
+      <div class="stat-label">Total Positions</div>
+      <div class="stat-value" id="statCount">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Investors</div>
+      <div class="stat-value" id="statUsers">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Companies</div>
+      <div class="stat-value" id="statCompanies">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Invested</div>
+      <div class="stat-value">$<span id="statTotal">0</span></div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="searchInput" type="text" placeholder="Search email, name, ticker…" autocomplete="off">
+    </div>
+    <div class="chips">
+      <button class="chip active" data-sort="date">Latest</button>
+      <button class="chip" data-sort="value">By Value</button>
+      <button class="chip" data-sort="user">By User</button>
+      <button class="chip" data-sort="ticker">By Ticker</button>
+    </div>
+      <button class="create-btn" id="btnCreate" onclick="openCreateModal()">+ New Allocation</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Ticker</th>
+          <th>Shares</th>
+          <th>Price</th>
+          <th>Value</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="holdingsBody">
+        <tr><td colspan="6" class="empty">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script>
+let __all = [];
+let __search = '';
+let __sort = 'date';
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+async function init(){
+  try{
+    const me = await ApexAPI.admin.getMe();
+    if(!me || me.error){
+      location.href = '/adminprivate/login';
+      return;
+    }
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('shell').style.display = 'block';
+    await load();
+    bindControls();
+  }catch(e){
+    document.getElementById('loadingState').innerHTML = 'Error: ' + esc(e.message);
+  }
+}
+
+async function load(){
+  const tbody = document.getElementById('holdingsBody');
+  tbody.innerHTML = '<tr><td colspan="6" class="empty">Loading…</td></tr>';
+  try{
+    const res = await ApexAPI.admin.listHoldings();
+    if(!res?.success) throw new Error(res?.error || 'Failed');
+    __all = res.holdings || [];
+    const st = res.stats || {};
+    document.getElementById('statCount').textContent = st.totalHoldings || 0;
+    document.getElementById('statUsers').textContent = st.uniqueUsers || 0;
+    document.getElementById('statCompanies').textContent = st.uniqueCompanies || 0;
+    document.getElementById('statTotal').textContent = (st.totalUsd || 0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+    render();
+  }catch(e){
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">Error: '+esc(e.message)+'</td></tr>';
+  }
+}
+
+function render(){
+  const tbody = document.getElementById('holdingsBody');
+  const q = __search.toLowerCase().trim();
+  let rows = __all.filter(h => {
+    if(!q) return true;
+    return (h.userEmail||'').toLowerCase().includes(q)
+        || (h.userName||'').toLowerCase().includes(q)
+        || (h.ticker||'').toLowerCase().includes(q);
+  });
+  rows.sort((a,b) => {
+    if(__sort==='value') return b.totalValue - a.totalValue;
+    if(__sort==='user') return (a.userEmail||'').localeCompare(b.userEmail||'');
+    if(__sort==='ticker') return (a.ticker||'').localeCompare(b.ticker||'');
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+  if(!rows.length){
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">No holdings found.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(h => {
+      const d = h.createdAt ? new Date(h.createdAt) : null;
+      const dateStr = d ? d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+      return '<tr>'
+        + '<td><div class="user-cell"><span class="user-email">'+esc(h.userEmail||'—')+'</span>'
+          + (h.userName ? '<span class="user-name">'+esc(h.userName)+'</span>' : '')
+          + '</div></td>'
+        + '<td><span class="ticker">'+esc(h.ticker||'—')+'</span></td>'
+        + '<td><span class="mono">'+Number(h.shares||0).toLocaleString('en-US',{maximumFractionDigits:4})+'</span></td>'
+        + '<td><span class="mono">$'+Number(h.pricePerShare||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'</span></td>'
+        + '<td><span class="mono">$'+Number(h.currentValue||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'</span></td>'
+        + '<td class="date-cell">'+dateStr+'</td>'
+      + '</tr>';
+    }).join('');
+}
+
+function bindControls(){
+  document.getElementById('searchInput').addEventListener('input', e => {
+    __search = e.target.value;
+    render();
+  });
+  document.querySelectorAll('[data-sort]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      document.querySelectorAll('[data-sort]').forEach(x => x.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      __sort = e.currentTarget.dataset.sort;
+      render();
+    });
+  });
+}
+
+init();
+</script>
+
+<!-- ═══ Manage Holding Modal ═══ -->
+<div class="mh-modal-bg" id="mhModal">
+  <div class="mh-modal">
+    <div class="mh-header">
+      <div class="mh-header-logo" id="mhLogo">?</div>
+      <div class="mh-header-info">
+        <div class="mh-header-title" id="mhTitle">Symbol</div>
+        <div class="mh-header-sub" id="mhSub">user@example.com</div>
+      </div>
+      <button class="mh-close" onclick="closeManage()">×</button>
+    </div>
+
+    <div class="mh-summary">
+      <div class="mh-sum-cell"><div class="mh-sum-label">Shares</div><div class="mh-sum-val" id="mhShares">—</div></div>
+      <div class="mh-sum-cell"><div class="mh-sum-label">Value</div><div class="mh-sum-val" id="mhValue">—</div></div>
+      <div class="mh-sum-cell"><div class="mh-sum-label">Unrealized</div><div class="mh-sum-val" id="mhUnrealized">—</div></div>
+    </div>
+
+    <div class="mh-tabs">
+      <button class="mh-tab active" data-tab="edit"><span class="tab-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></span>Edit</button>
+      <button class="mh-tab" data-tab="price"><span class="tab-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg></span>Adjust Value</button>
+      <button class="mh-tab" data-tab="history"><span class="tab-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/></svg></span>History</button>
+      <button class="mh-tab" data-tab="lockup"><span class="tab-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>Lock-up</button>
+      <button class="mh-tab" data-tab="pnl"><span class="tab-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg></span>Pay Out</button>
+      <button class="mh-tab" data-tab="liq"><span class="tab-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6"/><path d="M8 6l4-4 4 4"/><path d="M4 20h16"/><path d="M6 20l1.5-8h9L18 20"/></svg></span>Liquidate</button>
+      <button class="mh-tab" data-tab="del"><span class="tab-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span>Delete</button>
+    </div>
+
+    <!-- Edit tab -->
+    <div class="mh-tab-panel active" data-panel="edit">
+      <div class="mh-two-col">
+        <div class="mh-field"><label>Shares</label><input type="text" inputmode="decimal" id="eShares"></div>
+        <div class="mh-field"><label>Avg price ($)</label><input type="text" inputmode="decimal" id="eAvg"></div>
+      </div>
+      <div class="mh-two-col">
+        <div class="mh-field"><label>Current price ($)</label><input type="text" inputmode="decimal" id="eCurrent"></div>
+        <div class="mh-field"><label>Invested total ($)</label><input type="text" inputmode="decimal" id="eInvested" placeholder="auto: shares × avg"></div>
+      </div>
+      <div class="mh-field"><label>Company name</label><input type="text" id="eCompany"></div>
+      
+      <div class="mh-actions">
+        <button class="mh-btn cancel" onclick="closeManage()">Cancel</button>
+        <button class="mh-btn primary" id="btnEditSave">Save Changes</button>
+      </div>
+    </div>
+
+    <!-- Adjust Value tab (paper P&L management) -->
+    <div class="mh-tab-panel" data-panel="price">
+      <!-- Current state display -->
+      <div class="pv-state">
+        <div class="pv-state-row">
+          <div class="pv-state-cell"><div class="pv-state-label">Current price</div><div class="pv-state-val mono" id="pvCurrentPrice">—</div></div>
+          <div class="pv-state-cell"><div class="pv-state-label">Current P&L</div><div class="pv-state-val mono" id="pvCurrentPnl">—</div></div>
+        </div>
+      </div>
+
+      <!-- Quick % adjustments -->
+      <div class="mh-field">
+        <label>Quick move — position gains</label>
+        <div class="pv-quick">
+          <button type="button" class="pv-chip up" data-pct="1">+1%</button>
+          <button type="button" class="pv-chip up" data-pct="5">+5%</button>
+          <button type="button" class="pv-chip up" data-pct="10">+10%</button>
+          <button type="button" class="pv-chip up" data-pct="25">+25%</button>
+          <button type="button" class="pv-chip up" data-pct="50">+50%</button>
+        </div>
+      </div>
+      <div class="mh-field">
+        <label>Quick move — position falls</label>
+        <div class="pv-quick">
+          <button type="button" class="pv-chip dn" data-pct="-1">−1%</button>
+          <button type="button" class="pv-chip dn" data-pct="-5">−5%</button>
+          <button type="button" class="pv-chip dn" data-pct="-10">−10%</button>
+          <button type="button" class="pv-chip dn" data-pct="-25">−25%</button>
+          <button type="button" class="pv-chip dn" data-pct="-50">−50%</button>
+        </div>
+      </div>
+
+      <!-- Or manual exact price -->
+      <div class="mh-field"><label>Or set exact price ($)</label><input type="text" inputmode="decimal" id="pPrice" placeholder="e.g. 210.00"></div>
+
+      <!-- Live preview -->
+      <div class="pv-preview" id="pPreview">
+        <div class="pv-preview-label">Preview</div>
+        <div class="pv-preview-body">Change quick % or enter a price</div>
+      </div>
+
+      <div class="mh-warning">This adjusts <b>paper value only</b> — user's portfolio P&L changes, but <b>no cash moves</b>. Use "Pay Out" for real dividends or "Liquidate" to convert to cash.</div>
+
+      
+      <div class="mh-actions">
+        <button class="mh-btn cancel" onclick="closeManage()">Cancel</button>
+        <button class="mh-btn primary" id="btnPriceSave">Apply Change</button>
+      </div>
+    </div>
+
+    <!-- Pay Out tab (credit only) -->
+    <div class="mh-tab-panel" data-panel="pnl">
+      <div class="mh-warning">Credits <b>real cash</b> to the user's account. Use for dividends, tender payouts, bonuses, refunds.<br><br><b>To reflect a paper loss instead, use "Set Price".</b></div>
+      <div class="mh-field"><label>Payout amount ($) — positive only</label><input type="text" inputmode="decimal" id="rAmount" placeholder="e.g. 500"></div>
+      <div class="mh-preview" id="rPreview">Enter an amount to preview</div>
+      
+      <div class="mh-actions">
+        <button class="mh-btn cancel" onclick="closeManage()">Cancel</button>
+        <button class="mh-btn primary" id="btnPnlSave">Credit User</button>
+      </div>
+    </div>
+
+    <!-- Liquidate tab -->
+    <div class="mh-tab-panel" data-panel="liq">
+      <div class="mh-warning">Sells <b>all shares</b> at your specified price, credits user's cash, then <b>deletes the holding</b>.</div>
+      <div class="mh-field"><label>Sale price per share ($)</label><input type="text" inputmode="decimal" id="lPrice" placeholder="e.g. 200.00"></div>
+      <div class="mh-preview" id="lPreview">Enter a price to preview payout</div>
+      
+      <div class="mh-actions">
+        <button class="mh-btn cancel" onclick="closeManage()">Cancel</button>
+        <button class="mh-btn warn" id="btnLiquidate">Liquidate All</button>
+      </div>
+    </div>
+
+    <!-- History tab (valuation timeline) -->
+    <div class="mh-tab-panel" data-panel="history">
+      <div class="hist-summary" id="histSummary">Loading history…</div>
+      <div class="hist-chart-wrap"><svg id="histChart" viewBox="0 0 320 140" preserveAspectRatio="none"></svg></div>
+      <div class="hist-timeline" id="histTimeline"></div>
+    </div>
+
+    <!-- Lock-up tab -->
+    <div class="mh-tab-panel" data-panel="lockup">
+      <div class="lock-status" id="lockStatus">Loading…</div>
+      <div class="mh-field">
+        <label>Quick presets</label>
+        <div class="pv-quick">
+          <button type="button" class="pv-chip up" data-lockdays="0">Unlock</button>
+          <button type="button" class="pv-chip up" data-lockdays="90">3 months</button>
+          <button type="button" class="pv-chip up" data-lockdays="180">6 months</button>
+          <button type="button" class="pv-chip up" data-lockdays="365">1 year</button>
+          <button type="button" class="pv-chip up" data-lockdays="730">2 years</button>
+        </div>
+      </div>
+      <div class="mh-field"><label>Or set exact unlock date</label><input type="date" id="lockDate"></div>
+      <div class="mh-field"><label>Notes (visible to user)</label><textarea id="lockNotes" placeholder="e.g. Locked until 180 days post-IPO"></textarea></div>
+      <div class="mh-warning">Users cannot request liquidation before the unlock date. Admin can override at any time.</div>
+      <div class="mh-actions">
+        <button class="mh-btn cancel" onclick="closeManage()">Cancel</button>
+        <button class="mh-btn primary" id="btnLockSave">Save Lock-up</button>
+      </div>
+    </div>
+
+    <!-- Delete tab -->
+    <div class="mh-tab-panel" data-panel="del">
+      <div class="mh-danger-box"><b>Permanent deletion.</b> Holding disappears from user's portfolio. Optionally refund their invested amount.</div>
+      <label class="mh-checkbox"><input type="checkbox" id="dRefund"> Refund invested amount ($<span id="dInvested">0</span>) to user</label>
+      
+      <div class="mh-actions">
+        <button class="mh-btn cancel" onclick="closeManage()">Cancel</button>
+        <button class="mh-btn danger" id="btnDelete">Delete Forever</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Create Allocation Modal ═══ -->
+<div class="mh-modal-bg" id="mhCreateModal">
+  <div class="mh-modal">
+    <div class="mh-header">
+      <div class="mh-header-logo">+</div>
+      <div class="mh-header-info">
+        <div class="mh-header-title">Create Holding</div>
+        <div class="mh-header-sub">Allocate pre-IPO shares to a user</div>
+      </div>
+      <button class="mh-close" onclick="closeCreate()">×</button>
+    </div>
+    <div style="padding:18px 20px 24px">
+      <div class="mh-field"><label>User email</label><input type="text" id="cEmail" placeholder="user@example.com"><div class="mh-field-hint" id="cUserHint">Type email to find user</div></div>
+      <div class="mh-two-col">
+        <div class="mh-field"><label>Ticker</label><input type="text" id="cSymbol" placeholder="SPCX"></div>
+        <div class="mh-field"><label>Company name</label><input type="text" id="cCompany" placeholder="SpaceX"></div>
+      </div>
+      <div class="mh-two-col">
+        <div class="mh-field"><label>Shares</label><input type="text" inputmode="decimal" id="cShares" placeholder="10"></div>
+        <div class="mh-field"><label>Avg price ($)</label><input type="text" inputmode="decimal" id="cAvg" placeholder="100.00"></div>
+      </div>
+      <label class="mh-checkbox"><input type="checkbox" id="cCharge" checked> Charge user's cash balance ($<span id="cCost">0</span> total)</label>
+      
+      <div class="mh-actions">
+        <button class="mh-btn cancel" onclick="closeCreate()">Cancel</button>
+        <button class="mh-btn primary" id="btnCreateSave">Create Holding</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mh-toast" id="mhToast"></div>
+
+
+<script>
+(function(){
+  const fmt = n => Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmtSh = n => Number(n||0).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:4});
+
+  let currentHolding = null;      // full holding object for open modal
+  let allHoldings = [];           // cache from last GET /api/admin?resource=holdings
+
+  function toast(msg, kind){
+    const t = document.getElementById('mhToast');
+    t.textContent = msg;
+    t.className = 'mh-toast show ' + (kind||'');
+    setTimeout(() => { t.className = 'mh-toast'; }, 2600);
+  }
+
+  // ── Cache holdings after each render so we can look up on click ──
+  // Wrap the existing loadHoldings/render function by hooking into fetch
+  const origFetch = window.fetch;
+  window.fetch = async function(...args){
+    const res = await origFetch.apply(this, args);
+    try {
+      const url = typeof args[0] === 'string' ? args[0] : (args[0] && args[0].url) || '';
+      if (url.indexOf('/api/admin') !== -1 && url.indexOf('resource=holdings') !== -1 && (!args[1] || args[1].method === 'GET' || !args[1].method)) {
+        const clone = res.clone();
+        clone.json().then(j => {
+          if (j && j.holdings) {
+            allHoldings = j.holdings;
+            // Post-process: after DOM updates, tag rows with data-h-id
+            setTimeout(tagRows, 30);
+          }
+        }).catch(()=>{});
+      }
+    } catch(e){}
+    return res;
+  };
+
+  function tagRows(){
+    const tbody = document.getElementById('holdingsBody');
+    if (!tbody) return;
+    const rows = tbody.querySelectorAll('tr');
+    let idx = 0;
+    rows.forEach(tr => {
+      // Skip empty/loading/error rows (colspan cells)
+      if (tr.querySelector('td[colspan]')) return;
+      const h = allHoldings[idx];
+      if (h) {
+        tr.dataset.hId = h._id;
+        tr.classList.add('row-clickable');
+        idx++;
+      }
+    });
+  }
+
+  // ── Delegated click on tbody ──
+  document.addEventListener('click', function(e){
+    const tr = e.target.closest('tr[data-h-id]');
+    if (!tr) return;
+    const id = tr.dataset.hId;
+    const h = allHoldings.find(x => String(x._id) === String(id));
+    if (h) openManage(h);
+  });
+
+  // ── Open Manage modal ──
+  function openManage(h){
+    currentHolding = h;
+    const sym = (h.ticker || h.symbol || '?').toUpperCase();
+    const initial = sym[0];
+    const local = '/images/logos/' + sym.toLowerCase() + '.png';
+    // Guess domain from company name (e.g. "NVIDIA" -> "nvidia.com")
+    const dom = (h.companyName || sym).toLowerCase().replace(/[^a-z0-9]/g,'') + '.com';
+    const clearbit = 'https://logo.clearbit.com/' + dom + '?size=128';
+    const gfav = 'https://www.google.com/s2/favicons?domain=' + dom + '&sz=128';
+    document.getElementById('mhLogo').innerHTML = '<img src="' + local + '" alt="" '
+      + 'onerror="if(!this.dataset.f1){this.dataset.f1=1;this.src=\'' + clearbit + '\'}'
+      + 'else if(!this.dataset.f2){this.dataset.f2=1;this.src=\'' + gfav + '\'}'
+      + 'else{this.parentNode.textContent=\'' + initial + '\'}">';
+    document.getElementById('mhTitle').textContent = (h.companyName || sym) + ' · ' + sym;
+    document.getElementById('mhSub').textContent = (h.userName || '') + ' · ' + (h.userEmail || '?');
+
+    // Summary
+    const shares = Number(h.shares) || 0;
+    const value = Number(h.currentValue) || (shares * (Number(h.currentPrice) || Number(h.pricePerShare) || 0));
+    const cost = Number(h.totalValue) || (shares * (Number(h.pricePerShare) || 0));
+    const pnl = value - cost;
+    document.getElementById('mhShares').textContent = fmtSh(shares);
+    document.getElementById('mhValue').textContent = '$' + fmt(value);
+    const uEl = document.getElementById('mhUnrealized');
+    uEl.textContent = (pnl >= 0 ? '+$' : '-$') + fmt(Math.abs(pnl));
+    uEl.className = 'mh-sum-val ' + (pnl >= 0 ? 'up' : 'dn');
+
+    // Prefill Edit
+    document.getElementById('eShares').value = shares;
+    document.getElementById('eAvg').value = Number(h.pricePerShare) || 0;
+    document.getElementById('eCurrent').value = Number(h.currentPrice) || Number(h.pricePerShare) || 0;
+    document.getElementById('eInvested').value = cost.toFixed(2);
+    document.getElementById('eCompany').value = h.companyName || '';
+
+    // Prefill Adjust Value tab
+    document.getElementById('pPrice').value = '';
+    const curPrice = Number(h.currentPrice) || Number(h.pricePerShare) || 0;
+    const curShares = Number(h.shares) || 0;
+    const curCost = Number(h.totalValue) || (curShares * (Number(h.pricePerShare) || 0));
+    const curVal = curPrice * curShares;
+    const curPnl = curVal - curCost;
+    const curPnlPct = curCost > 0 ? (curPnl / curCost) * 100 : 0;
+    document.getElementById('pvCurrentPrice').textContent = '$' + fmt(curPrice);
+    const pnlEl = document.getElementById('pvCurrentPnl');
+    pnlEl.textContent = (curPnl >= 0 ? '+$' : '-$') + fmt(Math.abs(curPnl)) + ' (' + (curPnl >= 0 ? '+' : '') + curPnlPct.toFixed(2) + '%)';
+    pnlEl.className = 'pv-state-val mono ' + (curPnl >= 0 ? 'up' : (curPnl < 0 ? 'dn' : ''));
+    document.getElementById('pPreview').innerHTML = '<div class="pv-preview-label">Preview</div><div class="pv-preview-body">Tap a quick % or enter a new price</div>';
+    document.querySelectorAll('.pv-chip').forEach(c => c.classList.remove('selected'));
+    document.getElementById('rAmount').value = '';
+    document.getElementById('rPreview').textContent = 'Enter an amount to preview';
+    document.getElementById('lPrice').value = '';
+    document.getElementById('lPreview').textContent = 'Enter a price to preview payout';
+    document.getElementById('dRefund').checked = false;
+    document.getElementById('dInvested').textContent = fmt(cost);
+
+    // Reset to Edit tab
+    document.querySelectorAll('.mh-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'edit'));
+    document.querySelectorAll('.mh-tab-panel').forEach(p => p.classList.toggle('active', p.dataset.panel === 'edit'));
+
+    document.getElementById('mhModal').classList.add('show');
+  }
+  window.closeManage = function(){
+    document.getElementById('mhModal').classList.remove('show');
+    currentHolding = null;
+  };
+
+  // ── Tab switching ──
+  document.querySelectorAll('.mh-tab').forEach(btn => btn.addEventListener('click', () => {
+    const t = btn.dataset.tab;
+    document.querySelectorAll('.mh-tab').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.mh-tab-panel').forEach(p => p.classList.toggle('active', p.dataset.panel === t));
+    if (t === 'history' && window.loadHistoryTab) window.loadHistoryTab();
+    if (t === 'lockup' && window.loadLockupTab) window.loadLockupTab();
+  }));
+
+  // ── Live previews ──
+  function renderPricePreview(newPrice){
+    if (!currentHolding) return;
+    const shares = Number(currentHolding.shares) || 0;
+    const oldPrice = Number(currentHolding.currentPrice) || Number(currentHolding.pricePerShare) || 0;
+    const cost = Number(currentHolding.totalValue) || (shares * (Number(currentHolding.pricePerShare) || 0));
+    if (!newPrice || newPrice <= 0) {
+      document.getElementById('pPreview').innerHTML = '<div class="pv-preview-label">Preview</div><div class="pv-preview-body">Tap a quick % or enter a new price</div>';
+      return;
+    }
+    const oldVal = oldPrice * shares;
+    const newVal = newPrice * shares;
+    const delta = newVal - oldVal;
+    const deltaPct = oldPrice > 0 ? ((newPrice - oldPrice) / oldPrice) * 100 : 0;
+    const newPnl = newVal - cost;
+    const newPnlPct = cost > 0 ? (newPnl / cost) * 100 : 0;
+    const upDn = delta >= 0 ? 'up' : 'dn';
+    const sign = delta >= 0 ? '+' : '-';
+    const pnlSign = newPnl >= 0 ? '+' : '-';
+    document.getElementById('pPreview').innerHTML =
+      '<div class="pv-preview-label">Preview</div>'
+      + '<div class="pv-preview-body">'
+      +   'Price: <b>$'+fmt(oldPrice)+'</b> → <b>$'+fmt(newPrice)+'</b>'
+      +   '<span class="pv-delta '+upDn+'">'+(delta>=0?'+':'')+deltaPct.toFixed(2)+'%</span>'
+      +   '<br>Value: <b>$'+fmt(oldVal)+'</b> → <b>$'+fmt(newVal)+'</b>'
+      +   '<br>New P&L: <b style="color:'+(newPnl>=0?'#3ed598':'#ef4444')+'">'+pnlSign+'$'+fmt(Math.abs(newPnl))+' ('+(newPnl>=0?'+':'')+newPnlPct.toFixed(2)+'%)</b>'
+      +   '<br><span style="color:#737373;font-size:11px">Change to portfolio: '+sign+'$'+fmt(Math.abs(delta))+'</span>'
+      + '</div>';
+  }
+
+  document.getElementById('pPrice').addEventListener('input', function(){
+    document.querySelectorAll('.pv-chip').forEach(c => c.classList.remove('selected'));
+    renderPricePreview(parseFloat(this.value));
+  });
+
+  // Quick % chips
+  document.querySelectorAll('.pv-chip').forEach(chip => chip.addEventListener('click', function(){
+    if (!currentHolding) return;
+    const pct = parseFloat(this.dataset.pct);
+    const oldPrice = Number(currentHolding.currentPrice) || Number(currentHolding.pricePerShare) || 0;
+    const newPrice = +(oldPrice * (1 + pct/100)).toFixed(4);
+    document.getElementById('pPrice').value = newPrice;
+    document.querySelectorAll('.pv-chip').forEach(c => c.classList.remove('selected'));
+    this.classList.add('selected');
+    renderPricePreview(newPrice);
+  }));
+
+  document.getElementById('rAmount').addEventListener('input', function(){
+    const amt = parseFloat(this.value);
+    if (isNaN(amt) || amt === 0) { document.getElementById('rPreview').textContent = 'Enter a valid amount'; return; }
+    if (amt < 0) { document.getElementById('rPreview').innerHTML = '<b style="color:#ef4444">Negative not allowed here.</b> Use "Set Price" for paper losses, or Delete for penalties.'; return; }
+    document.getElementById('rPreview').innerHTML = 'Will <b style="color:#3ed598">CREDIT $'+fmt(amt)+'</b> to user\'s cash balance';
+  });
+
+  document.getElementById('lPrice').addEventListener('input', function(){
+    if (!currentHolding) return;
+    const salePrice = parseFloat(this.value);
+    const shares = Number(currentHolding.shares) || 0;
+    const invested = Number(currentHolding.totalValue) || 0;
+    if (!salePrice || salePrice <= 0) { document.getElementById('lPreview').textContent = 'Enter a valid price'; return; }
+    const proceeds = salePrice * shares;
+    const pnl = proceeds - invested;
+    const sign = pnl >= 0 ? '+' : '-';
+    document.getElementById('lPreview').innerHTML = 'User receives <b>$'+fmt(proceeds)+'</b><br>Realized P&L: <b style="color:'+(pnl>=0?'#3ed598':'#ef4444')+'">'+sign+'$'+fmt(Math.abs(pnl))+'</b><br><br><i style="color:#737373">Holding will be deleted after payout.</i>';
+  });
+
+  // ── Charge preview for Create modal ──
+  function updateCreateCost(){
+    const s = parseFloat(document.getElementById('cShares').value) || 0;
+    const a = parseFloat(document.getElementById('cAvg').value) || 0;
+    document.getElementById('cCost').textContent = fmt(s * a);
+  }
+  ['cShares','cAvg'].forEach(id => document.getElementById(id).addEventListener('input', updateCreateCost));
+
+
+  // ═══════════════════════════════════════════════
+  // HISTORY tab
+  // ═══════════════════════════════════════════════
+  window.loadHistoryTab = async function(){
+    if (!currentHolding) return;
+    const summary = document.getElementById('histSummary');
+    const chart = document.getElementById('histChart');
+    const timeline = document.getElementById('histTimeline');
+    summary.textContent = 'Loading history…';
+    timeline.innerHTML = '';
+    chart.innerHTML = '';
+    try {
+      const r = await fetch('/api/admin?resource=holdings', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ action: 'history', holdingId: currentHolding._id })
+      });
+      const j = await r.json();
+      if (j.error) throw new Error(j.error);
+      const snaps = j.snapshots || [];
+      if (!snaps.length) {
+        summary.innerHTML = 'No history yet. Use <b>Adjust Value</b> to record the first snapshot.';
+        return;
+      }
+      const chrono = snaps.slice().reverse();
+      const first = chrono[0].oldPrice || chrono[0].price;
+      const last = chrono[chrono.length - 1].price;
+      const totalDelta = last - first;
+      const totalPct = first > 0 ? (totalDelta / first) * 100 : 0;
+      const sign = totalDelta >= 0 ? '+' : '-';
+      summary.innerHTML =
+        '<b>' + snaps.length + '</b> changes recorded &middot; '
+        + 'From <b>$' + fmt(first) + '</b> &rarr; <b>$' + fmt(last) + '</b> &middot; '
+        + 'Total: <b style="color:' + (totalDelta>=0?'#3ed598':'#ef4444') + '">' + sign + '$' + fmt(Math.abs(totalDelta)) + ' (' + (totalDelta>=0?'+':'') + totalPct.toFixed(2) + '%)</b>';
+
+      const w = 320, h = 140, pad = 10;
+      const prices = chrono.map(s => s.price);
+      const min = Math.min.apply(null, prices);
+      const max = Math.max.apply(null, prices);
+      const range = max - min || 1;
+      const step = (w - pad*2) / Math.max(1, prices.length - 1);
+      const pts = prices.map((v, i) => {
+        const x = pad + i * step;
+        const y = pad + (1 - (v - min) / range) * (h - pad*2);
+        return x.toFixed(1) + ',' + y.toFixed(1);
+      }).join(' ');
+      const strokeColor = totalDelta >= 0 ? '#3ed598' : '#ef4444';
+      chart.innerHTML =
+        '<defs><linearGradient id="histGrad" x1="0" y1="0" x2="0" y2="1">'
+        + '<stop offset="0%" stop-color="' + strokeColor + '" stop-opacity="0.3"/>'
+        + '<stop offset="100%" stop-color="' + strokeColor + '" stop-opacity="0"/>'
+        + '</linearGradient></defs>'
+        + '<polygon fill="url(#histGrad)" points="' + pad + ',' + (h-pad) + ' ' + pts + ' ' + (w-pad) + ',' + (h-pad) + '"/>'
+        + '<polyline fill="none" stroke="' + strokeColor + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="' + pts + '"/>';
+
+      timeline.innerHTML = snaps.map(s => {
+        const cls = s.deltaPct > 0 ? 'up' : (s.deltaPct < 0 ? 'dn' : 'neu');
+        const sgn = s.deltaPct >= 0 ? '+' : '';
+        const d = new Date(s.createdAt);
+        const dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+        return '<div class="hist-row">'
+          + '<div class="hist-dot ' + cls + '"></div>'
+          + '<div class="hist-body">'
+          +   '<div class="hist-price">$' + fmt(s.oldPrice||0) + ' &rarr; $' + fmt(s.price) + '</div>'
+          +   '<div class="hist-reason">' + (s.changeReason||'&mdash;') + '</div>'
+          + '</div>'
+          + '<div class="hist-delta ' + cls + '">' + sgn + Number(s.deltaPct||0).toFixed(2) + '%</div>'
+          + '<div class="hist-date">' + dateStr + '</div>'
+        + '</div>';
+      }).join('');
+    } catch(e) {
+      summary.textContent = 'Failed to load: ' + e.message;
+    }
+  };
+
+  // ═══════════════════════════════════════════════
+  // LOCK-UP tab
+  // ═══════════════════════════════════════════════
+  window.loadLockupTab = function(){
+    if (!currentHolding) return;
+    const status = document.getElementById('lockStatus');
+    const dateInput = document.getElementById('lockDate');
+    const notesInput = document.getElementById('lockNotes');
+    const lockedUntil = currentHolding.lockedUntil || null;
+    const notes = currentHolding.notes || '';
+    dateInput.value = '';
+    notesInput.value = notes;
+    document.querySelectorAll('.pv-chip[data-lockdays]').forEach(c => c.classList.remove('selected'));
+
+    const svgLock = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+    const svgUnlock = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9 1"/></svg>';
+
+    if (lockedUntil) {
+      const d = new Date(lockedUntil);
+      const now = new Date();
+      const isLocked = d > now;
+      const daysLeft = Math.ceil((d - now) / 86400000);
+      const dateStr = d.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+      dateInput.value = d.toISOString().slice(0, 10);
+      if (isLocked) {
+        status.className = 'lock-status locked';
+        status.innerHTML = '<div class="lock-status-icon-svg">' + svgLock + '</div>'
+          + '<div class="lock-status-title">Locked</div>'
+          + '<div class="lock-status-sub">' + dateStr + ' &middot; ' + daysLeft + ' day' + (daysLeft===1?'':'s') + ' remaining</div>';
+      } else {
+        status.className = 'lock-status unlocked';
+        status.innerHTML = '<div class="lock-status-icon-svg">' + svgUnlock + '</div>'
+          + '<div class="lock-status-title">Unlocked</div>'
+          + '<div class="lock-status-sub">Was locked until ' + dateStr + '</div>';
+      }
+    } else {
+      status.className = 'lock-status unlocked';
+      status.innerHTML = '<div class="lock-status-icon-svg">' + svgUnlock + '</div>'
+        + '<div class="lock-status-title">No lock-up</div>'
+        + '<div class="lock-status-sub">User can request liquidation at any time</div>';
+    }
+  };
+
+  // ── Lockup quick chips ──
+  document.querySelectorAll('.pv-chip[data-lockdays]').forEach(chip => chip.addEventListener('click', function(){
+    const days = parseInt(this.dataset.lockdays);
+    document.querySelectorAll('.pv-chip[data-lockdays]').forEach(c => c.classList.remove('selected'));
+    this.classList.add('selected');
+    if (days === 0) {
+      document.getElementById('lockDate').value = '';
+    } else {
+      const d = new Date(Date.now() + days * 86400000);
+      document.getElementById('lockDate').value = d.toISOString().slice(0, 10);
+    }
+  }));
+
+  document.getElementById('lockDate').addEventListener('input', function(){
+    document.querySelectorAll('.pv-chip[data-lockdays]').forEach(c => c.classList.remove('selected'));
+  });
+
+  // ── Save Lock-up ──
+  document.getElementById('btnLockSave').addEventListener('click', async function(){
+    if (!currentHolding && 'btnLockSave' !== 'btnCreateSave') return;
+    if (this.dataset.busy === '1') return;
+    this.dataset.busy = '1';
+    const dateVal = document.getElementById('lockDate').value;
+    const notes = document.getElementById('lockNotes').value.trim();
+    const body = { action: 'set-lockup', holdingId: currentHolding._id, notes };
+    if (dateVal) {
+      body.lockedUntil = dateVal;
+      body.lockupDays = Math.max(0, Math.ceil((new Date(dateVal) - new Date()) / 86400000));
+    } else {
+      body.lockedUntil = null;
+      body.lockupDays = 0;
+    }
+    this.disabled = true; this.textContent = 'Saving…';
+    const j = await post(body);
+    this.disabled = false; this.textContent = 'Save Lock-up'; this.dataset.busy='0';
+    if (j.error) { toast(j.error, 'error'); return; }
+    toast(dateVal ? 'Lock-up updated' : 'Lock-up removed', 'success');
+    currentHolding.lockedUntil = body.lockedUntil;
+    currentHolding.notes = notes;
+    if (window.loadLockupTab) window.loadLockupTab();
+  });
+
+
+    // ── Post helper ──
+  async function post(body){
+    const r = await fetch('/api/admin?resource=holdings', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    return r.json();
+  }
+
+  function reloadList(){
+    // Best-effort: call whichever loader function the page exposes
+    if (typeof loadHoldings === 'function') { loadHoldings(); return; }
+    if (typeof load === 'function') { load(); return; }
+    // Fallback: full page reload
+    setTimeout(() => location.reload(), 300);
+  }
+
+  // ── Save: Edit ──
+  document.getElementById('btnEditSave').addEventListener('click', async function(){
+    if (!currentHolding && 'btnEditSave' !== 'btnCreateSave') return;
+    if (this.dataset.busy === '1') return;
+    this.dataset.busy = '1';
+    const body = { action: 'adjust', holdingId: currentHolding._id };
+    const s = parseFloat(document.getElementById('eShares').value);
+    const a = parseFloat(document.getElementById('eAvg').value);
+    const c = parseFloat(document.getElementById('eCurrent').value);
+    const i = parseFloat(document.getElementById('eInvested').value);
+    const n = document.getElementById('eCompany').value.trim();
+    if (!isNaN(s)) body.shares = s;
+    if (!isNaN(a)) body.avgPriceUSD = a;
+    if (!isNaN(c)) body.currentPriceUSD = c;
+    if (!isNaN(i)) body.totalInvestedUSD = i;
+    if (n) body.companyName = n;
+
+    this.disabled = true; this.textContent = 'Saving…';
+    const j = await post(body);
+    this.disabled = false; this.textContent = 'Save Changes'; this.dataset.busy='0';
+    if (j.error) { toast(j.error, 'error'); return; }
+    toast('Holding updated', 'success');
+    closeManage(); reloadList();
+  });
+
+  // ── Save: Set Price ──
+  document.getElementById('btnPriceSave').addEventListener('click', async function(){
+    if (!currentHolding) return;
+    if (this.dataset.busy === '1') return;  // prevent double-submit
+    this.dataset.busy = '1';
+    const newPrice = parseFloat(document.getElementById('pPrice').value);
+    if (!newPrice || newPrice <= 0) { alert('Valid price required'); return; }
+    this.disabled = true; this.textContent = 'Updating…';
+    const j = await post({ action: 'set-price', holdingId: currentHolding._id, currentPriceUSD: newPrice });
+    this.disabled = false; this.textContent = 'Update Price'; this.dataset.busy='0';
+    this.dataset.busy = '0';
+    if (j.error) { toast(j.error, 'error'); return; }
+    if (j.noop) { toast('Price unchanged — nothing to record', 'error'); return; }
+    const s = j.paperPnl >= 0 ? '+' : '-';
+    toast('Price updated · P&L ' + s + '$' + fmt(Math.abs(j.paperPnl||0)), 'success');
+    // Update the local holding snapshot so subsequent history/chart calls see it
+    currentHolding.currentPrice = newPrice;
+    currentHolding.currentPriceUSD = newPrice;
+    // Reset the input + preview
+    document.getElementById('pPrice').value = '';
+    document.querySelectorAll('.pv-chip').forEach(c => c.classList.remove('selected'));
+    closeManage(); reloadList();
+  });
+
+  // ── Realize P&L ──
+  document.getElementById('btnPnlSave').addEventListener('click', async function(){
+    if (!currentHolding && 'btnPnlSave' !== 'btnCreateSave') return;
+    if (this.dataset.busy === '1') return;
+    this.dataset.busy = '1';
+    const amount = parseFloat(document.getElementById('rAmount').value);
+    if (isNaN(amount) || amount <= 0) { alert('Amount must be positive. For paper losses use "Set Price".'); return; }
+    if (!confirm('CREDIT $' + fmt(amount) + ' to user\'s cash?')) return;
+    this.disabled = true; this.textContent = 'Processing…';
+    const j = await post({ action: 'realize-pnl', holdingId: currentHolding._id, amount });
+    this.disabled = false; this.textContent = 'Apply P&L'; this.dataset.busy='0';
+    if (j.error) { toast(j.error, 'error'); return; }
+    toast('Credited $' + fmt(amount) + ' · New balance $' + fmt(j.afterBalance), 'success');
+    closeManage(); reloadList();
+  });
+
+  // ── Liquidate ──
+  document.getElementById('btnLiquidate').addEventListener('click', async function(){
+    if (!currentHolding && 'btnLiquidate' !== 'btnCreateSave') return;
+    if (this.dataset.busy === '1') return;
+    this.dataset.busy = '1';
+    const salePrice = parseFloat(document.getElementById('lPrice').value);
+    if (!salePrice || salePrice <= 0) { alert('Valid sale price required'); return; }
+    if (!confirm('Liquidate ALL ' + fmtSh(currentHolding.shares) + ' shares of ' + (currentHolding.ticker||currentHolding.symbol) + ' at $' + fmt(salePrice) + '? This deletes the holding.')) return;
+    this.disabled = true; this.textContent = 'Liquidating…';
+    const j = await post({ action: 'liquidate', holdingId: currentHolding._id, salePrice });
+    this.disabled = false; this.textContent = 'Liquidate All'; this.dataset.busy='0';
+    if (j.error) { toast(j.error, 'error'); return; }
+    const s = j.pnl >= 0 ? '+' : '-';
+    toast('Liquidated · Proceeds $' + fmt(j.proceeds) + ' · P&L ' + s + '$' + fmt(Math.abs(j.pnl||0)), 'success');
+    closeManage(); reloadList();
+  });
+
+  // ── Delete ──
+  document.getElementById('btnDelete').addEventListener('click', async function(){
+    if (!currentHolding && 'btnDelete' !== 'btnCreateSave') return;
+    if (this.dataset.busy === '1') return;
+    this.dataset.busy = '1';
+    const refund = document.getElementById('dRefund').checked;
+    if (!confirm('DELETE this holding forever?' + (refund ? ' User will be refunded $' + fmt(currentHolding.totalValue || 0) : ' NO refund will be issued.'))) return;
+    this.disabled = true; this.textContent = 'Deleting…';
+    const j = await post({ action: 'delete', holdingId: currentHolding._id, refund });
+    this.disabled = false; this.textContent = 'Delete Forever'; this.dataset.busy='0';
+    if (j.error) { toast(j.error, 'error'); return; }
+    toast(refund ? 'Deleted · Refunded $' + fmt(j.refundAmount||0) : 'Deleted', 'success');
+    closeManage(); reloadList();
+  });
+
+  // ── Create modal ──
+  window.openCreateModal = function(){
+    document.getElementById('cEmail').value = '';
+    document.getElementById('cUserHint').textContent = 'Type email to find user';
+    document.getElementById('cUserHint').style.color = '';
+    document.getElementById('cSymbol').value = '';
+    document.getElementById('cCompany').value = '';
+    document.getElementById('cShares').value = '';
+    document.getElementById('cAvg').value = '';
+    document.getElementById('cCost').textContent = '0';
+    document.getElementById('cCharge').checked = true;
+    document.getElementById('mhCreateModal').classList.add('show');
+    document.getElementById('mhCreateModal').dataset.userId = '';
+  };
+  window.closeCreate = function(){
+    document.getElementById('mhCreateModal').classList.remove('show');
+  };
+
+  // ── Live user lookup (debounced) ──
+  let lookupTimer;
+  document.getElementById('cEmail').addEventListener('input', function(){
+    const email = this.value.trim();
+    const hint = document.getElementById('cUserHint');
+    document.getElementById('mhCreateModal').dataset.userId = '';
+    if (!email || email.length < 3) { hint.textContent = 'Type email to find user'; hint.style.color = ''; return; }
+    clearTimeout(lookupTimer);
+    lookupTimer = setTimeout(async () => {
+      hint.textContent = 'Searching…'; hint.style.color = '';
+      try {
+        const r = await fetch('/api/admin?resource=users&search=' + encodeURIComponent(email));
+        const j = await r.json();
+        const users = j.users || [];
+        const exact = users.find(u => (u.email||'').toLowerCase() === email.toLowerCase()) || users[0];
+        if (exact) {
+          document.getElementById('mhCreateModal').dataset.userId = exact.id;
+          hint.textContent = '✓ ' + (exact.fullName || '') + ' (' + exact.email + ')';
+          hint.style.color = '#3ed598';
+        } else {
+          hint.textContent = '✗ No user found'; hint.style.color = '#ef4444';
+        }
+      } catch(e) {
+        hint.textContent = 'Lookup failed'; hint.style.color = '#ef4444';
+      }
+    }, 400);
+  });
+
+  // ── Save: Create ──
+  document.getElementById('btnCreateSave').addEventListener('click', async function(){
+    const userId = document.getElementById('mhCreateModal').dataset.userId;
+    const symbol = document.getElementById('cSymbol').value.trim().toUpperCase();
+    const companyName = document.getElementById('cCompany').value.trim();
+    const shares = parseFloat(document.getElementById('cShares').value);
+    const avgPriceUSD = parseFloat(document.getElementById('cAvg').value);
+    const chargeUser = document.getElementById('cCharge').checked;
+    if (!userId) { alert('Select a valid user by email first'); return; }
+    if (!symbol) { alert('Ticker required'); return; }
+    if (!shares || shares <= 0) { alert('Valid shares required'); return; }
+    if (!avgPriceUSD || avgPriceUSD <= 0) { alert('Valid avg price required'); return; }
+    this.disabled = true; this.textContent = 'Creating…';
+    const j = await post({ action: 'create', userId, symbol, companyName, shares, avgPriceUSD, chargeUser });
+    this.disabled = false; this.textContent = 'Create Holding'; this.dataset.busy='0';
+    if (j.error) { toast(j.error, 'error'); return; }
+    toast('Holding created for ' + symbol, 'success');
+    closeCreate(); reloadList();
+  });
+
+  // ── Close modals on backdrop click ──
+  document.querySelectorAll('.mh-modal-bg').forEach(m => m.addEventListener('click', e => {
+    if (e.target === m) {
+      if (m.id === 'mhModal') closeManage();
+      else if (m.id === 'mhCreateModal') closeCreate();
+    }
+  }));
+
+  // ── ESC to close ──
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      if (document.getElementById('mhModal').classList.contains('show')) closeManage();
+      if (document.getElementById('mhCreateModal').classList.contains('show')) closeCreate();
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

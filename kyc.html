@@ -1,213 +1,416 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="/js/loader.js?v=1786129802"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
 <title>Identity Verification · Apex IPO Access</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{background:#0a0d11;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;padding:20px}
-  .wrap{max-width:540px;margin:0 auto}
-  .back{display:inline-flex;align-items:center;gap:6px;color:#8a94a3;text-decoration:none;font-size:13px;margin-bottom:20px}
-  .back:hover{color:#fff}
-  .back svg{width:14px;height:14px}
-  h1{font-size:24px;font-weight:700;margin-bottom:6px}
-  .sub{color:#8a94a3;font-size:13px;margin-bottom:24px;line-height:1.5}
-  .status-card{background:#1a1d21;border:1px solid #2a2d31;border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}
-  .status-card .l{font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px}
-  .status-card .v{font-size:13px;font-weight:600;padding:4px 10px;border-radius:10px}
-  .status-pending{background:rgba(251,191,36,0.15);color:#fbbf24}
-  .status-verified{background:rgba(34,197,94,0.15);color:#22c55e}
-  .status-rejected{background:rgba(239,68,68,0.15);color:#ef4444}
+  :root{
+    --bg:#000; --bg-1:#0a0a0a; --bg-2:#0f0f0f; --bg-3:#161616;
+    --border:#1a1a1a; --border-2:#222; --text:#fff;
+    --text-2:#a0a0a0; --text-3:#666;
+    --accent:#4a9eff; --accent-2:#3d87da;
+    --green:#22c55e; --green-bg:rgba(34,197,94,.12);
+    --red:#ef4444; --red-bg:rgba(239,68,68,.12);
+    --orange:#f59e0b; --orange-bg:rgba(245,158,11,.12);
+    --r:14px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Montserrat',-apple-system,sans-serif;min-height:100vh;-webkit-tap-highlight-color:transparent}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit}
 
-  .upload-grid{display:flex;flex-direction:column;gap:14px;margin-bottom:24px}
-  .upload-box{background:#1a1d21;border:2px dashed #2a2d31;border-radius:12px;padding:20px;cursor:pointer;transition:all 0.15s;text-align:center;position:relative}
-  .upload-box:hover{border-color:#4a9eff;background:#1f2227}
-  .upload-box.has-file{border-color:#22c55e;border-style:solid}
-  .upload-box input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
-  .upload-icon{width:38px;height:38px;margin:0 auto 10px;color:#4a9eff}
-  .upload-title{font-size:14px;font-weight:600;color:#fff;margin-bottom:4px}
-  .upload-hint{font-size:11px;color:#6b7280}
-  .upload-preview{max-width:100%;max-height:180px;border-radius:8px;margin:0 auto;display:block;object-fit:contain}
-  .upload-status{font-size:11px;color:#22c55e;margin-top:8px;font-weight:600}
+  .topbar{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;gap:12px}
+  .icon-btn{width:42px;height:42px;border-radius:12px;background:transparent;border:1px solid var(--border-2);display:grid;place-items:center;color:var(--text);cursor:pointer;transition:.15s}
+  .icon-btn:active{background:var(--bg-3)}
+  .topbar-title{flex:1;min-width:0}
+  .topbar-title h1{font-size:16px;font-weight:600;line-height:1.2;letter-spacing:-.2px}
+  .topbar-title p{font-size:11px;color:var(--text-3);margin-top:2px}
 
-  .submit-btn{width:100%;padding:15px;background:linear-gradient(135deg,#4a9eff,#3a86d6);color:#000;border:none;border-radius:11px;font-family:inherit;font-weight:700;font-size:14px;letter-spacing:0.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
-  .submit-btn:disabled{opacity:0.5;cursor:not-allowed}
-  .submit-btn svg{width:16px;height:16px}
+  .wrap{padding:16px;padding-bottom:100px;max-width:560px;margin:0 auto}
 
-  .info-box{background:rgba(74,158,255,0.08);border:1px solid rgba(74,158,255,0.2);border-radius:10px;padding:12px 14px;font-size:12px;color:#a8b2c1;line-height:1.5;margin-bottom:20px}
-  .info-box strong{color:#fff}
+  .status-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:18px}
+  .status-pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+  .status-pill.not_submitted,.status-pill.pending{background:var(--orange-bg);color:var(--orange)}
+  .status-pill.approved,.status-pill.verified{background:var(--green-bg);color:var(--green)}
+  .status-pill.rejected{background:var(--red-bg);color:var(--red)}
+
+  h2.page-title{font-size:22px;font-weight:700;letter-spacing:-.3px;margin-bottom:6px}
+  p.page-sub{font-size:13px;color:var(--text-2);margin-bottom:22px;line-height:1.5}
+
+  .card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px}
+  .card-title{font-size:13px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .card-title svg{color:var(--accent)}
+
+  .field{margin-bottom:14px}
+  .field:last-child{margin-bottom:0}
+  .field label{display:block;font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:6px}
+  .field label .req{color:var(--red);margin-left:3px}
+  .field input,.field select,.field textarea{width:100%;background:var(--bg-1);border:1px solid var(--border-2);border-radius:10px;color:var(--text);font-size:14px;padding:11px 14px;outline:none;transition:.15s;font-family:inherit}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+  .field select{appearance:none;background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'/%3e%3c/svg%3e");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+  .upload-grid{display:grid;gap:12px}
+  .upload-box{background:var(--bg-1);border:2px dashed var(--border-2);border-radius:12px;padding:18px;cursor:pointer;transition:.15s;text-align:center;position:relative;min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  .upload-box:active{border-color:var(--accent);background:var(--bg-3)}
+  .upload-box.has-file{border-color:var(--green);border-style:solid;background:rgba(34,197,94,.04)}
+  .upload-box input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+  .upload-icon{width:34px;height:34px;color:var(--accent)}
+  .upload-box.has-file .upload-icon{color:var(--green)}
+  .upload-title{font-size:13px;font-weight:600}
+  .upload-hint{font-size:11px;color:var(--text-3)}
+  .upload-preview{max-width:100%;max-height:130px;border-radius:8px;object-fit:contain}
+  .upload-status{font-size:11px;color:var(--green);font-weight:600;display:flex;align-items:center;gap:4px}
+
+  .btn-submit{width:100%;background:var(--accent);color:#000;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s;margin-top:6px;font-family:inherit}
+  .btn-submit:active:not(:disabled){background:var(--accent-2)}
+  .btn-submit:disabled{opacity:.45;cursor:not-allowed}
+
+  #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;width:calc(100% - 32px);max-width:360px;pointer-events:none}
+  .t-msg{padding:12px 16px;border-radius:10px;font-size:13px;font-weight:500;text-align:center;animation:slideUp .3s,fadeOut .4s 2.6s forwards;pointer-events:auto;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  .t-msg.success{background:var(--green);color:#fff}
+  .t-msg.error{background:var(--red);color:#fff}
+  .t-msg.info{background:var(--accent);color:#000}
+  @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+  @keyframes fadeOut{to{opacity:0;transform:translateY(20px)}}
+
+  .info-banner{background:rgba(74,158,255,.08);border:1px solid rgba(74,158,255,.2);border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;margin-bottom:18px;font-size:12px;line-height:1.5;color:var(--text-2)}
+  .info-banner svg{flex-shrink:0;color:var(--accent);margin-top:1px}
+  .info-banner strong{color:var(--text)}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <a href="account.html" class="back">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-    Back to Account
+<!-- Admin impersonation banner -->
+<div id="impersonationBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(90deg,#ff9500,#ffb80b);color:#1a1a1a;padding:8px 12px;font-family:'Montserrat',-apple-system,sans-serif;font-size:12px;font-weight:600;box-shadow:0 2px 10px rgba(0,0,0,0.35);align-items:center;justify-content:space-between;gap:10px">
+  <span style="display:flex;align-items:center;gap:6px;min-width:0;flex:1;overflow:hidden">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">Admin viewing <span id="impEmail" style="font-weight:700">user</span></span>
+  </span>
+  <button onclick="returnToAdmin()" style="background:#1a1a1a;color:#ffb80b;border:none;padding:5px 11px;border-radius:6px;cursor:pointer;font-weight:700;font-size:11px;font-family:'Montserrat',sans-serif;white-space:nowrap;flex-shrink:0">← Admin</button>
+</div>
+<script>
+(function(){
+  function getCookie(n){const m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):'';}
+  if(getCookie('apex_impersonating')==='1'){
+    const b=document.getElementById('impersonationBanner');
+    if(b){
+      b.style.display='flex';
+      const spacer=document.createElement('div');
+      spacer.id='impBannerSpacer';
+      spacer.style.height='38px';
+      spacer.style.width='100%';
+      document.body.insertBefore(spacer, document.body.firstChild);
+      let raw=getCookie('apex_impersonating_email');
+      try{ raw=decodeURIComponent(raw); }catch(_){}
+      const e=document.getElementById('impEmail');
+      if(e&&raw) e.textContent=raw;
+    }
+  }
+  window.returnToAdmin=async function(){
+    try{
+      const res=await fetch('/api/admin?resource=unimpersonate',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:'{}'});
+      const data=await res.json();
+      if(data.ok){ window.location.href = data.redirect || '/adminprivate'; }
+      else alert(data.error||'Failed to return');
+    }catch(e){ alert(e.message); }
+  };
+})();
+</script>
+<!-- /impersonation banner -->
+
+<header class="topbar">
+  <a href="/account.html" class="icon-btn" aria-label="Back">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
   </a>
+  <div class="topbar-title">
+    <h1>Identity Verification</h1>
+    <p>KYC Required for trading</p>
+  </div>
+</header>
 
-  <h1>Identity Verification</h1>
-  <p class="sub">Upload clear photos of your government-issued ID and a selfie. Your information is encrypted and reviewed within 24 hours.</p>
+<div id="toast"></div>
 
-  <div class="status-card">
-    <div>
-      <div class="l">Verification Status</div>
+<main class="wrap">
+
+  <span class="status-pill" id="kycStatusBadge">Loading…</span>
+
+  <h2 class="page-title">Verify your identity</h2>
+  <p class="page-sub">We're required by law to verify all members. Documents are encrypted and only reviewed by compliance staff.</p>
+
+  <div class="info-banner">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <div>Files up to <strong>10 MB</strong>. We auto-compress large photos. Review usually completes within <strong>24 hours</strong>.</div>
+  </div>
+
+  <!-- Document Type -->
+  <div class="card">
+    <div class="card-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 15l-5-5L5 21"/></svg>
+      Identity Document
     </div>
-    <div class="v status-pending" id="kycStatusBadge">PENDING</div>
+    <div class="field">
+      <label>Document Type<span class="req">*</span></label>
+      <select id="documentType">
+        <option value="passport">Passport</option>
+        <option value="drivers_license">Driver's License</option>
+        <option value="national_id">National ID Card</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Document Number<span class="req">*</span></label>
+      <input type="text" id="documentNumber" placeholder="e.g. A12345678" />
+    </div>
   </div>
 
-  <div class="info-box">
-    <strong>Accepted documents:</strong> Driver's License, Passport, or State ID. Files must be JPG, PNG, or PDF under 5MB.
+  <!-- Document Uploads -->
+  <div class="card">
+    <div class="card-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Upload Documents
+    </div>
+
+    <div class="upload-grid">
+      <label class="upload-box" id="boxFront">
+        <input type="file" id="fileFront" accept="image/*,.pdf" />
+        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 15l-5-5L5 21"/></svg>
+        <div class="upload-title">ID Front</div>
+        <div class="upload-hint">Front of your government ID</div>
+      </label>
+
+      <label class="upload-box" id="boxBack">
+        <input type="file" id="fileBack" accept="image/*,.pdf" />
+        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <div class="upload-title">ID Back</div>
+        <div class="upload-hint">Back of your government ID</div>
+      </label>
+
+      <label class="upload-box" id="boxSelfie">
+        <input type="file" id="fileSelfie" accept="image/*" capture="user" />
+        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <div class="upload-title">Selfie</div>
+        <div class="upload-hint">Clear photo of your face</div>
+      </label>
+    </div>
   </div>
 
-  <div class="upload-grid">
-    <label class="upload-box" id="boxFront">
-      <input type="file" id="fileFront" accept="image/*,.pdf">
-      <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 15l-5-5L5 21"/></svg>
-      <div class="upload-title">ID Front</div>
-      <div class="upload-hint">Front side of your government ID</div>
-    </label>
-
-    <label class="upload-box" id="boxBack">
-      <input type="file" id="fileBack" accept="image/*,.pdf">
-      <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      <div class="upload-title">ID Back</div>
-      <div class="upload-hint">Back side (or skip for passport)</div>
-    </label>
-
-    <label class="upload-box" id="boxSelfie">
-      <input type="file" id="fileSelfie" accept="image/*" capture="user">
-      <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <div class="upload-title">Selfie</div>
-      <div class="upload-hint">Clear photo of your face</div>
-    </label>
-  </div>
-
-  <button class="submit-btn" id="submitBtn" disabled>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+  <button class="btn-submit" id="submitBtn" disabled>
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     Submit for Verification
   </button>
-</div>
+</main>
 
-<script src="js/apex-api.js?v=1"></script>
-<script src="js/supabase.js?v=1781643381"></script>
-<script src="js/notify.js?v=1781643381"></script>
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script src="/js/supabase.js?v=1786129802"></script>
+<script src="/js/notify.js?v=1786129802"></script>
 <script>
 (async function(){
-  // Wait for window.sb to be initialized
-  var tries = 0;
-  while((typeof sb === 'undefined' || !sb) && tries < 50){
+  function toast(msg, type='info'){
+    const t = document.createElement('div');
+    t.className = 't-msg ' + type;
+    t.innerHTML = msg;
+    document.getElementById('toast').appendChild(t);
+    setTimeout(() => t.remove(), 3200);
+  }
+
+  // Wait for shim
+  let tries = 0;
+  while ((typeof sb === 'undefined' || !sb) && tries < 50) {
     await new Promise(r => setTimeout(r, 100));
     tries++;
   }
-  if(typeof sb === 'undefined' || !sb){
-    alert('Supabase failed to load. Please refresh.');
+  if (typeof sb === 'undefined' || !sb) {
+    toast('Failed to load. Please refresh.', 'error');
     return;
   }
-  var user = await window.apex.getUser();
-  if(!user){ window.location.href = 'login.html'; return; }
-  var profile = await window.apex.getProfile();
 
-  // Set status badge
-  var st = (profile?.kyc_status || 'pending').toLowerCase();
-  var badge = document.getElementById('kycStatusBadge');
-  badge.textContent = st.toUpperCase();
-  badge.className = 'v status-' + st;
+  // Auth check
+  const user = await window.apex.getUser();
+  if (!user) { window.location.href = 'login.html'; return; }
 
-  if(st === 'verified'){
+  // Load profile + LIVE KYC status from /api/kyc
+  const profile = await window.apex.getProfile();
+  let st = (profile?.kyc_status || 'not_submitted').toLowerCase();
+  try {
+    const liveRes = await fetch('/api/kyc', { credentials: 'include' });
+    const liveJson = await liveRes.json();
+    if (liveJson?.kycStatus) st = liveJson.kycStatus.toLowerCase();
+  } catch(_) {}
+  const badge = document.getElementById('kycStatusBadge');
+  const labels = { not_submitted:'Not Submitted', pending:'Pending Review', approved:'Verified', rejected:'Rejected' };
+  badge.textContent = labels[st] || st.toUpperCase();
+  badge.className = 'status-pill ' + st;
+
+  // Prefill known data
+
+  // Lock form if approved/pending
+  if (st === 'approved') {
     document.getElementById('submitBtn').disabled = true;
-    document.getElementById('submitBtn').innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> Already Verified';
+    document.getElementById('submitBtn').innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg> Already Verified';
+    toast('<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>Your identity is already verified', 'success');
+    return;
+  }
+  if (st === 'pending') {
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Pending Review';
+    toast('Your submission is being reviewed', 'info');
     return;
   }
 
-  var files = { front:null, back:null, selfie:null };
+  // ─── Image compression helper ──────────────────────────
+  async function compressImage(file, maxSizeMB = 4){
+    if (!file.type.startsWith('image/')) return file; // PDFs pass through
+    if (file.size <= maxSizeMB * 1024 * 1024) return file;
 
-  function handleFile(slot, inputId, boxId){
-    document.getElementById(inputId).addEventListener('change', function(e){
-      var f = e.target.files[0];
-      if(!f) return;
-      if(f.size > 5*1024*1024){ alert('File too large (max 5MB)'); return; }
-      files[slot] = f;
-      var box = document.getElementById(boxId);
-      box.classList.add('has-file');
-      // Preview if image
-      if(f.type.startsWith('image/')){
-        var url = URL.createObjectURL(f);
-        box.innerHTML = '<input type="file" id="'+inputId+'" accept="image/*,.pdf"><img src="'+url+'" class="upload-preview"><div class="upload-status"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> Ready to upload</div>';
-        // Re-attach handler since we replaced innerHTML
-        handleFile(slot, inputId, boxId);
-      } else {
-        box.querySelector('.upload-title').textContent = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> ' + f.name;
-        box.querySelector('.upload-hint').textContent = 'Ready to upload';
-      }
-      checkSubmit();
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = e => { img.src = e.target.result; };
+      reader.onerror = reject;
+      img.onload = () => {
+        const maxDim = 1600;
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim){
+          const scale = Math.min(maxDim/width, maxDim/height);
+          width *= scale; height *= scale;
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        canvas.toBlob(blob => {
+          if (!blob) return reject(new Error('Compression failed'));
+          resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
+        }, 'image/jpeg', 0.82);
+      };
+      img.onerror = reject;
+      reader.readAsDataURL(file);
     });
   }
 
-  function checkSubmit(){
-    var btn = document.getElementById('submitBtn');
-    btn.disabled = !(files.front && files.selfie); // back is optional
+  // ─── File handling ─────────────────────────────────────
+  const files = { front:null, back:null, selfie:null };
+  const MAX = 10 * 1024 * 1024; // 10 MB hard limit
+
+  function bindFileInput(slot, inputId, boxId){
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.addEventListener('change', async (e) => {
+      const f = e.target.files[0];
+      if (!f) return;
+      if (f.size > MAX) {
+        toast('File too large — max 10 MB', 'error');
+        e.target.value = '';
+        return;
+      }
+
+      const box = document.getElementById(boxId);
+      box.classList.add('has-file');
+
+      // Show "compressing" if large
+      if (f.type.startsWith('image/') && f.size > 4*1024*1024) {
+        toast('Compressing image…', 'info');
+      }
+
+      let processed = f;
+      try { processed = await compressImage(f); } catch(_){}
+      files[slot] = processed;
+
+      // Visual feedback
+      const titleLabel = slot === 'front' ? 'ID Front' : slot === 'back' ? 'ID Back' : 'Selfie';
+      if (processed.type.startsWith('image/')) {
+        const url = URL.createObjectURL(processed);
+        box.innerHTML =
+          '<input type="file" id="'+inputId+'" accept="image/*'+(slot==='selfie'?'':'.pdf')+'">' +
+          '<img src="'+url+'" class="upload-preview" alt="preview">' +
+          '<div class="upload-title">'+titleLabel+'</div>' +
+          '<div class="upload-status"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg> Ready ('+(processed.size/1024/1024).toFixed(1)+' MB)</div>';
+      } else {
+        box.innerHTML =
+          '<input type="file" id="'+inputId+'" accept="image/*,.pdf">' +
+          '<svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' +
+          '<div class="upload-title">'+titleLabel+'</div>' +
+          '<div class="upload-status"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg> '+processed.name+'</div>';
+      }
+      bindFileInput(slot, inputId, boxId);
+      validate();
+    });
   }
 
-  handleFile('front','fileFront','boxFront');
-  handleFile('back','fileBack','boxBack');
-  handleFile('selfie','fileSelfie','boxSelfie');
+  function validate(){
+    // User can upload any combination of files. Submit enables when
+    // at least one file is provided AND basic ID info is filled in.
+    const hasAnyFile = files.front || files.back || files.selfie;
+    const ok =
+      hasAnyFile &&
+      document.getElementById('documentType').value &&
+      document.getElementById('documentNumber').value.trim();
+    document.getElementById('submitBtn').disabled = !ok;
+  }
 
+  bindFileInput('front','fileFront','boxFront');
+  bindFileInput('back','fileBack','boxBack');
+  bindFileInput('selfie','fileSelfie','boxSelfie');
+
+  ['documentType','documentNumber']
+    .forEach(id => document.getElementById(id).addEventListener('input', validate));
+
+  // ─── Submit ────────────────────────────────────────────
   document.getElementById('submitBtn').addEventListener('click', async function(){
-    var btn = this;
+    const btn = this;
     btn.disabled = true;
-    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" opacity="0.3"/><path d="M22 12a10 10 0 0 1-10 10"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite"/></path></svg> Uploading...';
+    btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" opacity="0.3"/><path d="M22 12a10 10 0 0 1-10 10"/></svg> Uploading…';
+
     try {
-      var updates = { kyc_submitted_at: new Date().toISOString(), kyc_status: 'pending' };
-
-      async function up(slot, file){
-        if(!file) return null;
-        var ext = (file.name.split('.').pop()||'jpg').toLowerCase();
-        var path = user.id + '/' + slot + '_' + Date.now() + '.' + ext;
-        var { error } = await sb.storage.from('kyc-docs').upload(path, file, { upsert:true });
-        if(error) throw error;
-        var { data } = sb.storage.from('kyc-docs').createSignedUrl(path, 60*60*24*365); // 1yr signed URL
-        return (await data) || path;
+      async function uploadFile(slot, file){
+        if (!file) return '';
+        const ext = (file.name.split('.').pop()||'jpg').toLowerCase();
+        const path = user.id + '/' + slot + '_' + Date.now() + '.' + ext;
+        const { data, error } = await sb.storage.from('kyc-docs').upload(path, file, { upsert:true });
+        if (error) throw new Error(slot + ' upload: ' + error.message);
+        if (!data?.url) throw new Error(slot + ' upload: no URL returned');
+        return data.url;
       }
 
-      if(files.front){
-        var fr = files.front;
-        var ext = (fr.name.split('.').pop()||'jpg').toLowerCase();
-        var p1 = user.id + '/front_' + Date.now() + '.' + ext;
-        var u1 = await sb.storage.from('kyc-docs').upload(p1, fr, { upsert:true });
-        if(u1.error) throw u1.error;
-        var s1 = await sb.storage.from('kyc-docs').createSignedUrl(p1, 60*60*24*365);
-        updates.kyc_id_front_url = s1.data?.signedUrl || p1;
-      }
-      if(files.back){
-        var fb = files.back;
-        var extB = (fb.name.split('.').pop()||'jpg').toLowerCase();
-        var p2 = user.id + '/back_' + Date.now() + '.' + extB;
-        var u2 = await sb.storage.from('kyc-docs').upload(p2, fb, { upsert:true });
-        if(u2.error) throw u2.error;
-        var s2 = await sb.storage.from('kyc-docs').createSignedUrl(p2, 60*60*24*365);
-        updates.kyc_id_back_url = s2.data?.signedUrl || p2;
-      }
-      if(files.selfie){
-        var fs = files.selfie;
-        var extS = (fs.name.split('.').pop()||'jpg').toLowerCase();
-        var p3 = user.id + '/selfie_' + Date.now() + '.' + extS;
-        var u3 = await sb.storage.from('kyc-docs').upload(p3, fs, { upsert:true });
-        if(u3.error) throw u3.error;
-        var s3 = await sb.storage.from('kyc-docs').createSignedUrl(p3, 60*60*24*365);
-        updates.kyc_selfie_url = s3.data?.signedUrl || p3;
-      }
+      btn.innerHTML = '⬆ Uploading documents…';
+      const frontUrl  = files.front  ? await uploadFile('front', files.front)   : '';
+      const backUrl   = files.back   ? await uploadFile('back', files.back)     : '';
+      const selfieUrl = files.selfie ? await uploadFile('selfie', files.selfie) : '';
 
-      var r = await sb.from('profiles').update(updates).eq('id', user.id);
-      if(r.error) throw r.error;
+      btn.innerHTML = '📤 Submitting…';
+      const payload = {
+        documentType:   document.getElementById('documentType').value,
+        documentNumber: document.getElementById('documentNumber').value.trim(),
+        fullName:       profile?.full_name || user.email.split('@')[0],
+        country:        profile?.country || 'US',
+        dateOfBirth:    profile?.date_of_birth || '',
+        address:        profile?.address || '',
+        city:           profile?.city || '',
+        postalCode:     profile?.postal_code || '',
+        frontImageUrl:  frontUrl,
+        backImageUrl:   backUrl,
+        selfieUrl:      selfieUrl
+      };
 
-      alert('Documents submitted! Your account will be reviewed within 24 hours.');
-      window.location.href = 'account.html';
+      const r = await fetch('/api/kyc', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || 'Submission failed');
+
+      toast('<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>Submitted for review!', 'success');
+      setTimeout(() => { window.location.href = 'account.html'; }, 1500);
+
     } catch(e){
-      alert('Upload failed: ' + (e.message || e));
+      toast('Failed: ' + e.message, 'error');
       btn.disabled = false;
-      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Submit for Verification';
+      btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Submit for Verification';
     }
   });
 })();
