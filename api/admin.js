@@ -2028,7 +2028,7 @@ module.exports = async (req, res) => {
         action = 'created';
       }
       const total = await Company.countDocuments({ status: 'active' });
-      await adminLog(adminUser, 'seed-terafab-' + action, null, 'company',
+      await adminLog(admin, 'seed-terafab-' + action, null, 'company',
         existing ? { ticker: 'TFAB' } : null,
         { ticker: 'TFAB', stage: 'Construction JV', price: 125 },
         'Manual TFAB seed via admin API');
