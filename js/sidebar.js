@@ -290,11 +290,32 @@
     }
   });
 
-  // Highlight active page
-  const currentPage = location.pathname.split('/').pop() || 'dashboard.html';
-  sidebar.querySelectorAll('.ax-sb-item[data-page]').forEach(a => {
-    if(a.dataset.page === currentPage) a.classList.add('active');
-  });
+  // Highlight active page — robust matching (handles .html, no-.html, query strings, trailing slash)
+  (function highlightActive(){
+    // Normalize current path: strip query, strip trailing slash, ensure .html suffix if missing
+    var path = (location.pathname || '/').split('?')[0].replace(/\/$/, '');
+    var last = path.split('/').pop() || 'dashboard';   // "" → dashboard for root
+    // If URL has no extension (e.g. "/markets"), add ".html" for comparison
+    if (last && last.indexOf('.') === -1) last = last + '.html';
+    // Map root/index to dashboard so Home stays highlighted after login
+    if (!last || last === '.html' || last === 'index.html') last = 'dashboard.html';
+
+    var matched = false;
+    sidebar.querySelectorAll('.ax-sb-item[data-page]').forEach(function(a){
+      var dp = (a.dataset.page || '').toLowerCase();
+      // Exact match OR base-filename match (e.g. "markets.html" matches "/markets")
+      if (dp === last || dp.split('.')[0] === last.split('.')[0]) {
+        a.classList.add('active');
+        matched = true;
+      } else {
+        a.classList.remove('active');
+      }
+    });
+    // Debug hook: window._sbDebug() shows what matched
+    window._sbDebug = function(){
+      console.log('[sidebar] path:', location.pathname, '→ normalized:', last, '→ matched:', matched);
+    };
+  })();
 
   // Logout handler
   sidebar.querySelector('#axLogoutBtn').addEventListener('click', async (e) => {
