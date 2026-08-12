@@ -48,3 +48,7 @@ node_modules/
 *.bak
 *.bak-*
 *.pre-mongo-backup
+*.bak
+*.bak2
+*.backup
+.backup-*
