@@ -1,14 +1,14 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Security · APEX IPO ACCESS</title>
-<link rel="stylesheet" href="css/style.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js?v=1"></script>
-<script src="js/notify.js?v=1"></script>
-<script src="js/sidebar.js?v=2"></script>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script src="/js/notify.js?v=1786129802"></script>
+<script src="/js/sidebar.js?v=1786400153" defer></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{background:#000;color:#fff;font-family:'Plus Jakarta Sans',sans-serif}
@@ -106,18 +106,23 @@
       Need Help?
     </h3>
     <div class="desc">If you suspect unauthorized access, contact support immediately.</div>
-    <a href="mailto:support@apexipoaccess.com" class="btn" style="display:flex;text-decoration:none">Contact Support</a>
+    <a href="mailto:support@apexipoholdings.com" class="btn" style="display:flex;text-decoration:none">Contact Support</a>
   </div>
 </div>
 
-<script src="js/bottom-nav.js?v=1"></script>
+<script src="/js/bottom-nav.js?v=1786129802"></script>
 
 <script>
 const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
 const X_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
 
 window.__loadSecurity = async function(){
-  const { data:{ user } } = await sb.auth.getUser();
+  let user = null;
+  try {
+    const _r = await fetch('/api/auth?action=me', { credentials: 'include' });
+    const _j = await _r.json();
+    if (_j.ok && _j.user) user = _j.user;
+  } catch(e) {}
   if(!user){ window.location.href = 'login.html'; return; }
 
   // Device info
@@ -139,10 +144,21 @@ window.__loadSecurity = async function(){
     document.getElementById('memberSince').textContent = new Date(user.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
   }
 
-  // Profile info
-  const { data: profile } = await sb.from('profiles')
-    .select('kyc_status,account_status,is_admin,is_suspended,banned,email_verified_at,two_factor_enabled,two_factor_method,last_login_at,last_login_ip,can_withdraw,can_deposit')
-    .eq('id', user.id).single();
+  // Profile info (already loaded from /api/auth?action=me)
+  const profile = {
+    kyc_status:          user.kycStatus || user.kyc_status || 'pending',
+    account_status:      user.accountStatus || user.account_status || 'active',
+    is_admin:            !!user.isAdmin,
+    is_suspended:        !!user.isSuspended || !!user.is_suspended,
+    banned:              !!user.banned,
+    email_verified_at:   user.emailVerifiedAt || user.email_verified_at || null,
+    two_factor_enabled:  !!user.twoFactorEnabled || !!user.two_factor_enabled,
+    two_factor_method:   user.twoFactorMethod || user.two_factor_method || null,
+    last_login_at:       user.lastLoginAt || user.last_login_at || null,
+    last_login_ip:       user.lastLoginIp || user.last_login_ip || null,
+    can_withdraw:        user.canWithdraw !== false,
+    can_deposit:         user.canDeposit !== false,
+  };
 
   if(!profile) return;
 
@@ -224,15 +240,28 @@ window.__loadSecurity = async function(){
   }
 };
 
-if(window.__sbReady){ __loadSecurity(); } else { document.addEventListener("sb-ready", __loadSecurity, { once: true }); }
+__loadSecurity();
 
 async function changePassword(){
-  const { data:{ user } } = await sb.auth.getUser();
+  let user = null;
+  try {
+    const _r = await fetch('/api/auth?action=me', { credentials: 'include' });
+    const _j = await _r.json();
+    if (_j.ok && _j.user) user = _j.user;
+  } catch(e) {}
   if(!user) return;
   if(!confirm('Send a password reset link to ' + user.email + '?')) return;
-  const { error } = await sb.auth.resetPasswordForEmail(user.email, {
-    redirectTo: window.location.origin + '/reset-password.html'
-  });
+  let error = null;
+  try {
+    const _r = await fetch('/api/auth?action=forgot-password', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: user.email })
+    });
+    const _j = await _r.json();
+    if (!_j.ok) error = { message: _j.error || 'Could not send reset email' };
+  } catch(e) { error = { message: e.message }; }
   if(error){
     if(typeof toast === 'function') toast(error.message, 'error');
     else alert(error.message);
@@ -243,12 +272,14 @@ async function changePassword(){
 }
 
 function setupTwoFa(){
-  alert('2FA setup coming soon. Contact support@apexipoaccess.com to enable 2FA on your account.');
+  alert('2FA setup coming soon. Contact support@apexipoholdings.com to enable 2FA on your account.');
 }
 
 async function signOutAll(){
   if(!confirm('Sign out of all devices? You will need to log in again.')) return;
-  await sb.auth.signOut({ scope: 'global' });
+  try {
+    await fetch('/api/auth?action=logout', { method: 'POST', credentials: 'include' });
+  } catch(e) {}
   window.location.href = 'login.html';
 }
 </script>

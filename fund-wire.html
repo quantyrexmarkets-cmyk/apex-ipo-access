@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wire Transfer | Apex IPO Access</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js?v=1781643381"></script>
-<script src="js/notify.js?v=1781643381"></script>
-<script src="js/sidebar.js?v=2" defer></script>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script src="/js/supabase.js?v=1786129802"></script>
+<script src="/js/notify.js?v=1786129802"></script>
+<script src="/js/sidebar.js?v=1786400153" defer></script>
 <script>
-  document.addEventListener('sb-ready', async () => {
-    const { data } = await sb.auth.getUser();
-    if(!data.user) window.location.href = 'login.html';
-  });
+(async function authGuard(){
+  try {
+    const r = await fetch('/api/auth?action=me', { credentials:'include' });
+    if(!r.ok){ window.location.href = '/login.html'; return; }
+  } catch(e){ window.location.href = '/login.html'; }
+})();
 </script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
@@ -116,12 +119,49 @@
 </style>
 </head>
 <body>
+<!-- Admin impersonation banner -->
+<div id="impersonationBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(90deg,#ff9500,#ffb80b);color:#1a1a1a;padding:8px 12px;font-family:'Montserrat',-apple-system,sans-serif;font-size:12px;font-weight:600;box-shadow:0 2px 10px rgba(0,0,0,0.35);align-items:center;justify-content:space-between;gap:10px">
+  <span style="display:flex;align-items:center;gap:6px;min-width:0;flex:1;overflow:hidden">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">Admin viewing <span id="impEmail" style="font-weight:700">user</span></span>
+  </span>
+  <button onclick="returnToAdmin()" style="background:#1a1a1a;color:#ffb80b;border:none;padding:5px 11px;border-radius:6px;cursor:pointer;font-weight:700;font-size:11px;font-family:'Montserrat',sans-serif;white-space:nowrap;flex-shrink:0">← Admin</button>
+</div>
+<script>
+(function(){
+  function getCookie(n){const m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):'';}
+  if(getCookie('apex_impersonating')==='1'){
+    const b=document.getElementById('impersonationBanner');
+    if(b){
+      b.style.display='flex';
+      const spacer=document.createElement('div');
+      spacer.id='impBannerSpacer';
+      spacer.style.height='38px';
+      spacer.style.width='100%';
+      document.body.insertBefore(spacer, document.body.firstChild);
+      let raw=getCookie('apex_impersonating_email');
+      try{ raw=decodeURIComponent(raw); }catch(_){}
+      const e=document.getElementById('impEmail');
+      if(e&&raw) e.textContent=raw;
+    }
+  }
+  window.returnToAdmin=async function(){
+    try{
+      const res=await fetch('/api/admin?resource=unimpersonate',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:'{}'});
+      const data=await res.json();
+      if(data.ok){ window.location.href = data.redirect || '/adminprivate'; }
+      else alert(data.error||'Failed to return');
+    }catch(e){ alert(e.message); }
+  };
+})();
+</script>
+<!-- /impersonation banner -->
 
 <header class="dash-header">
   <button class="menu-btn" onclick="document.dispatchEvent(new Event('open-sidebar'))" aria-label="Open menu">
     <span></span><span></span><span></span>
   </button>
-  <a href="dashboard.html" class="logo">
+  <a href="/dashboard.html" class="logo">
     <div class="logo-text-stack">
       <span class="logo-line1">APEX</span>
       <span class="logo-line2">IPO ACCESS</span>
@@ -132,7 +172,7 @@
 </header>
 
 <div class="wrap">
-  <a href="fund-account.html" class="back-btn">
+  <a href="/fund-account.html" class="back-btn">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
     Back
   </a>
@@ -190,16 +230,20 @@
   document.getElementById('amountVal').textContent = '$' + amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   // Load wire settings from DB
-  document.addEventListener('sb-ready', async function(){
-    try {
-      var { data } = await sb.from('wire_settings').select('*').eq('id',1).single();
-      if(data && (data.bank_name || data.beneficiary_name)){
-        document.getElementById('wirePreview').style.display = 'block';
-        document.getElementById('wpBank').textContent = data.bank_name || '—';
-        document.getElementById('wpBenef').textContent = data.beneficiary_name || '—';
-      }
-    } catch(e){ console.warn(e); }
-  });
+    // Load wire settings from MongoDB API
+    (async function loadWireSettings(){
+      try {
+        var r = await fetch('/api/wallets?type=wire', { credentials:'include' });
+        if(!r.ok) return;
+        var res = await r.json();
+        var w = res.wire || res.settings || {};
+        if(w && (w.bankName || w.bank_name || w.beneficiaryName || w.beneficiary_name)){
+          document.getElementById('wirePreview').style.display = 'block';
+          document.getElementById('wpBank').textContent = w.bankName || w.bank_name || '—';
+          document.getElementById('wpBenef').textContent = w.beneficiaryName || w.beneficiary_name || '—';
+        }
+      } catch(e){ console.warn('wire settings:', e); }
+    })();
 
   // Persist for proof page
   sessionStorage.setItem('fund_method', 'wire');
@@ -213,7 +257,7 @@
       'Amount: $' + amount.toLocaleString('en-US', { minimumFractionDigits: 2 }) + '\n\n' +
       'Please send me the wire instructions.\n\nThank you.'
     );
-    window.location.href = 'mailto:support@apexipoaccess.com?subject=' + subject + '&body=' + body;
+    window.location.href = 'mailto:support@apexipoholdings.com?subject=' + subject + '&body=' + body;
   });
 
   document.getElementById('proofBtn').addEventListener('click', function(){
@@ -221,9 +265,9 @@
   });
 </script>
 
-<script src="js/floating-widget.js?v=1781343118" defer></script>
-<script src="js/bottom-nav.js?v=1"></script>
-  <script src="js/user-bell.js?v=1"></script>
-  <script src="js/session-guard.js?v=3" defer></script>
+<script src="/js/floating-widget.js?v=1786129802" defer></script>
+<script src="/js/bottom-nav.js?v=1786129802"></script>
+  <script src="/js/user-bell.js?v=1786129802"></script>
+  <script src="/js/session-guard.js?v=1786129802" defer></script>
 </body>
 </html>

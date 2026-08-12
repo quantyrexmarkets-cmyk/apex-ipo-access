@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="/js/loader.js?v=1786129802"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>Trade Management | Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#000; --bg-1:#0a0a0a; --bg-2:#111; --bg-3:#171717; --bg-hover:#1c1c1c;
+    --border:#1f1f1f; --border-2:#2a2a2a;
+    --text:#fff; --text-dim:#8590a1; --text-mute:#5a5f72;
+    --up:#3ed598; --down:#ef4444; --accent:#4a9eff; --warn:#ffb800;
+  }
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;min-height:100vh}
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-feature-settings:"tnum" 1}
+
+  .header{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:14px 20px;background:rgba(0,0,0,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+  .back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--text-dim);font-size:13px;font-weight:600;background:rgba(255,255,255,0.04);padding:8px 12px;border-radius:10px;border:1px solid var(--border);cursor:pointer}
+  .header-title{flex:1;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:800;letter-spacing:-0.01em}
+  .refresh-btn{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer}
+
+  .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:16px 20px 4px}
+  .stat-card{background:var(--bg-1);border:1px solid var(--border);border-radius:14px;padding:14px}
+  .stat-label{font-size:10px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
+  .stat-value{font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;letter-spacing:-0.01em;line-height:1.1}
+  .stat-sub{font-size:11px;color:var(--text-mute);margin-top:4px;font-weight:600}
+  .stat-value.up{color:var(--up)} .stat-value.dn{color:var(--down)}
+
+  .tabs{display:flex;gap:6px;padding:14px 20px 8px;overflow-x:auto;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab-btn{flex-shrink:0;background:var(--bg-1);border:1px solid var(--border);color:var(--text-dim);padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+  .tab-btn.active{background:var(--accent);color:#001a3a;border-color:var(--accent)}
+
+  .filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:6px 20px 12px}
+  .filter-input,.filter-select{background:var(--bg-1);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-size:13px;font-family:inherit;outline:none}
+  .filter-input::placeholder{color:var(--text-mute)}
+  .filter-select{cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238590a1' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:right 10px center;padding-right:32px}
+
+  .trade-list{padding:4px 20px 100px;display:flex;flex-direction:column;gap:10px}
+  .trade-card{background:var(--bg-1);border:1px solid var(--border);border-radius:14px;padding:14px}
+  .tc-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .tc-logo{width:36px;height:36px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:4px;font-weight:800;color:#000;flex-shrink:0;font-size:14px}
+  .tc-logo img{width:100%;height:100%;object-fit:contain}
+  .tc-title-wrap{flex:1;min-width:0}
+  .tc-ticker{font-size:14px;font-weight:800}
+  .tc-user{font-size:11px;color:var(--text-dim);font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tc-status{padding:3px 8px;border-radius:6px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;flex-shrink:0}
+  .st-open{background:rgba(62,213,152,0.14);color:var(--up)}
+  .st-closed{background:rgba(139,144,163,0.12);color:var(--text-dim)}
+  .st-pending{background:rgba(255,184,0,0.14);color:var(--warn)}
+  .st-filled{background:rgba(62,213,152,0.14);color:var(--up)}
+  .st-cancelled{background:rgba(139,144,163,0.12);color:var(--text-dim)}
+
+  .tc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;padding:10px 0;border-top:1px solid rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.04);margin-bottom:10px}
+  .tc-cell{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .tc-label{font-size:9px;color:var(--text-mute);font-weight:700;text-transform:uppercase;letter-spacing:0.06em}
+  .tc-val{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tc-val.up{color:var(--up)} .tc-val.dn{color:var(--down)}
+
+  .tc-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .tc-btn{padding:8px 4px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid;background:transparent;transition:.15s}
+  .tc-btn:active{transform:scale(0.96)}
+  .tc-btn.close-b{color:var(--down);border-color:rgba(239,68,68,0.3)}
+  .tc-btn.adjust-b{color:var(--accent);border-color:rgba(74,158,255,0.3)}
+  .tc-btn.delete-b{color:var(--warn);border-color:rgba(255,184,0,0.3)}
+  .tc-btn.impersonate-b{color:var(--text-dim);border-color:var(--border-2)}
+  .tc-btn:disabled{opacity:0.5;cursor:not-allowed}
+
+  .empty{padding:60px 20px;text-align:center;color:var(--text-dim)}
+  .empty-title{font-size:15px;font-weight:700;margin-bottom:6px;color:var(--text)}
+  .loading{padding:40px 20px;text-align:center;color:var(--text-dim);font-size:13px}
+
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+  .modal-bg.show{display:flex}
+  .modal{background:var(--bg-2);border:1px solid var(--border-2);border-radius:16px;padding:22px;max-width:400px;width:100%;max-height:90vh;overflow-y:auto}
+  .modal h3{font-family:'Plus Jakarta Sans',sans-serif;font-size:17px;font-weight:800;margin-bottom:14px}
+  .modal .field{margin-bottom:14px}
+  .modal label{display:block;font-size:11px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
+  .modal input,.modal textarea,.modal select{width:100%;background:var(--bg-1);border:1px solid var(--border);border-radius:9px;padding:10px 12px;color:var(--text);font-size:13px;font-family:inherit;outline:none}
+  .modal input:focus,.modal textarea:focus{border-color:var(--accent)}
+  .modal textarea{resize:vertical;min-height:64px}
+  .modal .checkbox-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-dim);margin-bottom:14px;cursor:pointer}
+  .modal .checkbox-row input{width:auto;margin:0}
+  .modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .modal-btn{padding:11px;border-radius:10px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;border:1px solid}
+  .modal-btn.cancel{background:transparent;color:var(--text-dim);border-color:var(--border-2)}
+  .modal-btn.confirm{background:var(--down);color:#fff;border-color:var(--down)}
+  .modal-btn.confirm.blue{background:var(--accent);border-color:var(--accent);color:#001a3a}
+  .modal-btn.confirm.orange{background:var(--warn);border-color:var(--warn);color:#1a1000}
+
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);padding:12px 20px;border-radius:12px;font-size:14px;font-weight:600;background:var(--bg-3);border:1px solid var(--border-2);opacity:0;pointer-events:none;transition:.3s;z-index:200;max-width:90vw;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.success{color:var(--up);border-color:rgba(62,213,152,0.4)}
+  .toast.error{color:var(--down);border-color:rgba(239,68,68,0.4)}
+
+  @media (min-width: 768px){
+    body{max-width:900px;margin:0 auto;border-left:1px solid var(--border);border-right:1px solid var(--border)}
+    .stats-grid{grid-template-columns:repeat(4,1fr)}
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <button class="back-btn" onclick="location.href='/adminprivate'">← Admin</button>
+  <div class="header-title">Trade Management</div>
+  <button class="refresh-btn" onclick="loadAll()" aria-label="Refresh">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+  </button>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-label">Open positions</div><div class="stat-value" id="stOpen">—</div><div class="stat-sub" id="stNotional">Loading…</div></div>
+  <div class="stat-card"><div class="stat-label">Realized P&L (all)</div><div class="stat-value" id="stPnlAll">—</div><div class="stat-sub" id="stPnlToday">—</div></div>
+  <div class="stat-card"><div class="stat-label">Closed positions</div><div class="stat-value" id="stClosed">—</div><div class="stat-sub" id="stPnl7d">—</div></div>
+  <div class="stat-card"><div class="stat-label">Top ticker</div><div class="stat-value" id="stTopTicker">—</div><div class="stat-sub" id="stTopCount">—</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="open-pos">Open Positions</button>
+  <button class="tab-btn" data-tab="closed-pos">Closed Positions</button>
+  <button class="tab-btn" data-tab="pending-orders">Pending Orders</button>
+  <button class="tab-btn" data-tab="filled-orders">Order History</button>
+</div>
+
+<div class="filters">
+  <input class="filter-input" id="fUser" placeholder="Search user (email/name)…">
+  <input class="filter-input" id="fTicker" placeholder="Ticker (e.g. TSLA)">
+</div>
+
+<div id="listWrap" class="trade-list"></div>
+
+<div class="modal-bg" id="modalClose">
+  <div class="modal">
+    <h3>Force close position?</h3>
+    <div class="field"><label>User</label><input readonly id="mcUser"></div>
+    <div class="field"><label>Position</label><input readonly id="mcInfo"></div>
+    <div class="field"><label>Exit price (leave blank = live bid)</label><input id="mcExit" type="text" inputmode="decimal" placeholder="Auto (live)"></div>
+    <div class="field"><label>Reason (required for audit)</label><textarea id="mcReason" placeholder="e.g. Support request #1234"></textarea></div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeAllModals()">Cancel</button>
+      <button class="modal-btn confirm" id="mcConfirm">Force Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalAdjust">
+  <div class="modal">
+    <h3>Adjust position</h3>
+    <div class="field"><label>User</label><input readonly id="maUser"></div>
+    <div class="field"><label>Ticker</label><input readonly id="maTicker"></div>
+    <div class="field"><label>Entry price</label><input id="maEntry" type="text" inputmode="decimal"></div>
+    <div class="field"><label>Quantity</label><input id="maQty" type="text" inputmode="decimal"></div>
+    <div class="field"><label>Cost basis (auto if empty)</label><input id="maCost" type="text" inputmode="decimal" placeholder="entry × qty"></div>
+    <div class="field"><label>Company name</label><input id="maName"></div>
+    <div class="field"><label>Realized P&L (closed only)</label><input id="maPnl" type="text" inputmode="decimal" placeholder="Only if closed"></div>
+    <div class="field"><label>Reason</label><textarea id="maReason" placeholder="e.g. Fix cost basis"></textarea></div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeAllModals()">Cancel</button>
+      <button class="modal-btn confirm blue" id="maConfirm">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalDelete">
+  <div class="modal">
+    <h3>Delete position?</h3>
+    <div class="field"><label>User</label><input readonly id="mdUser"></div>
+    <div class="field"><label>Position</label><input readonly id="mdInfo"></div>
+    <label class="checkbox-row"><input type="checkbox" id="mdRefund"> Refund current market value to user</label>
+    <div class="field"><label>Reason</label><textarea id="mdReason" placeholder="e.g. Test data cleanup"></textarea></div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeAllModals()">Cancel</button>
+      <button class="modal-btn confirm orange" id="mdConfirm">Delete Forever</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalCancel">
+  <div class="modal">
+    <h3>Cancel pending order?</h3>
+    <div class="field"><label>User</label><input readonly id="mcnUser"></div>
+    <div class="field"><label>Order</label><input readonly id="mcnInfo"></div>
+    <div class="field"><label>Reason</label><textarea id="mcnReason" placeholder="e.g. User request"></textarea></div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeAllModals()">Keep Order</button>
+      <button class="modal-btn confirm" id="mcnConfirm">Cancel Order</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+(function(){
+  const fmt = n => Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmtBig = n => { const a = Math.abs(n||0); if (a >= 1e9) return '$'+(n/1e9).toFixed(2)+'B'; if (a >= 1e6) return '$'+(n/1e6).toFixed(2)+'M'; if (a >= 1e3) return '$'+(n/1e3).toFixed(2)+'K'; return '$'+fmt(n); };
+  const fmtPct = n => { const s = n>=0?'+':''; return s+Number(n||0).toFixed(2)+'%'; };
+  const fmtDate = d => { if(!d) return '—'; const dt = new Date(d); return dt.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' '+dt.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); };
+
+  const state = { tab: 'open-pos', items: [], filterUser: '', filterTicker: '' };
+  let pending = null;
+
+  function toast(msg, kind){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + (kind||'');
+    setTimeout(()=>{ t.className = 'toast'; }, 2600);
+  }
+  function closeAllModals(){
+    document.querySelectorAll('.modal-bg').forEach(m => m.classList.remove('show'));
+    pending = null;
+  }
+  window.closeAllModals = closeAllModals;
+
+  async function loadStats(){
+    try {
+      const r = await fetch('/api/admin?resource=trades&stats=1');
+      const j = await r.json();
+      if (!j.ok) return;
+      const s = j.stats;
+      document.getElementById('stOpen').textContent = s.openCount;
+      document.getElementById('stClosed').textContent = s.closedCount;
+      document.getElementById('stNotional').textContent = 'Notional: ' + fmtBig(s.totalNotional);
+      const pnlEl = document.getElementById('stPnlAll');
+      pnlEl.textContent = (s.realizedPnlAll >= 0 ? '+' : '') + fmtBig(s.realizedPnlAll);
+      pnlEl.className = 'stat-value ' + (s.realizedPnlAll >= 0 ? 'up' : 'dn');
+      document.getElementById('stPnlToday').textContent = 'Today: ' + (s.realizedPnlToday>=0?'+':'') + fmtBig(s.realizedPnlToday);
+      document.getElementById('stPnl7d').textContent = '7d: ' + (s.realizedPnl7d>=0?'+':'') + fmtBig(s.realizedPnl7d);
+      if (s.topTickers && s.topTickers[0]) {
+        document.getElementById('stTopTicker').textContent = s.topTickers[0].ticker;
+        document.getElementById('stTopCount').textContent = s.topTickers[0].count + ' positions';
+      }
+    } catch(e) { console.warn('stats', e); }
+  }
+
+  function logoHTML(item){
+    const t = (item.ticker||'').toLowerCase();
+    const local = '/images/logos/' + t + '.png';
+    const saved = (item.logoUrl && item.logoUrl.indexOf('duckduckgo') === -1) ? item.logoUrl : local;
+    const init = (item.ticker || '?')[0];
+    return '<img src="' + saved + '" onerror="if(!this.dataset.f){this.dataset.f=1;this.src=\'' + local + '\'}else{this.parentNode.textContent=\'' + init + '\'}">';
+  }
+
+  async function loadList(){
+    const list = document.getElementById('listWrap');
+    list.innerHTML = '<div class="loading">Loading…</div>';
+    try {
+      let url;
+      const isPos = state.tab.endsWith('-pos');
+      if (isPos) {
+        const status = state.tab === 'open-pos' ? 'open' : 'closed';
+        url = '/api/admin?resource=trades&status=' + status;
+      } else {
+        const status = state.tab === 'pending-orders' ? 'pending' : 'filled';
+        url = '/api/admin?resource=orders-admin&status=' + status;
+      }
+      if (state.filterUser)   url += '&user='   + encodeURIComponent(state.filterUser);
+      if (state.filterTicker) url += '&ticker=' + encodeURIComponent(state.filterTicker);
+
+      const r = await fetch(url);
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.error || 'Load failed');
+      state.items = isPos ? (j.positions||[]) : (j.orders||[]);
+      isPos ? renderPositions() : renderOrders();
+    } catch(e) {
+      list.innerHTML = '<div class="empty"><div class="empty-title" style="color:var(--down)">Failed</div><div class="empty-sub">'+e.message+'</div></div>';
+    }
+  }
+
+  function renderPositions(){
+    const list = document.getElementById('listWrap');
+    if (!state.items.length) {
+      list.innerHTML = '<div class="empty"><div class="empty-title">No positions found</div><div class="empty-sub">Try clearing filters</div></div>';
+      return;
+    }
+    list.innerHTML = state.items.map(p => {
+      const isOpen = p.status === 'open';
+      const pnl = p.pnl || 0;
+      const pnlCls = pnl >= 0 ? 'up' : 'dn';
+      const sign = pnl >= 0 ? '+' : '';
+      return `<div class="trade-card">
+        <div class="tc-head">
+          <div class="tc-logo">${logoHTML(p)}</div>
+          <div class="tc-title-wrap">
+            <div class="tc-ticker">${p.ticker} <span style="color:var(--text-dim);font-weight:600;font-size:11px">· ${(p.assetType||'').toUpperCase()}</span></div>
+            <div class="tc-user">${p.userName || p.userEmail}</div>
+          </div>
+          <div class="tc-status st-${p.status}">${p.status}</div>
+        </div>
+        <div class="tc-grid">
+          <div class="tc-cell"><div class="tc-label">Qty</div><div class="tc-val">${Number(p.quantity).toFixed(4)}</div></div>
+          <div class="tc-cell"><div class="tc-label">Entry</div><div class="tc-val">$${fmt(p.entryPrice)}</div></div>
+          <div class="tc-cell"><div class="tc-label">${isOpen?'Live':'Exit'}</div><div class="tc-val">$${fmt(p.currentPrice)}</div></div>
+          <div class="tc-cell"><div class="tc-label">P&L</div><div class="tc-val ${pnlCls}">${sign}$${fmt(Math.abs(pnl))} · ${fmtPct(p.pnlPct)}</div></div>
+          <div class="tc-cell"><div class="tc-label">Cost basis</div><div class="tc-val">$${fmt(p.costBasis)}</div></div>
+          <div class="tc-cell"><div class="tc-label">${isOpen?'Opened':'Closed'}</div><div class="tc-val">${fmtDate(isOpen?p.openedAt:p.closedAt)}</div></div>
+        </div>
+        <div class="tc-actions">
+          ${isOpen ? `<button class="tc-btn close-b" onclick="openClose('${p.id}')">Close</button>` : `<button class="tc-btn close-b" disabled>—</button>`}
+          <button class="tc-btn adjust-b" onclick="openAdjust('${p.id}')">Adjust</button>
+          <button class="tc-btn delete-b" onclick="openDelete('${p.id}')">Delete</button>
+          <button class="tc-btn impersonate-b" onclick="impersonate('${p.userId}')">👁 User</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderOrders(){
+    const list = document.getElementById('listWrap');
+    if (!state.items.length) {
+      list.innerHTML = '<div class="empty"><div class="empty-title">No orders found</div><div class="empty-sub">Try clearing filters</div></div>';
+      return;
+    }
+    list.innerHTML = state.items.map(o => {
+      const canCancel = o.status === 'pending' || o.status === 'partially_filled';
+      const size = o.shares ? Number(o.shares).toFixed(4)+' sh' : '$'+fmt(o.dollarAmount);
+      return `<div class="trade-card">
+        <div class="tc-head">
+          <div class="tc-logo">${logoHTML(o)}</div>
+          <div class="tc-title-wrap">
+            <div class="tc-ticker">
+              <span style="color:${o.side==='buy'?'var(--up)':'var(--down)'}">${o.side.toUpperCase()}</span> ${o.ticker}
+              <span style="color:var(--text-dim);font-weight:600;font-size:11px">· ${(o.orderType||'').toUpperCase()}</span>
+            </div>
+            <div class="tc-user">${o.userName || o.userEmail}</div>
+          </div>
+          <div class="tc-status st-${o.status}">${(o.status||'').replace('_',' ')}</div>
+        </div>
+        <div class="tc-grid">
+          <div class="tc-cell"><div class="tc-label">Size</div><div class="tc-val">${size}</div></div>
+          <div class="tc-cell"><div class="tc-label">Limit</div><div class="tc-val">$${fmt(o.limitPrice)}</div></div>
+          <div class="tc-cell"><div class="tc-label">Filled @</div><div class="tc-val">${o.filledPrice?'$'+fmt(o.filledPrice):'—'}</div></div>
+          <div class="tc-cell"><div class="tc-label">Placed</div><div class="tc-val">${fmtDate(o.placedAt)}</div></div>
+        </div>
+        <div class="tc-actions">
+          ${canCancel ? `<button class="tc-btn close-b" style="grid-column:span 2" onclick="openCancel('${o._id}')">Cancel order</button>` : '<div></div><div></div>'}
+          <button class="tc-btn impersonate-b" style="grid-column:span 2" onclick="impersonate('${o.userId}')">👁 View user</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  window.openClose = function(id){
+    const p = state.items.find(x => x.id === id); if (!p) return;
+    pending = p;
+    document.getElementById('mcUser').value = p.userEmail;
+    document.getElementById('mcInfo').value = p.ticker+' · '+Number(p.quantity).toFixed(4)+' sh · entry $'+fmt(p.entryPrice);
+    document.getElementById('mcExit').value = '';
+    document.getElementById('mcReason').value = '';
+    document.getElementById('modalClose').classList.add('show');
+  };
+  window.openAdjust = function(id){
+    const p = state.items.find(x => x.id === id); if (!p) return;
+    pending = p;
+    document.getElementById('maUser').value = p.userEmail;
+    document.getElementById('maTicker').value = p.ticker;
+    document.getElementById('maEntry').value = p.entryPrice;
+    document.getElementById('maQty').value = p.quantity;
+    document.getElementById('maCost').value = p.costBasis;
+    document.getElementById('maName').value = p.companyName || '';
+    document.getElementById('maPnl').value = p.realizedPnl || '';
+    document.getElementById('maReason').value = '';
+    document.getElementById('modalAdjust').classList.add('show');
+  };
+  window.openDelete = function(id){
+    const p = state.items.find(x => x.id === id); if (!p) return;
+    pending = p;
+    document.getElementById('mdUser').value = p.userEmail;
+    document.getElementById('mdInfo').value = p.ticker+' · '+Number(p.quantity).toFixed(4)+' sh · $'+fmt(p.currentValue||0);
+    document.getElementById('mdRefund').checked = false;
+    document.getElementById('mdReason').value = '';
+    document.getElementById('modalDelete').classList.add('show');
+  };
+  window.openCancel = function(id){
+    const o = state.items.find(x => x._id === id); if (!o) return;
+    pending = o;
+    document.getElementById('mcnUser').value = o.userEmail;
+    document.getElementById('mcnInfo').value = o.side.toUpperCase()+' '+o.ticker+' · '+o.orderType+' @ $'+fmt(o.limitPrice);
+    document.getElementById('mcnReason').value = '';
+    document.getElementById('modalCancel').classList.add('show');
+  };
+  window.impersonate = async function(userId){
+    if (!confirm('Impersonate this user?')) return;
+    try {
+      const r = await fetch('/api/admin?resource=impersonate', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ userId })
+      });
+      const j = await r.json();
+      if (j.ok && j.redirect) location.href = j.redirect;
+      else toast(j.error || 'Impersonate failed', 'error');
+    } catch(e) { toast(e.message, 'error'); }
+  };
+
+  async function post(url, body){
+    const r = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    return r.json();
+  }
+
+  document.getElementById('mcConfirm').addEventListener('click', async function(){
+    if (!pending) return;
+    const btn = this; btn.disabled = true; btn.textContent = 'Closing…';
+    const exitPrice = parseFloat(document.getElementById('mcExit').value) || undefined;
+    const reason = document.getElementById('mcReason').value.trim();
+    if (!reason) { alert('Reason required'); btn.disabled=false; btn.textContent='Force Close'; return; }
+    const j = await post('/api/admin?resource=trades&action=close', { positionId: pending.id, exitPrice, reason });
+    btn.disabled=false; btn.textContent='Force Close';
+    if (j.error) { toast(j.error, 'error'); return; }
+    toast('Closed at $'+fmt(j.exitPrice)+' · P&L $'+fmt(j.realizedPnl), 'success');
+    closeAllModals(); loadAll();
+  });
+
+  document.getElementById('maConfirm').addEventListener('click', async function(){
+    if (!pending) return;
+    const btn = this; btn.disabled = true; btn.textContent = 'Saving…';
+    const body = { positionId: pending.id, reason: document.getElementById('maReason').value.trim() };
+    const e = parseFloat(document.getElementById('maEntry').value);
+    const q = parseFloat(document.getElementById('maQty').value);
+    const c = parseFloat(document.getElementById('maCost').value);
+    const n = document.getElementById('maName').value.trim();
+    const pl = parseFloat(document.getElementById('maPnl').value);
+    if (!isNaN(e)) body.entryPrice = e;
+    if (!isNaN(q)) body.quantity = q;
+    if (!isNaN(c)) body.costBasis = c;
+    if (n) body.companyName = n;
+    if (!isNaN(pl)) body.realizedPnl = pl;
+    if (!body.reason) { alert('Reason required'); btn.disabled=false; btn.textContent='Save Changes'; return; }
+    const j = await post('/api/admin?resource=trades&action=adjust', body);
+    btn.disabled=false; btn.textContent='Save Changes';
+    if (j.error) { toast(j.error, 'error'); return; }
+    toast('Position updated', 'success');
+    closeAllModals(); loadAll();
+  });
+
+  document.getElementById('mdConfirm').addEventListener('click', async function(){
+    if (!pending) return;
+    const btn = this; btn.disabled=true; btn.textContent='Deleting…';
+    const refund = document.getElementById('mdRefund').checked;
+    const reason = document.getElementById('mdReason').value.trim();
+    if (!reason) { alert('Reason required'); btn.disabled=false; btn.textContent='Delete Forever'; return; }
+    const j = await post('/api/admin?resource=trades&action=delete', { positionId: pending.id, refund, reason });
+    btn.disabled=false; btn.textContent='Delete Forever';
+    if (j.error) { toast(j.error, 'error'); return; }
+    toast(refund ? 'Deleted · Refunded $'+fmt(j.refundAmount) : 'Deleted', 'success');
+    closeAllModals(); loadAll();
+  });
+
+  document.getElementById('mcnConfirm').addEventListener('click', async function(){
+    if (!pending) return;
+    const btn = this; btn.disabled=true; btn.textContent='Cancelling…';
+    const reason = document.getElementById('mcnReason').value.trim();
+    const j = await post('/api/admin?resource=orders-admin&action=cancel', { orderId: pending._id, reason });
+    btn.disabled=false; btn.textContent='Cancel Order';
+    if (j.error) { toast(j.error, 'error'); return; }
+    toast(j.refund > 0 ? 'Cancelled · Refunded $'+fmt(j.refund) : 'Cancelled', 'success');
+    closeAllModals(); loadAll();
+  });
+
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => {
+    state.tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+    loadList();
+  }));
+
+  let filterTimer;
+  ['fUser','fTicker'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      clearTimeout(filterTimer);
+      filterTimer = setTimeout(() => {
+        state.filterUser = document.getElementById('fUser').value.trim();
+        state.filterTicker = document.getElementById('fTicker').value.trim().toUpperCase();
+        loadList();
+      }, 350);
+    });
+  });
+
+  document.querySelectorAll('.modal-bg').forEach(m => m.addEventListener('click', e => { if (e.target === m) closeAllModals(); }));
+
+  window.loadAll = function(){ loadStats(); loadList(); };
+  loadAll();
+  setInterval(() => { if (!document.hidden) loadAll(); }, 30000);
+})();
+</script>
+
+</body>
+</html>

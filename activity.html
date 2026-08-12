@@ -1,14 +1,14 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Activity · APEX IPO ACCESS</title>
-<link rel="stylesheet" href="css/style.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js?v=1"></script>
-<script src="js/notify.js?v=1"></script>
-<script src="js/sidebar.js?v=2"></script>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script src="/js/notify.js?v=1786129802"></script>
+<script src="/js/sidebar.js?v=1786400153" defer></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{background:#000;color:#fff;font-family:'Plus Jakarta Sans',sans-serif}
@@ -63,6 +63,43 @@
 </style>
 </head>
 <body>
+<!-- Admin impersonation banner -->
+<div id="impersonationBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(90deg,#ff9500,#ffb80b);color:#1a1a1a;padding:8px 12px;font-family:'Montserrat',-apple-system,sans-serif;font-size:12px;font-weight:600;box-shadow:0 2px 10px rgba(0,0,0,0.35);align-items:center;justify-content:space-between;gap:10px">
+  <span style="display:flex;align-items:center;gap:6px;min-width:0;flex:1;overflow:hidden">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">Admin viewing <span id="impEmail" style="font-weight:700">user</span></span>
+  </span>
+  <button onclick="returnToAdmin()" style="background:#1a1a1a;color:#ffb80b;border:none;padding:5px 11px;border-radius:6px;cursor:pointer;font-weight:700;font-size:11px;font-family:'Montserrat',sans-serif;white-space:nowrap;flex-shrink:0">← Admin</button>
+</div>
+<script>
+(function(){
+  function getCookie(n){const m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):'';}
+  if(getCookie('apex_impersonating')==='1'){
+    const b=document.getElementById('impersonationBanner');
+    if(b){
+      b.style.display='flex';
+      const spacer=document.createElement('div');
+      spacer.id='impBannerSpacer';
+      spacer.style.height='38px';
+      spacer.style.width='100%';
+      document.body.insertBefore(spacer, document.body.firstChild);
+      let raw=getCookie('apex_impersonating_email');
+      try{ raw=decodeURIComponent(raw); }catch(_){}
+      const e=document.getElementById('impEmail');
+      if(e&&raw) e.textContent=raw;
+    }
+  }
+  window.returnToAdmin=async function(){
+    try{
+      const res=await fetch('/api/admin?resource=unimpersonate',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:'{}'});
+      const data=await res.json();
+      if(data.ok){ window.location.href = data.redirect || '/adminprivate'; }
+      else alert(data.error||'Failed to return');
+    }catch(e){ alert(e.message); }
+  };
+})();
+</script>
+<!-- /impersonation banner -->
 <header class="dash-header" style="position:sticky;top:0;z-index:100;background:rgba(0,0,0,0.92);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.08);padding:16px 20px;display:flex;justify-content:space-between;align-items:center">
   <button class="menu-btn" aria-label="Menu" style="width:38px;height:38px;display:flex;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer">
     <span style="width:22px;height:2px;background:#4a9eff"></span>
@@ -105,7 +142,7 @@
   </div>
 </div>
 
-<script src="js/bottom-nav.js?v=1"></script>
+<script src="/js/bottom-nav.js?v=1786129802"></script>
 
 <script>
 let allItems = [];
@@ -231,14 +268,20 @@ document.querySelectorAll('.chip').forEach(function(c){
 });
 
 async function loadActivity(){
-  const userRes = await sb.auth.getUser();
-  const user = userRes.data.user;
+  let user = null;
+  try {
+    const _r = await fetch('/api/auth?action=me', { credentials: 'include' });
+    const _j = await _r.json();
+    if (_j.ok && _j.user) user = _j.user;
+  } catch(e) {}
   if(!user){ window.location.href = 'login.html'; return; }
 
   const items = [];
 
   try {
-    const dep = await sb.from('deposits').select('*').eq('user_id', user.id).order('created_at',{ascending:false});
+    const _depR = await fetch('/api/deposits', { credentials: 'include' });
+    const _depJ = await _depR.json();
+    const dep = { data: (_depJ.ok && _depJ.deposits) ? _depJ.deposits : [] };
     (dep.data || []).forEach(function(d){
       items.push({
         kind: 'deposit',
@@ -252,7 +295,9 @@ async function loadActivity(){
   } catch(e){ console.warn('deposits:', e); }
 
   try {
-    const wd = await sb.from('withdrawals').select('*').eq('user_id', user.id).order('created_at',{ascending:false});
+    const _wdR = await fetch('/api/withdrawals', { credentials: 'include' });
+    const _wdJ = await _wdR.json();
+    const wd = { data: (_wdJ.ok && _wdJ.withdrawals) ? _wdJ.withdrawals : [] };
     (wd.data || []).forEach(function(w){
       items.push({
         kind: 'withdrawal',
@@ -266,7 +311,10 @@ async function loadActivity(){
   } catch(e){ console.warn('withdrawals:', e); }
 
   try {
-    const so = await sb.from('share_orders').select('*').eq('user_id', user.id).order('created_at',{ascending:false});
+    const _soR = await fetch('/api/portfolio', { credentials: 'include' });
+    const _soJ = await _soR.json();
+    const _holds = (_soJ.ok && _soJ.portfolio && _soJ.portfolio.holdings) ? _soJ.portfolio.holdings : [];
+    const so = { data: _holds.map(function(h){ return { ticker: h.symbol, shares: h.shares, total: h.totalInvestedUSD, amount: h.totalInvestedUSD, status: 'completed', created_at: h.lastPurchaseAt }; }) };
     (so.data || []).forEach(function(p){
       items.push({
         kind: 'purchase',
@@ -285,10 +333,9 @@ async function loadActivity(){
 }
 
 window.__loadActivity = loadActivity;
-if(window.__sbReady){ loadActivity(); }
-else { document.addEventListener('sb-ready', loadActivity, { once: true }); }
+loadActivity();
 </script>
 
-  <script src="js/session-guard.js?v=3" defer></script>
+  <script src="/js/session-guard.js?v=1786129802" defer></script>
 </body>
 </html>

@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="cache-control" content="no-cache, must-revalidate">
 <title>Holding Details — APEX IPO Access</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js?v=1781242485"></script>
+<script src="/js/apex-api.js?v=1786129802"></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
@@ -85,11 +85,61 @@
   .hd-cta-btn:active{transform:scale(0.98)}
 
   .hd-loading{text-align:center;padding:80px 20px;color:#8a94a3;font-size:14px}
+
+  /* ── Chunk 5: Valuation history + events + lockup ── */
+  .hd-lock-card{background:rgba(255,184,0,0.06);border:1px solid rgba(255,184,0,0.35);border-radius:12px;padding:16px;margin-bottom:14px;display:flex;gap:12px;align-items:flex-start}
+  .hd-lock-card.unlocked{background:rgba(62,213,152,0.06);border-color:rgba(62,213,152,0.3)}
+  .hd-lock-ico{width:32px;height:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#ffb800}
+  .hd-lock-card.unlocked .hd-lock-ico{color:#3ed598}
+  .hd-lock-ico svg{width:22px;height:22px}
+  .hd-lock-body{flex:1;min-width:0}
+  .hd-lock-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:4px}
+  .hd-lock-sub{font-size:12px;color:#8a94a3;line-height:1.5}
+  .hd-lock-sub b{color:#fff;font-family:'JetBrains Mono',Menlo,monospace}
+  .hd-lock-notes{margin-top:8px;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:8px;font-size:12px;color:#cbd0d8;line-height:1.5}
+
+  .hd-hist-summary{font-size:12px;color:#8a94a3;margin-bottom:10px;line-height:1.5}
+  .hd-hist-summary b{color:#fff;font-family:'JetBrains Mono',Menlo,monospace}
+  .hd-hist-chart{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px;height:160px;margin-bottom:12px}
+  .hd-hist-chart svg{width:100%;height:100%;display:block}
+
+  .hd-hist-timeline{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;max-height:280px;overflow-y:auto}
+  .hd-hist-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.04)}
+  .hd-hist-row:last-child{border-bottom:none}
+  .hd-hist-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .hd-hist-dot.up{background:#3ed598}
+  .hd-hist-dot.dn{background:#ef4444}
+  .hd-hist-dot.neu{background:#737373}
+  .hd-hist-body-cell{flex:1;min-width:0}
+  .hd-hist-price{font-size:12px;font-weight:700;font-family:'JetBrains Mono',Menlo,monospace;color:#fff}
+  .hd-hist-reason{font-size:11px;color:#8a94a3;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hd-hist-delta{font-size:11px;font-weight:700;font-family:'JetBrains Mono',Menlo,monospace;padding:3px 7px;border-radius:5px;flex-shrink:0}
+  .hd-hist-delta.up{background:rgba(62,213,152,0.14);color:#3ed598}
+  .hd-hist-delta.dn{background:rgba(239,68,68,0.14);color:#ef4444}
+  .hd-hist-date{font-size:10px;color:#737373;flex-shrink:0}
+
+  .hd-events{display:flex;flex-direction:column;gap:8px}
+  .hd-event{display:flex;gap:12px;padding:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;align-items:flex-start}
+  .hd-event-ico{width:32px;height:32px;border-radius:8px;background:rgba(74,158,255,0.14);color:#4a9eff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:800}
+  .hd-event-ico.funding{background:rgba(62,213,152,0.14);color:#3ed598}
+  .hd-event-ico.tender{background:rgba(74,158,255,0.14);color:#4a9eff}
+  .hd-event-ico.ipo{background:rgba(255,184,0,0.14);color:#ffb800}
+  .hd-event-ico.acquisition{background:rgba(139,92,246,0.14);color:#8b5cf6}
+  .hd-event-body{flex:1;min-width:0}
+  .hd-event-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:2px}
+  .hd-event-desc{font-size:11px;color:#8a94a3;line-height:1.5;margin-bottom:4px}
+  .hd-event-meta{display:flex;gap:10px;font-size:10px;color:#737373;font-family:'JetBrains Mono',Menlo,monospace}
+  .hd-event-price{color:#3ed598}
+  .hd-event-price.dn{color:#ef4444}
+
+  .hd-cta-btn.locked{background:rgba(139,144,163,0.14);color:#8a94a3;cursor:not-allowed;position:relative}
+  .hd-cta-btn.locked svg{width:14px;height:14px;margin-right:4px;vertical-align:middle}
+
 </style>
 </head>
 <body>
 <div class="hd-page">
-  <a href="portfolio.html" class="hd-back">
+  <a href="/portfolio.html" class="hd-back">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     Portfolio
   </a>
@@ -102,30 +152,49 @@
 <script>
 (async function(){
   const params = new URLSearchParams(location.search);
-  const allocId = params.get('id');
+  const allocId = params.get('id') || params.get('symbol') || params.get('ticker');
   const main = document.getElementById('hdMain');
 
   if(!allocId){
-    main.innerHTML = '<div class="hd-loading">Missing allocation ID.</div>';
+    main.innerHTML = '<div class="hd-loading">No holding specified.<br><a href="/portfolio" style="color:#4a9eff;margin-top:12px;display:inline-block">← Back to portfolio</a></div>';
     return;
   }
 
   // Get user
-  const { data: { user } } = await sb.auth.getUser();
-  if(!user){
-    location.href = 'login.html';
-    return;
-  }
+  let user = null;
+  try {
+    const _r = await fetch('/api/auth?action=me', { credentials: 'include' });
+    const _j = await _r.json();
+    if (_j.ok && _j.user) user = _j.user;
+  } catch(e) {}
+  if(!user){ location.href = 'login.html'; return; }
 
   // Fetch allocation
   let alloc;
   try {
-    const { data, error } = await sb.from('allocations')
-      .select('*')
-      .eq('id', allocId)
-      .eq('user_id', user.id)
-      .single();
-    if(error) throw error;
+    const _r = await fetch('/api/portfolio', { credentials: 'include' });
+    const _j = await _r.json();
+    const _holds = (_j.ok && _j.portfolio && _j.portfolio.holdings) ? _j.portfolio.holdings : [];
+    const _h = _holds.find(h => String(h.id) === String(allocId) || String(h.symbol) === String(allocId));
+    if (!_h) throw new Error('Holding not found');
+    const data = {
+      id: _h.id,
+      company_ticker: _h.symbol,
+      company_name: _h.companyName,
+      shares: _h.shares,
+      price_per_share: _h.avgPriceUSD,
+      total_value: _h.currentValueUSD,
+      invested: _h.totalInvestedUSD,
+      pnl: _h.pnlUSD,
+      pnl_pct: _h.pnlPercent,
+      created_at: _h.lastPurchaseAt,
+      isLocked: _h.isLocked,
+      lockedUntil: _h.lockedUntil,
+      lockupDays: _h.lockupDays,
+      daysUntilUnlock: _h.daysUntilUnlock,
+      notes: _h.notes,
+    };
+    const error = null;
     alloc = data;
   } catch(e){
     main.innerHTML = '<div class="hd-loading">Position not found.</div>';
@@ -135,8 +204,9 @@
   // Fetch company
   let company = null;
   try {
-    const { data } = await sb.from('companies').select('*').eq('ticker', alloc.company_ticker).single();
-    company = data;
+    const _r = await fetch('/api/companies?ticker=' + encodeURIComponent(alloc.company_ticker));
+    const _j = await _r.json();
+    company = (_j.ok && _j.company) ? _j.company : null;
   } catch(e){}
 
   const shares = parseFloat(alloc.shares || 0);
@@ -224,18 +294,187 @@
       ${company.growth_yoy ? `<div class="hd-row"><span class="hd-row-lbl">YoY Growth</span><span class="hd-row-val" style="color:#3ed598">+${company.growth_yoy}%</span></div>` : ''}
     </div>
     ` : ''}
+
+    <div id="hdLockSection"></div>
+    <div id="hdHistorySection"></div>
+    <div id="hdEventsSection"></div>
   `;
 
   // CTAs
   const cta = document.createElement('div');
   cta.className = 'hd-cta';
+  const lockSvgSmall = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+  const isLockedNow = alloc.isLocked || (alloc.lockedUntil && new Date(alloc.lockedUntil) > new Date());
+  const lockDate = alloc.lockedUntil ? new Date(alloc.lockedUntil) : null;
+  const lockDateStr = lockDate ? lockDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+  const daysLeftLock = lockDate ? Math.max(0, Math.ceil((lockDate - new Date()) / 86400000)) : 0;
+
   cta.innerHTML = `
     <button class="hd-cta-btn secondary" onclick="location.href='chart.html?ticker=${alloc.company_ticker}'">View Chart</button>
-    <button class="hd-cta-btn primary" onclick="location.href='buy-shares.html?ticker=${alloc.company_ticker}'">Buy More</button>
+    ${isLockedNow
+      ? `<button class="hd-cta-btn locked" onclick="showLockToast()">${lockSvgSmall}Locked</button>`
+      : `<button class="hd-cta-btn primary" onclick="location.href='buy-shares.html?ticker=${alloc.company_ticker}'">Buy More</button>`
+    }
   `;
   document.body.appendChild(cta);
+
+  // Toast helper for locked button
+  window.showLockToast = function(){
+    let t = document.getElementById('hdToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'hdToast';
+      t.style.cssText = 'position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:#171717;border:1px solid rgba(255,184,0,0.4);color:#ffb800;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:1000;opacity:0;transition:.3s;pointer-events:none;text-align:center;max-width:90vw';
+      document.body.appendChild(t);
+    }
+    t.textContent = 'Locked until ' + lockDateStr + ' · ' + daysLeftLock + ' day' + (daysLeftLock===1?'':'s') + ' remaining';
+    t.style.opacity = '1';
+    setTimeout(() => { t.style.opacity = '0'; }, 2800);
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  // Load lock-up section
+  // ═══════════════════════════════════════════════════════════════
+  (function renderLockSection(){
+    const el = document.getElementById('hdLockSection');
+    if (!el) return;
+    if (isLockedNow) {
+      el.innerHTML = `
+        <div class="hd-sect">
+          <div class="hd-lock-card">
+            <div class="hd-lock-ico">${lockSvgSmall}</div>
+            <div class="hd-lock-body">
+              <div class="hd-lock-title">Locked position</div>
+              <div class="hd-lock-sub">You cannot request liquidation until <b>${lockDateStr}</b><br><b>${daysLeftLock}</b> day${daysLeftLock===1?'':'s'} remaining</div>
+              ${alloc.notes ? `<div class="hd-lock-notes"><b style="color:#fff">Note from admin:</b> ${alloc.notes}</div>` : ''}
+            </div>
+          </div>
+        </div>`;
+    } else if (alloc.lockedUntil) {
+      el.innerHTML = `
+        <div class="hd-sect">
+          <div class="hd-lock-card unlocked">
+            <div class="hd-lock-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9 1"/></svg></div>
+            <div class="hd-lock-body">
+              <div class="hd-lock-title">Unlocked · Available to trade</div>
+              <div class="hd-lock-sub">Was locked until <b>${lockDateStr}</b></div>
+            </div>
+          </div>
+        </div>`;
+    }
+  })();
+
+  // ═══════════════════════════════════════════════════════════════
+  // Load valuation history
+  // ═══════════════════════════════════════════════════════════════
+  (async function renderHistory(){
+    const el = document.getElementById('hdHistorySection');
+    if (!el) return;
+    try {
+      const r = await fetch('/api/portfolio?type=history&symbol=' + encodeURIComponent(alloc.company_ticker));
+      const j = await r.json();
+      if (!j.ok || !j.snapshots || !j.snapshots.length) return;
+      const snaps = j.snapshots;
+      const chrono = snaps.slice().reverse();
+      const first = chrono[0].oldPrice || chrono[0].price;
+      const last = chrono[chrono.length - 1].price;
+      const totalDelta = last - first;
+      const totalPct = first > 0 ? (totalDelta / first) * 100 : 0;
+      const sign = totalDelta >= 0 ? '+' : '-';
+
+      const w = 320, h = 140, pad = 10;
+      const prices = chrono.map(s => s.price);
+      const min = Math.min.apply(null, prices);
+      const max = Math.max.apply(null, prices);
+      const range = max - min || 1;
+      const step = (w - pad*2) / Math.max(1, prices.length - 1);
+      const pts = prices.map((v, i) => {
+        const x = pad + i * step;
+        const y = pad + (1 - (v - min) / range) * (h - pad*2);
+        return x.toFixed(1) + ',' + y.toFixed(1);
+      }).join(' ');
+      const strokeColor = totalDelta >= 0 ? '#3ed598' : '#ef4444';
+
+      const timeline = snaps.map(s => {
+        const cls = s.deltaPct > 0 ? 'up' : (s.deltaPct < 0 ? 'dn' : 'neu');
+        const sgn = s.deltaPct >= 0 ? '+' : '';
+        const d = new Date(s.createdAt);
+        const dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+        return `<div class="hd-hist-row">
+          <div class="hd-hist-dot ${cls}"></div>
+          <div class="hd-hist-body-cell">
+            <div class="hd-hist-price">$${Number(s.oldPrice||0).toFixed(2)} → $${Number(s.price).toFixed(2)}</div>
+            <div class="hd-hist-reason">${s.changeReason || '—'}</div>
+          </div>
+          <div class="hd-hist-delta ${cls}">${sgn}${Number(s.deltaPct||0).toFixed(2)}%</div>
+          <div class="hd-hist-date">${dateStr}</div>
+        </div>`;
+      }).join('');
+
+      el.innerHTML = `
+        <div class="hd-sect">
+          <div class="hd-sect-title">Valuation History</div>
+          <div class="hd-hist-summary"><b>${snaps.length}</b> update${snaps.length===1?'':'s'} · From <b>$${first.toFixed(2)}</b> → <b>$${last.toFixed(2)}</b> · <b style="color:${totalDelta>=0?'#3ed598':'#ef4444'}">${sign}$${Math.abs(totalDelta).toFixed(2)} (${totalDelta>=0?'+':''}${totalPct.toFixed(2)}%)</b></div>
+          <div class="hd-hist-chart">
+            <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+              <defs><linearGradient id="hdHistGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="${strokeColor}" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="${strokeColor}" stop-opacity="0"/>
+              </linearGradient></defs>
+              <polygon fill="url(#hdHistGrad)" points="${pad},${h-pad} ${pts} ${w-pad},${h-pad}"/>
+              <polyline fill="none" stroke="${strokeColor}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${pts}"/>
+            </svg>
+          </div>
+          <div class="hd-hist-timeline">${timeline}</div>
+        </div>`;
+    } catch(e) { /* silent */ }
+  })();
+
+  // ═══════════════════════════════════════════════════════════════
+  // Load liquidity events
+  // ═══════════════════════════════════════════════════════════════
+  (async function renderEvents(){
+    const el = document.getElementById('hdEventsSection');
+    if (!el) return;
+    try {
+      const r = await fetch('/api/portfolio?type=events&ticker=' + encodeURIComponent(alloc.company_ticker));
+      const j = await r.json();
+      if (!j.ok || !j.events || !j.events.length) return;
+
+      const eventIcons = {
+        funding: 'F', tender: 'T', ipo: 'I', acquisition: 'A',
+        dividend: 'D', split: 'S', update: 'U',
+      };
+
+      const items = j.events.map(ev => {
+        const ico = eventIcons[ev.eventType] || 'E';
+        const cls = ev.eventType || 'update';
+        const d = new Date(ev.effectiveDate || ev.createdAt);
+        const dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+        const priceStr = ev.pricePerShare ? '$' + Number(ev.pricePerShare).toFixed(2) : '';
+        return `<div class="hd-event">
+          <div class="hd-event-ico ${cls}">${ico}</div>
+          <div class="hd-event-body">
+            <div class="hd-event-title">${ev.title}</div>
+            ${ev.description ? `<div class="hd-event-desc">${ev.description}</div>` : ''}
+            <div class="hd-event-meta">
+              <span>${dateStr}</span>
+              ${priceStr ? `<span class="hd-event-price">${priceStr}</span>` : ''}
+              <span style="text-transform:uppercase;letter-spacing:0.06em">${ev.eventType}</span>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+
+      el.innerHTML = `
+        <div class="hd-sect">
+          <div class="hd-sect-title">Recent Events</div>
+          <div class="hd-events">${items}</div>
+        </div>`;
+    } catch(e) { /* silent */ }
+  })();
 })();
 </script>
-  <script src="js/session-guard.js?v=3" defer></script>
+  <script src="/js/session-guard.js?v=1786129802" defer></script>
 </body>
 </html>

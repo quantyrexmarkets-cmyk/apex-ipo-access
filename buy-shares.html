@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Reserve Shares | Apex IPO Access</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js?v=1781643381"></script>
-<script src="js/notify.js?v=1781643381"></script>
-<script src="js/sidebar.js?v=2"></script>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script src="/js/notify.js?v=1786129802"></script>
+<script src="/js/sidebar.js?v=1786400153"></script>
 <script>
-  document.addEventListener('sb-ready', async () => {
-    const { data } = await sb.auth.getUser();
-    if(!data.user) window.location.href = 'login.html';
-  });
+  (async () => {
+    try {
+      const r = await fetch('/api/auth?action=me', { credentials: 'include' });
+      const j = await r.json();
+      if (!j.ok || !j.user) window.location.href = 'login.html';
+    } catch(e) { window.location.href = 'login.html'; }
+  })();
 </script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
@@ -256,9 +259,46 @@
 </style>
 </head>
 <body>
+<!-- Admin impersonation banner -->
+<div id="impersonationBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(90deg,#ff9500,#ffb80b);color:#1a1a1a;padding:8px 12px;font-family:'Montserrat',-apple-system,sans-serif;font-size:12px;font-weight:600;box-shadow:0 2px 10px rgba(0,0,0,0.35);align-items:center;justify-content:space-between;gap:10px">
+  <span style="display:flex;align-items:center;gap:6px;min-width:0;flex:1;overflow:hidden">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">Admin viewing <span id="impEmail" style="font-weight:700">user</span></span>
+  </span>
+  <button onclick="returnToAdmin()" style="background:#1a1a1a;color:#ffb80b;border:none;padding:5px 11px;border-radius:6px;cursor:pointer;font-weight:700;font-size:11px;font-family:'Montserrat',sans-serif;white-space:nowrap;flex-shrink:0">← Admin</button>
+</div>
+<script>
+(function(){
+  function getCookie(n){const m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):'';}
+  if(getCookie('apex_impersonating')==='1'){
+    const b=document.getElementById('impersonationBanner');
+    if(b){
+      b.style.display='flex';
+      const spacer=document.createElement('div');
+      spacer.id='impBannerSpacer';
+      spacer.style.height='38px';
+      spacer.style.width='100%';
+      document.body.insertBefore(spacer, document.body.firstChild);
+      let raw=getCookie('apex_impersonating_email');
+      try{ raw=decodeURIComponent(raw); }catch(_){}
+      const e=document.getElementById('impEmail');
+      if(e&&raw) e.textContent=raw;
+    }
+  }
+  window.returnToAdmin=async function(){
+    try{
+      const res=await fetch('/api/admin?resource=unimpersonate',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:'{}'});
+      const data=await res.json();
+      if(data.ok){ window.location.href = data.redirect || '/adminprivate'; }
+      else alert(data.error||'Failed to return');
+    }catch(e){ alert(e.message); }
+  };
+})();
+</script>
+<!-- /impersonation banner -->
 
 <header class="dash-header">
-  <a href="dashboard.html" class="logo">
+  <a href="/dashboard.html" class="logo">
     <img src="assets/spacex-logo.png" class="logo-x" alt="X" />
     <div class="logo-text-stack">
       <span class="logo-line1">APEX</span>
@@ -278,7 +318,7 @@
 
 <div class="wrap">
 
-  <a href="ipos.html" class="back-btn">
+  <a href="/ipos.html" class="back-btn">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
     Back to IPOs
   </a>
@@ -287,14 +327,14 @@
   <div class="co-card">
     <div class="co-top">
       <div class="co-logo">
-        <img id="coLogo" src="assets/spacex-logo.png" alt="">
+        <img id="coLogo" alt="" style="display:none">
       </div>
       <div class="co-info">
         <div class="co-name" id="coName"><span class="skel">Loading…</span></div>
         <div class="co-sector" id="coSector"><span class="skel">·····</span></div>
       </div>
       <div class="co-ticker">
-        <span class="lbl">PRE-IPO</span>
+        <span class="lbl">IPO</span>
         <span class="sym" id="coTicker">—</span>
       </div>
     </div>
@@ -321,21 +361,8 @@
     Projected Returns
   </div>
 
-  <div class="returns-table">
-    <div class="returns-row">
-      <div class="returns-cell">
-        <div class="period">3 Months</div>
-        <div class="pct">35–60%</div>
-      </div>
-      <div class="returns-cell">
-        <div class="period">6 Months</div>
-        <div class="pct">40–70%</div>
-      </div>
-      <div class="returns-cell">
-        <div class="period">12 Months</div>
-        <div class="pct">50–80%</div>
-      </div>
-    </div>
+  <div class="returns-table" id="returnsTable">
+    <!-- Populated by JS based on company type -->
   </div>
 
   <!-- ───────── HOLDING PERIOD ───────── -->
@@ -413,7 +440,7 @@
   </div>
 
   <button class="cta-btn" id="ctaBtn" disabled>Reserve Shares</button>
-  <p class="legal-note">Pre-IPO securities held via SPV · Subject to compliance review · Liquidity at IPO event</p>
+  <p class="legal-note">IPO securities held via SPV · Subject to compliance review · Liquidity at IPO event</p>
 
 </div>
 
@@ -426,7 +453,8 @@
   // URL params
   // ─────────────────────────────────────────────
   var params = new URLSearchParams(window.location.search);
-  var ticker = (params.get('ticker') || params.get('id') || 'SPCX').toUpperCase();
+  var ticker = (params.get('ticker') || params.get('id') || '').toUpperCase();
+  if (!ticker) { location.href = '/ipos.html'; return; }
 
   // ─────────────────────────────────────────────
   // State
@@ -435,7 +463,7 @@
     company: null,           // loaded from DB
     price: 100,              // neutral default (will be overridden by DB)
     name: 'Company',
-    sector: 'Pre-IPO',
+    sector: 'IPO',
     valuation: '—',
     logo: '',                // empty — will use generated avatar if no real logo
 
@@ -461,6 +489,45 @@
     return '$' + n.toFixed(0);
   }
 
+
+  // ─────────────────────────────────────────────
+  // Render returns table OR royalty structure (TFAB special-case)
+  // ─────────────────────────────────────────────
+  function renderReturnsOrRoyalty(){
+    var el = document.getElementById('returnsTable');
+    if(!el) return;
+    var isTfab = (ticker || '').toUpperCase() === 'TFAB';
+    if(isTfab){
+      el.innerHTML = ''
+        + '<div class="returns-row" style="flex-direction:column;gap:0">'
+        + '  <div class="returns-cell" style="border-right:none;border-bottom:1px solid #2e2e2e;padding:12px 14px;text-align:left">'
+        + '    <div class="period" style="color:#888;font-size:10px;letter-spacing:0.12em">BUILD PHASE · 2026–2028</div>'
+        + '    <div class="pct" style="color:#e8e8e8;font-size:14px;font-weight:600;margin-top:4px">4% / yr on wafer output royalties</div>'
+        + '  </div>'
+        + '  <div class="returns-cell" style="border-right:none;border-bottom:1px solid #2e2e2e;padding:12px 14px;text-align:left">'
+        + '    <div class="period" style="color:#888;font-size:10px;letter-spacing:0.12em">FIRST SILICON · Q4 2028</div>'
+        + '    <div class="pct" style="color:#e8e8e8;font-size:14px;font-weight:600;margin-top:4px">Convert to JV equity units</div>'
+        + '  </div>'
+        + '  <div class="returns-cell" style="border-right:none;padding:12px 14px;text-align:left">'
+        + '    <div class="period" style="color:#888;font-size:10px;letter-spacing:0.12em">PRODUCTION · 2029+</div>'
+        + '    <div class="pct" style="color:#e8e8e8;font-size:14px;font-weight:600;margin-top:4px">Ongoing royalty + JV dividends</div>'
+        + '  </div>'
+        + '</div>';
+    } else {
+      // Standard IPO: read from company.projectedReturns or fallback to defaults
+      var pr = (state.company && state.company.projectedReturns) || {};
+      var r3 = pr['3m'] || '35–60%';
+      var r6 = pr['6m'] || '40–70%';
+      var r12 = pr['12m'] || '50–80%';
+      el.innerHTML = ''
+        + '<div class="returns-row">'
+        + '  <div class="returns-cell"><div class="period">3 Months</div><div class="pct">' + r3 + '</div></div>'
+        + '  <div class="returns-cell"><div class="period">6 Months</div><div class="pct">' + r6 + '</div></div>'
+        + '  <div class="returns-cell"><div class="period">12 Months</div><div class="pct">' + r12 + '</div></div>'
+        + '</div>';
+    }
+  }
+
   // ─────────────────────────────────────────────
   // Render company info
   // ─────────────────────────────────────────────
@@ -471,6 +538,19 @@
     document.getElementById('coSector').innerHTML = state.sector;
     document.getElementById('coTicker').textContent = ticker;
     document.getElementById('coPrice').textContent = fmt(state.price);
+    renderReturnsOrRoyalty();
+      // ─── Show live price + change indicator ───
+      if (state.isLive && typeof state.livePrice === 'number') {
+        var _coP = document.getElementById('coPrice');
+        if (_coP) {
+          var col = state.liveChange >= 0 ? '#17e08a' : '#ff5c5c';
+          var sign = state.liveChange >= 0 ? '+' : '';
+          _coP.innerHTML = '$' + state.livePrice.toFixed(2) +
+            '<div style="font-size:11px;font-weight:600;color:' + col + ';margin-top:4px">' +
+            sign + state.liveChange.toFixed(2) + '% · Live</div>';
+        }
+      }
+
     document.getElementById('coValuation').textContent = state.valuation;
     var logoEl = document.getElementById('coLogo');
     if(state.logo){
@@ -588,47 +668,48 @@
     btn.textContent = 'Processing…';
 
     try {
-      var { data: userData } = await sb.auth.getUser();
-      if(!userData || !userData.user){ window.location.href = 'login.html'; return; }
-      var uid = userData.user.id;
-
       // Calculate maturity date
       var months = state.period === '3m' ? 3 : state.period === '6m' ? 6 : 12;
       var maturesAt = new Date();
       maturesAt.setMonth(maturesAt.getMonth() + months);
 
-      // Insert allocation
-      var { data: newAlloc, error: insErr } = await sb.from('allocations').insert({
-        user_id: uid,
-        company_ticker: ticker,
-        company_name: state.name,
-        shares: shares,
-        price_per_share: state.price,
-        // total_value auto-generated by DB
-        holding_period: state.period,
-        projected_return_min: state.returnMin,
-        projected_return_max: state.returnMax,
-        status: 'reserved',
-        tier: (state.amount >= 10000 ? 1 : state.amount >= 2500 ? 2 : 3),
-        matures_at: maturesAt.toISOString()
-      }).select().single();
-
-      if(insErr){
-        apexError('Could not reserve: ' + insErr.message);
+      // Submit via /api/buy (handles allocation + balance atomically)
+      var _buyR = await fetch('/api/buy', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          symbol: ticker,
+          companyName: state.name,
+          shares: shares,
+          pricePerShare: state.price,
+          months: months,
+          totalUSD: state.amount,
+          holdingPeriod: state.period,
+          projectedReturnMin: state.returnMin,
+          projectedReturnMax: state.returnMax,
+          tier: (state.amount >= 10000 ? 1 : state.amount >= 2500 ? 2 : 3),
+          maturesAt: maturesAt.toISOString(),
+        }),
+      });
+      var _buyJ = await _buyR.json();
+      if(!_buyJ.ok){
+        apexError('Could not reserve: ' + (_buyJ.error || 'Unknown error'));
         btn.disabled = false;
         btn.textContent = 'Reserve Shares';
         return;
       }
 
-      // Deduct from cash balance
-      var newBal = Math.max(0, state.availCash - state.amount);
-      var { error: balErr } = await sb.from('profiles')
-        .update({ cash_balance: newBal })
-        .eq('id', uid);
-
-      if(balErr){
-        apexWarn('Reserved but could not update balance — contact support');
-      }
+      // Alias allocation info from API response (safe defaults if fields missing)
+      var newAlloc = _buyJ.holding || _buyJ.allocation || _buyJ.data || {
+        id: _buyJ.id || _buyJ.orderId || ('ord_' + Date.now()),
+        created_at: _buyJ.createdAt || new Date().toISOString(),
+        tier: (state.amount >= 10000 ? 1 : state.amount >= 2500 ? 2 : 3),
+        status: 'reserved'
+      };
+      // Normalize field names (Mongo returns _id/createdAt, template wants id/created_at)
+      if (newAlloc && newAlloc._id && !newAlloc.id) newAlloc.id = String(newAlloc._id);
+      if (newAlloc && newAlloc.createdAt && !newAlloc.created_at) newAlloc.created_at = newAlloc.createdAt;
 
       // Save to session for receipt page
       sessionStorage.setItem('order_company', state.name);
@@ -681,57 +762,71 @@
   async function loadData(){
     try {
       // Load user balance
-      var { data: userData } = await sb.auth.getUser();
-      if(userData && userData.user){
-        var { data: profile } = await sb.from('profiles')
-          .select('cash_balance')
-          .eq('id', userData.user.id)
-          .single();
-        if(profile){
-          state.availCash = parseFloat(profile.cash_balance || 0);
+      try {
+        var _meR = await fetch('/api/auth?action=me', { credentials: 'include' });
+        var _meJ = await _meR.json();
+        if (_meJ.ok && _meJ.user) {
+          state.availCash = parseFloat(_meJ.user.balanceUSD || _meJ.user.cash_balance || 0);
           document.getElementById('availBal').textContent = fmt(state.availCash);
         }
-      }
+      } catch(e) { console.warn('Balance load failed', e); }
 
-      // Load company from DB (by ticker)
+      // Load company from API (by ticker)
       try {
-        var { data: company } = await sb.from('companies')
-          .select('*')
-          .eq('ticker', ticker)
-          .single();
-
+        var _cR = await fetch('/api/companies?ticker=' + encodeURIComponent(ticker));
+        var _cJ = await _cR.json();
+        var company = (_cJ.ok && _cJ.company) ? _cJ.company : null;
         if(company){
           state.company = company;
           state.name = company.name || state.name;
-          state.price = parseFloat(company.share_price || company.price || state.price);
-          state.sector = (company.sector || 'Pre-IPO') + ' · ' + (company.stage || 'Pre-IPO');
+          state.price = parseFloat(company.pricePerShare || company.share_price || company.price || state.price);
+          state.sector = (company.sector || 'IPO') + ' · ' + (company.stage || 'IPO');
           state.valuation = company.valuation
             ? (typeof company.valuation === 'number' ? fmtCompact(company.valuation) : company.valuation)
             : state.valuation;
-          if(company.domain) state.logo = `https://icons.duckduckgo.com/ip3/${company.domain}.ico`;
+          // Prefer explicit logoUrl (from DB), then snake_case fallback, then domain favicon
+          if(company.logoUrl) state.logo = company.logoUrl;
           else if(company.logo_url) state.logo = company.logo_url;
+          else if(company.domain) state.logo = `https://icons.duckduckgo.com/ip3/${company.domain}.ico`;
         }
       } catch(e){
         console.warn('Company not found in DB, using KNOWN fallback for', ticker);
       }
+
+      // ─── Live price override for public tickers ───
+      try {
+        const PUBLIC_TICKERS_BS = { TESLA:'TSLA', AAPL:'AAPL', MSFT:'MSFT', GOOGL:'GOOGL', AMZN:'AMZN', META:'META', NVDA:'NVDA', V:'V', NXPI:'NXPI', UBS:'UBS', JPM:'JPM', BAC:'BAC', NFLX:'NFLX', PLTR:'PLTR' };
+        var liveSym = PUBLIC_TICKERS_BS[(ticker||'').toUpperCase()];
+        if (liveSym) {
+          var _lR = await fetch('/api/companies?live=' + encodeURIComponent(liveSym));
+          var _lJ = await _lR.json();
+          if (_lJ.ok && _lJ.quotes && _lJ.quotes[0] && typeof _lJ.quotes[0].price === 'number') {
+            state.livePrice = _lJ.quotes[0].price;
+            state.liveChange = _lJ.quotes[0].changePercent;
+            state.price = _lJ.quotes[0].price;
+            state.isLive = true;
+          }
+        }
+      } catch(e) { console.warn('Live price fetch failed:', e); }
+
 
       // KNOWN fallback — used when DB doesn't have full info
       var KNOWN_NEEDS_FALLBACK = !state.company || !state.logo;
       if(KNOWN_NEEDS_FALLBACK){
         var KNOWN = {
           'SPCX':   { name:'SpaceX',     sector:'Aerospace · Live IPO',  valuation:'$400B', price:135, logo:'https://icons.duckduckgo.com/ip3/spacex.com.ico' },
-          'OAIB':   { name:'OpenAI',     sector:'AI · Pre-IPO',          valuation:'$157B', price:85,  logo:'https://icons.duckduckgo.com/ip3/openai.com.ico' },
-          'OPAI':   { name:'OpenAI',     sector:'AI · Pre-IPO',          valuation:'$157B', price:85,  logo:'https://icons.duckduckgo.com/ip3/openai.com.ico' },
-          'STRP':   { name:'Stripe',     sector:'Fintech · Pre-IPO',     valuation:'$70B',  price:42,  logo:'https://icons.duckduckgo.com/ip3/stripe.com.ico' },
-          'ANTH':   { name:'Anthropic',  sector:'AI · Pre-IPO',          valuation:'$60B',  price:65,  logo:'https://icons.duckduckgo.com/ip3/anthropic.com.ico' },
-          'XAI':    { name:'xAI',        sector:'AI · Pre-IPO',          valuation:'$50B',  price:38,  logo:'https://icons.duckduckgo.com/ip3/x.ai.ico' },
-          'NLNK':   { name:'Neuralink',  sector:'Biotech · Pre-IPO',     valuation:'$8B',   price:25,  logo:'https://icons.duckduckgo.com/ip3/neuralink.com.ico' },
-          'DBRX':   { name:'Databricks', sector:'Data · Pre-IPO',        valuation:'$62B',  price:73,  logo:'https://icons.duckduckgo.com/ip3/databricks.com.ico' },
-          'CNVA':   { name:'Canva',      sector:'SaaS · Pre-IPO',        valuation:'$32B',  price:48,  logo:'https://icons.duckduckgo.com/ip3/canva.com.ico' },
-          'STARLINK':{ name:'Starlink',  sector:'Satellite · Pre-IPO',   valuation:'$140B', price:78,  logo:'https://icons.duckduckgo.com/ip3/starlink.com.ico' },
-          'BORING': { name:'The Boring Company', sector:'Infrastructure · Pre-IPO', valuation:'$5.7B', price:18, logo:'https://icons.duckduckgo.com/ip3/boringcompany.com.ico' },
-          'TBC':    { name:'The Boring Company', sector:'Infrastructure · Pre-IPO', valuation:'$5.7B', price:18, logo:'https://icons.duckduckgo.com/ip3/boringcompany.com.ico' },
-          'XCORP':  { name:'X Corp',     sector:'Social · Pre-IPO',      valuation:'$19B',  price:22,  logo:'https://icons.duckduckgo.com/ip3/x.com.ico' },
+          'OAIB':   { name:'OpenAI',     sector:'AI · IPO',          valuation:'$157B', price:85,  logo:'https://icons.duckduckgo.com/ip3/openai.com.ico' },
+          'OPAI':   { name:'OpenAI',     sector:'AI · IPO',          valuation:'$157B', price:85,  logo:'https://icons.duckduckgo.com/ip3/openai.com.ico' },
+          'STRP':   { name:'Stripe',     sector:'Fintech · IPO',     valuation:'$70B',  price:42,  logo:'https://icons.duckduckgo.com/ip3/stripe.com.ico' },
+          'ANTH':   { name:'Anthropic',  sector:'AI · IPO',          valuation:'$60B',  price:65,  logo:'https://icons.duckduckgo.com/ip3/anthropic.com.ico' },
+          'XAI':    { name:'xAI',        sector:'AI · IPO',          valuation:'$50B',  price:38,  logo:'https://icons.duckduckgo.com/ip3/x.ai.ico' },
+          'NLNK':   { name:'Neuralink',  sector:'Biotech · IPO',     valuation:'$8B',   price:25,  logo:'https://icons.duckduckgo.com/ip3/neuralink.com.ico' },
+          'DBRX':   { name:'Databricks', sector:'Data · IPO',        valuation:'$62B',  price:73,  logo:'https://icons.duckduckgo.com/ip3/databricks.com.ico' },
+          'CNVA':   { name:'Canva',      sector:'SaaS · IPO',        valuation:'$32B',  price:48,  logo:'https://icons.duckduckgo.com/ip3/canva.com.ico' },
+          'STARLINK':{ name:'Starlink',  sector:'Satellite · IPO',   valuation:'$140B', price:78,  logo:'https://icons.duckduckgo.com/ip3/starlink.com.ico' },
+          'BORING': { name:'The Boring Company', sector:'Infrastructure · IPO', valuation:'$5.7B', price:18, logo:'https://icons.duckduckgo.com/ip3/boringcompany.com.ico' },
+          'TBC':    { name:'The Boring Company', sector:'Infrastructure · IPO', valuation:'$5.7B', price:18, logo:'https://icons.duckduckgo.com/ip3/boringcompany.com.ico' },
+          'XCORP':  { name:'X Corp',     sector:'Social · IPO',      valuation:'$19B',  price:22,  logo:'https://icons.duckduckgo.com/ip3/x.com.ico' },
           'TESLA':  { name:'Tesla',      sector:'Auto · Public',         valuation:'$1.2T', price:380, logo:'https://icons.duckduckgo.com/ip3/tesla.com.ico' }
         };
         var k = KNOWN[ticker];
@@ -751,17 +846,16 @@
     }
   }
 
-  if(window.sb) loadData();
-  else document.addEventListener('sb-ready', loadData, { once: true });
+  loadData();
 
   renderSummary();
 })();
 </script>
 
-<script src="js/floating-widget.js?v=3" defer></script>
-<script src="js/bottom-nav.js?v=1"></script>
+<script src="/js/floating-widget.js?v=1786129802" defer></script>
+<script src="/js/bottom-nav.js?v=1786129802"></script>
 
-  <script src="js/user-bell.js?v=1"></script>
+  <script src="/js/user-bell.js?v=1786129802"></script>
 <script>
 // Inline fallback — guarantee toggleSidebar exists
 if (typeof window.toggleSidebar !== 'function') {
@@ -774,6 +868,40 @@ if (typeof window.toggleSidebar !== 'function') {
   };
 }
 </script>
-  <script src="js/session-guard.js?v=3" defer></script>
+  <script src="/js/session-guard.js?v=1786129802" defer></script>
+
+<script>
+(function(){
+  // TFAB-specific copy adjustments — applied after DOM ready
+  var t = (new URLSearchParams(location.search).get('ticker') || '').toUpperCase();
+  if (t === 'TFAB') {
+    document.addEventListener('DOMContentLoaded', function(){
+      // Header tagline
+      var tag = document.querySelector('.logo-tagline');
+      if (tag) tag.textContent = 'FUND THE BUILD';
+      // Amount section header — find by text
+      document.querySelectorAll('.section-h').forEach(function(el){
+        var txt = (el.textContent || '').trim().toLowerCase();
+        if (txt.indexOf('amount to invest') !== -1) {
+          // Preserve icon, replace only the text
+          var svg = el.querySelector('svg');
+          el.innerHTML = '';
+          if (svg) el.appendChild(svg);
+          el.appendChild(document.createTextNode(' Contribution Amount'));
+        }
+        if (txt.indexOf('projected returns') !== -1) {
+          var svg2 = el.querySelector('svg');
+          el.innerHTML = '';
+          if (svg2) el.appendChild(svg2);
+          el.appendChild(document.createTextNode(' Royalty Structure'));
+        }
+      });
+      // Ticker chip label
+      var tickLbl = document.querySelector('.co-ticker .lbl');
+      if (tickLbl) tickLbl.textContent = 'JV';
+    });
+  }
+})();
+</script>
 </body>
 </html>

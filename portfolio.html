@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -8,16 +9,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Portfolio | Apex IPO Access</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js?v=1781643381"></script>
-<script src="js/notify.js?v=1781643381"></script>
-<script src="js/sidebar.js?v=2" defer></script>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script src="/js/notify.js?v=1786129802"></script>
+<script src="/js/sidebar.js?v=1786400153" defer></script>
 <script>
-  document.addEventListener('sb-ready', async () => {
-    const { data } = await sb.auth.getUser();
-    if(!data.user) window.location.href = 'login.html';
-  });
+  (async () => {
+    try {
+      const r = await fetch('/api/auth?action=me', { credentials: 'include' });
+      const j = await r.json();
+      if (!j.ok || !j.user) window.location.href = 'login.html';
+    } catch(e) { window.location.href = 'login.html'; }
+  })();
 </script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
@@ -264,16 +267,56 @@
   .tab.active{color:#4a9eff}
   .tab svg{width:20px;height:20px}
   .tab .lbl{font-size:10px;font-weight:500;letter-spacing:0.3px}
+
+  .h-lock-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:5px;background:rgba(255,184,0,0.14);color:#ffb800;font-size:10px;font-weight:700;font-family:'JetBrains Mono',Menlo,monospace;letter-spacing:0.02em;margin-left:6px}
+
 </style>
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 </head>
 <body>
+<!-- Admin impersonation banner -->
+<div id="impersonationBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(90deg,#ff9500,#ffb80b);color:#1a1a1a;padding:8px 12px;font-family:'Montserrat',-apple-system,sans-serif;font-size:12px;font-weight:600;box-shadow:0 2px 10px rgba(0,0,0,0.35);align-items:center;justify-content:space-between;gap:10px">
+  <span style="display:flex;align-items:center;gap:6px;min-width:0;flex:1;overflow:hidden">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">Admin viewing <span id="impEmail" style="font-weight:700">user</span></span>
+  </span>
+  <button onclick="returnToAdmin()" style="background:#1a1a1a;color:#ffb80b;border:none;padding:5px 11px;border-radius:6px;cursor:pointer;font-weight:700;font-size:11px;font-family:'Montserrat',sans-serif;white-space:nowrap;flex-shrink:0">← Admin</button>
+</div>
+<script>
+(function(){
+  function getCookie(n){const m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):'';}
+  if(getCookie('apex_impersonating')==='1'){
+    const b=document.getElementById('impersonationBanner');
+    if(b){
+      b.style.display='flex';
+      const spacer=document.createElement('div');
+      spacer.id='impBannerSpacer';
+      spacer.style.height='38px';
+      spacer.style.width='100%';
+      document.body.insertBefore(spacer, document.body.firstChild);
+      let raw=getCookie('apex_impersonating_email');
+      try{ raw=decodeURIComponent(raw); }catch(_){}
+      const e=document.getElementById('impEmail');
+      if(e&&raw) e.textContent=raw;
+    }
+  }
+  window.returnToAdmin=async function(){
+    try{
+      const res=await fetch('/api/admin?resource=unimpersonate',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:'{}'});
+      const data=await res.json();
+      if(data.ok){ window.location.href = data.redirect || '/adminprivate'; }
+      else alert(data.error||'Failed to return');
+    }catch(e){ alert(e.message); }
+  };
+})();
+</script>
+<!-- /impersonation banner -->
 
 <header class="dash-header">
   <button class="menu-btn" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
-  <a href="dashboard.html" class="logo">
+  <a href="/dashboard.html" class="logo">
     <img src="assets/spacex-logo.png" class="logo-x" alt="X" />
     <div class="logo-text-stack">
       <span class="logo-line1">APEX</span>
@@ -347,23 +390,23 @@
 
 <!-- BOTTOM TAB NAV -->
 <nav class="tab-nav">
-  <div onclick="location.href='dashboard.html'" class="tab">
+  <div onclick="location.href='/dashboard.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span class="lbl">Home</span>
   </div>
-  <div onclick="location.href='portfolio.html'" class="tab">
+  <div onclick="location.href='/portfolio.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
     <span class="lbl">Portfolio</span>
   </div>
-  <div onclick="location.href='ipos.html'" class="tab">
+  <div onclick="location.href='/ipos.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
     <span class="lbl">IPOs</span>
   </div>
-  <div onclick="location.href='docs.html'" class="tab">
+  <div onclick="location.href='/docs.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
     <span class="lbl">Docs</span>
   </div>
-  <div onclick="location.href='account.html'" class="tab">
+  <div onclick="location.href='/account.html'" class="tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>
     <span class="lbl">Account</span>
   </div>
@@ -371,19 +414,42 @@
 
 <script>
 (async function(){
-  if(!window.sb) await new Promise(r => document.addEventListener('sb-ready', r, { once:true }));
-  const { data: { user } } = await sb.auth.getUser();
-  if(!user) return;
-
   const fmt    = n => '$' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   const fmtInt = n => Number(n||0).toLocaleString('en-US');
 
-  // Load profile + allocations + companies in parallel
-  const [profile, { data: allocs }, { data: companies }] = await Promise.all([
-    window.apex.getProfile(),
-    sb.from('allocations').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-    sb.from('companies').select('ticker,name,domain,sector,price_per_share,expected_return,success_rate')
+  // Auth + portfolio + companies in parallel
+  const [meR, portR, compR] = await Promise.all([
+    fetch('/api/auth?action=me', { credentials: 'include' }),
+    fetch('/api/portfolio', { credentials: 'include' }),
+    fetch('/api/companies')
   ]);
+  const meJ   = await meR.json();
+  if (!meJ.ok || !meJ.user) { window.location.href = 'login.html'; return; }
+  const portJ = await portR.json();
+  const compJ = await compR.json();
+
+  const portfolioData = (portJ.ok && portJ.portfolio) ? portJ.portfolio : {};
+  const holdings  = portfolioData.holdings || [];
+  const companies = (compJ.ok && compJ.companies)     ? compJ.companies : [];
+
+  // Adapter: API → legacy field names expected by the rest of this page
+  const profile = {
+    cash_balance: portfolioData.cashBalanceUSD || meJ.user.balanceUSD || 0,
+  };
+  const allocs = holdings.map(h => ({
+    company_ticker: h.symbol,
+    ticker: h.symbol,
+    isLocked: h.isLocked,
+    lockedUntil: h.lockedUntil,
+    daysUntilUnlock: h.daysUntilUnlock,
+    lockupDays: h.lockupDays,
+    shares: h.shares,
+    total_value: h.currentValueUSD,
+    invested: h.totalInvestedUSD,
+    pnl: h.pnlUSD,
+    pnl_pct: h.pnlPercent,
+    created_at: h.lastPurchaseAt,
+  }));
 
   const companyMap = {};
   (companies || []).forEach(c => companyMap[c.ticker] = c);
@@ -465,65 +531,67 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
         </div>
         <div class="empty-title">No holdings yet</div>
-        <div class="empty-desc">Start building your pre-IPO portfolio by reserving shares in any of our 26 curated opportunities.</div>
-        <a href="dashboard.html" class="empty-cta">Browse opportunities →</a>
+        <div class="empty-desc">Start building your IPO portfolio by reserving shares in any of our 26 curated opportunities.</div>
+        <a href="/dashboard.html" class="empty-cta">Browse opportunities →</a>
       </div>
     `;
   } else {
-    holdContainer.innerHTML = '<div class="holdings">' + allocs.map(a => {
-      const comp = companyMap[a.company_ticker] || {};
-      const logo = comp.domain ? `https://icons.duckduckgo.com/ip3/${comp.domain}.ico` : '';
-      const sector = comp.sector || '';
-      const tierLbl = { 1:'Institutional', 2:'Priority', 3:'Standard' }[a.tier] || `Tier ${a.tier}`;
-      const statusLbl = {
-        'pending_funding': 'Pending',
-        'reserved':        'Reserved',
-        'funded':          'Funded',
-        'settled':         'Settled',
-        'cancelled':       'Cancelled'
-      }[a.status] || a.status;
-      const statusClass = {
-        'pending_funding':'pending',
-        'reserved':'reserved',
-        'funded':'reserved',
-        'settled':'settled',
-        'cancelled':'cancelled'
-      }[a.status] || 'reserved';
+      holdContainer.innerHTML = '<div class="holdings">' + allocs.map(a => {
+        // Field aliasing — API returns camelCase; older code expected snake_case
+        const ticker = a.symbol || a.company_ticker || '';
+        const companyName = a.companyName || a.company_name || ticker;
+        const shares = a.shares || 0;
+        const avgPrice = a.avgPriceUSD || a.price_per_share || 0;
+        const currentValue = a.currentValueUSD || a.total_value || (avgPrice * shares) || 0;
+        const invested = a.totalInvestedUSD || 0;
+        const pnl = a.pnlUSD || 0;
+        const pnlPct = a.pnlPercent || 0;
 
-      // Estimated gain based on expected_return midpoint
-      const m = (comp.expected_return || '').match(/\+(\d+)%\s*to\s*\+(\d+)%/);
-      const midPct = m ? ((parseInt(m[1]) + parseInt(m[2])) / 2) : 0;
+        // Derive tier from investment size
+        const tier = invested >= 10000 ? 1 : invested >= 2500 ? 2 : 3;
+        const tierLbl = { 1:'Institutional', 2:'Priority', 3:'Standard' }[tier];
 
-      return `
-        <div class="holding" onclick="location.href='holding-detail.html?id=${a.id}'">
-          <div class="h-logo">
-            <img src="${logo}" alt="${a.company_name}" onerror="this.parentElement.innerHTML='<div style=&quot;color:#000;font-weight:700;font-size:18px&quot;>${(a.company_name||'?')[0]}</div>'">
-          </div>
-          <div class="h-body">
-            <div class="h-name">${a.company_name}</div>
-            <div class="h-sub">
-              <span>${fmtInt(a.shares)} sh @ ${fmt(a.price_per_share)}</span>
-              <span class="h-status ${statusClass}">${statusLbl}</span>
-              <span>· ${tierLbl}</span>
-                <span class="h-mature">${(() => {
-                  if(!a.matures_at) return '';
-                  const days = Math.ceil((new Date(a.matures_at) - new Date()) / 86400000);
-                  if(days < 0) return '· Matured';
-                  if(days === 0) return '· Matures today';
-                  if(days === 1) return '· Matures in 1 day';
-                  return '· Matures in ' + days + ' days';
-                })()}</span>
+        // Lookup company meta from map
+        const comp = companyMap[ticker] || companyMap[ticker.toUpperCase()] || {};
+        const domain = comp.domain || '';
+        const logo = comp.logoUrl || (domain ? `https://icons.duckduckgo.com/ip3/${domain}.ico` : '');
+        const stage = comp.stage || 'Reserved';
+        const initial = (companyName || '?')[0];
+
+        // Estimated gain from expectedReturn midpoint
+        const expReturn = comp.expectedReturn || comp.expected_return || '';
+        const m = expReturn.match(/\+(\d+)%\s*to\s*\+(\d+)%/);
+        const midPct = m ? ((parseInt(m[1]) + parseInt(m[2])) / 2) : 0;
+
+        const pnlSign = pnl >= 0 ? '+' : '';
+
+        return `
+          <div class="holding" onclick="location.href='holding-detail.html?symbol=${encodeURIComponent(ticker)}'">
+            <div class="h-logo">
+              ${logo
+                ? `<img src="${logo}" alt="${companyName}" onerror="this.parentElement.innerHTML='<div style=&quot;color:#000;font-weight:700;font-size:18px&quot;>${initial}</div>'">`
+                : `<div style="color:#000;font-weight:700;font-size:18px">${initial}</div>`}
+            </div>
+            <div class="h-body">
+              <div class="h-name">${companyName}</div>
+              <div class="h-sub">
+                <span>${fmtInt(shares)} sh @ ${fmt(avgPrice)}</span>
+                <span class="h-status reserved">${stage}</span>
+                    ${h.isLocked ? `<span class="h-lock-badge" title="Locked until ${new Date(h.lockedUntil).toLocaleDateString()}">🔒 ${h.daysUntilUnlock}d</span>` : ''}
+                <span>· ${tierLbl}</span>
+              </div>
+            </div>
+            <div class="h-right">
+              <div class="h-value">${fmt(currentValue)}</div>
+              ${pnl !== 0
+                ? `<div class="h-pct" style="color:${pnl >= 0 ? '#17e08a' : '#ff5c5c'}">${pnlSign}${fmt(pnl)} (${pnlSign}${pnlPct.toFixed(2)}%)</div>`
+                : (midPct ? `<div class="h-pct">+${midPct.toFixed(0)}% proj.</div>` : '')}
+              ${comp.successRate ? `<div class="h-success">${comp.successRate}% success</div>` : ''}
             </div>
           </div>
-          <div class="h-right">
-            <div class="h-value">${fmt(a.total_value)}</div>
-            ${midPct ? `<div class="h-pct">+${midPct.toFixed(0)}% proj.</div>` : ''}
-              ${comp.success_rate ? `<div class="h-success">${comp.success_rate}% success</div>` : ''}
-          </div>
-        </div>
-      `;
-    }).join('') + '</div>';
-  }
+        `;
+      }).join('') + '</div>';
+    }
 
   // ---- Allocation breakdown donut ----
   if(allocs && allocs.length > 0){
@@ -533,11 +601,11 @@
     // Aggregate by ticker
     const byTicker = {};
     allocs.forEach(a => {
-      const t = a.company_ticker;
+      const t = a.symbol || a.company_ticker;
       if(!byTicker[t]){
-        byTicker[t] = { name: a.company_name, value: 0, ticker: t };
+        byTicker[t] = { name: a.companyName || a.company_name || t, value: 0, ticker: t };
       }
-      byTicker[t].value += parseFloat(a.total_value || 0);
+      byTicker[t].value += parseFloat(a.currentValueUSD || a.total_value || 0);
     });
     const segments = Object.values(byTicker).sort((a,b) => b.value - a.value);
     const total = segments.reduce((s,x) => s + x.value, 0);
@@ -640,7 +708,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (looksLikeDocs && isDead) {
       if (el.tagName === 'A') el.setAttribute('href', 'docs.html');
-      el.setAttribute('onclick', "location.href='docs.html'");
+      el.setAttribute('onclick', "location.href='/docs.html'");
       el.style.cursor = 'pointer';
     }
   });
@@ -648,9 +716,9 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 <!-- /docs-quicknav-fix -->
 
-<script src="js/bottom-nav.js?v=1"></script>
-<script src="js/floating-widget.js?v=1781343118" defer></script>
-  <script src="js/user-bell.js?v=1">
+<script src="/js/bottom-nav.js?v=1786129802"></script>
+<script src="/js/floating-widget.js?v=1786129802" defer></script>
+  <script src="/js/user-bell.js?v=1786129802">
 
 // === Premium mini chart (bulletproof) ===
 window.addEventListener('load', function(){
@@ -760,6 +828,6 @@ setTimeout(function(){
 }, 3000);
 </script>
 
-  <script src="js/session-guard.js?v=3" defer></script>
+  <script src="/js/session-guard.js?v=1786129802" defer></script>
 </body>
 </html>

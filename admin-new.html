@@ -1,0 +1,2734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="/js/loader.js?v=1786129802"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>Admin Panel | Apex IPO Access</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#000;
+    --bg-1:#0a0a0a;
+    --bg-2:#111;
+    --bg-3:#171717;
+    --bg-hover:#1c1c1c;
+    --border:#1f1f1f;
+    --border-2:#2a2a2a;
+    --text:#fff;
+    --text-2:#b4bcc9;
+    --text-3:#737a87;
+    --accent:#4a9eff;
+    --accent-hover:#6db1ff;
+    --success:#10b981;
+    --warn:#f59e0b;
+    --danger:#ef4444;
+    --purple:#a855f7;
+    --radius:14px;
+    --radius-sm:10px;
+    --sidebar-w:248px;
+    --topbar-h:64px;
+    --shadow:0 8px 32px rgba(0,0,0,.5);
+  }
+  html,body{
+    background:var(--bg);color:var(--text);
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;min-height:100vh;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input,select,textarea{font-family:inherit}
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:4px}
+  ::-webkit-scrollbar-thumb:hover{background:#3a3a3a}
+
+  /* ─────────── LAYOUT ─────────── */
+  .layout{display:flex;min-height:100vh;min-height:100dvh}
+
+  /* ─────────── SIDEBAR ─────────── */
+  .sidebar{
+    position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);
+    background:var(--bg-1);border-right:1px solid var(--border);
+    display:flex;flex-direction:column;z-index:60;
+    transition:transform .25s ease;
+  }
+  .brand{
+    padding:22px 22px 22px;display:flex;align-items:center;gap:10px;
+    border-bottom:1px solid var(--border);
+  }
+  .brand-icon{
+    width:32px;height:32px;border-radius:8px;
+    background:linear-gradient(135deg,var(--accent),#00d4aa);
+    display:flex;align-items:center;justify-content:center;color:#000;
+    flex-shrink:0;
+  }
+  .brand-text{
+    font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:15px;
+    letter-spacing:.5px;line-height:1.2;
+  }
+  .brand-text small{
+    display:block;color:var(--text-3);font-weight:500;font-size:10px;
+    letter-spacing:1.5px;margin-top:2px;
+  }
+  .nav{
+    padding:18px 12px;flex:1;overflow-y:auto;
+    display:flex;flex-direction:column;gap:2px;
+  }
+  .nav-section{
+    font-size:10px;text-transform:uppercase;letter-spacing:1.5px;
+    color:var(--text-3);font-weight:700;padding:14px 12px 8px;
+  }
+  .nav-item{
+    display:flex;align-items:center;gap:12px;padding:11px 12px;
+    color:var(--text-2);font-size:13.5px;font-weight:500;
+    border-radius:var(--radius-sm);transition:all .15s;cursor:pointer;
+    position:relative;width:100%;text-align:left;
+  }
+  .nav-item:hover{color:var(--text);background:var(--bg-3)}
+  .nav-item.active{color:var(--text);background:var(--bg-3)}
+  .nav-item.active::before{
+    content:'';position:absolute;left:-12px;top:50%;transform:translateY(-50%);
+    width:3px;height:18px;background:var(--accent);border-radius:0 3px 3px 0;
+  }
+  .nav-item svg{width:18px;height:18px;stroke-width:2;flex-shrink:0}
+  .nav-badge{
+    margin-left:auto;background:var(--danger);color:#fff;font-size:10px;
+    font-weight:700;padding:2px 6px;border-radius:10px;min-width:18px;
+    text-align:center;line-height:1.4;
+  }
+  .sidebar-footer{
+    padding:14px;border-top:1px solid var(--border);
+    display:flex;align-items:center;gap:10px;
+  }
+  .sidebar-footer .avatar{
+    width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#4a9eff,#00d4aa);
+    display:flex;align-items:center;justify-content:center;font-weight:700;color:#000;font-size:13px;
+    flex-shrink:0;
+  }
+  .sidebar-footer .info{flex:1;min-width:0;overflow:hidden}
+  .sidebar-footer .name{font-size:13px;font-weight:600;text-overflow:ellipsis;overflow:hidden;white-space:nowrap}
+  .sidebar-footer .role{font-size:11px;color:var(--text-3)}
+  .sidebar-footer .logout{
+    color:var(--text-3);padding:8px;border-radius:8px;
+  }
+  .sidebar-footer .logout:hover{color:var(--danger);background:rgba(239,68,68,.1)}
+
+  /* ─────────── MAIN ─────────── */
+  .main{
+    margin-left:var(--sidebar-w);flex:1;min-width:0;
+    display:flex;flex-direction:column;min-height:100vh;
+  }
+  .topbar{
+    height:var(--topbar-h);padding:0 28px;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    background:rgba(0,0,0,.7);backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--border);
+    position:sticky;top:0;z-index:50;
+  }
+  .topbar-left{display:flex;align-items:center;gap:14px;min-width:0;flex:1}
+  .menu-btn{
+    width:38px;height:38px;border-radius:10px;display:none;
+    align-items:center;justify-content:center;color:var(--text);
+    border:1px solid var(--border-2);
+  }
+  .menu-btn:active{background:var(--bg-3)}
+  .page-title{
+    font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;
+    font-size:20px;letter-spacing:-.3px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .topbar-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .icon-btn{
+    width:38px;height:38px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--text-2);background:var(--bg-3);
+    transition:all .15s;
+  }
+  .icon-btn:hover{color:var(--text);background:var(--bg-hover)}
+  .icon-btn svg{width:18px;height:18px;stroke-width:2}
+
+  .content{padding:28px;flex:1}
+
+  /* ─────────── STATS GRID ─────────── */
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:16px;margin-bottom:28px;
+  }
+  .stat-card{
+    background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);
+    padding:20px;display:flex;align-items:center;gap:16px;
+    transition:border-color .15s;
+  }
+  .stat-card:hover{border-color:var(--border-2)}
+  .stat-icon{
+    width:44px;height:44px;border-radius:12px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .stat-icon svg{width:22px;height:22px;stroke-width:2}
+  .stat-icon.blue{background:rgba(74,158,255,.15);color:var(--accent)}
+  .stat-icon.green{background:rgba(16,185,129,.15);color:var(--success)}
+  .stat-icon.yellow{background:rgba(245,158,11,.15);color:var(--warn)}
+  .stat-icon.red{background:rgba(239,68,68,.15);color:var(--danger)}
+  .stat-info{min-width:0;flex:1}
+  .stat-label{font-size:12px;color:var(--text-3);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+  .stat-value{
+    font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:26px;
+    letter-spacing:-.5px;line-height:1.1;
+  }
+
+  /* ─────────── PANEL ─────────── */
+  .panel{
+    background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);
+    overflow:hidden;margin-bottom:20px;
+  }
+  .panel-head{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:18px 22px;border-bottom:1px solid var(--border);gap:12px;
+    flex-wrap:wrap;
+  }
+  .panel-title{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:700;font-size:15px;letter-spacing:-.2px;
+  }
+  .panel-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .panel-body{padding:0}
+  .panel-body.padded{padding:22px}
+
+  .filter-bar{
+    padding:14px 22px;border-bottom:1px solid var(--border);
+    display:flex;gap:8px;flex-wrap:wrap;
+  }
+
+  /* ─────────── BUTTONS ─────────── */
+  .btn{
+    background:var(--accent);color:#000;padding:9px 16px;
+    border-radius:8px;font-size:13px;font-weight:600;
+    display:inline-flex;align-items:center;gap:6px;
+    transition:all .15s;line-height:1;white-space:nowrap;
+  }
+  .btn:hover{background:var(--accent-hover)}
+  .btn:active{transform:scale(.97)}
+  .btn svg{width:14px;height:14px;stroke-width:2.5}
+  .btn-sm{padding:7px 12px;font-size:12px}
+  .btn-xs{padding:5px 10px;font-size:11px;font-weight:700}
+  .btn-ghost{background:var(--bg-3);color:var(--text-2)}
+  .btn-ghost:hover{background:var(--bg-hover);color:var(--text)}
+  .btn-ghost.active{background:var(--accent);color:#000}
+  .btn-success{background:var(--success);color:#fff}
+  .btn-success:hover{background:#0ea571}
+  .btn-danger{background:var(--danger);color:#fff}
+  .btn-danger:hover{background:#dc2626}
+  .btn-warn{background:var(--warn);color:#000}
+  .btn-warn:hover{background:#d97706}
+
+  /* ─────────── TABLE ─────────── */
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{
+    width:100%;border-collapse:collapse;min-width:600px;
+  }
+  thead th{
+    text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.7px;
+    color:var(--text-3);font-weight:700;padding:14px 18px;
+    border-bottom:1px solid var(--border);background:var(--bg-1);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:16px 18px;border-bottom:1px solid var(--border);
+    font-size:13.5px;color:var(--text);vertical-align:middle;
+  }
+  tbody tr{transition:background .1s}
+  tbody tr:hover{background:var(--bg-3)}
+  tbody tr:last-child td{border-bottom:none}
+  .mono{font-family:'SF Mono',Monaco,monospace;font-size:12px}
+  .truncate{max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* ─────────── BADGES ─────────── */
+  .badge{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:4px 9px;border-radius:20px;
+    font-size:11px;font-weight:600;text-transform:capitalize;letter-spacing:.2px;
+    white-space:nowrap;line-height:1.3;
+  }
+  .badge::before{
+    content:'';width:6px;height:6px;border-radius:50%;background:currentColor;
+  }
+  .badge-pending{background:rgba(245,158,11,.13);color:#fbbf24}
+  .badge-approved{background:rgba(16,185,129,.13);color:#34d399}
+  .badge-rejected{background:rgba(239,68,68,.13);color:#f87171}
+  .badge-processing{background:rgba(74,158,255,.13);color:#60a5fa}
+  .badge-completed{background:rgba(16,185,129,.18);color:#10b981}
+  .badge-active{background:rgba(16,185,129,.13);color:#34d399}
+  .badge-disabled{background:rgba(239,68,68,.13);color:#f87171}
+  .badge-admin{background:rgba(168,85,247,.13);color:#c084fc}
+  .badge-not_submitted{background:rgba(115,122,135,.15);color:#9ba3b4}
+
+  /* ─────────── INPUTS ─────────── */
+  .input,.select,.textarea{
+    width:100%;background:var(--bg-1);border:1px solid var(--border-2);color:var(--text);
+    padding:11px 14px;border-radius:10px;font-size:14px;font-family:inherit;
+    transition:border-color .15s;
+  }
+  .input:focus,.select:focus,.textarea:focus{outline:none;border-color:var(--accent)}
+  .textarea{min-height:90px;resize:vertical}
+  .select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23737a87' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+
+  .search-row{
+    display:flex;gap:10px;padding:18px 22px;border-bottom:1px solid var(--border);
+  }
+  .search-input{
+    flex:1;background:var(--bg-1);border:1px solid var(--border-2);color:var(--text);
+    padding:10px 14px 10px 38px;border-radius:10px;font-size:14px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23737a87' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='8'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>");
+    background-repeat:no-repeat;background-position:left 12px center;
+  }
+  .search-input:focus{outline:none;border-color:var(--accent)}
+
+  /* ─────────── EMPTY / LOADING ─────────── */
+  .empty,.loading{
+    padding:64px 24px;text-align:center;color:var(--text-3);font-size:14px;
+  }
+  .empty-icon{
+    width:48px;height:48px;margin:0 auto 14px;color:var(--text-3);
+    opacity:.5;
+  }
+  .empty-icon svg{width:100%;height:100%}
+  .spinner{
+    width:24px;height:24px;border:2px solid var(--border-2);border-top-color:var(--accent);
+    border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ─────────── ROW ACTIONS ─────────── */
+  .row-actions{display:flex;gap:6px;flex-wrap:wrap}
+
+  /* ─────────── MODAL ─────────── */
+  .modal-back{
+    position:fixed;inset:0;background:rgba(0,0,0,.78);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    z-index:200;display:none;align-items:center;justify-content:center;
+    padding:16px;
+  }
+  .modal-back.show{display:flex}
+  .modal{
+    background:var(--bg-2);border:1px solid var(--border-2);
+    border-radius:var(--radius);box-shadow:var(--shadow);
+    width:100%;max-width:560px;max-height:90vh;
+    overflow-y:auto;display:flex;flex-direction:column;
+  }
+  .modal-head{
+    padding:22px 24px 14px;border-bottom:1px solid var(--border);
+    display:flex;justify-content:space-between;align-items:flex-start;gap:10px;
+  }
+  .modal-head h2{
+    font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:700;
+    letter-spacing:-.2px;line-height:1.3;
+  }
+  .modal-head .sub{font-size:13px;color:var(--text-3);margin-top:4px}
+  .modal-close{
+    width:32px;height:32px;border-radius:8px;color:var(--text-3);flex-shrink:0;
+  }
+  .modal-close:hover{background:var(--bg-3);color:var(--text)}
+  .modal-body{padding:20px 24px}
+  .modal-foot{
+    padding:16px 24px;border-top:1px solid var(--border);
+    display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;
+  }
+  .form-row{margin-bottom:14px}
+  .form-row:last-child{margin-bottom:0}
+  .form-row label{
+    display:block;font-size:12px;color:var(--text-2);font-weight:500;
+    margin-bottom:6px;letter-spacing:.2px;
+  }
+  .form-row .hint{font-size:11px;color:var(--text-3);margin-top:4px}
+  .form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .checkbox-row{display:flex;align-items:center;gap:10px;padding:8px 0}
+  .checkbox-row input{width:18px;height:18px;accent-color:var(--accent)}
+
+  /* User detail mini sections */
+  .detail-block{
+    background:var(--bg-1);border:1px solid var(--border);border-radius:10px;
+    padding:14px;margin-bottom:12px;
+  }
+  .detail-block h4{
+    font-size:12px;color:var(--text-3);text-transform:uppercase;
+    letter-spacing:.5px;margin-bottom:10px;font-weight:600;
+  }
+  .detail-balance{
+    font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:700;
+    letter-spacing:-.5px;
+  }
+  .detail-list{display:flex;flex-direction:column;gap:8px;font-size:13px}
+  .detail-list .row{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    padding:8px 10px;background:var(--bg-2);border-radius:8px;
+  }
+
+  /* ─────────── TOAST ─────────── */
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
+    background:var(--success);color:#fff;
+    padding:13px 20px;border-radius:10px;font-weight:600;font-size:13.5px;
+    box-shadow:var(--shadow);z-index:300;
+    display:flex;align-items:center;gap:8px;
+    transition:transform .25s;max-width:90vw;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .toast.error{background:var(--danger)}
+  .toast svg{width:18px;height:18px;flex-shrink:0}
+
+  /* ─────────── SECTIONS ─────────── */
+  .section{display:none}
+  .section.active{display:block}
+
+  .backdrop{
+    position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:55;display:none;
+  }
+  .backdrop.show{display:block}
+
+
+
+  /* ─── COMPACT USER/ROW CARDS (mobile) ─── */
+  .user-card{
+    display:flex;align-items:center;gap:12px;
+    padding:14px 16px;border-bottom:1px solid var(--border);
+    transition:background .1s;
+  }
+  .user-card:last-child{border-bottom:none}
+  .user-card:active{background:var(--bg-3)}
+  .uc-avatar{
+    width:40px;height:40px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(135deg,#4a9eff,#00d4aa);
+    display:flex;align-items:center;justify-content:center;
+    color:#000;font-weight:700;font-size:15px;
+  }
+  .uc-info{flex:1;min-width:0;overflow:hidden}
+  .uc-name{
+    font-size:14px;font-weight:600;color:var(--text);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    line-height:1.3;
+  }
+  .uc-email{
+    font-size:12px;color:var(--text-3);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    line-height:1.3;margin-top:1px;
+  }
+  .uc-right{
+    display:flex;flex-direction:column;align-items:flex-end;gap:4px;
+    flex-shrink:0;
+  }
+  .uc-balance{
+    font-size:14px;font-weight:700;
+    font-family:'Plus Jakarta Sans',sans-serif;
+  }
+  .uc-badges{display:flex;gap:4px;align-items:center}
+  .uc-badges .badge{font-size:10px;padding:2px 7px}
+  .uc-action{
+    margin-left:8px;flex-shrink:0;color:var(--text-3);
+    width:32px;height:32px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .uc-action:hover{color:var(--accent);background:var(--bg-3)}
+  .uc-action svg{width:16px;height:16px;stroke-width:2.2}
+
+  /* ─── COMPACT TX ROW (deposits/withdrawals/kyc) ─── */
+  .tx-card{
+    display:flex;align-items:center;gap:12px;
+    padding:14px 16px;border-bottom:1px solid var(--border);
+  }
+  .tx-card:last-child{border-bottom:none}
+  .tx-icon{
+    width:40px;height:40px;border-radius:10px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .tx-icon svg{width:18px;height:18px;stroke-width:2}
+  .tx-icon.in{background:rgba(16,185,129,.13);color:#10b981}
+  .tx-icon.out{background:rgba(239,68,68,.13);color:#ef4444}
+  .tx-icon.kyc{background:rgba(168,85,247,.13);color:#a855f7}
+  .tx-info{flex:1;min-width:0;overflow:hidden}
+  .tx-title{
+    font-size:14px;font-weight:600;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .tx-sub{
+    font-size:12px;color:var(--text-3);margin-top:2px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .tx-right{
+    display:flex;flex-direction:column;align-items:flex-end;gap:5px;
+    flex-shrink:0;
+  }
+  .tx-amount{
+    font-size:14px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;
+  }
+  .tx-actions{
+    display:flex;gap:6px;margin-top:8px;justify-content:flex-end;
+  }
+  .tx-meta-row{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    padding:10px 16px;background:var(--bg-1);font-size:12px;color:var(--text-3);
+    border-bottom:1px solid var(--border);
+  }
+
+  /* ─── DESKTOP: hide cards / show tables ─── */
+  @media (min-width:761px){
+    .users-list,.tx-list{display:none}
+    .table-wrap{display:block}
+  }
+  @media (max-width:760px){
+    .users-list,.tx-list{display:block}
+    .table-wrap{display:none}
+  }
+
+  /* ─────────── MOBILE ─────────── */
+  @media (max-width:960px){
+    :root{--topbar-h:60px}
+    .sidebar{transform:translateX(-100%);width:280px;box-shadow:var(--shadow)}
+    .sidebar.open{transform:translateX(0)}
+    .main{margin-left:0}
+    .menu-btn{display:flex}
+    .topbar{padding:0 16px}
+    .content{padding:18px 14px}
+    .stat-card{padding:16px}
+    .stat-value{font-size:22px}
+    .panel-head{padding:14px 16px}
+    .filter-bar{padding:12px 16px}
+    .search-row{padding:14px 16px}
+    thead th{padding:12px 14px}
+    tbody td{padding:14px 14px;font-size:13px}
+    .modal{max-height:95vh}
+    .modal-head{padding:18px 18px 12px}
+    .modal-body{padding:16px 18px}
+    .modal-foot{padding:14px 18px}
+  }
+  @media (max-width:480px){
+    .stats{grid-template-columns:1fr 1fr;gap:10px}
+    .stat-card{padding:14px;gap:10px}
+    .stat-icon{width:38px;height:38px}
+    .stat-icon svg{width:18px;height:18px}
+    .stat-value{font-size:18px}
+    .stat-label{font-size:10px}
+    .form-grid-2{grid-template-columns:1fr}
+  }
+
+
+
+/* Brand avatar */
+#brandAvatar{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,#4a9eff,#3aed98);
+  display:flex;align-items:center;justify-content:center;
+  color:#0a0a0a;font-weight:700;font-size:15px;
+  overflow:hidden;flex-shrink:0;
+  font-family:'Montserrat',sans-serif;
+}
+#brandAvatar img{width:100%;height:100%;object-fit:cover;display:block}
+#brandAvatar span{display:flex;align-items:center;justify-content:center;width:100%;height:100%}
+
+/* Avatar upload in profile modal */
+.ap-avatar-wrap{position:relative;display:inline-block;cursor:pointer}
+.ap-avatar-wrap:hover .ap-avatar-overlay{opacity:1}
+.ap-avatar-overlay{
+  position:absolute;inset:0;border-radius:50%;
+  background:rgba(0,0,0,0.55);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;opacity:0;transition:opacity .15s;
+}
+
+/* Clickable brand */
+.brand-btn{
+  background:none;
+  border:none;
+  width:100%;
+  text-align:left;
+  cursor:pointer;
+  padding:14px 16px;
+  border-radius:10px;
+  transition:background .15s;
+  font:inherit;
+  color:inherit;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.brand-btn:hover{
+  background:rgba(255,255,255,0.04);
+}
+.brand-btn:active{
+  background:rgba(255,255,255,0.08);
+}
+.brand-btn .brand-text small{display:block}
+
+/* ─── Wallet Cards (inline editor) ─── */
+.wallet-cards{display:flex;flex-direction:column;gap:16px}
+.wallet-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:18px}
+.wallet-card.active{border-color:rgba(58,237,152,0.25)}
+.wc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.wc-title-wrap{display:flex;align-items:center;gap:12px}
+.wc-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff;flex-shrink:0;overflow:hidden;background:rgba(255,255,255,0.06)}
+.wc-icon img{width:100%;height:100%;object-fit:contain;padding:4px;display:block}
+.wc-symbol{font-weight:700;font-size:16px;letter-spacing:0.3px}
+.wc-status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-3);margin-top:2px}
+.wc-status .dot{width:6px;height:6px;border-radius:50%;background:#666}
+.wc-status.active .dot{background:#3aed98;box-shadow:0 0 6px rgba(58,237,152,0.6)}
+.wc-status.active{color:#3aed98}
+.wc-field{margin-bottom:14px}
+.wc-field label{display:block;font-size:12px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;font-weight:600}
+.wc-field label .req{color:#ff5252}
+.wc-input-wrap{position:relative}
+.wc-input-wrap .ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-3);pointer-events:none}
+.wc-input-wrap .input{padding-left:38px;font-family:'SF Mono',ui-monospace,monospace;font-size:13px}
+.wc-qr-box{border:2px dashed rgba(255,255,255,0.12);border-radius:10px;padding:14px;display:flex;align-items:center;gap:14px}
+.wc-qr-box.filled{border-style:solid;border-color:rgba(255,255,255,0.08);background:rgba(255,255,255,0.02)}
+.wc-qr-thumb{width:72px;height:72px;border-radius:8px;background:#fff;padding:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wc-qr-thumb img{max-width:100%;max-height:100%;display:block}
+.wc-qr-placeholder{width:72px;height:72px;border-radius:8px;background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;color:var(--text-3);flex-shrink:0}
+.wc-qr-action{flex:1;color:var(--accent);font-weight:600;font-size:14px;cursor:pointer;background:none;border:none;text-align:left;padding:0}
+.wc-qr-action:hover{color:#6ab6ff}
+.wc-qr-remove{background:rgba(255,82,82,0.1);border:1px solid rgba(255,82,82,0.25);color:#ff5252;padding:8px 10px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.wc-qr-remove:hover{background:rgba(255,82,82,0.2)}
+.wc-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.05)}
+.wc-actions .btn{padding:9px 12px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px}
+.wc-actions svg{width:14px;height:14px}
+.wc-empty-note{background:rgba(255,184,11,0.08);border:1px solid rgba(255,184,11,0.2);color:#ffb80b;padding:8px 12px;border-radius:8px;font-size:12px;margin-bottom:14px;text-align:center}
+
+
+/* ─── Withdrawal Detail Modal ─── */
+.tx-row-clickable{cursor:pointer;transition:background .15s}
+.tx-row-clickable:hover{background:rgba(255,255,255,0.02)}
+.wd-modal-body{padding:16px;font-family:'Montserrat',-apple-system,sans-serif}
+.wd-modal-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.wd-modal-user{font-weight:600;font-size:14px;color:var(--text-1)}
+.wd-modal-email{font-size:12px;color:var(--text-3);margin-top:2px}
+.wd-modal-amount-wrap{text-align:right}
+.wd-modal-amount{font-family:'Montserrat',-apple-system,sans-serif;font-size:14px;font-weight:600;color:var(--text-1);margin-bottom:6px;letter-spacing:0.2px}
+.wd-modal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 14px;margin-bottom:14px;padding:12px;background:rgba(255,255,255,0.02);border-radius:8px}
+.wd-modal-lbl{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;font-weight:600;margin-bottom:3px}
+.wd-modal-val{font-size:12px;color:var(--text-1);font-weight:500}
+.wd-modal-section{background:rgba(74,158,255,0.05);border:1px solid rgba(74,158,255,0.15);border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.wd-modal-addr-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.wd-modal-addr{flex:1;background:rgba(0,0,0,0.3);padding:8px 10px;border-radius:6px;font-size:11px;word-break:break-all;color:#4a9eff}
+.wd-modal-copy{background:rgba(74,158,255,0.15);border:1px solid rgba(74,158,255,0.25);color:#4a9eff;padding:7px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;flex-shrink:0}
+.wd-modal-copy:hover{background:rgba(74,158,255,0.25)}
+.wd-modal-memo{margin-top:8px;font-size:11px;color:var(--text-2)}
+.wd-modal-bank-row{font-size:12px;color:var(--text-2);margin-top:5px}
+.wd-modal-bank-row span{color:var(--text-3);font-weight:600;margin-right:6px}
+.wd-modal-note{background:rgba(255,184,11,0.06);border:1px solid rgba(255,184,11,0.15);padding:8px 12px;border-radius:6px;font-size:11px;color:var(--text-2);margin-bottom:10px;word-break:break-all}
+.wd-modal-foot{display:flex;gap:8px;padding:12px 16px;border-top:1px solid rgba(255,255,255,0.06)}
+.wd-modal-foot .btn{flex:1;padding:10px;font-size:13px;font-weight:600}
+.dep-modal-body{padding:16px;font-family:'Montserrat',-apple-system,sans-serif}
+.dep-modal-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.dep-modal-user{font-weight:600;font-size:14px;color:var(--text-1)}
+.dep-modal-email{font-size:12px;color:var(--text-3);margin-top:2px}
+.dep-modal-amount-wrap{text-align:right}
+.dep-modal-amount{font-family:'Montserrat',-apple-system,sans-serif;font-size:14px;font-weight:600;color:var(--text-1);margin-bottom:6px;letter-spacing:0.2px}
+.dep-modal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 14px;margin-bottom:14px;padding:12px;background:rgba(255,255,255,0.02);border-radius:8px}
+.dep-modal-lbl{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;font-weight:600;margin-bottom:3px}
+.dep-modal-val{font-size:12px;color:var(--text-1);font-weight:500}
+.dep-modal-section{background:rgba(74,158,255,0.05);border:1px solid rgba(74,158,255,0.15);border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.dep-modal-hash-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.dep-modal-hash{flex:1;background:rgba(0,0,0,0.3);padding:8px 10px;border-radius:6px;font-size:11px;word-break:break-all;color:#4a9eff}
+.dep-modal-copy{background:rgba(74,158,255,0.15);border:1px solid rgba(74,158,255,0.25);color:#4a9eff;padding:7px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;flex-shrink:0}
+.dep-modal-copy:hover{background:rgba(74,158,255,0.25)}
+.dep-modal-proof{width:100%;max-height:220px;object-fit:contain;border-radius:8px;border:1px solid rgba(255,255,255,0.08);margin-top:6px;cursor:pointer}
+.dep-modal-note{background:rgba(255,184,11,0.06);border:1px solid rgba(255,184,11,0.15);padding:8px 12px;border-radius:6px;font-size:11px;color:var(--text-2);margin-bottom:10px;word-break:break-all}
+.dep-modal-foot{display:flex;gap:8px;padding:12px 16px;border-top:1px solid rgba(255,255,255,0.06)}
+.dep-modal-foot .btn{flex:1;padding:10px;font-size:13px;font-weight:600}
+</style>
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script>
+  // Pre-paint hash routing — prevents dashboard flash
+  (function(){
+    var valid = ['dashboard','users','deposits','withdrawals','kyc','wallets','companies'];
+    var h = (location.hash||'').replace('#','').trim();
+    window.__initialSection = valid.indexOf(h) >= 0 ? h : 'dashboard';
+  })();
+</script>
+
+</head>
+<body>
+
+
+<div class="backdrop" id="backdrop"></div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <button type="button" class="brand brand-btn" onclick="openAdminProfile()" title="Admin profile">
+      <div class="brand-icon" id="brandAvatar">
+        <span id="brandAvatarInitial">A</span>
+      </div>
+      <div class="brand-text">APEX<small>IPO ACCESS · ADMIN</small></div>
+    </button>
+
+    <nav class="nav">
+      <div class="nav-section">Overview</div>
+      <button class="nav-item" data-section="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+        Dashboard
+      </button>
+
+      <div class="nav-section">Management</div>
+      <button class="nav-item" data-section="users">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Users
+      </button>
+      <button class="nav-item" data-section="deposits">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><polyline points="19 12 12 19 5 12"/></svg>
+        Deposits
+        <span class="nav-badge" id="badge-deposits" style="display:none">0</span>
+      </button>
+      <button class="nav-item" data-section="withdrawals">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><polyline points="5 12 12 5 19 12"/></svg>
+        Withdrawals
+        <span class="nav-badge" id="badge-withdrawals" style="display:none">0</span>
+      </button>
+      <button class="nav-item" data-section="kyc">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        KYC Review
+        <span class="nav-badge" id="badge-kyc" style="display:none">0</span>
+      </button>
+
+      <div class="nav-section">Investments</div>
+        <button class="nav-item" data-section="companies">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          Manage Shares
+        </button>
+            <a class="nav-item" href="/admin/holdings?from=/adminprivate" style="text-decoration:none">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+              <span>All Holdings</span>
+            </a>
+        <a class="nav-item" href="/admin/trades?from=/adminprivate" style="text-decoration:none">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+              <span>All Trades</span>
+            </a>
+            <div class="nav-section">Settings</div>
+            <a class="nav-item" href="/admin/settings?from=/adminprivate" style="text-decoration:none">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Settings</span>
+            </a>
+            <a class="nav-item" href="/admin/broadcast?from=/adminprivate" style="text-decoration:none">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+              <span>Broadcast</span>
+            </a>
+            <a class="nav-item" href="/admin/logs?from=/adminprivate" style="text-decoration:none">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              <span>Audit Log</span>
+            </a>
+            
+      <button class="nav-item" data-section="wallets">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+        Crypto Wallets
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="avatar" id="sideAvatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:60%;height:60%"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div class="info">
+        <div class="name" id="sideName">Loading…</div>
+        <div class="role">Administrator</div>
+      </div>
+      <button class="logout" id="logoutBtn" title="Logout">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-btn" id="menuBtn" aria-label="Menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <h1 class="page-title" id="pageTitle">Dashboard</h1>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn" id="refreshBtn" title="Refresh">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ─── DASHBOARD ─── -->
+      <section class="section" data-section="dashboard">
+        <div class="stats">
+          <div class="stat-card">
+            <div class="stat-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">Total Users</div>
+              <div class="stat-value" id="statUsers">—</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon yellow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">Pending KYC</div>
+              <div class="stat-value" id="statKyc">—</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">Pending Deposits</div>
+              <div class="stat-value" id="statDeposits">—</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">Pending Withdrawals</div>
+              <div class="stat-value" id="statWithdrawals">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Recent Users</div>
+            <button class="btn btn-ghost btn-sm" data-jump="users">View all →</button>
+          </div>
+          <div class="panel-body" id="recentUsers">
+            <div class="loading"><div class="spinner"></div>Loading…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── USERS ─── -->
+      <section class="section" data-section="users">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">All Users</div>
+          </div>
+          <div class="search-row">
+            <input type="text" class="search-input" id="userSearch" placeholder="Search by email or name…">
+            <button class="btn" id="userSearchBtn">Search</button>
+          </div>
+          <div class="panel-body" id="usersTable">
+            <div class="loading"><div class="spinner"></div>Loading…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── DEPOSITS ─── -->
+      <section class="section" data-section="deposits">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Deposits</div>
+          </div>
+          <div class="filter-bar">
+            <button class="btn btn-ghost btn-sm active" data-filter="pending">Pending</button>
+            <button class="btn btn-ghost btn-sm" data-filter="approved">Approved</button>
+            <button class="btn btn-ghost btn-sm" data-filter="rejected">Rejected</button>
+            <button class="btn btn-ghost btn-sm" data-filter="all">All</button>
+          </div>
+          <div class="panel-body" id="depositsTable">
+            <div class="loading"><div class="spinner"></div>Loading…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── WITHDRAWALS ─── -->
+      <section class="section" data-section="withdrawals">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Withdrawals</div>
+          </div>
+          <div class="filter-bar">
+            <button class="btn btn-ghost btn-sm active" data-wfilter="pending">Pending</button>
+            <button class="btn btn-ghost btn-sm" data-wfilter="processing">Processing</button>
+            <button class="btn btn-ghost btn-sm" data-wfilter="completed">Completed</button>
+            <button class="btn btn-ghost btn-sm" data-wfilter="rejected">Rejected</button>
+            <button class="btn btn-ghost btn-sm" data-wfilter="all">All</button>
+          </div>
+          <div class="panel-body" id="withdrawalsTable">
+            <div class="loading"><div class="spinner"></div>Loading…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── KYC ─── -->
+      <section class="section" data-section="kyc">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">KYC Submissions</div>
+          </div>
+          <div class="filter-bar">
+            <button class="btn btn-ghost btn-sm active" data-kfilter="pending">Pending</button>
+            <button class="btn btn-ghost btn-sm" data-kfilter="approved">Approved</button>
+            <button class="btn btn-ghost btn-sm" data-kfilter="rejected">Rejected</button>
+            <button class="btn btn-ghost btn-sm" data-kfilter="all">All</button>
+          </div>
+          <div class="panel-body" id="kycTable">
+            <div class="loading"><div class="spinner"></div>Loading…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── WALLETS ─── -->
+      <section class="section" data-section="wallets">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">Crypto Wallets</div>
+              <div class="sub" style="color:var(--text-3);font-size:13px;margin-top:4px">Active wallets shown to users for crypto deposits</div>
+            </div>
+          </div>
+          <div class="panel-body" id="walletsTable">
+            <div class="loading"><div class="spinner"></div>Loading…</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  
+      <!-- ===== COMPANIES SECTION (premium black/white) ===== -->
+        <section class="section" data-section="companies">
+          <div class="ms-header">
+            <div class="ms-title">
+              <h2>Manage Shares</h2>
+              <p><span id="msCount">0</span> companies in catalog</p>
+            </div>
+            <a href="/admin/company/new" class="ms-cta">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              New Company
+            </a>
+          </div>
+          <div class="ms-toolbar">
+            <div class="ms-search">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input id="msSearchInput" type="text" placeholder="Search ticker or name…" autocomplete="off">
+            </div>
+            <div class="ms-chips">
+              <button class="ms-chip active" data-msfilter="all">All</button>
+              <button class="ms-chip" data-msfilter="active">Active</button>
+              <button class="ms-chip" data-msfilter="paused">Paused</button>
+              <button class="ms-chip" data-msfilter="closed">Closed</button>
+            </div>
+          </div>
+          <div id="companiesGrid" class="ms-grid">
+            <div class="ms-empty">Loading…</div>
+          </div>
+        </section><!-- Company edit modal -->
+      <div id="companyModal" class="modal-back" style="display:none">
+        <div class="modal" style="max-width:640px;max-height:92vh">
+          <div class="modal-head">
+            <h2 id="cmTitle">Add Company</h2>
+            <button class="modal-close" onclick="closeCompanyModal()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="modal-body" style="padding:18px;overflow-y:auto;font-family:'Montserrat',sans-serif">
+            <div class="cm-grid">
+              <div class="cm-field"><label>Ticker <span style="color:#ff5252">*</span></label><input id="cmTicker" type="text" maxlength="10" placeholder="SPCX"></div>
+              <div class="cm-field"><label>Name <span style="color:#ff5252">*</span></label><input id="cmName" type="text" placeholder="SpaceX"></div>
+              <div class="cm-field"><label>Sector</label><input id="cmSector" type="text" placeholder="Aerospace"></div>
+              <div class="cm-field"><label>Stage</label>
+                <select id="cmStage"><option value="IPO">IPO</option><option value="Live IPO">Live IPO</option><option value="Public">Public</option><option value="Closed">Closed</option></select>
+              </div>
+              <div class="cm-field"><label>Status</label>
+                <select id="cmStatus"><option value="active">Active</option><option value="paused">Paused</option><option value="closed">Closed</option></select>
+              </div>
+              <div class="cm-field"><label>Price / Share (USD) <span style="color:#ff5252">*</span></label><input id="cmPrice" type="number" step="0.01" min="0"></div>
+              <div class="cm-field"><label>Valuation</label><input id="cmValuation" type="text" placeholder="$400B"></div>
+              <div class="cm-field"><label>IPO Window</label><input id="cmIpoWindow" type="text" placeholder="Q1 2026"></div>
+              <div class="cm-field"><label>Min Investment ($)</label><input id="cmMinInv" type="number" step="0.01" min="0" value="0"></div>
+              <div class="cm-field"><label>Max Investment ($)</label><input id="cmMaxInv" type="number" step="0.01" min="0" value="0"></div>
+              <div class="cm-field"><label>Available Shares</label><input id="cmAvail" type="number" min="0" value="0"></div>
+              <div class="cm-field"><label>Reserved Shares</label><input id="cmReserved" type="number" min="0" value="0"></div>
+              <div class="cm-field"><label>Success Rate (%)</label><input id="cmSuccess" type="number" min="0" max="100" value="0"></div>
+              <div class="cm-field"><label>Expected Return</label><input id="cmReturn" type="text" placeholder="+40% to +70%"></div>
+              <div class="cm-field"><label>Growth YoY</label><input id="cmGrowth" type="text" placeholder="+45%"></div>
+              <div class="cm-field"><label>Founded Year</label><input id="cmFounded" type="number" min="1800" max="2100"></div>
+              <div class="cm-field"><label>HQ</label><input id="cmHq" type="text" placeholder="Hawthorne, CA"></div>
+              <div class="cm-field"><label>Domain</label><input id="cmDomain" type="text" placeholder="spacex.com"></div>
+              <div class="cm-field" style="grid-column:1/-1"><label>Logo URL</label><input id="cmLogo" type="text" placeholder="https://..."></div>
+              <div class="cm-field" style="grid-column:1/-1"><label>Description</label><textarea id="cmDesc" rows="3"></textarea></div>
+              <div class="cm-field"><label>Sort Order</label><input id="cmSort" type="number" min="0" value="0"></div>
+              <div class="cm-field"><label>Show on Homepage</label>
+                <select id="cmShow"><option value="true">Yes</option><option value="false">No</option></select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-foot" style="display:flex;gap:8px;padding:14px 18px;border-top:1px solid rgba(255,255,255,0.06)">
+            <button class="btn btn-danger" id="cmDeleteBtn" onclick="deleteCompany()" style="display:none">Delete</button>
+            <button class="btn btn-ghost" onclick="closeCompanyModal()" style="flex:1">Cancel</button>
+            <button class="btn btn-success" id="cmSaveBtn" onclick="saveCompany()" style="flex:1.4">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <style>
+      .companies-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding:4px}
+      .company-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px;cursor:pointer;transition:border-color .15s,background .15s;font-family:'Montserrat',sans-serif}
+      .company-card:hover{border-color:rgba(74,158,255,0.3);background:rgba(74,158,255,0.04)}
+      .company-card .cc-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+      .company-card .cc-logo{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#4a9eff,#3aed98);display:flex;align-items:center;justify-content:center;color:#0a0a0a;font-weight:700;font-size:14px;overflow:hidden;flex-shrink:0}
+      .company-card .cc-logo img{width:100%;height:100%;object-fit:cover}
+      .company-card .cc-name{font-size:14px;font-weight:600;color:var(--text-1)}
+      .company-card .cc-ticker{font-size:11px;color:#4a9eff;font-weight:700;letter-spacing:0.8px;margin-top:2px}
+      .company-card .cc-price{font-size:18px;font-weight:700;color:var(--text-1);margin-top:6px}
+      .company-card .cc-meta{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.04);font-size:11px;color:var(--text-3)}
+      .cc-badge{padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+      .cc-badge.active{background:rgba(58,237,152,0.12);color:#3aed98}
+      .cc-badge.paused{background:rgba(255,184,11,0.12);color:#ffb80b}
+      .cc-badge.closed{background:rgba(239,68,68,0.12);color:#ef4444}
+      .cm-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}
+      .cm-field label{display:block;font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:5px;font-family:'Montserrat',sans-serif}
+      .cm-field input,.cm-field select,.cm-field textarea{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 12px;color:var(--text-1);font-family:'Montserrat',sans-serif;font-size:13px;transition:border-color .15s}
+      .cm-field input:focus,.cm-field select:focus,.cm-field textarea:focus{outline:none;border-color:#4a9eff;background:rgba(74,158,255,0.05)}
+      #companyModal.show{display:flex !important}/* ===== MANAGE SHARES — premium black/white ===== */
+      .ms-header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+      .ms-title h2{margin:0;font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.3px;color:#fff}
+      .ms-title p{margin:4px 0 0;font-size:12px;color:#737373;letter-spacing:0.2px}
+      .ms-cta{display:inline-flex;align-items:center;gap:6px;background:#fff;color:#000;border:1px solid #fff;padding:10px 16px;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;text-decoration:none;cursor:pointer;transition:opacity .15s,transform .15s}
+      .ms-cta:hover{opacity:.85;transform:translateY(-1px)}
+      .ms-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+      .ms-search{position:relative;flex:1;min-width:200px;max-width:360px}
+      .ms-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#737373;pointer-events:none}
+      .ms-search input{width:100%;background:#0a0a0a;border:1px solid #1f1f1f;border-radius:8px;padding:10px 12px 10px 34px;color:#fff;font-family:'Montserrat',sans-serif;font-size:13px;transition:border-color .15s}
+      .ms-search input::placeholder{color:#525252}
+      .ms-search input:focus{outline:none;border-color:#fff}
+      .ms-chips{display:flex;gap:6px;flex-wrap:wrap}
+      .ms-chip{background:transparent;border:1px solid #1f1f1f;color:#737373;padding:8px 14px;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+      .ms-chip:hover{border-color:#404040;color:#a3a3a3}
+      .ms-chip.active{background:#fff;border-color:#fff;color:#000;font-weight:600}
+      .ms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+      .ms-card{background:#0a0a0a;border:1px solid #1f1f1f;border-radius:12px;padding:18px;cursor:pointer;transition:border-color .15s,transform .15s,background .15s;font-family:'Montserrat',sans-serif;display:flex;flex-direction:column;gap:14px;position:relative}
+      .ms-card:hover{border-color:#fff;transform:translateY(-2px);background:#0f0f0f}
+      .ms-card-head{display:flex;align-items:flex-start;gap:12px}
+      .ms-logo{width:44px;height:44px;border-radius:10px;background:#1f1f1f;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;overflow:hidden;flex-shrink:0;border:1px solid #2a2a2a}
+      .ms-logo img{width:100%;height:100%;object-fit:cover}
+      .ms-headtext{flex:1;min-width:0}
+      .ms-ticker{font-family:'JetBrains Mono',Menlo,monospace;font-size:11px;font-weight:700;color:#fff;letter-spacing:1px;text-transform:uppercase}
+      .ms-name{font-size:14px;font-weight:600;color:#e5e5e5;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .ms-status{position:absolute;top:14px;right:14px;display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:#737373;text-transform:uppercase;letter-spacing:0.5px}
+      .ms-status::before{content:"";width:6px;height:6px;border-radius:50%;background:#525252}
+      .ms-status.active{color:#fff}
+      .ms-status.active::before{background:#fff;box-shadow:0 0 8px rgba(255,255,255,0.6)}
+      .ms-status.paused::before{background:#a3a3a3}
+      .ms-status.closed::before{background:#404040}
+      .ms-priceblock{display:flex;align-items:baseline;gap:6px;padding-top:8px;border-top:1px solid #1f1f1f}
+      .ms-price{font-family:'JetBrains Mono',Menlo,monospace;font-size:24px;font-weight:700;color:#fff;letter-spacing:-0.5px;font-variant-numeric:tabular-nums}
+      .ms-price-label{font-size:10px;color:#737373;text-transform:uppercase;letter-spacing:0.5px}
+      .ms-card-foot{display:flex;justify-content:space-between;align-items:center;gap:8px}
+      .ms-meta{font-size:11px;color:#737373;display:flex;align-items:center;gap:6px}
+      .ms-edit{background:transparent;border:1px solid #2a2a2a;color:#a3a3a3;padding:6px 12px;border-radius:6px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+      .ms-edit:hover{border-color:#fff;color:#fff;background:#fff;color:#000}
+      .ms-empty{grid-column:1/-1;padding:60px 20px;text-align:center;color:#525252;font-family:'Montserrat',sans-serif;font-size:13px;border:1px dashed #1f1f1f;border-radius:12px}
+      @media(max-width:560px){
+        .ms-grid{grid-template-columns:1fr}
+        .ms-toolbar{flex-direction:column;align-items:stretch}
+        .ms-search{max-width:100%}
+        .ms-chips{justify-content:flex-start;overflow-x:auto}
+      }
+      @media(max-width:560px){.cm-grid{grid-template-columns:1fr}.companies-grid{grid-template-columns:1fr}}
+      </style>
+
+      <script>
+      let __companies = [];
+      let __editingCompanyId = null;
+
+      async function loadCompanies(){
+        const grid = document.getElementById('companiesGrid');
+        if(!grid) return;
+        grid.innerHTML = '<div class="empty-state">Loading…</div>';
+        try{
+          const res = await ApexAPI.admin.listCompanies();
+          if(!res?.ok) throw new Error(res?.error||'Failed');
+          __companies = res.companies || [];
+          renderCompanies();
+          bindManageSharesControls();
+        }catch(e){
+          grid.innerHTML = '<div class="empty-state">Error: '+e.message+'</div>';
+        }
+      }
+
+      function renderCompanies(){
+        const grid = document.getElementById("companiesGrid");
+        const countEl = document.getElementById("msCount");
+        if(countEl) countEl.textContent = __companies.length;
+        if(!__companies.length){
+          grid.innerHTML = '<div class="ms-empty">No companies yet. Click "New Company" to begin.</div>';
+          return;
+        }
+        // Apply search + filter
+        const q = (window.__msSearch || '').toLowerCase().trim();
+        const f = window.__msFilter || 'all';
+        const filtered = __companies.filter(c => {
+          if(f !== 'all' && (c.status||'active') !== f) return false;
+          if(!q) return true;
+          return (c.ticker||'').toLowerCase().includes(q)
+              || (c.name||'').toLowerCase().includes(q);
+        });
+        if(!filtered.length){
+          grid.innerHTML = '<div class="ms-empty">No matches.</div>';
+          return;
+        }
+        grid.innerHTML = filtered.map(c => {
+          const initial = (c.name||c.ticker||"?").charAt(0).toUpperCase();
+          let logoSrc = "";
+          if(c.logoUrl) logoSrc = c.logoUrl;
+          else if(c.domain) logoSrc = "https://icons.duckduckgo.com/ip3/"+c.domain+".ico";
+          const logo = logoSrc
+            ? '<img src="'+esc(logoSrc)+'" alt="" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+esc(initial)+'\'">'
+            : esc(initial);
+          const status = (c.status||'active').toLowerCase();
+          const price = Number(c.pricePerShare||0).toFixed(2);
+          const editUrl = '/admin/company?ticker='+encodeURIComponent(c.ticker);
+          return '<div class="ms-card" onclick="if(!event.target.closest(\'.ms-edit\'))location.href=\''+editUrl+'\'">'
+            + '<span class="ms-status '+status+'">'+esc(status)+'</span>'
+            + '<div class="ms-card-head">'
+              + '<div class="ms-logo">'+logo+'</div>'
+              + '<div class="ms-headtext">'
+                + '<div class="ms-ticker">'+esc(c.ticker||'')+'</div>'
+                + '<div class="ms-name">'+esc(c.name||'')+'</div>'
+              + '</div>'
+            + '</div>'
+            + '<div class="ms-priceblock">'
+              + '<span class="ms-price">$'+price+'</span>'
+              + '<span class="ms-price-label">/ share</span>'
+            + '</div>'
+            + '<div class="ms-card-foot">'
+              + '<span class="ms-meta">'+esc(c.sector||c.stage||'—')+'</span>'
+              + '<a href="'+editUrl+'" class="ms-edit" onclick="event.stopPropagation()">Edit</a>'
+            + '</div>'
+          + '</div>';
+        }).join('');
+      }
+
+      // Wire search + filter chips (idempotent)
+      function bindManageSharesControls(){
+        if(window.__msBound) return;
+        const input = document.getElementById('msSearchInput');
+        if(input){
+          input.addEventListener('input', e => {
+            window.__msSearch = e.target.value;
+            renderCompanies();
+          });
+        }
+        document.querySelectorAll('[data-msfilter]').forEach(btn => {
+          btn.addEventListener('click', e => {
+            document.querySelectorAll('[data-msfilter]').forEach(x => x.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            window.__msFilter = e.currentTarget.dataset.msfilter;
+            renderCompanies();
+          });
+        });
+        window.__msBound = true;
+      }
+
+      window.openCompanyModal = function(id){
+        __editingCompanyId = id || null;
+        const m = document.getElementById('companyModal');
+        m.classList.add('show'); m.style.display='flex';
+        document.getElementById('cmTitle').textContent = id ? 'Edit Company' : 'Add Company';
+        document.getElementById('cmDeleteBtn').style.display = id ? 'inline-flex' : 'none';
+        const c = id ? __companies.find(x => x._id === id) : {};
+        const v = (k, d='') => c?.[k] ?? d;
+        document.getElementById('cmTicker').value = v('ticker');
+        document.getElementById('cmTicker').disabled = !!id;
+        document.getElementById('cmName').value = v('name');
+        document.getElementById('cmSector').value = v('sector');
+        document.getElementById('cmStage').value = v('stage','IPO');
+        document.getElementById('cmStatus').value = v('status','active');
+        document.getElementById('cmPrice').value = v('pricePerShare',0);
+        document.getElementById('cmValuation').value = v('valuation');
+        document.getElementById('cmIpoWindow').value = v('ipoWindow');
+        document.getElementById('cmMinInv').value = v('minInvestment',0);
+        document.getElementById('cmMaxInv').value = v('maxInvestment',0);
+        document.getElementById('cmAvail').value = v('availableShares',0);
+        document.getElementById('cmReserved').value = v('reservedShares',0);
+        document.getElementById('cmSuccess').value = v('successRate',0);
+        document.getElementById('cmReturn').value = v('expectedReturn');
+        document.getElementById('cmGrowth').value = v('growthYoY');
+        document.getElementById('cmFounded').value = v('foundedYear','');
+        document.getElementById('cmHq').value = v('hq');
+        document.getElementById('cmDomain').value = v('domain');
+        document.getElementById('cmLogo').value = v('logoUrl');
+        document.getElementById('cmDesc').value = v('description');
+        document.getElementById('cmSort').value = v('sortOrder',0);
+        document.getElementById('cmShow').value = String(v('showOnHomepage', true));
+      };
+
+      window.closeCompanyModal = function(){
+        const m = document.getElementById('companyModal');
+        m.classList.remove('show'); m.style.display='none';
+      };
+
+      window.saveCompany = async function(){
+        const btn = document.getElementById('cmSaveBtn');
+        const orig = btn.innerHTML; btn.disabled=true; btn.innerHTML='Saving…';
+        try{
+          const data = {
+            ticker: document.getElementById('cmTicker').value.trim().toUpperCase(),
+            name: document.getElementById('cmName').value.trim(),
+            sector: document.getElementById('cmSector').value.trim(),
+            stage: document.getElementById('cmStage').value,
+            status: document.getElementById('cmStatus').value,
+            pricePerShare: parseFloat(document.getElementById('cmPrice').value)||0,
+            valuation: document.getElementById('cmValuation').value.trim(),
+            ipoWindow: document.getElementById('cmIpoWindow').value.trim(),
+            minInvestment: parseFloat(document.getElementById('cmMinInv').value)||0,
+            maxInvestment: parseFloat(document.getElementById('cmMaxInv').value)||0,
+            availableShares: parseInt(document.getElementById('cmAvail').value)||0,
+            reservedShares: parseInt(document.getElementById('cmReserved').value)||0,
+            successRate: parseInt(document.getElementById('cmSuccess').value)||0,
+            expectedReturn: document.getElementById('cmReturn').value.trim(),
+            growthYoY: document.getElementById('cmGrowth').value.trim(),
+            foundedYear: parseInt(document.getElementById('cmFounded').value)||null,
+            hq: document.getElementById('cmHq').value.trim(),
+            domain: document.getElementById('cmDomain').value.trim(),
+            logoUrl: document.getElementById('cmLogo').value.trim(),
+            description: document.getElementById('cmDesc').value.trim(),
+            sortOrder: parseInt(document.getElementById('cmSort').value)||0,
+            showOnHomepage: document.getElementById('cmShow').value === 'true',
+          };
+          if(!data.ticker || !data.name){ throw new Error('Ticker and Name are required'); }
+          const res = __editingCompanyId
+            ? await ApexAPI.admin.updateCompany(__editingCompanyId, data)
+            : await ApexAPI.admin.createCompany(data);
+          if(!res?.ok) throw new Error(res?.error||'Save failed');
+          toast(__editingCompanyId ? 'Company updated' : 'Company created', false);
+          closeCompanyModal();
+          loadCompanies();
+        }catch(e){ toast(e.message, true); }
+        finally{ btn.disabled=false; btn.innerHTML=orig; }
+      };
+
+      window.deleteCompany = async function(){
+        if(!__editingCompanyId) return;
+        const c = __companies.find(x => x._id === __editingCompanyId);
+        if(!confirm('Delete '+(c?.name||'this company')+'? This cannot be undone.')) return;
+        try{
+          const res = await ApexAPI.admin.deleteCompany(__editingCompanyId);
+          if(!res?.ok) throw new Error(res?.error||'Delete failed');
+          toast('Company deleted', false);
+          closeCompanyModal();
+          loadCompanies();
+        }catch(e){ toast(e.message, true); }
+      };
+
+      // Load companies when nav button clicked
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-section="companies"]').forEach(b => {
+          b.addEventListener('click', () => setTimeout(loadCompanies, 50));
+        });
+        const m = document.getElementById('companyModal');
+        if(m) m.addEventListener('click', e => { if(e.target===m) closeCompanyModal(); });
+      });
+      </script>
+
+    </main>
+</div>
+
+<!-- ─────── MODALS ─────── -->
+<div class="modal-back" id="userModal">
+  <div class="modal" id="userModalContent"></div>
+</div>
+
+<div class="modal-back" id="actionModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h2 id="actionModalTitle">Action</h2>
+        <p class="sub" id="actionModalSub"></p>
+      </div>
+      <button class="modal-close" data-close-modal>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label>Note (optional)</label>
+        <textarea class="textarea" id="actionNote" placeholder="Visible to the user…"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close-modal>Cancel</button>
+      <button class="btn" id="actionConfirmBtn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-back" id="balanceModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h2>Adjust Balance</h2>
+        <p class="sub" id="balanceModalSub"></p>
+      </div>
+      <button class="modal-close" data-close-modal>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="balanceUserId">
+      <div class="form-row">
+        <label>Type</label>
+        <select class="select" id="balanceType">
+          <option value="adjust">Adjust (add / subtract)</option>
+          <option value="set">Set (overwrite)</option>
+        </select>
+        <div class="hint">Adjust: positive adds, negative subtracts. Set: replaces balance entirely.</div>
+      </div>
+      <div class="form-row">
+        <label>Amount (USD)</label>
+        <input class="input" type="number" step="0.01" id="balanceAmount" placeholder="0.00">
+      </div>
+      <div class="form-row">
+        <label>Reason</label>
+        <input class="input" id="balanceReason" placeholder="Bonus credit, refund, etc.">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close-modal>Cancel</button>
+      <button class="btn btn-warn" id="balanceConfirmBtn">Apply</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// =====================================================
+// APEX ADMIN — MongoDB / ApexAPI
+// =====================================================
+
+const $  = (s,p=document) => p.querySelector(s);
+const $$ = (s,p=document) => Array.from(p.querySelectorAll(s));
+
+const state = {
+  user:null, users:[], deposits:[], withdrawals:[], kyc:[], wallets:[],
+  depositFilter:'pending', withdrawalFilter:'pending', kycFilter:'pending',
+  currentSection:'dashboard',
+};
+
+// ---------- TOAST ----------
+function toast(msg, isError){
+  const t = $('#toast');
+  t.innerHTML = (isError
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+  ) + '<span>' + esc(msg) + '</span>';
+  t.classList.toggle('error', !!isError);
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+// ---------- INIT ----------
+async function init(){
+  const user = await ApexAPI.auth.requireAdmin();
+  if (!user) return;
+  state.user = user;
+  $('#sideName').textContent = user.fullName || user.email;
+  $('#sideAvatar').textContent = (user.fullName || user.email).charAt(0).toUpperCase();
+
+  bindNav();
+  bindLogout();
+  bindMobileMenu();
+  bindRefresh();
+  bindFilters();
+  bindModals();
+  bindWalletForm();
+  bindBalanceForm();
+  bindUserSearch();
+  bindJumpButtons();
+
+  // Hash-aware initial section + back/forward support
+  (function(){
+    const valid = ['dashboard','users','deposits','withdrawals','kyc','wallets','companies'];
+    const h = (location.hash||'').replace('#','').trim();
+    const initial = window.__initialSection || (valid.includes(h) ? h : 'dashboard');
+    switchSection(initial);
+    window.addEventListener('hashchange', () => {
+      const hh = (location.hash||'').replace('#','').trim();
+      if (valid.includes(hh) && hh !== state.currentSection) switchSection(hh);
+    });
+  })();
+  pollBadges();
+}
+
+function bindNav(){
+  $$('.nav-item').forEach(item=>{
+    item.addEventListener('click',()=>switchSection(item.dataset.section));
+  });
+}
+
+function bindJumpButtons(){
+  $$('[data-jump]').forEach(b=>b.addEventListener('click',()=>switchSection(b.dataset.jump)));
+}
+
+function switchSection(name){
+  state.currentSection = name;
+      if (location.hash.replace('#','') !== name) {
+        history.replaceState(null, '', '#' + name);
+      }
+  $$('.nav-item').forEach(i=>i.classList.toggle('active', i.dataset.section===name));
+  $$('.section').forEach(s=>s.classList.toggle('active', s.dataset.section===name));
+  $('#pageTitle').textContent = ({
+    dashboard:'Dashboard', users:'Users', deposits:'Deposits', companies:'Manage Shares',
+    withdrawals:'Withdrawals', kyc:'KYC Review', wallets:'Crypto Wallets',
+  })[name];
+  closeSidebar();
+
+  if (name==='dashboard') loadDashboard();
+  if (name==='users') loadUsers();
+  if (name==='deposits') loadDeposits();
+  if (name==='withdrawals') loadWithdrawals();
+  if (name==='kyc') loadKyc();
+  if (name==='wallets') loadWallets();
+      if (name==='companies') loadCompanies();
+}
+
+function bindLogout(){
+  $('#logoutBtn').addEventListener('click', async ()=>{
+    await ApexAPI.auth.logout();
+    location.href='/adminprivate/login';
+  });
+}
+
+function bindMobileMenu(){
+  $('#menuBtn').addEventListener('click',()=>{
+    $('#sidebar').classList.add('open');
+    $('#backdrop').classList.add('show');
+  });
+  $('#backdrop').addEventListener('click', closeSidebar);
+}
+function closeSidebar(){
+  $('#sidebar').classList.remove('open');
+  $('#backdrop').classList.remove('show');
+}
+
+function bindRefresh(){
+  $('#refreshBtn').addEventListener('click',()=>{
+    const refresh = $('#refreshBtn');
+    refresh.style.transform='rotate(360deg)';
+    refresh.style.transition='transform .6s';
+    setTimeout(()=>{refresh.style.transform='';refresh.style.transition='';}, 700);
+    switchSection(state.currentSection);
+  });
+}
+
+function bindFilters(){
+  $$('[data-filter]').forEach(b=>b.addEventListener('click',e=>{
+    $$('[data-filter]').forEach(x=>x.classList.remove('active'));
+    e.target.classList.add('active');
+    state.depositFilter = b.dataset.filter;
+    loadDeposits();
+  }));
+  $$('[data-wfilter]').forEach(b=>b.addEventListener('click',e=>{
+    $$('[data-wfilter]').forEach(x=>x.classList.remove('active'));
+    e.target.classList.add('active');
+    state.withdrawalFilter = b.dataset.wfilter;
+    loadWithdrawals();
+  }));
+  $$('[data-kfilter]').forEach(b=>b.addEventListener('click',e=>{
+    $$('[data-kfilter]').forEach(x=>x.classList.remove('active'));
+    e.target.classList.add('active');
+    state.kycFilter = b.dataset.kfilter;
+    loadKyc();
+  }));
+}
+
+function bindModals(){
+  $$('[data-close-modal]').forEach(b=>b.addEventListener('click',e=>{
+    e.target.closest('.modal-back').classList.remove('show');
+  }));
+  $$('.modal-back').forEach(m=>m.addEventListener('click',e=>{
+    if (e.target===m) m.classList.remove('show');
+  }));
+}
+
+// ---------- BADGE POLL ----------
+async function pollBadges(){
+  try{
+    const [d,w,k] = await Promise.all([
+      ApexAPI.admin.listDeposits('pending'),
+      ApexAPI.admin.listWithdrawals('pending'),
+      ApexAPI.admin.listKyc('pending'),
+    ]);
+    updateBadge('badge-deposits', d.count);
+    updateBadge('badge-withdrawals', w.count);
+    updateBadge('badge-kyc', k.count);
+  } catch{}
+}
+function updateBadge(id,n){
+  const el=$('#'+id);
+  if (n>0){ el.style.display=''; el.textContent=n; }
+  else el.style.display='none';
+}
+
+// ---------- DASHBOARD ----------
+async function loadDashboard(){
+  try{
+    const [usersRes, depRes, wdRes, kycRes] = await Promise.all([
+      ApexAPI.admin.listUsers(),
+      ApexAPI.admin.listDeposits('pending'),
+      ApexAPI.admin.listWithdrawals('pending'),
+      ApexAPI.admin.listKyc('pending'),
+    ]);
+    $('#statUsers').textContent = usersRes.count;
+    $('#statKyc').textContent = kycRes.count;
+    $('#statDeposits').textContent = depRes.count;
+    $('#statWithdrawals').textContent = wdRes.count;
+    updateBadge('badge-deposits', depRes.count);
+    updateBadge('badge-withdrawals', wdRes.count);
+    updateBadge('badge-kyc', kycRes.count);
+    renderRecentUsers(usersRes.users.slice(0,8));
+  } catch(err){
+    toast('Failed to load dashboard: ' + err.message, true);
+  }
+}
+
+function renderRecentUsers(users){
+  if (!users.length) return $('#recentUsers').innerHTML = emptyState('No users yet');
+  const cards = users.map(u=>userCardHTML(u)).join('');
+  const rows = users.map(u=>`
+        <tr>
+          <td>${esc(u.fullName)||'—'}</td>
+          <td>${esc(u.email)}</td>
+          <td>${badge(u.accountStatus||'pending')}</td>
+          <td>${badge(u.kycStatus||'not_submitted')}</td>
+          <td style="text-align:right;font-weight:600">$${money(u.balanceUSD)}</td>
+          <td style="text-align:right"><button class="btn btn-ghost btn-xs" onclick="viewUser('${u.id}')">View</button></td>
+        </tr>`).join('');
+  $('#recentUsers').innerHTML = `
+    <div class="users-list">${cards}</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Name</th><th>Email</th><th>Status</th><th>KYC</th><th style="text-align:right">Balance</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+
+// ---------- USERS ----------
+function bindUserSearch(){
+  $('#userSearchBtn').addEventListener('click', loadUsers);
+  $('#userSearch').addEventListener('keydown',e=>{if(e.key==='Enter') loadUsers();});
+}
+async function loadUsers(){
+  const search = $('#userSearch').value.trim();
+  try{
+    const res = await ApexAPI.admin.listUsers(search ? {search} : {});
+    state.users = res.users;
+    renderUsers();
+  } catch(err){
+    toast('Failed: ' + err.message, true);
+  }
+}
+function renderUsers(){
+  if (!state.users.length) return $('#usersTable').innerHTML = emptyState('No users found');
+  const cards = state.users.map(u=>userCardHTML(u)).join('');
+  const rows = state.users.map(u=>`
+        <tr>
+          <td>${esc(u.fullName)||'<span style="color:var(--text-3)">unnamed</span>'}</td>
+          <td>${esc(u.email)}</td>
+          <td>${u.role==='admin'?'<span class="badge badge-admin">Admin</span>':'<span style="color:var(--text-3)">User</span>'}</td>
+          <td>${badge(u.accountStatus||'pending')}</td>
+          <td>${badge(u.kycStatus||'not_submitted')}</td>
+          <td style="text-align:right;font-weight:600">$${money(u.balanceUSD)}</td>
+          <td style="text-align:right"><button class="btn btn-ghost btn-xs" onclick="viewUser('${u.id}')">View</button></td>
+        </tr>`).join('');
+  $('#usersTable').innerHTML = `
+    <div class="users-list">${cards}</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>User</th><th>Email</th><th>Role</th><th>Account</th><th>KYC</th><th style="text-align:right">Balance</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+
+function userCardHTML(u){
+  const initial = (u.fullName || u.email || '?').charAt(0).toUpperCase();
+  const avatarHTML = u.avatarUrl
+    ? `<img src="${esc(u.avatarUrl)}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`
+    : initial;
+  return `<div class="user-card" onclick="viewUser('${u.id}')">
+    <div class="uc-avatar" style="overflow:hidden">${avatarHTML}</div>
+    <div class="uc-info">
+      <div class="uc-name">${esc(u.fullName)||'<span style="color:var(--text-3)">unnamed</span>'} ${u.role==='admin'?'<span class="badge badge-admin" style="margin-left:4px;font-size:9px;padding:1px 6px">Admin</span>':''}</div>
+      <div class="uc-email">${esc(u.email)}</div>
+    </div>
+    <div class="uc-right">
+      <div class="uc-balance">$${money(u.balanceUSD)}</div>
+      <div class="uc-badges">${badge(u.accountStatus||'pending')}</div>
+    </div>
+    <div class="uc-action">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+  </div>`;
+}
+
+async function viewUser(id){
+  try{
+    const res = await ApexAPI.admin.getUser(id);
+    const u = res.user;
+    $('#userModalContent').innerHTML = `
+      <div class="modal-head">
+        <div>
+          <h2>${esc(u.fullName)||'User'} ${u.role==='admin'?'<span class="badge badge-admin" style="margin-left:6px">Admin</span>':''}</h2>
+          <p class="sub">${esc(u.email)}</p>
+        </div>
+        <button class="modal-close" data-close-modal>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-block">
+          <h4>Balance</h4>
+          <div class="detail-balance">$${money(u.balanceUSD)}</div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>Account Status</label>
+            <select class="select" id="editAccountStatus">
+              <option value="pending"${u.accountStatus==='pending'?' selected':''}>Pending</option>
+              <option value="approved"${u.accountStatus==='approved'?' selected':''}>Approved</option>
+              <option value="rejected"${u.accountStatus==='rejected'?' selected':''}>Rejected</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>KYC Status</label>
+            <select class="select" id="editKycStatus">
+              <option value="not_submitted"${u.kycStatus==='not_submitted'?' selected':''}>Not submitted</option>
+              <option value="pending"${u.kycStatus==='pending'?' selected':''}>Pending</option>
+              <option value="approved"${u.kycStatus==='approved'?' selected':''}>Approved</option>
+              <option value="rejected"${u.kycStatus==='rejected'?' selected':''}>Rejected</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Account Active</label>
+          <select class="select" id="editStatus">
+            <option value="active"${u.status==='active'?' selected':''}>Active</option>
+            <option value="disabled"${u.status==='disabled'?' selected':''}>Disabled</option>
+          </select>
+        </div>
+
+        ${miniBlock('Recent Deposits', res.deposits, d=>`${esc(d.method)} • $${money(d.amountUSD)} • ${badge(d.status)}`)}
+        ${miniBlock('Recent Withdrawals', res.withdrawals, w=>`${esc(w.method)} • $${money(w.amountUSD)} • ${badge(w.status)}`)}
+        ${miniBlock('Holdings', res.holdings, h=>`${esc(h.symbol)} • ${h.shares} shares • avg $${money(h.avgPriceUSD)}`)}
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-warn" onclick="openBalance('${u.id}','${esc(u.email)}')">Adjust Balance</button>
+        <button class="btn btn-ghost" data-close-modal>Close</button>
+        <button class="btn" onclick="saveUser('${u.id}')">Save Changes</button>
+      </div>`;
+    $('#userModal').classList.add('show');
+    bindModals();
+  } catch(err){
+    toast('Failed: ' + err.message, true);
+  }
+}
+
+function miniBlock(title, items, fn){
+  return `<div class="detail-block">
+    <h4>${title} (${items.length})</h4>
+    <div class="detail-list">
+      ${items.length?items.slice(0,5).map(i=>`<div class="row"><span>${fn(i)}</span></div>`).join(''):'<div style="color:var(--text-3);font-size:13px">None</div>'}
+    </div>
+  </div>`;
+}
+
+async function saveUser(id){
+  try{
+    await ApexAPI.admin.updateUser(id,{
+      accountStatus: $('#editAccountStatus').value,
+      kycStatus: $('#editKycStatus').value,
+      status: $('#editStatus').value,
+    });
+    toast('User updated');
+    $('#userModal').classList.remove('show');
+    loadUsers();
+    pollBadges();
+  } catch(err){
+    toast('Failed: ' + err.message, true);
+  }
+}
+
+// ---------- DEPOSITS ----------
+async function loadDeposits(){
+  try{
+    const filter = state.depositFilter==='all' ? null : state.depositFilter;
+    const res = await ApexAPI.admin.listDeposits(filter);
+    state.deposits = res.deposits;
+    renderDeposits();
+  } catch(err){
+    toast('Failed: ' + err.message, true);
+  }
+}
+function renderDeposits(){
+  if (!state.deposits.length) return $('#depositsTable').innerHTML = emptyState('No deposits found');
+  const cards = state.deposits.map(d=>`<div class="tx-row-clickable" onclick="viewDeposit('${d._id}')">${txCardHTML(d,'deposit')}</div>`).join('');
+  $('#depositsTable').innerHTML = `
+    <div class="tx-list">${cards}</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>User</th><th>Method</th><th style="text-align:right">Amount</th><th>Asset</th><th>TX Hash</th><th>Status</th><th>Date</th><th></th></tr></thead>
+      <tbody>${state.deposits.map(d=>`
+        <tr>
+          <td data-label="User">${esc(d.userId?.email||'—')}</td>
+          <td data-label="Method"><span style="text-transform:capitalize">${esc(d.method)}</span></td>
+          <td data-label="Amount" style="font-weight:600">$${money(d.amountUSD)}</td>
+          <td data-label="Asset"><span class="mono">${esc(d.asset)}</span>${d.network?'<span style="color:var(--text-3);font-size:11px"> · '+esc(d.network)+'</span>':''}</td>
+          <td data-label="TX"><span class="mono truncate" title="${esc(d.txHash||'')}">${esc((d.txHash||'').slice(0,14))}${d.txHash?'…':'—'}</span></td>
+          <td data-label="Status">${badge(d.status)}</td>
+          <td data-label="Date"><span style="color:var(--text-3);font-size:12px">${formatDate(d.createdAt)}</span></td>
+          <td data-label=""><div class="row-actions">
+            ${d.status==='pending'?`
+              <button class="btn btn-success btn-xs" onclick="reviewDeposit('${d._id}','approve')">Approve</button>
+              <button class="btn btn-danger btn-xs" onclick="reviewDeposit('${d._id}','reject')">Reject</button>
+            `:'<span style="color:var(--text-3);font-size:12px">—</span>'}
+          </div></td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+}
+
+// ─── Deposit detail modal ───
+window.viewDeposit = function(id){
+  const d = state.deposits.find(x => x._id === id);
+  if (!d) return;
+  const user = d.userId || {};
+  const userEmail = user.email || 'unknown';
+  const userName = user.fullName || user.firstName || '';
+  const method = (d.method || '').toLowerCase();
+  const isCrypto = method === 'crypto';
+
+  const svgCoin = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M9 9h4.5a2.5 2.5 0 0 1 0 5H9"/></svg>';
+  const svgBank = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="10" width="18" height="11" rx="1"/><path d="M3 10l9-7 9 7"/><line x1="12" y1="10" x2="12" y2="21"/></svg>';
+  const svgNote = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:5px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>';
+  const svgLink = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:5px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
+
+  let actions = '';
+  if (d.status === 'pending') {
+    actions = `
+      <button class="btn btn-success" onclick="closeDepositModal();reviewDeposit('${d._id}','approve')">Approve</button>
+      <button class="btn btn-danger" onclick="closeDepositModal();reviewDeposit('${d._id}','reject')">Reject</button>`;
+  }
+
+  const body = `
+    <div class="dep-modal-body">
+      <div class="dep-modal-top">
+        <div>
+          <div class="dep-modal-user">${esc(userName || userEmail)}</div>
+          ${userName ? `<div class="dep-modal-email">${esc(userEmail)}</div>` : ''}
+        </div>
+        <div class="dep-modal-amount-wrap">
+          <div class="dep-modal-amount">$${money(d.amountUSD)}</div>
+          ${badge(d.status)}
+        </div>
+      </div>
+
+      <div class="dep-modal-grid">
+        <div><div class="dep-modal-lbl">Method</div><div class="dep-modal-val">${isCrypto ? svgCoin+'Crypto' : svgBank+'Wire / Bank'}</div></div>
+        <div><div class="dep-modal-lbl">Asset</div><div class="dep-modal-val"><strong>${esc(d.asset||'USD')}</strong></div></div>
+        ${d.network ? `<div><div class="dep-modal-lbl">Network</div><div class="dep-modal-val">${esc(d.network)}</div></div>` : ''}
+        ${d.amountAsset ? `<div><div class="dep-modal-lbl">Amount (Asset)</div><div class="dep-modal-val">${d.amountAsset}</div></div>` : ''}
+        <div><div class="dep-modal-lbl">Date</div><div class="dep-modal-val">${esc(formatDate(d.createdAt))}</div></div>
+      </div>
+
+      ${d.txHash ? `
+        <div class="dep-modal-section">
+          <div class="dep-modal-lbl">TX Hash</div>
+          <div class="dep-modal-hash-row">
+            <code class="dep-modal-hash mono">${esc(d.txHash)}</code>
+            <button class="dep-modal-copy" onclick="navigator.clipboard.writeText('${esc(d.txHash)}').then(()=>toast('Copied!'))">Copy</button>
+          </div>
+        </div>` : ''}
+
+      ${d.proofUrl ? `
+        <div class="dep-modal-section">
+          <div class="dep-modal-lbl">${svgNote}Payment Proof</div>
+          <img class="dep-modal-proof" src="${esc(d.proofUrl)}" alt="Proof" onclick="window.open('${esc(d.proofUrl)}','_blank')" title="Click to open full size"/>
+        </div>` : ''}
+
+      ${d.adminNote ? `<div class="dep-modal-note">${svgNote}${esc(d.adminNote)}</div>` : ''}
+    </div>
+    ${actions ? `<div class="dep-modal-foot">${actions}</div>` : ''}
+  `;
+
+  let modal = document.getElementById('depDetailModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'depDetailModal';
+    modal.className = 'modal-back';
+    modal.innerHTML = `
+      <div class="modal">
+        <div class="modal-head">
+          <h2>Deposit Details</h2>
+          <button class="modal-close" onclick="closeDepositModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div id="depDetailBody"></div>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeDepositModal(); });
+  }
+  document.getElementById('depDetailBody').innerHTML = body;
+  modal.classList.add('show');
+};
+
+window.closeDepositModal = function(){
+  const m = document.getElementById('depDetailModal');
+  if (m) m.classList.remove('show');
+};
+
+function reviewDeposit(id,action){
+  openAction(
+    action==='approve'?'Approve Deposit':'Reject Deposit',
+    action==='approve'?'This will credit the user\'s balance.':'This will reject the deposit.',
+    async (note)=>{
+      await ApexAPI.admin.reviewDeposit(id,action,note);
+      toast('Deposit ' + (action==='approve'?'approved':'rejected'));
+      loadDeposits(); pollBadges();
+    });
+}
+
+// ---------- WITHDRAWALS ----------
+async function loadWithdrawals(){
+  try{
+    const filter = state.withdrawalFilter==='all' ? null : state.withdrawalFilter;
+    const res = await ApexAPI.admin.listWithdrawals(filter);
+    state.withdrawals = res.withdrawals;
+    renderWithdrawals();
+  } catch(err){
+    toast('Failed: ' + err.message, true);
+  }
+}
+function renderWithdrawals(){
+  if (!state.withdrawals.length) return $('#withdrawalsTable').innerHTML = emptyState('No withdrawals found');
+
+  // Mobile: clickable compact cards
+  const cards = state.withdrawals.map(w => `
+    <div class="tx-row-clickable" onclick="viewWithdrawal('${w._id}')">
+      ${txCardHTML(w,'withdrawal')}
+    </div>
+  `).join('');
+
+  $('#withdrawalsTable').innerHTML = `
+    <div class="tx-list">${cards}</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>User</th><th>Method</th><th style="text-align:right">Amount</th><th>Destination</th><th>Status</th><th>Date</th><th></th></tr></thead>
+      <tbody>${state.withdrawals.map(w=>`
+        <tr style="cursor:pointer" onclick="viewWithdrawal('${w._id}')">
+          <td data-label="User">${esc(w.userId?.email||'—')}</td>
+          <td data-label="Method"><span style="text-transform:capitalize">${esc(w.method)}</span></td>
+          <td data-label="Amount" style="font-weight:600">$${money(w.amountUSD)}</td>
+          <td data-label="Destination"><span class="mono truncate" title="${esc(w.destinationAddress||'')}">${esc((w.destinationAddress||'').slice(0,18))}${w.destinationAddress?'…':'—'}</span></td>
+          <td data-label="Status">${badge(w.status)}</td>
+          <td data-label="Date"><span style="color:var(--text-3);font-size:12px">${formatDate(w.createdAt)}</span></td>
+          <td data-label=""><div class="row-actions" onclick="event.stopPropagation()">
+            ${w.status==='pending'?`
+              <button class="btn btn-warn btn-xs" onclick="reviewWithdrawal('${w._id}','approve')">Process</button>
+              <button class="btn btn-danger btn-xs" onclick="reviewWithdrawal('${w._id}','reject')">Reject</button>
+            `:w.status==='processing'?`
+              <button class="btn btn-success btn-xs" onclick="reviewWithdrawal('${w._id}','complete')">Complete</button>
+              <button class="btn btn-danger btn-xs" onclick="reviewWithdrawal('${w._id}','reject')">Reject</button>
+            `:'<span style="color:var(--text-3);font-size:12px">—</span>'}
+          </div></td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+}
+
+// ─── Withdrawal detail modal ───
+window.viewWithdrawal = function(id){
+  const w = state.withdrawals.find(x => x._id === id);
+  if (!w) return;
+  const user = w.userId || {};
+  const userEmail = user.email || 'unknown';
+  const userName = user.fullName || '';
+  const method = (w.method || '').toLowerCase();
+  const isCrypto = method === 'crypto';
+  const isBank = method === 'bank' || method === 'wire';
+  const bank = w.bankDetails || {};
+
+  let actions = '';
+  if (w.status === 'pending') {
+    actions = `
+      <button class="btn btn-warn" onclick="closeDetailModal();reviewWithdrawal('${w._id}','approve')">Process</button>
+      <button class="btn btn-danger" onclick="closeDetailModal();reviewWithdrawal('${w._id}','reject')">Reject</button>`;
+  } else if (w.status === 'processing') {
+    actions = `
+      <button class="btn btn-success" onclick="closeDetailModal();reviewWithdrawal('${w._id}','complete')">Mark Complete</button>
+      <button class="btn btn-danger" onclick="closeDetailModal();reviewWithdrawal('${w._id}','reject')">Reject</button>`;
+  }
+
+  const body = `
+    <div class="wd-modal-body">
+      <div class="wd-modal-top">
+        <div>
+          <div class="wd-modal-user">${esc(userName || userEmail)}</div>
+          ${userName ? `<div class="wd-modal-email">${esc(userEmail)}</div>` : ''}
+        </div>
+        <div class="wd-modal-amount-wrap">
+          <div class="wd-modal-amount">$${money(w.amountUSD)}</div>
+          ${badge(w.status)}
+        </div>
+      </div>
+
+      <div class="wd-modal-grid">
+        <div><div class="wd-modal-lbl">Method</div><div class="wd-modal-val">${isCrypto?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M9 9h4.5a2.5 2.5 0 0 1 0 5H9"/></svg>Crypto':isBank?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="10" width="18" height="11" rx="1"/><path d="M3 10l9-7 9 7"/><line x1="12" y1="10" x2="12" y2="21"/></svg>Bank':esc(w.method)}</div></div>
+        ${isCrypto?`<div><div class="wd-modal-lbl">Asset</div><div class="wd-modal-val"><strong>${esc(w.asset||'—')}</strong></div></div>`:''}
+        ${isCrypto?`<div><div class="wd-modal-lbl">Network</div><div class="wd-modal-val">${esc(w.network||'—')}</div></div>`:''}
+        ${isBank&&bank.bankName?`<div><div class="wd-modal-lbl">Bank</div><div class="wd-modal-val">${esc(bank.bankName)}</div></div>`:''}
+        ${isBank&&bank.accountName?`<div><div class="wd-modal-lbl">Account Name</div><div class="wd-modal-val">${esc(bank.accountName)}</div></div>`:''}
+        ${isBank&&bank.country?`<div><div class="wd-modal-lbl">Country</div><div class="wd-modal-val">${esc(bank.country)}</div></div>`:''}
+        <div><div class="wd-modal-lbl">Date</div><div class="wd-modal-val">${esc(formatDate(w.createdAt))}</div></div>
+      </div>
+
+      ${isCrypto&&w.destinationAddress?`
+        <div class="wd-modal-section">
+          <div class="wd-modal-lbl">Destination Address</div>
+          <div class="wd-modal-addr-row">
+            <code class="wd-modal-addr mono">${esc(w.destinationAddress)}</code>
+            <button class="wd-modal-copy" onclick="navigator.clipboard.writeText('${esc(w.destinationAddress)}').then(()=>toast('Address copied'))">Copy</button>
+          </div>
+          ${w.destinationMemo?`<div class="wd-modal-memo">Memo/Tag: <code class="mono">${esc(w.destinationMemo)}</code></div>`:''}
+        </div>
+      `:''}
+
+      ${isBank&&(bank.accountNumber||bank.iban||bank.routingNumber||bank.swiftCode)?`
+        <div class="wd-modal-section">
+          <div class="wd-modal-lbl">Bank Details</div>
+          ${bank.accountNumber?`<div class="wd-modal-bank-row"><span>Account #:</span> <code class="mono">${esc(bank.accountNumber)}</code></div>`:''}
+          ${bank.iban?`<div class="wd-modal-bank-row"><span>IBAN:</span> <code class="mono">${esc(bank.iban)}</code></div>`:''}
+          ${bank.routingNumber?`<div class="wd-modal-bank-row"><span>Routing #:</span> <code class="mono">${esc(bank.routingNumber)}</code></div>`:''}
+          ${bank.swiftCode?`<div class="wd-modal-bank-row"><span>SWIFT:</span> <code class="mono">${esc(bank.swiftCode)}</code></div>`:''}
+        </div>
+      `:''}
+
+      ${w.adminNote?`<div class="wd-modal-note"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:5px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>${esc(w.adminNote)}</div>`:''}
+      ${w.txHash?`<div class="wd-modal-note"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:5px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>TX: <code class="mono">${esc(w.txHash)}</code></div>`:''}
+    </div>
+    ${actions?`<div class="wd-modal-foot">${actions}</div>`:''}
+  `;
+
+  // Build modal
+  let modal = document.getElementById('wdDetailModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'wdDetailModal';
+    modal.className = 'modal-back';
+    modal.innerHTML = `
+      <div class="modal">
+        <div class="modal-head">
+          <h2>Withdrawal Details</h2>
+          <button class="modal-close" onclick="closeDetailModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div id="wdDetailBody"></div>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeDetailModal(); });
+  }
+  document.getElementById('wdDetailBody').innerHTML = body;
+  modal.classList.add('show');
+};
+
+window.closeDetailModal = function(){
+  const m = document.getElementById('wdDetailModal');
+  if (m) m.classList.remove('show');
+};
+
+function withdrawalCardHTML(w){
+  const user = w.userId || {};
+  const userEmail = user.email || 'unknown';
+  const userName = user.fullName || user.firstName || '';
+  const initial = (userName || userEmail).charAt(0).toUpperCase();
+  const method = (w.method || '').toLowerCase();
+  const isCrypto = method === 'crypto';
+  const isBank = method === 'bank' || method === 'wire';
+  const bank = w.bankDetails || {};
+
+  // Action buttons based on status
+  let actions = '';
+  if (w.status === 'pending') {
+    actions = `
+      <button class="btn btn-warn" onclick="reviewWithdrawal('${w._id}','approve')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Process
+      </button>
+      <button class="btn btn-danger" onclick="reviewWithdrawal('${w._id}','reject')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Reject
+      </button>`;
+  } else if (w.status === 'processing') {
+    actions = `
+      <button class="btn btn-success" onclick="reviewWithdrawal('${w._id}','complete')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Mark Complete
+      </button>
+      <button class="btn btn-danger" onclick="reviewWithdrawal('${w._id}','reject')">Reject</button>`;
+  }
+
+  return `
+    <div class="wd-card wd-status-${esc(w.status)}">
+      <div class="wd-head">
+        <div class="wd-user">
+          <div class="wd-avatar">${esc(initial)}</div>
+          <div>
+            <div class="wd-user-name">${esc(userName || userEmail)}</div>
+            ${userName ? `<div class="wd-user-email">${esc(userEmail)}</div>` : ''}
+          </div>
+        </div>
+        <div class="wd-amount-wrap">
+          <div class="wd-amount">$${money(w.amountUSD)}</div>
+          ${badge(w.status)}
+        </div>
+      </div>
+
+      <div class="wd-grid">
+        <div class="wd-field">
+          <div class="wd-label">Method</div>
+          <div class="wd-value">${isCrypto ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M9 9h4.5a2.5 2.5 0 0 1 0 5H9"/></svg>Crypto' : isBank ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="10" width="18" height="11" rx="1"/><path d="M3 10l9-7 9 7"/><line x1="12" y1="10" x2="12" y2="21"/></svg>Bank Transfer' : esc(w.method)}</div>
+        </div>
+        ${isCrypto ? `
+          <div class="wd-field">
+            <div class="wd-label">Asset</div>
+            <div class="wd-value"><strong>${esc(w.asset || '—')}</strong></div>
+          </div>
+          <div class="wd-field">
+            <div class="wd-label">Network</div>
+            <div class="wd-value">${esc(w.network || '—')}</div>
+          </div>
+        ` : ''}
+        ${isBank ? `
+          ${bank.bankName ? `<div class="wd-field"><div class="wd-label">Bank</div><div class="wd-value">${esc(bank.bankName)}</div></div>` : ''}
+          ${bank.accountName ? `<div class="wd-field"><div class="wd-label">Account Name</div><div class="wd-value">${esc(bank.accountName)}</div></div>` : ''}
+          ${bank.country ? `<div class="wd-field"><div class="wd-label">Country</div><div class="wd-value">${esc(bank.country)}</div></div>` : ''}
+        ` : ''}
+        <div class="wd-field">
+          <div class="wd-label">Date</div>
+          <div class="wd-value">${esc(formatDate(w.createdAt))}</div>
+        </div>
+      </div>
+
+      ${isCrypto && w.destinationAddress ? `
+        <div class="wd-address-box">
+          <div class="wd-label">Destination Address</div>
+          <div class="wd-address-row">
+            <code class="wd-address mono">${esc(w.destinationAddress)}</code>
+            <button class="wd-copy-btn" onclick="navigator.clipboard.writeText('${esc(w.destinationAddress)}').then(()=>toast('Address copied'))" title="Copy">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+          ${w.destinationMemo ? `<div class="wd-memo"><span class="wd-label-inline">Memo/Tag:</span> <code class="mono">${esc(w.destinationMemo)}</code></div>` : ''}
+        </div>
+      ` : ''}
+
+      ${isBank && (bank.accountNumber || bank.iban || bank.routingNumber || bank.swiftCode) ? `
+        <div class="wd-address-box">
+          <div class="wd-label">Bank Details</div>
+          ${bank.accountNumber ? `<div class="wd-bank-row"><span class="wd-bank-key">Account #:</span> <code class="mono">${esc(bank.accountNumber)}</code></div>` : ''}
+          ${bank.iban ? `<div class="wd-bank-row"><span class="wd-bank-key">IBAN:</span> <code class="mono">${esc(bank.iban)}</code></div>` : ''}
+          ${bank.routingNumber ? `<div class="wd-bank-row"><span class="wd-bank-key">Routing #:</span> <code class="mono">${esc(bank.routingNumber)}</code></div>` : ''}
+          ${bank.swiftCode ? `<div class="wd-bank-row"><span class="wd-bank-key">SWIFT:</span> <code class="mono">${esc(bank.swiftCode)}</code></div>` : ''}
+        </div>
+      ` : ''}
+
+      ${w.adminNote ? `<div class="wd-note">📝 ${esc(w.adminNote)}</div>` : ''}
+      ${w.txHash ? `<div class="wd-note">🔗 TX: <code class="mono">${esc(w.txHash)}</code></div>` : ''}
+
+      ${actions ? `<div class="wd-actions">${actions}</div>` : ''}
+    </div>
+  `;
+}
+function reviewWithdrawal(id,action){
+  openAction(
+    action.charAt(0).toUpperCase()+action.slice(1)+' Withdrawal',
+    action==='reject'?'Funds will be refunded to the user.':'Optional note for the user.',
+    async (note)=>{
+      await ApexAPI.admin.reviewWithdrawal(id,action,note);
+      toast('Withdrawal ' + action + 'd');
+      loadWithdrawals(); pollBadges();
+    });
+}
+
+// ---------- KYC ----------
+async function loadKyc(){
+  try{
+    const filter = state.kycFilter==='all' ? null : state.kycFilter;
+    const res = await ApexAPI.admin.listKyc(filter);
+    state.kyc = res.documents;
+    renderKyc();
+  } catch(err){
+    toast('Failed: ' + err.message, true);
+  }
+}
+function renderKyc(){
+  if (!state.kyc.length) return $('#kycTable').innerHTML = emptyState('No KYC submissions');
+
+  function kycRichCard(d){
+    const userEmail = d.userId?.email || '—';
+    const userId = d.userId?._id || d.userId || '';
+    const docType = (d.documentType||'').replace(/_/g,' ');
+    const thumb = (url, label) => url
+      ? `<a href="${esc(url)}" target="_blank" rel="noopener" title="View ${label} full size" style="display:block;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg-2);position:relative;aspect-ratio:1/1">
+           <img src="${esc(url)}" alt="${label}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">
+           <div style="display:none;width:100%;height:100%;align-items:center;justify-content:center;color:var(--text-3);font-size:11px;text-align:center">${label}<br>(failed)</div>
+           <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.8));color:#fff;font-size:10px;padding:4px 6px;font-weight:600;text-transform:uppercase;letter-spacing:.3px">${label}</div>
+         </a>`
+      : `<div style="aspect-ratio:1/1;border:1px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text-3);font-size:11px;background:var(--bg-2)">No ${label}</div>`;
+
+    return `
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px">
+          <div style="min-width:0;flex:1">
+            <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:2px">${esc(d.fullName||'Unknown')}</div>
+            <div style="font-size:12px;color:var(--text-3);word-break:break-all">${esc(userEmail)}</div>
+          </div>
+          ${badge(d.status)}
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;font-size:11px">
+          <span style="background:var(--bg-2);border:1px solid var(--border);padding:3px 9px;border-radius:20px;color:var(--text-2);text-transform:capitalize">${esc(docType)}</span>
+          ${d.documentNumber?`<span style="background:var(--bg-2);border:1px solid var(--border);padding:3px 9px;border-radius:20px;color:var(--text-2);font-family:monospace">${esc(d.documentNumber)}</span>`:''}
+          ${d.country?`<span style="background:var(--bg-2);border:1px solid var(--border);padding:3px 9px;border-radius:20px;color:var(--text-2)">📍 ${esc(d.country)}</span>`:''}
+          <span style="color:var(--text-3);padding:3px 0">${formatDate(d.createdAt)}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">
+          ${thumb(d.frontImageUrl, 'Front')}
+          ${thumb(d.backImageUrl,  'Back')}
+          ${thumb(d.selfieUrl,     'Selfie')}
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-top:12px;border-top:1px solid var(--border)">
+          ${userId
+            ? `<a href="/adminprivate/user?id=${esc(userId)}" style="color:var(--accent);font-size:12px;font-weight:600;text-decoration:none">View full profile →</a>`
+            : `<span></span>`}
+          <div style="display:flex;gap:6px">
+            ${d.status==='pending'
+              ? `<button class="btn btn-success btn-xs" onclick="reviewKyc('${d._id}','approve')">✓ Approve</button>
+                 <button class="btn btn-danger btn-xs" onclick="reviewKyc('${d._id}','reject')">✗ Reject</button>`
+              : `<span style="color:var(--text-3);font-size:12px;text-transform:capitalize">${esc(d.status)}</span>`}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  $('#kycTable').innerHTML = state.kyc.map(kycRichCard).join('');
+}
+function reviewKyc(id,action){
+  openAction(
+    action==='approve'?'Approve KYC':'Reject KYC',
+    action==='approve'?'User can now trade and withdraw.':'User must re-submit documents.',
+    async (note)=>{
+      await ApexAPI.admin.reviewKyc(id,action,note);
+      toast('KYC ' + (action==='approve'?'approved':'rejected'));
+      loadKyc(); pollBadges();
+    });
+}
+
+// ---------- WALLETS ----------
+async function loadWallets(){
+  try{
+    const res = await ApexAPI.admin.listWallets();
+    state.wallets = res.wallets;
+    renderWallets();
+  } catch(err){
+    toast('Failed: ' + err.message, true);
+  }
+}
+// 7 supported wallet templates (always shown)
+const WALLET_TEMPLATES = [
+  { asset:'BTC',  label:'Bitcoin',   network:'Bitcoin',  iconClass:'btc',  logo:'https://assets.coingecko.com/coins/images/1/large/bitcoin.png' },
+  { asset:'ETH',  label:'Ethereum',  network:'ERC20',    iconClass:'eth',  logo:'https://assets.coingecko.com/coins/images/279/large/ethereum.png' },
+  { asset:'USDT', label:'Tether',    network:'TRC20',    iconClass:'usdt', logo:'https://assets.coingecko.com/coins/images/325/large/Tether.png' },
+  { asset:'USDC', label:'USD Coin',  network:'ERC20',    iconClass:'usdc', logo:'https://assets.coingecko.com/coins/images/6319/large/usdc.png' },
+  { asset:'SOL',  label:'Solana',    network:'Solana',   iconClass:'sol',  logo:'https://assets.coingecko.com/coins/images/4128/large/solana.png' },
+  { asset:'BNB',  label:'BNB',       network:'BSC',      iconClass:'bnb',  logo:'https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png' },
+  { asset:'DOGE',      label:'Dogecoin',  network:'Dogecoin', iconClass:'doge', logo:'https://assets.coingecko.com/coins/images/5/large/dogecoin.png' },
+  { asset:'XRP',  label:'Ripple',    network:'Ripple',   iconClass:'xrp',  logo:'https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png' },
+];
+
+function renderWallets(){
+  const byAsset = {};
+  (state.wallets || []).forEach(w => { byAsset[w.asset] = w; });
+  const cards = WALLET_TEMPLATES.map(tpl => {
+    const w = byAsset[tpl.asset] || null;
+    return walletCardHTML(tpl, w);
+  }).join('');
+  $('#walletsTable').innerHTML = `<div class="wallet-cards">${cards}</div>`;
+  WALLET_TEMPLATES.forEach(tpl => bindWalletCard(tpl.asset));
+}
+
+function walletCardHTML(tpl, w){
+  const active = w ? !!w.active : false;
+  const address = w ? (w.address || '') : '';
+  const qrUrl = w ? (w.qrUrl || '') : '';
+  const exists = !!w;
+  return `
+    <div class="wallet-card ${active ? 'active' : ''}" data-asset="${tpl.asset}" data-id="${w ? w._id : ''}">
+      <div class="wc-head">
+        <div class="wc-title-wrap">
+          <div class="wc-icon ${tpl.iconClass}"><img src="${tpl.logo}" alt="${tpl.asset}" onerror="this.outerHTML='<span style=&quot;font-weight:800;font-size:18px&quot;>'+(this.alt||'?')[0]+'</span>'"></div>
+          <div>
+            <div class="wc-symbol">${tpl.asset}</div>
+            <div class="wc-status ${active ? 'active' : ''}"><span class="dot"></span>${exists ? (active ? 'Active' : 'Inactive') : 'Not configured'}</div>
+          </div>
+        </div>
+        <span class="badge ${active ? 'badge-active' : 'badge-disabled'}">${active ? 'ACTIVE' : 'OFF'}</span>
+      </div>
+      ${!exists ? `<div class="wc-empty-note">Add address & barcode below, then click Create to activate</div>` : ''}
+      <div class="wc-field">
+        <label>${tpl.asset} Address <span class="req">*</span></label>
+        <div class="wc-input-wrap">
+          <svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <input class="input wc-address" placeholder="${tpl.asset} wallet address" value="${esc(address)}">
+        </div>
+      </div>
+      <div class="wc-field">
+        <label>${tpl.asset} Barcode <span class="req">*</span></label>
+        <input type="file" class="wc-qr-file" accept="image/*" style="display:none">
+        <input type="hidden" class="wc-qr-url" value="${esc(qrUrl)}">
+        <div class="wc-qr-box ${qrUrl ? 'filled' : ''}">
+          ${qrUrl
+            ? `<div class="wc-qr-thumb"><img src="${esc(qrUrl)}" alt="QR"></div>`
+            : `<div class="wc-qr-placeholder"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>`
+          }
+          <button type="button" class="wc-qr-action wc-qr-upload-btn">${qrUrl ? 'Replace Barcode' : 'Upload Barcode'}</button>
+          ${qrUrl ? `<button type="button" class="wc-qr-remove wc-qr-remove-btn" title="Remove QR"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>` : ''}
+        </div>
+      </div>
+      <div class="wc-actions">
+        <button class="btn wc-save-btn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          ${exists ? 'Save' : 'Create'}
+        </button>
+        ${exists ? `
+          <button class="btn btn-ghost wc-toggle-btn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${active ? '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>' : '<polygon points="5 3 19 12 5 21 5 3"/>'}</svg>
+            ${active ? 'Deactivate' : 'Activate'}
+          </button>
+          <button class="btn btn-danger wc-delete-btn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>
+            Delete
+          </button>
+        ` : '<div></div><div></div>'}
+      </div>
+    </div>
+  `;
+}
+
+function bindWalletCard(asset){
+  const card = document.querySelector(`.wallet-card[data-asset="${asset}"]`);
+  if (!card) return;
+  const tpl = WALLET_TEMPLATES.find(t => t.asset === asset);
+  const addressInput = card.querySelector('.wc-address');
+  const qrUrlInput = card.querySelector('.wc-qr-url');
+  const qrFileInput = card.querySelector('.wc-qr-file');
+  const uploadBtn = card.querySelector('.wc-qr-upload-btn');
+  const removeBtn = card.querySelector('.wc-qr-remove-btn');
+  const saveBtn = card.querySelector('.wc-save-btn');
+  const toggleBtn = card.querySelector('.wc-toggle-btn');
+  const deleteBtn = card.querySelector('.wc-delete-btn');
+
+  if (uploadBtn) uploadBtn.addEventListener('click', () => qrFileInput.click());
+
+  if (qrFileInput) qrFileInput.addEventListener('change', async e => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast('Choose an image', true); return; }
+    if (file.size > 5 * 1024 * 1024) { toast('Image too large (max 5 MB)', true); return; }
+    uploadBtn.textContent = 'Uploading…';
+    uploadBtn.disabled = true;
+    try {
+      const res = await ApexAPI.upload.file(file, 'wallet_qr');
+      const url = res.secure_url || res.url || res.fileUrl;
+      if (!url) throw new Error('Upload returned no URL');
+      qrUrlInput.value = url;
+      const id = card.getAttribute('data-id');
+      const existing = state.wallets.find(w => w.asset === asset) || { asset, address: addressInput.value, active: false };
+      existing.qrUrl = url;
+      existing.address = addressInput.value;
+      card.outerHTML = walletCardHTML(tpl, id ? { ...existing, _id: id } : existing);
+      bindWalletCard(asset);
+      toast('Barcode uploaded');
+    } catch(err){
+      toast('Upload failed: ' + err.message, true);
+      uploadBtn.textContent = 'Upload Barcode';
+      uploadBtn.disabled = false;
+    }
+  });
+
+  if (removeBtn) removeBtn.addEventListener('click', () => {
+    qrUrlInput.value = '';
+    const id = card.getAttribute('data-id');
+    const existing = state.wallets.find(w => w.asset === asset) || { asset, address: addressInput.value, active: false };
+    existing.qrUrl = '';
+    existing.address = addressInput.value;
+    card.outerHTML = walletCardHTML(tpl, id ? { ...existing, _id: id } : null);
+    bindWalletCard(asset);
+  });
+
+  if (saveBtn) saveBtn.addEventListener('click', async () => {
+    const address = addressInput.value.trim();
+    const qrUrl = qrUrlInput.value.trim();
+    if (!address) { toast('Address is required', true); return; }
+    saveBtn.disabled = true;
+    const origLabel = saveBtn.innerHTML;
+    saveBtn.innerHTML = 'Saving…';
+    try {
+      const id = card.getAttribute('data-id');
+      const data = {
+        label: tpl.label, asset: tpl.asset, network: tpl.network,
+        address, qrUrl, active: true,
+        sortOrder: WALLET_TEMPLATES.findIndex(t => t.asset === asset) + 1,
+      };
+      if (id) {
+        await ApexAPI.admin.updateWallet(id, data);
+        toast(tpl.asset + ' updated');
+      } else {
+        await ApexAPI.admin.createWallet(data);
+        toast(tpl.asset + ' created');
+      }
+      loadWallets();
+    } catch(err){
+      toast('Save failed: ' + err.message, true);
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = origLabel;
+    }
+  });
+
+  if (toggleBtn) toggleBtn.addEventListener('click', async () => {
+    const id = card.getAttribute('data-id');
+    if (!id) return;
+    const w = state.wallets.find(x => x._id === id);
+    if (!w) return;
+    toggleBtn.disabled = true;
+    try {
+      await ApexAPI.admin.updateWallet(id, { active: !w.active });
+      toast(w.active ? tpl.asset + ' deactivated' : tpl.asset + ' activated');
+      loadWallets();
+    } catch(err){
+      toast('Failed: ' + err.message, true);
+      toggleBtn.disabled = false;
+    }
+  });
+
+  if (deleteBtn) deleteBtn.addEventListener('click', async () => {
+    const id = card.getAttribute('data-id');
+    if (!id) return;
+    if (!confirm('Delete ' + tpl.asset + ' wallet? This cannot be undone.')) return;
+    deleteBtn.disabled = true;
+    try {
+      await ApexAPI.admin.deleteWallet(id);
+      toast(tpl.asset + ' deleted');
+      loadWallets();
+    } catch(err){
+      toast('Delete failed: ' + err.message, true);
+      deleteBtn.disabled = false;
+    }
+  });
+}
+
+function bindWalletForm(){ /* legacy — replaced by inline card binding */ }
+
+function editWallet(){ /* legacy — replaced by inline card */ }
+
+function refreshQrPreview(url){
+  const preview = document.getElementById('wQrPreview');
+  const img = document.getElementById('wQrImg');
+  const label = document.getElementById('wQrUploadLabel');
+  if (url) {
+    img.src = url;
+    preview.style.display = 'block';
+    if (label) label.textContent = 'Replace QR Image';
+  } else {
+    img.src = '';
+    preview.style.display = 'none';
+    if (label) label.textContent = 'Upload QR Image';
+  }
+}
+
+async function deleteWallet(id){
+  if (!confirm('Delete this wallet? This cannot be undone.')) return;
+  try{
+    await ApexAPI.admin.deleteWallet(id);
+    toast('Wallet deleted');
+    loadWallets();
+  } catch(err){
+    toast('Failed: ' + err.message, true);
+  }
+}
+
+// ---------- ACTION MODAL ----------
+let actionCallback = null;
+function openAction(title, sub, callback){
+  $('#actionModalTitle').textContent = title;
+  $('#actionModalSub').textContent = sub||'';
+  $('#actionNote').value='';
+  actionCallback = callback;
+  $('#actionModal').classList.add('show');
+}
+$('#actionConfirmBtn').addEventListener('click', async ()=>{
+  try{
+    await actionCallback($('#actionNote').value.trim());
+    $('#actionModal').classList.remove('show');
+  } catch(err){
+    toast('Failed: ' + err.message, true);
+  }
+});
+
+// ---------- BALANCE ----------
+function openBalance(userId, email){
+  $('#balanceUserId').value = userId;
+  $('#balanceModalSub').textContent = 'Adjust balance for ' + email;
+  $('#balanceAmount').value='';
+  $('#balanceReason').value='';
+  $('#balanceType').value='adjust';
+  $('#balanceModal').classList.add('show');
+}
+function bindBalanceForm(){
+  $('#balanceConfirmBtn').addEventListener('click', async ()=>{
+    try{
+      const userId = $('#balanceUserId').value;
+      const amount = parseFloat($('#balanceAmount').value);
+      const reason = $('#balanceReason').value.trim();
+      const type = $('#balanceType').value;
+      if (isNaN(amount)) { toast('Amount required', true); return; }
+      await ApexAPI.admin.adjustBalance(userId, amount, reason, type);
+      toast('Balance updated');
+      $('#balanceModal').classList.remove('show');
+      $('#userModal').classList.remove('show');
+      loadUsers();
+    } catch(err){
+      toast('Failed: ' + err.message, true);
+    }
+  });
+}
+
+
+function txCardHTML(t, kind){
+  const dir = kind === 'deposit' ? 'in' : 'out';
+  const icon = kind === 'deposit'
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>';
+  const actions = t.status === 'pending'
+    ? (kind === 'deposit'
+      ? `<button class="btn btn-success btn-xs" onclick="event.stopPropagation();reviewDeposit('${t._id}','approve')">Approve</button>
+         <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();reviewDeposit('${t._id}','reject')">Reject</button>`
+      : `<button class="btn btn-warn btn-xs" onclick="event.stopPropagation();reviewWithdrawal('${t._id}','approve')">Process</button>
+         <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();reviewWithdrawal('${t._id}','reject')">Reject</button>`)
+    : (t.status === 'processing' && kind === 'withdrawal'
+      ? `<button class="btn btn-success btn-xs" onclick="event.stopPropagation();reviewWithdrawal('${t._id}','complete')">Complete</button>
+         <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();reviewWithdrawal('${t._id}','reject')">Reject</button>`
+      : '');
+  return `<div class="tx-card">
+    <div class="tx-icon ${dir}">${icon}</div>
+    <div class="tx-info">
+      <div class="tx-title">${esc(t.userId?.email||'—')}</div>
+      <div class="tx-sub"><span style="text-transform:capitalize">${esc(t.method)}</span> · ${esc(t.asset||'USD')} · ${formatDate(t.createdAt)}</div>
+    </div>
+    <div class="tx-right">
+      <div class="tx-amount">$${money(t.amountUSD)}</div>
+      ${badge(t.status)}
+    </div>
+  </div>
+  ${actions ? `<div class="tx-meta-row"><span>Actions</span><div style="display:flex;gap:6px">${actions}</div></div>` : ''}`;
+}
+
+function kycCardHTML(d){
+  const actions = d.status === 'pending'
+    ? `<button class="btn btn-success btn-xs" onclick="event.stopPropagation();reviewKyc('${d._id}','approve')">Approve</button>
+       <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();reviewKyc('${d._id}','reject')">Reject</button>`
+    : '';
+  return `<div class="tx-card">
+    <div class="tx-icon kyc">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    </div>
+    <div class="tx-info">
+      <div class="tx-title">${esc(d.fullName)||esc(d.userId?.email)||'—'}</div>
+      <div class="tx-sub"><span style="text-transform:capitalize">${esc((d.documentType||'').replace('_',' '))}</span> · ${esc(d.country)||'—'} · ${formatDate(d.createdAt)}</div>
+    </div>
+    <div class="tx-right">${badge(d.status)}</div>
+  </div>
+  ${actions ? `<div class="tx-meta-row"><span>Actions</span><div style="display:flex;gap:6px">${actions}</div></div>` : ''}`;
+}
+
+
+// ---------- HELPERS ----------
+function badge(status){
+  const map = {
+    pending:'badge-pending', approved:'badge-approved', rejected:'badge-rejected',
+    processing:'badge-processing', completed:'badge-completed',
+    active:'badge-active', disabled:'badge-disabled',
+    not_submitted:'badge-not_submitted', cancelled:'badge-rejected',
+  };
+  const cls = map[status] || 'badge-pending';
+  const label = (status||'—').replace('_',' ');
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function emptyState(msg){
+  return `<div class="empty">
+    <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
+    <div>${esc(msg)}</div>
+  </div>`;
+}
+
+function esc(s){
+  if (s===null||s===undefined) return '';
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function money(n){
+  return Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function formatDate(d){
+  if (!d) return '—';
+  const date = new Date(d);
+  const today = new Date();
+  const sameDay = date.toDateString() === today.toDateString();
+  if (sameDay) return date.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  return date.toLocaleDateString();
+}
+
+// expose
+window.viewUser = viewUser;
+window.saveUser = saveUser;
+window.reviewDeposit = reviewDeposit;
+window.reviewWithdrawal = reviewWithdrawal;
+window.reviewKyc = reviewKyc;
+window.editWallet = editWallet;
+window.deleteWallet = deleteWallet;
+window.openBalance = openBalance;
+
+init();
+</script>
+
+<script>
+// Override modal — redirect to dedicated page instead
+window.viewUser = function(id) {
+  location.href = '/adminprivate/user?id=' + id;
+};
+</script>
+
+<!-- Admin Profile Modal -->
+<div id="adminProfileModal" class="modal-back" style="display:none">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-head">
+      <h2>Admin Profile</h2>
+      <button class="modal-close" onclick="closeAdminProfile()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="padding:18px;font-family:'Montserrat',sans-serif">
+      <!-- Profile summary -->
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.06)">
+        <div class="ap-avatar-wrap" onclick="document.getElementById('apAvatarFile').click()" title="Click to change avatar">
+          <div id="apAvatar" style="width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#4a9eff,#3aed98);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:#1a1a1a;flex-shrink:0;overflow:hidden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:60%;height:60%"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div class="ap-avatar-overlay" style="width:54px;height:54px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+          <input type="file" id="apAvatarFile" accept="image/*" style="display:none" onchange="uploadAdminAvatar(this)">
+        </div>
+        <div style="flex:1;min-width:0">
+          <div id="apName" style="font-size:15px;font-weight:600;color:var(--text-1)">Loading…</div>
+          <div id="apEmail" style="font-size:12px;color:var(--text-3);margin-top:2px;word-break:break-all"></div>
+          <div style="font-size:10px;color:#3aed98;margin-top:4px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600">● Administrator</div>
+        </div>
+      </div>
+
+      <!-- Edit fields -->
+      <div class="ap-field">
+        <label>Full Name</label>
+        <input type="text" id="apFullName" placeholder="Your name">
+      </div>
+      <div class="ap-field">
+        <label>Phone</label>
+        <input type="tel" id="apPhone" placeholder="(555) 123-4567">
+      </div>
+      <div class="ap-field">
+        <label>Email <span style="color:var(--text-3);font-weight:400;text-transform:none;letter-spacing:0">(read-only)</span></label>
+        <input type="email" id="apEmailReadOnly" disabled style="opacity:0.6;cursor:not-allowed">
+      </div>
+
+      <!-- Change password section -->
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06)">
+        <div style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Change Password
+        </div>
+        <div class="ap-field">
+          <label>Current Password</label>
+          <input type="password" id="apCurPwd" autocomplete="current-password">
+        </div>
+        <div class="ap-field">
+          <label>New Password</label>
+          <input type="password" id="apNewPwd" autocomplete="new-password" minlength="8">
+        </div>
+        <div class="ap-field">
+          <label>Confirm New Password</label>
+          <input type="password" id="apNewPwd2" autocomplete="new-password">
+        </div>
+        <p style="font-size:10px;color:var(--text-3);margin:4px 0 0">Leave blank to keep current password</p>
+      </div>
+    </div>
+    <div class="modal-foot" style="display:flex;gap:8px;padding:14px 18px;border-top:1px solid rgba(255,255,255,0.06)">
+      <button class="btn btn-ghost" onclick="closeAdminProfile()" style="flex:1">Cancel</button>
+      <button class="btn btn-success" id="apSaveBtn" onclick="saveAdminProfile()" style="flex:1.4">Save Changes</button>
+    </div>
+  </div>
+</div>
+<style>
+.ap-field{margin-bottom:12px}
+.ap-field label{display:block;font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:5px;font-family:'Montserrat',sans-serif}
+.ap-field input{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 12px;color:var(--text-1);font-family:'Montserrat',sans-serif;font-size:13px;transition:border-color .15s,background .15s}
+.ap-field input:focus{outline:none;border-color:#4a9eff;background:rgba(74,158,255,0.05)}
+#adminProfileModal.show{display:flex !important}
+</style>
+<script>
+window.openAdminProfile = async function(){
+  const m = document.getElementById('adminProfileModal');
+  if(!m) return;
+  m.classList.add('show');
+  m.style.display = 'flex';
+  try{
+    const res = await ApexAPI.admin.getMe();
+    if(!res || res.success===false) throw new Error(res?.error||'Failed to load');
+    const a = res.admin || {};
+    document.getElementById('apName').textContent = a.fullName || a.email || 'Admin';
+    document.getElementById('apEmail').textContent = a.email || '';
+    document.getElementById('apEmailReadOnly').value = a.email || '';
+    document.getElementById('apFullName').value = a.fullName || '';
+    document.getElementById('apPhone').value = a.phone || '';
+    document.getElementById('apCurPwd').value = '';
+    document.getElementById('apNewPwd').value = '';
+    document.getElementById('apNewPwd2').value = '';
+    // Avatar initial
+    const initial = (a.fullName || a.email || 'A').trim().charAt(0).toUpperCase();
+    const apAv = document.getElementById('apAvatar');
+    if(a.avatarUrl){
+      apAv.innerHTML = '<img src="'+a.avatarUrl+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+    } else {
+      apAv.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:60%;height:60%"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+    }
+    // Also update brand avatar in sidebar
+    setBrandAvatar(a.avatarUrl, initial);
+    window.__adminAvatarUrl = a.avatarUrl || '';
+  }catch(e){
+    toast('Failed to load profile: '+e.message, true);
+    closeAdminProfile();
+  }
+};
+window.closeAdminProfile = function(){
+  const m = document.getElementById('adminProfileModal');
+  if(m){ m.classList.remove('show'); m.style.display='none'; }
+};
+window.saveAdminProfile = async function(){
+  const btn = document.getElementById('apSaveBtn');
+  const orig = btn.innerHTML;
+  btn.disabled = true; btn.innerHTML = 'Saving…';
+  try{
+    const fullName = document.getElementById('apFullName').value.trim();
+    const phone = document.getElementById('apPhone').value.trim();
+    const curPwd = document.getElementById('apCurPwd').value;
+    const newPwd = document.getElementById('apNewPwd').value;
+    const newPwd2 = document.getElementById('apNewPwd2').value;
+    const payload = { fullName, phone };
+    if(newPwd || curPwd){
+      if(!curPwd) throw new Error('Enter current password to change it');
+      if(newPwd.length < 8) throw new Error('New password must be at least 8 characters');
+      if(newPwd !== newPwd2) throw new Error('New passwords do not match');
+      payload.currentPassword = curPwd;
+      payload.newPassword = newPwd;
+    }
+    const res = await ApexAPI.admin.updateMe(payload);
+    if(!res || res.success===false) throw new Error(res?.error || 'Save failed');
+    toast('Profile updated', false);
+    // Update sidebar footer name immediately
+    if(fullName){
+      const sideName = document.getElementById('sideName');
+      if(sideName) sideName.textContent = fullName;
+      const sideAvatar = document.getElementById('sideAvatar');
+      if(sideAvatar) sideAvatar.textContent = (fullName.charAt(0)||'A').toUpperCase();
+    }
+    closeAdminProfile();
+  }catch(e){
+    toast(e.message, true);
+  }finally{
+    btn.disabled = false; btn.innerHTML = orig;
+  }
+};
+
+window.setBrandAvatar = function(url, initial){
+  const SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:60%;height:60%"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+  const el = document.getElementById('brandAvatar');
+  if(el){
+    el.innerHTML = url ? '<img src="'+url+'" alt="">' : SVG;
+  }
+  const sideAv = document.getElementById('sideAvatar');
+  if(sideAv){
+    sideAv.innerHTML = url
+      ? '<img src="'+url+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">'
+      : SVG;
+    sideAv.style.display = 'flex';
+    sideAv.style.alignItems = 'center';
+    sideAv.style.justifyContent = 'center';
+  }
+};
+
+window.uploadAdminAvatar = async function(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  if(!file.type.startsWith('image/')){ toast('Please select an image', true); return; }
+  if(file.size > 5*1024*1024){ toast('Image must be under 5MB', true); return; }
+  try{
+    toast('Uploading…', false);
+    if(!window.ApexAPI?.upload?.file) throw new Error('Upload not available');
+    const result = await ApexAPI.upload.file(file, 'general');
+    const url = result.secure_url || result.url;
+    if(!url) throw new Error('No URL returned');
+    // Save to admin profile
+    const res = await ApexAPI.admin.updateMe({ avatarUrl: url });
+    if(!res || res.success===false) throw new Error(res?.error||'Save failed');
+    // Update UI immediately
+    const apAv = document.getElementById('apAvatar');
+    if(apAv) apAv.innerHTML = '<img src="'+url+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+    const a = (document.getElementById('apName')?.textContent || 'A').trim().charAt(0).toUpperCase();
+    setBrandAvatar(url, a);
+    window.__adminAvatarUrl = url;
+    toast('Avatar updated', false);
+  }catch(e){
+    toast('Upload failed: '+e.message, true);
+  }
+};
+
+// Load admin avatar on page load
+(async function loadAdminAvatar(){
+  try{
+    if(!window.ApexAPI?.admin?.getMe) return;
+    const res = await ApexAPI.admin.getMe();
+    if(res?.admin){
+      const a = res.admin;
+      const initial = (a.fullName || a.email || 'A').trim().charAt(0).toUpperCase();
+      setBrandAvatar(a.avatarUrl, initial);
+      window.__adminAvatarUrl = a.avatarUrl || '';
+    }
+  }catch(_){}
+})();
+
+// Close on backdrop click
+document.addEventListener('DOMContentLoaded', ()=>{
+  const m = document.getElementById('adminProfileModal');
+  if(m) m.addEventListener('click', e=>{ if(e.target===m) closeAdminProfile(); });
+});
+</script>
+<!-- /Admin Profile Modal -->
+</body>
+</html>

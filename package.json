@@ -1,0 +1,32 @@
+{
+  "name": "spacex-insider",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quantyrexmarkets-cmyk/apex-ipo-access.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/quantyrexmarkets-cmyk/apex-ipo-access/issues"
+  },
+  "homepage": "https://github.com/quantyrexmarkets-cmyk/apex-ipo-access#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.10.0",
+    "cookie": "^1.1.1",
+    "dotenv": "^17.4.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.7.1"
+  },
+  "devDependencies": {
+    "vercel": "^58.7.1"
+  }
+}

@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Withdrawal Submitted | Apex IPO Access</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js?v=1781643381"></script>
-<script src="js/notify.js?v=1781643381"></script>
-<script src="js/sidebar.js?v=2"></script>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script src="/js/supabase.js?v=1786129802"></script>
+<script src="/js/notify.js?v=1786129802"></script>
+<script src="/js/sidebar.js?v=1786400153"></script>
 <script>
-  document.addEventListener('sb-ready', async () => {
+  (async () => {
     const { data } = await sb.auth.getUser();
     if(!data.user) window.location.href = 'login.html';
   });
@@ -156,8 +157,8 @@
   </div>
 
   <div class="actions" id="actions">
-    <a href="dashboard.html" class="btn btn-primary">Back to Dashboard</a>
-    <a href="activity.html" class="btn btn-secondary">View account activity</a>
+    <a href="/dashboard.html" class="btn btn-primary">Back to Dashboard</a>
+    <a href="/activity.html" class="btn btn-secondary">View account activity</a>
   </div>
 </main>
 
@@ -237,8 +238,8 @@
   }, 3600);
 </script>
 
-<script src="js/floating-widget.js?v=1781343118" defer></script>
+<script src="/js/floating-widget.js?v=1786129802" defer></script>
 
-  <script src="js/session-guard.js?v=3" defer></script>
+  <script src="/js/session-guard.js?v=1786129802" defer></script>
 </body>
 </html>

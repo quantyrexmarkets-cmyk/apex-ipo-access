@@ -37,3 +37,18 @@ nohup.out
 js/_*
 *.bak.*
 .backup-*/
+node_modules/
+.vercel
+.env*
+
+# Backup files (auto-generated, do not commit)
+*.backup
+*.backup2
+*.backup3
+*.bak
+*.bak-*
+*.pre-mongo-backup
+*.bak
+*.bak2
+*.backup
+.backup-*

@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Welcome | Apex IPO Access</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js?v=1781643381"></script>
-<script src="js/sidebar.js?v=2"></script>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script src="/js/supabase.js?v=1786129802"></script>
+<script src="/js/sidebar.js?v=1786400153"></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
@@ -82,7 +83,7 @@
 <body>
 
 <header class="complete-header">
-  <a href="index.html" class="logo">
+  <a href="/index.html" class="logo">
     <img src="assets/spacex-logo.png" class="logo-x" alt="X" />
     <div class="logo-text-stack">
       <span class="logo-line1">APEX</span>
@@ -117,12 +118,12 @@
     </div>
   </div>
 
-  <a href="pending-approval.html" class="cta">Check application status →</a>
+  <a href="/pending-approval.html" class="cta">Check application status →</a>
   <p class="small">Redirecting in <span id="countdown">8</span>s…</p>
 </div>
 
 <script>
-  document.addEventListener('sb-ready', async () => {
+  (async () => {
     const profile = await window.apex.getProfile();
     if(profile && profile.first_name){
       document.getElementById('userName').textContent = profile.first_name;

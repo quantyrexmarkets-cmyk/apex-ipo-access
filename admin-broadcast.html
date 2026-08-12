@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="/js/loader.js?v=1786129802"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Broadcast — APEX Admin</title>
+<link rel="icon" href="/assets/spacex-logo.png">
+<style>
+:root{--bg:#000;--bg-2:#0a0a0a;--bg-3:#141414;--text-1:#fff;--text-2:#a3a3a3;--text-3:#737373;--border:#1f1f1f;--danger:#ef4444;--success:#10b981}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text-1);font-family:'Montserrat',-apple-system,sans-serif;font-size:14px;min-height:100vh;-webkit-font-smoothing:antialiased}
+.shell{max-width:780px;margin:0 auto;padding:20px 16px 100px}
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.back-btn{background:transparent;border:1px solid var(--border);color:var(--text-2);padding:9px 14px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s}
+.back-btn:hover{border-color:#fff;color:#fff}
+.topbar h1{font-size:22px;font-weight:700;letter-spacing:-0.3px;flex:1}
+
+.reach-banner{background:linear-gradient(135deg,#0a0a0a,#141414);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:18px;display:flex;align-items:center;gap:14px;transition:border-color .15s}
+.reach-banner.has-reach{border-color:#fff}
+.reach-banner svg{width:24px;height:24px;color:var(--text-3);flex-shrink:0}
+.reach-banner.has-reach svg{color:#fff}
+.reach-text{flex:1}
+.reach-label{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:2px}
+.reach-count{font-size:24px;font-weight:700;font-family:'JetBrains Mono',Menlo,monospace;color:#fff}
+.reach-count .suffix{font-size:13px;color:var(--text-2);font-weight:500;margin-left:6px}
+
+.card{background:var(--bg-2);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:14px;transition:border-color .15s}
+.card:hover{border-color:#2a2a2a}
+.card-head{display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.card-head svg{width:16px;height:16px;color:#fff}
+.card-head h2{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:transparent;border:1px solid var(--border);color:var(--text-3);padding:9px 14px;border-radius:8px;font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+.chip:hover{border-color:#404040;color:var(--text-2)}
+.chip.active{background:#fff;border-color:#fff;color:#000;font-weight:600}
+
+.field{margin-top:14px}
+.field label{display:block;font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px}
+.field input,.field textarea{width:100%;background:#000;border:1px solid var(--border);border-radius:8px;padding:11px 13px;color:#fff;font-family:inherit;font-size:13px;transition:border-color .15s}
+.field input:focus,.field textarea:focus{outline:none;border-color:#fff}
+.field textarea{resize:vertical;min-height:90px}
+.field .hint{font-size:10px;color:var(--text-3);margin-top:5px}
+.field.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.conditional{margin-top:14px;padding-top:14px;border-top:1px dashed var(--border);display:none}
+.conditional.show{display:block}
+
+.preview-bubble{background:#0f0f0f;border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:8px}
+.preview-bubble-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
+.preview-icon{width:32px;height:32px;border-radius:50%;background:#fff;color:#000;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700}
+.preview-title{font-size:13px;font-weight:600;color:#fff;flex:1;margin-top:6px}
+.preview-time{font-size:10px;color:var(--text-3);margin-top:7px}
+.preview-msg{font-size:12px;color:var(--text-2);line-height:1.5;margin-left:42px}
+.preview-link{font-size:11px;color:#fff;margin-left:42px;margin-top:6px;text-decoration:underline}
+
+.footbar{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(14px);border-top:1px solid var(--border);padding:14px 16px;z-index:10;display:flex;justify-content:center}
+.footbar-inner{max-width:780px;width:100%;display:flex;gap:10px}
+.btn{padding:12px 18px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s}
+.btn-primary{background:#fff;color:#000;flex:1}
+.btn-primary:hover{opacity:.85}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--text-2);border:1px solid var(--border);text-decoration:none}
+.btn-ghost:hover{border-color:#fff;color:#fff}
+
+.toast{position:fixed;top:20px;right:20px;background:var(--bg-3);border:1px solid var(--border);padding:12px 16px;border-radius:8px;font-size:13px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.4);max-width:340px;animation:slideIn .2s}
+.toast.success{border-color:#fff}
+.toast.error{border-color:var(--danger);color:var(--danger)}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+.loading{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--text-3)}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;margin-right:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.modal-back{position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(6px);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-back.show{display:flex}
+.modal{background:var(--bg-2);border:1px solid var(--border);border-radius:14px;max-width:420px;width:100%;padding:24px;animation:slideIn .15s}
+.modal h3{font-size:16px;font-weight:700;margin-bottom:10px}
+.modal p{font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:20px}
+.modal .actions{display:flex;gap:10px}
+
+@media(max-width:560px){.field.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="loadingState" class="loading"><div class="spinner"></div>Loading…</div>
+
+<div class="shell" id="shell" style="display:none">
+  <div class="topbar">
+    <a href="/adminprivate" class="back-btn" data-smart-back>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </a>
+    <h1>New Broadcast</h1>
+  </div>
+
+  <div class="reach-banner" id="reachBanner">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <div class="reach-text">
+      <div class="reach-label">Will reach</div>
+      <div class="reach-count"><span id="reachCount">0</span><span class="suffix">users</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      <h2>Audience</h2>
+    </div>
+    <div class="chips" id="targetChips">
+      <button class="chip active" data-target="all">All Users</button>
+      <button class="chip" data-target="kyc_verified">KYC Verified</button>
+      <button class="chip" data-target="kyc_pending">Pending KYC</button>
+      <button class="chip" data-target="active">Active Only</button>
+      <button class="chip" data-target="emails">Custom Emails</button>
+      <button class="chip" data-target="date_range">Date Range</button>
+    </div>
+
+    <div class="conditional" id="emailsCondition">
+      <div class="field">
+        <label>Email Addresses</label>
+        <textarea id="emailsInput" placeholder="user1@example.com, user2@example.com…  (comma or newline separated)"></textarea>
+        <div class="hint">Each email must match a registered user.</div>
+      </div>
+    </div>
+
+    <div class="conditional" id="dateCondition">
+      <div class="field row">
+        <div><label>Signed Up From</label><input id="dateFrom" type="date"></div>
+        <div><label>Signed Up To</label><input id="dateTo" type="date"></div>
+      </div>
+      <div class="hint" style="font-size:10px;color:var(--text-3);margin-top:6px">Leave either blank to set an open range.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/></svg>
+      <h2>Type</h2>
+    </div>
+    <div class="chips" id="typeChips">
+      <button class="chip active" data-type="admin">Announcement</button>
+      <button class="chip" data-type="system">System</button>
+    </div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px dashed var(--border)">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:var(--text-2)">
+        <input type="checkbox" id="alsoEmail" style="width:18px;height:18px;accent-color:#fff;cursor:pointer">
+        <span>📧 Also send via email (recipients with verified addresses only)</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <h2>Message</h2>
+    </div>
+    <div class="field"><label>Title <span style="color:var(--danger)">*</span></label><input id="titleInput" type="text" maxlength="200" placeholder="e.g. New IPO Available"></div>
+    <div class="field"><label>Body <span style="color:var(--danger)">*</span></label><textarea id="messageInput" maxlength="2000" placeholder="Write your message to all users…"></textarea></div>
+    <div class="field"><label>Link (optional)</label><input id="linkInput" type="text" placeholder="/dashboard or full URL"><div class="hint">User can click the notification to be taken here.</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      <h2>Preview</h2>
+    </div>
+    <div class="preview-bubble">
+      <div class="preview-bubble-head">
+        <div class="preview-icon">🔔</div>
+        <div class="preview-title" id="previewTitle">Title will appear here</div>
+        <div class="preview-time">now</div>
+      </div>
+      <div class="preview-msg" id="previewMsg">Message body will appear here…</div>
+      <div class="preview-link" id="previewLink" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<div class="footbar" id="footbar" style="display:none">
+  <div class="footbar-inner">
+    <a href="/adminprivate" class="btn btn-ghost">Cancel</a>
+    <button class="btn btn-primary" id="sendBtn" onclick="confirmSend()">📡 Send Broadcast</button>
+  </div>
+</div>
+
+<div class="modal-back" id="confirmModal">
+  <div class="modal">
+    <h3>Send broadcast?</h3>
+    <p>This will deliver the notification to <strong id="confirmCount">0</strong> users immediately. This action cannot be undone.</p>
+    <div class="actions">
+      <button class="btn btn-ghost" onclick="closeModal()" style="flex:1">Cancel</button>
+      <button class="btn btn-primary" onclick="doSend()" style="flex:1.4">Yes, Send</button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script>
+let __target = 'all';
+let __type = 'admin';
+let __previewTimer = null;
+let __currentCount = 0;
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function $(id){ return document.getElementById(id); }
+function toast(msg, type){
+  const t = document.createElement('div');
+  t.className = 'toast ' + (type || 'success');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+function getTargetSpec(){
+  const spec = { type: __target };
+  if (__target === 'emails') {
+    const raw = $('emailsInput').value || '';
+    spec.emails = raw.split(/[\s,;\n]+/).map(e => e.trim().toLowerCase()).filter(Boolean);
+  }
+  if (__target === 'date_range') {
+    spec.from = $('dateFrom').value || null;
+    spec.to = $('dateTo').value || null;
+  }
+  return spec;
+}
+
+async function refreshReach(){
+  clearTimeout(__previewTimer);
+  __previewTimer = setTimeout(async () => {
+    try {
+      const spec = getTargetSpec();
+      const r = await ApexAPI.admin.previewBroadcast(spec);
+      const n = (r && r.success) ? (r.count || 0) : 0;
+      __currentCount = n;
+      $('reachCount').textContent = n.toLocaleString();
+      $('reachBanner').classList.toggle('has-reach', n > 0);
+    } catch(e) {
+      $('reachCount').textContent = '?';
+    }
+  }, 250);
+}
+
+function refreshPreview(){
+  const t = $('titleInput').value.trim() || 'Title will appear here';
+  const m = $('messageInput').value.trim() || 'Message body will appear here…';
+  const l = $('linkInput').value.trim();
+  $('previewTitle').textContent = t;
+  $('previewMsg').textContent = m;
+  if (l) { $('previewLink').textContent = '→ ' + l; $('previewLink').style.display = 'block'; }
+  else { $('previewLink').style.display = 'none'; }
+}
+
+function bindControls(){
+  document.querySelectorAll('#targetChips .chip').forEach(c => {
+    c.addEventListener('click', e => {
+      document.querySelectorAll('#targetChips .chip').forEach(x => x.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      __target = e.currentTarget.dataset.target;
+      $('emailsCondition').classList.toggle('show', __target === 'emails');
+      $('dateCondition').classList.toggle('show', __target === 'date_range');
+      refreshReach();
+    });
+  });
+  document.querySelectorAll('#typeChips .chip').forEach(c => {
+    c.addEventListener('click', e => {
+      document.querySelectorAll('#typeChips .chip').forEach(x => x.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      __type = e.currentTarget.dataset.type;
+    });
+  });
+  ['emailsInput','dateFrom','dateTo'].forEach(id => $(id).addEventListener('input', refreshReach));
+  ['titleInput','messageInput','linkInput'].forEach(id => $(id).addEventListener('input', refreshPreview));
+}
+
+function confirmSend(){
+  const title = $('titleInput').value.trim();
+  const message = $('messageInput').value.trim();
+  if (!title) return toast('Title is required', 'error');
+  if (!message) return toast('Message is required', 'error');
+  if (__currentCount === 0) return toast('No users matched — refine your audience', 'error');
+  $('confirmCount').textContent = __currentCount.toLocaleString();
+  $('confirmModal').classList.add('show');
+}
+
+function closeModal(){
+  $('confirmModal').classList.remove('show');
+}
+
+async function doSend(){
+  closeModal();
+  const btn = $('sendBtn');
+  btn.disabled = true;
+  const orig = btn.innerHTML;
+  btn.innerHTML = 'Sending…';
+  try {
+    const payload = {
+      title: $('titleInput').value.trim(),
+      message: $('messageInput').value.trim(),
+      link: $('linkInput').value.trim(),
+      type: __type,
+      target: getTargetSpec(),
+      sendEmail: $('alsoEmail').checked,
+    };
+    const r = await ApexAPI.admin.sendBroadcast(payload);
+    if (!r?.success) throw new Error(r?.error || 'Failed');
+    toast(`Broadcast sent to ${r.sent} users`, 'success');
+    setTimeout(() => location.href = '/adminprivate', 1200);
+  } catch(e) {
+    toast(e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = orig;
+  }
+}
+
+async function init(){
+  try {
+    const me = await ApexAPI.admin.getMe();
+    if (!me || me.error) { location.href = '/adminprivate/login'; return; }
+    $('loadingState').style.display = 'none';
+    $('shell').style.display = 'block';
+    $('footbar').style.display = 'flex';
+    bindControls();
+    refreshPreview();
+    refreshReach();
+  } catch(e) {
+    $('loadingState').innerHTML = 'Error: ' + esc(e.message);
+  }
+}
+
+init();
+</script>
+</body>
+</html>

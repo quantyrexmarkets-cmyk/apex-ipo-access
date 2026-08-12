@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Upload Payment Proof | Apex IPO Access</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js?v=1781643381"></script>
-<script src="js/notify.js?v=1781643381"></script>
-<script src="js/sidebar.js?v=2" defer></script>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script src="/js/supabase.js?v=1786129802"></script>
+<script src="/js/notify.js?v=1786129802"></script>
+<script src="/js/sidebar.js?v=1786400153" defer></script>
 <script>
-  document.addEventListener('sb-ready', async () => {
-    const { data } = await sb.auth.getUser();
-    if(!data.user) window.location.href = 'login.html';
-  });
+(async function authGuard(){
+  try {
+    const r = await fetch('/api/auth?action=me', { credentials:'include' });
+    if(!r.ok){ window.location.href = '/login.html'; return; }
+  } catch(e){ window.location.href = '/login.html'; }
+})();
 </script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
@@ -108,7 +111,7 @@
   <button class="menu-btn" onclick="document.dispatchEvent(new Event('open-sidebar'))" aria-label="Open menu">
     <span></span><span></span><span></span>
   </button>
-  <a href="dashboard.html" class="logo">
+  <a href="/dashboard.html" class="logo">
     <div class="logo-text-stack">
       <span class="logo-line1">APEX</span>
       <span class="logo-line2">IPO ACCESS</span>
@@ -119,7 +122,7 @@
 </header>
 
 <div class="wrap">
-  <a href="fund-wire.html" class="back-btn">
+  <a href="/fund-wire.html" class="back-btn">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
     Back
   </a>
@@ -229,38 +232,65 @@
     submitBtn.textContent = 'Uploading...';
 
     try {
-      var { data: userData } = await sb.auth.getUser();
+      var meAuthRes = await fetch('/api/auth?action=me', { credentials:'include' });
+      if(!meAuthRes.ok){ window.location.href = '/login.html'; return; }
+      var meAuthJson = await meAuthRes.json();
+      var user = meAuthJson.user;
       var user = userData?.user;
-      if(!user){ apexError('Session expired'); window.location.href='login.html'; return; }
+      if(!user){ apexError('Session expired'); window.location.href='/login.html'; return; }
 
       // Generate unique filename
       var ext = selectedFile.name.split('.').pop().toLowerCase();
       var filename = Date.now() + '-' + Math.random().toString(36).substr(2,8) + '.' + ext;
       var filepath = user.id + '/' + filename;
 
-      // Upload to Storage
-      var { error: upErr } = await sb.storage
-        .from('payment-proofs')
-        .upload(filepath, selectedFile, { cacheControl: '3600', upsert: false });
+      // Step 1: Get signed Cloudinary params
+      var signRes = await fetch('/api/upload?action=sign', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ purpose: 'deposit_proof' })
+      });
+      var signJson = await signRes.json();
+      if(!signRes.ok || signJson.error){ throw new Error(signJson.error || 'Could not sign upload'); }
 
-      if(upErr){ throw upErr; }
+      // Step 2: Upload directly to Cloudinary
+      var cldFD = new FormData();
+      cldFD.append('file', selectedFile);
+      cldFD.append('api_key', signJson.apiKey);
+      cldFD.append('timestamp', signJson.timestamp);
+      cldFD.append('signature', signJson.signature);
+      cldFD.append('folder', signJson.folder);
+      if(signJson.uploadPreset) cldFD.append('upload_preset', signJson.uploadPreset);
+
+      var cldRes = await fetch('https://api.cloudinary.com/v1_1/' + signJson.cloudName + '/auto/upload', {
+        method: 'POST',
+        body: cldFD
+      });
+      var cldJson = await cldRes.json();
+      if(!cldRes.ok || cldJson.error){ throw new Error((cldJson.error && cldJson.error.message) || 'Upload failed'); }
+      filepath = cldJson.secure_url || filepath;
 
       // Generate reference code
       var refCode = 'WIRE-' + Date.now().toString(36).toUpperCase();
 
-      // Insert deposit row
+      // Insert deposit row via MongoDB API
       var notesVal = document.getElementById('notes').value.trim();
-      var { error: insErr } = await sb.from('deposits').insert({
-        user_id: user.id,
-        method: 'wire',
-        amount: amount,
-        reference_code: refCode,
-        status: 'awaiting_review',
-        proof_url: filepath,
-        notes: notesVal || null
+      var depRes = await fetch('/api/deposits', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          method: 'wire',
+          asset: 'USD',
+          amountUSD: amount,
+          txHash: refCode,
+          proofUrl: filepath,
+          notes: notesVal || null
+        })
       });
-
-      if(insErr){ throw insErr; }
+      var depJson = await depRes.json();
+      if(!depRes.ok || depJson.error){ throw new Error(depJson.error || 'Submit failed'); }
 
       // Persist for process page
       sessionStorage.setItem('fund_ref_code', refCode);
@@ -277,9 +307,9 @@
   });
 </script>
 
-<script src="js/floating-widget.js?v=1781343118" defer></script>
-<script src="js/bottom-nav.js?v=1"></script>
-  <script src="js/user-bell.js?v=1"></script>
-  <script src="js/session-guard.js?v=3" defer></script>
+<script src="/js/floating-widget.js?v=1786129802" defer></script>
+<script src="/js/bottom-nav.js?v=1786129802"></script>
+  <script src="/js/user-bell.js?v=1786129802"></script>
+  <script src="/js/session-guard.js?v=1786129802" defer></script>
 </body>
 </html>

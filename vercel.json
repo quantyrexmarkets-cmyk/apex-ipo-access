@@ -1,0 +1,368 @@
+{
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/about",
+      "destination": "/about.html"
+    },
+    {
+      "source": "/how-it-works",
+      "destination": "/how-it-works.html"
+    },
+    {
+      "source": "/pricing",
+      "destination": "/pricing.html"
+    },
+    {
+      "source": "/careers",
+      "destination": "/careers.html"
+    },
+    {
+      "source": "/press",
+      "destination": "/press.html"
+    },
+    {
+      "source": "/contact",
+      "destination": "/contact.html"
+    },
+    {
+      "source": "/support",
+      "destination": "/support.html"
+    },
+    {
+      "source": "/docs",
+      "destination": "/docs.html"
+    },
+    {
+      "source": "/research",
+      "destination": "/research.html"
+    },
+    {
+      "source": "/stats",
+      "destination": "/stats.html"
+    },
+    {
+      "source": "/trading",
+      "destination": "/trading.html"
+    },
+    {
+      "source": "/markets",
+      "destination": "/markets.html"
+    },
+    {
+      "source": "/trade",
+      "destination": "/trade-hub.html"
+    },
+    {
+      "source": "/positions",
+      "destination": "/positions.html"
+    },
+    {
+      "source": "/private-markets",
+      "destination": "/private-markets.html"
+    },
+    {
+      "source": "/security",
+      "destination": "/security.html"
+    },
+    {
+      "source": "/risk",
+      "destination": "/risk.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/form-crs",
+      "destination": "/form-crs.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/signup",
+      "destination": "/signup.html"
+    },
+    {
+      "source": "/signup/step-2",
+      "destination": "/signup-2.html"
+    },
+    {
+      "source": "/signup/step-3",
+      "destination": "/signup-3.html"
+    },
+    {
+      "source": "/signup/step-4",
+      "destination": "/signup-4.html"
+    },
+    {
+      "source": "/signup/step-5",
+      "destination": "/signup-5.html"
+    },
+    {
+      "source": "/signup/step-6",
+      "destination": "/signup-6.html"
+    },
+    {
+      "source": "/signup/step-7",
+      "destination": "/signup-7.html"
+    },
+    {
+      "source": "/signup/complete",
+      "destination": "/signup-complete.html"
+    },
+    {
+      "source": "/forgot-password",
+      "destination": "/forgot-password.html"
+    },
+    {
+      "source": "/verify-2fa",
+      "destination": "/verify-2fa.html"
+    },
+    {
+      "source": "/verify-email",
+      "destination": "/verify-email.html"
+    },
+    {
+      "source": "/pending-approval",
+      "destination": "/pending-approval.html"
+    },
+    {
+      "source": "/waitlist",
+      "destination": "/waitlist.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
+    },
+    {
+      "source": "/portfolio",
+      "destination": "/portfolio.html"
+    },
+    {
+      "source": "/account",
+      "destination": "/account.html"
+    },
+    {
+      "source": "/activity",
+      "destination": "/activity.html"
+    },
+    {
+      "source": "/kyc",
+      "destination": "/kyc.html"
+    },
+    {
+      "source": "/ipos",
+      "destination": "/ipos.html"
+    },
+    {
+      "source": "/ipo",
+      "destination": "/ipo-opportunity.html"
+    },
+    {
+      "source": "/holding",
+      "destination": "/holding-detail.html"
+    },
+    {
+      "source": "/chart",
+      "destination": "/chart.html"
+    },
+    {
+      "source": "/buy",
+      "destination": "/buy-shares.html"
+    },
+    {
+      "source": "/buy/review",
+      "destination": "/buy-review.html"
+    },
+    {
+      "source": "/buy/receipt",
+      "destination": "/buy-receipt.html"
+    },
+    {
+      "source": "/fund",
+      "destination": "/fund-account.html"
+    },
+    {
+      "source": "/fund/crypto",
+      "destination": "/fund-crypto.html"
+    },
+    {
+      "source": "/fund/wire",
+      "destination": "/fund-wire.html"
+    },
+    {
+      "source": "/fund/proof",
+      "destination": "/fund-proof.html"
+    },
+    {
+      "source": "/fund/process",
+      "destination": "/fund-process.html"
+    },
+    {
+      "source": "/withdraw",
+      "destination": "/withdraw.html"
+    },
+    {
+      "source": "/withdraw/ach",
+      "destination": "/withdraw-ach.html"
+    },
+    {
+      "source": "/withdraw/bank",
+      "destination": "/withdraw-bank.html"
+    },
+    {
+      "source": "/withdraw/crypto",
+      "destination": "/withdraw-crypto.html"
+    },
+    {
+      "source": "/withdraw/process",
+      "destination": "/withdraw-process.html"
+    },
+    {
+      "source": "/companies/spacex",
+      "destination": "/spacex.html"
+    },
+    {
+      "source": "/companies/tesla",
+      "destination": "/tesla.html"
+    },
+    {
+      "source": "/companies/xai",
+      "destination": "/xai.html"
+    },
+    {
+      "source": "/companies/neuralink",
+      "destination": "/neuralink.html"
+    },
+    {
+      "source": "/adminprivate",
+      "destination": "/admin-new.html"
+    },
+    {
+      "source": "/adminprivate/login",
+      "destination": "/admin-login.html"
+    },
+    {
+      "source": "/adminprivate/user",
+      "destination": "/admin-user.html"
+    },
+    {
+      "source": "/admin/company/new",
+      "destination": "/admin-company.html"
+    },
+    {
+      "source": "/admin/company",
+      "destination": "/admin-company.html"
+    },
+    {
+      "source": "/admin/holdings",
+      "destination": "/admin-holdings.html"
+    },
+    {
+      "source": "/admin/settings",
+      "destination": "/admin-settings.html"
+    },
+    {
+      "source": "/admin/broadcast",
+      "destination": "/admin-broadcast.html"
+    },
+    {
+      "source": "/admin/logs",
+      "destination": "/admin-logs.html"
+    },
+    {
+      "source": "/reset-password",
+      "destination": "/reset-password.html"
+    },
+    {
+      "source": "/verify-email-sent",
+      "destination": "/verify-email-sent.html"
+    },
+    {
+      "source": "/orders",
+      "destination": "/orders.html"
+    },
+    {
+      "source": "/admin/trades",
+      "destination": "/admin-trades.html"
+    },
+    {
+      "source": "/admin-trades",
+      "destination": "/admin-trades.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/admin",
+      "destination": "/adminprivate/login",
+      "permanent": false
+    },
+    {
+      "source": "/admin.html",
+      "destination": "/adminprivate/login",
+      "permanent": true
+    },
+    {
+      "source": "/admin-new.html",
+      "destination": "/adminprivate",
+      "permanent": true
+    },
+    {
+      "source": "/admin-login.html",
+      "destination": "/adminprivate/login",
+      "permanent": true
+    },
+    {
+      "source": "/admin-user.html",
+      "destination": "/adminprivate/user",
+      "permanent": true
+    },
+    {
+      "source": "/admin-old-backup.html",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/smartsupp-test.html",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/admin-holdings.html",
+      "destination": "/admin/holdings",
+      "permanent": true
+    },
+    {
+      "source": "/admin-settings.html",
+      "destination": "/admin/settings",
+      "permanent": true
+    },
+    {
+      "source": "/admin-broadcast.html",
+      "destination": "/admin/broadcast",
+      "permanent": true
+    },
+    {
+      "source": "/admin-logs.html",
+      "destination": "/admin/logs",
+      "permanent": true
+    },
+    {
+      "source": "/reset-password.html",
+      "destination": "/reset-password",
+      "permanent": true
+    },
+    {
+      "source": "/verify-email-sent.html",
+      "destination": "/verify-email-sent",
+      "permanent": true
+    }
+  ]
+}

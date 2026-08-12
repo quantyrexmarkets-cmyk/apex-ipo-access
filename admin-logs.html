@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="/js/loader.js?v=1786129802"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Audit Log — APEX Admin</title>
+<link rel="icon" href="/assets/spacex-logo.png">
+<style>
+:root{--bg:#000;--bg-2:#0a0a0a;--bg-3:#141414;--text-1:#fff;--text-2:#a3a3a3;--text-3:#737373;--border:#1f1f1f;--danger:#ef4444}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text-1);font-family:'Montserrat',-apple-system,sans-serif;font-size:14px;min-height:100vh;-webkit-font-smoothing:antialiased}
+.shell{max-width:1200px;margin:0 auto;padding:20px 16px 80px}
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.back-btn{background:transparent;border:1px solid var(--border);color:var(--text-2);padding:9px 14px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s}
+.back-btn:hover{border-color:#fff;color:#fff}
+.topbar h1{font-size:22px;font-weight:700;letter-spacing:-0.3px;flex:1}
+.icon-btn{background:transparent;border:1px solid var(--border);color:var(--text-2);width:36px;height:36px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .15s}
+.icon-btn:hover{border-color:#fff;color:#fff;transform:rotate(180deg)}
+
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:18px}
+.stat-card{background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:16px;transition:border-color .15s}
+.stat-card:hover{border-color:#2a2a2a}
+.stat-label{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:6px}
+.stat-value{font-size:22px;font-weight:700;font-family:'JetBrains Mono',Menlo,monospace;font-variant-numeric:tabular-nums;color:#fff}
+.stat-sub{font-size:10px;color:var(--text-3);margin-top:4px;font-family:'JetBrains Mono',Menlo,monospace}
+
+.filters{background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px}
+.filter-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.filter-row:last-child{margin-bottom:0}
+.search{position:relative;flex:1;min-width:200px;max-width:380px}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-3);pointer-events:none}
+.search input{width:100%;background:#000;border:1px solid var(--border);border-radius:8px;padding:9px 12px 9px 34px;color:#fff;font-family:inherit;font-size:13px;transition:border-color .15s}
+.search input::placeholder{color:#525252}
+.search input:focus{outline:none;border-color:#fff}
+.date-input{background:#000;border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:#fff;font-family:inherit;font-size:13px;transition:border-color .15s;color-scheme:dark}
+.date-input:focus{outline:none;border-color:#fff}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:transparent;border:1px solid var(--border);color:var(--text-3);padding:7px 12px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:500;cursor:pointer;transition:all .15s}
+.chip:hover{border-color:#404040;color:var(--text-2)}
+.chip.active{background:#fff;border-color:#fff;color:#000;font-weight:600}
+.chip-label{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;font-weight:600;margin-right:6px;align-self:center}
+
+.table-wrap{background:var(--bg-2);border:1px solid var(--border);border-radius:12px;overflow:hidden;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:780px}
+thead{background:#0f0f0f;border-bottom:1px solid var(--border)}
+th{text-align:left;padding:14px 16px;color:var(--text-3);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap}
+td{padding:14px 16px;border-bottom:1px solid #141414;color:#e5e5e5;vertical-align:top}
+tbody tr{transition:background .15s;cursor:pointer}
+tbody tr:hover{background:#0f0f0f}
+tbody tr:last-child td{border-bottom:none}
+
+.time-cell{font-family:'JetBrains Mono',Menlo,monospace;font-size:11px;color:var(--text-3);white-space:nowrap}
+.time-cell .date{color:#fff;font-size:12px;display:block}
+.admin-cell{display:flex;flex-direction:column;gap:2px;max-width:200px}
+.admin-email{font-size:12px;color:#fff;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.admin-name{font-size:10px;color:var(--text-3)}
+.action-pill{display:inline-block;padding:4px 9px;border-radius:6px;font-family:'JetBrains Mono',Menlo,monospace;font-size:10px;font-weight:600;text-transform:lowercase;letter-spacing:0.3px;background:#1a1a1a;border:1px solid #2a2a2a;color:#fff}
+.action-pill.danger{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.4);color:#ef4444}
+.action-pill.success{background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.4);color:#10b981}
+.action-pill.warning{background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.4);color:#f59e0b}
+.target-type{font-family:'JetBrains Mono',Menlo,monospace;font-size:11px;color:var(--text-2);text-transform:uppercase;letter-spacing:0.6px}
+.target-id{font-family:'JetBrains Mono',Menlo,monospace;font-size:10px;color:var(--text-3);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.details-preview{font-family:'JetBrains Mono',Menlo,monospace;font-size:11px;color:var(--text-3);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.empty{padding:60px 20px;text-align:center;color:#525252;font-size:13px}
+.load-more{display:flex;justify-content:center;padding:18px}
+.load-more button{background:transparent;border:1px solid var(--border);color:var(--text-2);padding:10px 18px;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.load-more button:hover{border-color:#fff;color:#fff}
+.load-more button:disabled{opacity:.5;cursor:not-allowed}
+
+.loading{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--text-3)}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;margin-right:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.modal-back{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-back.show{display:flex}
+.modal{background:var(--bg-2);border:1px solid var(--border);border-radius:14px;max-width:640px;width:100%;max-height:85vh;overflow-y:auto;animation:slideIn .15s}
+.modal-head{display:flex;align-items:center;gap:10px;padding:18px 22px;border-bottom:1px solid var(--border)}
+.modal-head h3{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;flex:1}
+.modal-close{background:transparent;border:none;color:var(--text-2);cursor:pointer;padding:4px;font-size:20px;line-height:1}
+.modal-close:hover{color:#fff}
+.modal-body{padding:20px 22px}
+.detail-row{display:grid;grid-template-columns:120px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid #141414;font-size:12px}
+.detail-row:last-child{border-bottom:none}
+.detail-key{color:var(--text-3);font-size:10px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600}
+.detail-val{color:#fff;font-family:'JetBrains Mono',Menlo,monospace;word-break:break-word;font-size:12px}
+.detail-val.json{background:#000;padding:10px;border-radius:6px;border:1px solid var(--border);white-space:pre-wrap;max-height:300px;overflow:auto;font-size:11px}
+@keyframes slideIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+@media(max-width:560px){
+  th,td{padding:10px 12px;font-size:11px}
+  .details-preview{max-width:120px}
+}
+</style>
+</head>
+<body>
+<div id="loadingState" class="loading"><div class="spinner"></div>Loading…</div>
+
+<div class="shell" id="shell" style="display:none">
+  <div class="topbar">
+    <a href="/adminprivate" class="back-btn" data-smart-back>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </a>
+    <h1>Audit Log</h1>
+    <button class="icon-btn" onclick="refresh()" title="Refresh">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+    </button>
+  </div>
+
+  <div class="summary">
+    <div class="stat-card">
+      <div class="stat-label">Total Events</div>
+      <div class="stat-value" id="statTotal">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Today</div>
+      <div class="stat-value" id="statToday">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Filtered</div>
+      <div class="stat-value" id="statFiltered">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Top Action</div>
+      <div class="stat-value" id="statTopAction" style="font-size:14px">—</div>
+      <div class="stat-sub" id="statTopCount"></div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="filter-row">
+      <div class="search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input id="searchInput" type="text" placeholder="Search admin email…" autocomplete="off">
+      </div>
+      <input id="dateFrom" type="date" class="date-input">
+      <input id="dateTo" type="date" class="date-input">
+    </div>
+    <div class="filter-row">
+      <span class="chip-label">Target:</span>
+      <div class="chips" id="targetChips">
+        <button class="chip active" data-target="all">All</button>
+        <button class="chip" data-target="user">User</button>
+        <button class="chip" data-target="deposit">Deposit</button>
+        <button class="chip" data-target="withdrawal">Withdrawal</button>
+        <button class="chip" data-target="kyc">KYC</button>
+        <button class="chip" data-target="wallet">Wallet</button>
+        <button class="chip" data-target="system">System</button>
+      </div>
+    </div>
+    <div class="filter-row" id="actionChipsRow" style="display:none">
+      <span class="chip-label">Action:</span>
+      <div class="chips" id="actionChips"></div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Admin</th>
+          <th>Action</th>
+          <th>Target</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody id="logsBody">
+        <tr><td colspan="5" class="empty">Loading…</td></tr>
+      </tbody>
+    </table>
+    <div class="load-more" id="loadMoreWrap" style="display:none">
+      <button id="loadMoreBtn" onclick="loadMore()">Load More</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-back" id="detailsModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Event Details</h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script>
+let __filters = { action: null, targetType: 'all', search: '', from: '', to: '' };
+let __page = 1;
+let __limit = 50;
+let __hasMore = false;
+let __debounce = null;
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function actionPillClass(action) {
+  if (!action) return '';
+  if (/delete|reject/i.test(action)) return 'danger';
+  if (/approve|create/i.test(action)) return 'success';
+  if (/update|adjust/i.test(action)) return 'warning';
+  return '';
+}
+
+function formatTime(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const date = d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+  const time = d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12: false });
+  return { date, time };
+}
+
+function formatDetails(obj) {
+  if (!obj || typeof obj !== 'object') return String(obj || '');
+  try {
+    const entries = Object.entries(obj).slice(0, 3);
+    return entries.map(([k,v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`).join(', ');
+  } catch (e) { return ''; }
+}
+
+async function load(reset) {
+  if (reset) { __page = 1; }
+  const tbody = $('logsBody');
+  if (reset) tbody.innerHTML = '<tr><td colspan="5" class="empty">Loading…</td></tr>';
+
+  try {
+    const opts = {
+      page: __page,
+      limit: __limit,
+      targetType: __filters.targetType,
+      search: __filters.search,
+      from: __filters.from,
+      to: __filters.to,
+    };
+    if (__filters.action) opts.action = __filters.action;
+    const r = await ApexAPI.admin.listLogs(opts);
+    if (!r?.success) throw new Error(r?.error || 'Failed');
+
+    const stats = r.stats || {};
+    $('statTotal').textContent = (stats.totalAll || 0).toLocaleString();
+    $('statToday').textContent = (stats.todayCount || 0).toLocaleString();
+    $('statFiltered').textContent = (stats.filteredCount || 0).toLocaleString();
+    if (stats.topActions && stats.topActions.length) {
+      $('statTopAction').textContent = stats.topActions[0].action;
+      $('statTopCount').textContent = stats.topActions[0].count + ' events';
+      // Populate action chips
+      renderActionChips(stats.topActions);
+    }
+
+    __hasMore = r.pagination?.hasMore || false;
+    $('loadMoreWrap').style.display = __hasMore ? 'flex' : 'none';
+
+    const logs = r.logs || [];
+    if (!logs.length && reset) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty">No events found.</td></tr>';
+      return;
+    }
+    const rowsHtml = logs.map(l => {
+      const t = formatTime(l.createdAt);
+      const detPreview = formatDetails(l.details);
+      return `<tr onclick='showDetails(${JSON.stringify(l._id)})' data-id="${esc(l._id)}">
+        <td><div class="time-cell"><span class="date">${esc(t.date)}</span>${esc(t.time)}</div></td>
+        <td><div class="admin-cell">
+          <span class="admin-email" title="${esc(l.adminEmail)}">${esc(l.adminEmail)}</span>
+          ${l.adminName ? `<span class="admin-name">${esc(l.adminName)}</span>` : ''}
+        </div></td>
+        <td><span class="action-pill ${actionPillClass(l.action)}">${esc(l.action)}</span></td>
+        <td>
+          <span class="target-type">${esc(l.targetType)}</span>
+          ${l.targetId ? `<span class="target-id" title="${esc(l.targetId)}">${esc(String(l.targetId).slice(0,12))}…</span>` : ''}
+        </td>
+        <td><span class="details-preview" title="${esc(JSON.stringify(l.details||{}))}">${esc(detPreview) || '—'}</span></td>
+      </tr>`;
+    }).join('');
+
+    if (reset) {
+      tbody.innerHTML = rowsHtml;
+      window.__logsCache = {};
+    } else {
+      tbody.insertAdjacentHTML('beforeend', rowsHtml);
+    }
+    logs.forEach(l => { window.__logsCache[l._id] = l; });
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty">Error: ' + esc(e.message) + '</td></tr>';
+  }
+}
+
+function renderActionChips(topActions) {
+  const row = $('actionChipsRow');
+  const wrap = $('actionChips');
+  if (!topActions || !topActions.length) { row.style.display = 'none'; return; }
+  row.style.display = 'flex';
+  const html = '<button class="chip ' + (!__filters.action ? 'active' : '') + '" data-action="">All</button>' +
+    topActions.slice(0, 10).map(a =>
+      `<button class="chip ${__filters.action === a.action ? 'active' : ''}" data-action="${esc(a.action)}">${esc(a.action)}</button>`
+    ).join('');
+  wrap.innerHTML = html;
+  wrap.querySelectorAll('.chip').forEach(c => {
+    c.addEventListener('click', e => {
+      wrap.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      __filters.action = e.currentTarget.dataset.action || null;
+      load(true);
+    });
+  });
+}
+
+function loadMore() {
+  __page++;
+  load(false);
+}
+
+function refresh() {
+  load(true);
+}
+
+function showDetails(id) {
+  const log = window.__logsCache?.[id];
+  if (!log) return;
+  const t = formatTime(log.createdAt);
+  const html = `
+    <div class="detail-row"><div class="detail-key">Time</div><div class="detail-val">${esc(t.date)} ${esc(t.time)}</div></div>
+    <div class="detail-row"><div class="detail-key">Admin</div><div class="detail-val">${esc(log.adminEmail)}${log.adminName ? ' (' + esc(log.adminName) + ')' : ''}</div></div>
+    <div class="detail-row"><div class="detail-key">Action</div><div class="detail-val"><span class="action-pill ${actionPillClass(log.action)}">${esc(log.action)}</span></div></div>
+    <div class="detail-row"><div class="detail-key">Target Type</div><div class="detail-val">${esc(log.targetType)}</div></div>
+    ${log.targetId ? `<div class="detail-row"><div class="detail-key">Target ID</div><div class="detail-val">${esc(log.targetId)}</div></div>` : ''}
+    ${log.ipAddress ? `<div class="detail-row"><div class="detail-key">IP Address</div><div class="detail-val">${esc(log.ipAddress)}</div></div>` : ''}
+    <div class="detail-row"><div class="detail-key">Details</div><div class="detail-val json">${esc(JSON.stringify(log.details || {}, null, 2))}</div></div>
+  `;
+  $('modalBody').innerHTML = html;
+  $('detailsModal').classList.add('show');
+}
+
+function closeModal() {
+  $('detailsModal').classList.remove('show');
+}
+
+function bindControls() {
+  $('searchInput').addEventListener('input', e => {
+    clearTimeout(__debounce);
+    __filters.search = e.target.value;
+    __debounce = setTimeout(() => load(true), 350);
+  });
+  $('dateFrom').addEventListener('change', e => { __filters.from = e.target.value; load(true); });
+  $('dateTo').addEventListener('change', e => { __filters.to = e.target.value; load(true); });
+  document.querySelectorAll('#targetChips .chip').forEach(c => {
+    c.addEventListener('click', e => {
+      document.querySelectorAll('#targetChips .chip').forEach(x => x.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      __filters.targetType = e.currentTarget.dataset.target;
+      load(true);
+    });
+  });
+  $('detailsModal').addEventListener('click', e => {
+    if (e.target.id === 'detailsModal') closeModal();
+  });
+}
+
+async function init() {
+  try {
+    const me = await ApexAPI.admin.getMe();
+    if (!me || me.error) { location.href = '/adminprivate/login'; return; }
+    $('loadingState').style.display = 'none';
+    $('shell').style.display = 'block';
+    bindControls();
+    await load(true);
+  } catch(e) {
+    $('loadingState').innerHTML = 'Error: ' + esc(e.message);
+  }
+}
+
+init();
+</script>
+</body>
+</html>

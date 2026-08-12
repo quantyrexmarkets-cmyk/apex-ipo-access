@@ -1,253 +1,236 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Account Pending | Apex IPO Access</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js?v=1781643381"></script>
+<title>Account Pending | APEX IPO Access</title>
+<link rel="icon" href="/assets/spacex-logo.png">
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  html,body{
-    background:#000;color:#fff;
-    font-family:'Inter',sans-serif;
-    -webkit-font-smoothing:antialiased;
-    min-height:100vh;
-  }
-  .wrap{
-    min-height:100vh;
-    display:flex;align-items:center;justify-content:center;
-    padding:24px;
-  }
-  .card{
-    width:100%;max-width:440px;
-    background:#0a0d12;
-    border:1px solid rgba(255,255,255,0.06);
-    border-radius:16px;
-    padding:40px 32px;
-    text-align:center;
-  }
-  .brand{
-    font-family:'Plus Jakarta Sans',sans-serif;
-    font-weight:700;font-size:14px;letter-spacing:3px;
-    color:#fff;margin-bottom:48px;
-  }
-  .brand span{color:#4a9eff}
+:root{--bg:#000;--bg-2:#0a0a0a;--text-1:#fff;--text-2:#a3a3a3;--text-3:#737373;--border:#1f1f1f;--danger:#ef4444;--success:#10b981;--warn:#f59e0b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text-1);font-family:'Inter',-apple-system,sans-serif;font-size:14px;min-height:100vh;-webkit-font-smoothing:antialiased}
+.wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{width:100%;max-width:480px;background:var(--bg-2);border:1px solid var(--border);border-radius:16px;padding:40px 32px;text-align:center}
 
-  .icon{
-    width:64px;height:64px;border-radius:50%;
-    background:rgba(255,184,0,0.08);
-    border:1px solid rgba(255,184,0,0.25);
-    display:inline-flex;align-items:center;justify-content:center;
-    margin-bottom:24px;
-  }
-  .icon svg{width:28px;height:28px;color:#ffb800}
+.brand{font-size:11px;font-weight:700;letter-spacing:3px;color:var(--text-3);text-transform:uppercase;margin-bottom:32px}
 
-  h1{
-    font-family:'Plus Jakarta Sans',sans-serif;
-    font-weight:600;font-size:22px;letter-spacing:-0.3px;
-    margin-bottom:10px;color:#fff;
-  }
-  .sub{
-    color:#8b95a8;font-size:14px;line-height:1.6;
-    margin-bottom:32px;
-  }
-  .sub b{color:#fff;font-weight:600}
+.icon-wrap{width:80px;height:80px;border-radius:50%;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);display:inline-flex;align-items:center;justify-content:center;margin-bottom:24px;position:relative}
+.icon-wrap.success{background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.3)}
+.icon-wrap.error{background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.3)}
+.icon-wrap svg{width:36px;height:36px;color:var(--warn)}
+.icon-wrap.success svg{color:var(--success)}
+.icon-wrap.error svg{color:var(--danger)}
+.icon-wrap.pending::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(245,158,11,0.2);border-top-color:var(--warn);animation:spin 1.5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-  .meta{
-    background:rgba(255,255,255,0.02);
-    border:1px solid rgba(255,255,255,0.05);
-    border-radius:10px;
-    padding:16px;margin-bottom:24px;
-    text-align:left;
-  }
-  .meta-row{
-    display:flex;justify-content:space-between;align-items:center;
-    padding:8px 0;font-size:13px;
-  }
-  .meta-row + .meta-row{border-top:1px solid rgba(255,255,255,0.04)}
-  .meta-row .l{color:#6a7585;font-weight:500}
-  .meta-row .v{color:#fff;font-weight:600;font-family:'Manrope',sans-serif}
-  .meta-row .status{color:#ffb800;display:flex;align-items:center;gap:6px}
-  .meta-row .status::before{
-    content:'';width:6px;height:6px;border-radius:50%;
-    background:#ffb800;
-    animation:pulse 1.6s infinite;
-  }
-  @keyframes pulse{50%{opacity:0.3}}
+h1{font-family:'Plus Jakarta Sans',sans-serif;font-size:24px;font-weight:700;letter-spacing:-0.4px;margin-bottom:10px}
+.sub{color:var(--text-2);font-size:14px;line-height:1.6;margin-bottom:28px}
 
-  .notice{
-    font-size:13px;color:#a8b2c1;line-height:1.6;
-    margin-bottom:28px;
-    padding:14px 16px;
-    background:rgba(74,158,255,0.06);
-    border:1px solid rgba(74,158,255,0.15);
-    border-radius:10px;
-    text-align:left;
-  }
-  .notice b{color:#fff;font-weight:600;display:block;margin-bottom:4px;font-size:13px}
+.info-box{background:#000;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:24px;text-align:left}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:12px}
+.info-row:not(:last-child){border-bottom:1px solid #141414}
+.info-label{color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;font-weight:600;font-size:10px}
+.info-value{color:#fff;font-weight:500;font-family:'JetBrains Mono',Menlo,monospace;font-size:12px}
 
-  .btn-row{display:flex;gap:10px;margin-bottom:24px}
-  .btn{
-    flex:1;padding:13px;border-radius:10px;
-    font-family:'Inter',sans-serif;
-    font-weight:600;font-size:13px;
-    cursor:pointer;border:none;transition:all .2s;
-    text-decoration:none;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .btn-primary{background:#4a9eff;color:#000}
-  .btn-primary:hover{background:#5cacff}
-  .btn-outline{
-    background:transparent;color:#fff;
-    border:1px solid rgba(255,255,255,0.12);
-  }
-  .btn-outline:hover{background:rgba(255,255,255,0.04)}
+.status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.status-dot.pending{background:var(--warn);box-shadow:0 0 8px rgba(245,158,11,0.5);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 
-  .foot{
-    font-size:12px;color:#6a7585;
-    padding-top:20px;
-    border-top:1px solid rgba(255,255,255,0.05);
-  }
-  .foot a{color:#4a9eff;font-weight:500;text-decoration:none}
-  .foot a:hover{text-decoration:underline}
-  .foot .sep{margin:0 8px;color:#3a4250}
+.btn{display:inline-block;width:100%;background:#fff;color:#000;padding:12px;border-radius:8px;font-weight:600;font-size:13px;border:none;cursor:pointer;font-family:inherit;text-decoration:none;text-align:center;transition:opacity .15s}
+.btn:hover{opacity:.85}
+.btn-ghost{background:transparent;color:var(--text-2);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:#fff;color:#fff}
+
+.footer{margin-top:20px;font-size:11px;color:var(--text-3);line-height:1.6}
+.footer a{color:var(--text-2);text-decoration:none}
+.footer a:hover{color:#fff;text-decoration:underline}
+
+.poll-status{margin-top:16px;font-size:11px;color:var(--text-3);display:flex;align-items:center;justify-content:center;gap:6px}
+.poll-dot{width:6px;height:6px;border-radius:50%;background:var(--text-3);animation:pulse 1.5s ease-in-out infinite}
+
+.state{display:none}
+.state.active{display:block}
 </style>
 </head>
 <body>
-
 <div class="wrap">
   <div class="card">
+    <div class="brand">APEX IPO ACCESS</div>
 
-    <div class="brand">APEX <span>·</span> IPO ACCESS</div>
-
-    <div id="pendingState">
-    <div class="icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/>
-        <polyline points="12 6 12 12 16 14"/>
-      </svg>
-    </div>
-
-    <h1>Application under review</h1>
-    <div class="sub">
-      Thanks, <b id="userName">Investor</b>. Our compliance team is verifying your information. This typically takes up to 24 hours.
-    </div>
-
-    <div class="meta">
-      <div class="meta-row">
-        <span class="l">Email</span>
-        <span class="v" id="userEmail">—</span>
+    <!-- PENDING STATE -->
+    <div id="pendingState" class="state active">
+      <div class="icon-wrap pending">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       </div>
-      <div class="meta-row">
-        <span class="l">Submitted</span>
-        <span class="v" id="submitDate">—</span>
-      </div>
-      <div class="meta-row">
-        <span class="l">Status</span>
-        <span class="v status">Pending review</span>
-      </div>
-    </div>
+      <h1>Application Under Review</h1>
+      <p class="sub">Thank you for choosing APEX.<br><br>Your application is currently undergoing verification and compliance review. Upon completion, you will receive a confirmation email regarding your account status. Reviews are typically completed within 24 hours.</p>
 
-    <div class="notice">
-      <b>What happens next?</b>
-      You'll receive an email at the address above once your account is approved. No further action is required from you right now.
-    </div>
-
-    <div class="btn-row">
-      <button class="btn btn-outline" onclick="window.location.reload()">Refresh status</button>
-      <a class="btn btn-primary" href="mailto:support@apexipoaccess.com?subject=Account Review">Contact support</a>
-    </div>
-
-    <div class="foot">
-      <a href="#" onclick="window._logout();return false;">Sign out</a>
-      <span class="sep">·</span>
-      <a href="mailto:support@apexipoaccess.com">support@apexipoaccess.com</a>
-    </div>
-    </div>
-
-    <div id="approvedState" style="display:none">
-      <div class="icon" style="background:rgba(62,213,152,0.08);border-color:rgba(62,213,152,0.3)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#3ed598" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>
+      <div class="info-box">
+        <div class="info-row">
+          <span class="info-label">Email</span>
+          <span class="info-value" id="userEmail">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Submitted</span>
+          <span class="info-value" id="submitDate">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Status</span>
+          <span class="info-value"><span class="status-dot pending"></span>Pending Review</span>
+        </div>
       </div>
 
-      <h1>Account approved</h1>
-      <div class="sub">
-        Welcome aboard, <b id="userName2">Investor</b>. Your account has been verified by our compliance team and is now active.
-      </div>
+      <a href="/" class="btn btn-ghost">Back to Home</a>
 
-      <div class="notice" style="background:rgba(62,213,152,0.06);border-color:rgba(62,213,152,0.18)">
-        <b style="color:#3ed598"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> Verification complete</b>
-        You now have full access to Apex IPO Access — including pre-IPO opportunities, deposits, and your investor dashboard.
-      </div>
-
-      <div class="btn-row">
-        <a class="btn btn-primary" href="#" onclick="window._goToLogin();return false;" style="flex:1">Login to dashboard →</a>
-      </div>
-
-      <div class="foot">
-        Need help? <a href="mailto:support@apexipoaccess.com">support@apexipoaccess.com</a>
+      <div class="poll-status">
+        <span class="poll-dot"></span>
+        <span id="pollText">Checking status…</span>
       </div>
     </div>
 
+    <!-- APPROVED + VERIFIED -->
+    <div id="approvedState" class="state">
+      <div class="icon-wrap success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h1>Account Approved</h1>
+      <p class="sub">Your account has been activated. You may now access your dashboard and begin exploring investment opportunities.</p>
+      <a href="/login" class="btn">Continue to Login</a>
+    </div>
+
+    <!-- APPROVED + UNVERIFIED -->
+    <div id="verifyState" class="state">
+      <div class="icon-wrap success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+      </div>
+      <h1>Account Approved</h1>
+      <p class="sub">Your application has been successfully approved.<br><br>To finalize your account activation, please verify your email address using the link sent to <strong id="verifyEmail">—</strong>.</p>
+      <button class="btn" onclick="resendVerify()">Resend Verification Email</button>
+      <div id="resendMsg" style="margin-top:12px;font-size:12px;color:var(--text-2);min-height:18px"></div>
+    </div>
+
+    <!-- REJECTED -->
+    <div id="rejectedState" class="state">
+      <div class="icon-wrap error">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </div>
+      <h1>Application Not Approved</h1>
+      <p class="sub">After review, we are unable to approve your application at this time. For further information or to discuss this decision, please contact our support team.</p>
+      <a href="mailto:support@apexipoholdings.com" class="btn">Contact Support</a>
+    </div>
+
+    <!-- NOT FOUND -->
+    <div id="notFoundState" class="state">
+      <div class="icon-wrap error">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <h1>Account Not Found</h1>
+      <p class="sub">We were unable to locate this account. The verification may have already been completed or the link may have expired.</p>
+      <a href="/login" class="btn">Go to Login</a>
+    </div>
+
+    <div class="footer">
+      Questions about your application? Contact <a href="mailto:support@apexipoholdings.com">support@apexipoholdings.com</a><br>
+      &copy; <span id="year">2026</span> APEX IPO Access
+    </div>
   </div>
 </div>
 
 <script>
-  window._logout = async function(){
-    try { await sb.auth.signOut(); } catch(e){}
-    window.location.href = 'login.html';
-  };
+(function() {
+  var params = new URLSearchParams(location.search);
+  var email = params.get('email') || '';
+  var pollInterval = 15000; // 15 seconds
+  var pollCount = 0;
 
-  async function checkApproval(){
-    if (typeof sb === 'undefined' || !sb || !sb.auth) {
-      return setTimeout(checkApproval, 200);
-    }
-    var { data } = await sb.auth.getUser();
-    if(!data || !data.user){ window.location.href = 'login.html'; return; }
+  document.getElementById('year').textContent = new Date().getFullYear();
+  document.getElementById('userEmail').textContent = email || '—';
+  document.getElementById('verifyEmail').textContent = email || '—';
+  document.getElementById('submitDate').textContent = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-    var { data: profile } = await sb.from('profiles').select('*').eq('id', data.user.id).single();
-    if(profile){
-      if(profile.banned){
-        await sb.auth.signOut();
-        alert('Your account has been suspended.\n\n' + (profile.banned_reason || ''));
-        window.location.href = 'login.html';
-        return;
+  if (!email) {
+    // No email param — just show generic pending and stop polling
+    document.getElementById('pollText').textContent = 'Add ?email= to URL to track status';
+    return;
+  }
+
+  function showState(id) {
+    var states = ['pendingState', 'approvedState', 'verifyState', 'rejectedState', 'notFoundState'];
+    states.forEach(function(s) {
+      var el = document.getElementById(s);
+      if (el) el.classList.toggle('active', s === id);
+    });
+  }
+
+  async function checkStatus() {
+    pollCount++;
+    document.getElementById('pollText').textContent = 'Checking status… (poll #' + pollCount + ')';
+    try {
+      var r = await fetch('/api/auth?action=check-status&email=' + encodeURIComponent(email));
+      if (r.status === 404) {
+        showState('notFoundState');
+        return false;
+      }
+      var data = await r.json();
+      if (!data.ok) {
+        document.getElementById('pollText').textContent = 'Error checking status';
+        return true; // keep polling
       }
 
-      var name = ((profile.first_name||'') + ' ' + (profile.last_name||'')).trim() || 'Investor';
-      document.getElementById('userName').textContent = name;
-      var un2 = document.getElementById('userName2'); if(un2) un2.textContent = name;
-      document.getElementById('userEmail').textContent = profile.email || data.user.email || '—';
-      if(profile.created_at){
-        document.getElementById('submitDate').textContent = new Date(profile.created_at).toLocaleDateString('en-US',{month:'short', day:'numeric', year:'numeric'});
+      if (data.accountStatus === 'rejected') {
+        showState('rejectedState');
+        return false; // stop polling
       }
 
-      // <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> Approved — switch to success state
-      if(profile.account_status === 'approved' || profile.is_admin){
-        showApprovedState();
+      if (data.accountStatus === 'approved') {
+        if (data.emailVerified) {
+          showState('approvedState');
+          // Redirect to login after 2s
+          setTimeout(function() { location.href = '/login'; }, 2500);
+        } else {
+          showState('verifyState');
+          // Keep polling in case they verify in another tab
+        }
+        return data.emailVerified ? false : true;
       }
+
+      // Still pending — keep polling
+      document.getElementById('pollText').textContent = 'Next check in 15s…';
+      return true;
+    } catch (e) {
+      document.getElementById('pollText').textContent = 'Network error — retrying…';
+      return true;
     }
   }
 
-  checkApproval();
-
-  function showApprovedState(){
-    document.getElementById('pendingState').style.display = 'none';
-    document.getElementById('approvedState').style.display = 'block';
+  async function startPolling() {
+    var keepGoing = await checkStatus();
+    if (keepGoing) {
+      setTimeout(startPolling, pollInterval);
+    }
   }
 
-  window._goToLogin = async function(){
-    try { await sb.auth.signOut(); } catch(e){}
-    window.location.href = 'login.html';
+  // Initial check after 500ms, then poll every 15s
+  setTimeout(startPolling, 500);
+
+  window.resendVerify = async function() {
+    var msg = document.getElementById('resendMsg');
+    msg.textContent = 'Sending…';
+    try {
+      var r = await fetch('/api/auth?action=resend-verify', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ email: email })
+      });
+      var j = await r.json();
+      msg.textContent = j.ok ? '✓ Email sent! Check your inbox.' : (j.error || 'Failed to send');
+    } catch (e) {
+      msg.textContent = 'Network error. Try again.';
+    }
   };
+})();
 </script>
-
 </body>
 </html>

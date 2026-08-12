@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="/js/loader.js?v=1786129802"></script>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Verify Identity | Apex IPO Access</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js?v=1781643381"></script>
-<script src="js/notify.js?v=1781643381"></script>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/apex-api.js?v=1786129802"></script>
+<script src="/js/supabase.js?v=1786129802"></script>
+<script src="/js/notify.js?v=1786129802"></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{
@@ -141,7 +142,7 @@
     <div class="timer" id="timer">Resend available in 60s</div>
   </div>
 
-  <a href="login.html" class="back-link">
+  <a href="/login.html" class="back-link">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
       <path d="M19 12H5M12 19l-7-7 7-7"/>
     </svg>
@@ -231,12 +232,14 @@
     verifyBtn.textContent = 'Verifying...';
     errorMsg.textContent = '';
 
-    document.addEventListener('sb-ready', doVerify);
-    if(window.sb) doVerify();
+    doVerify();
 
     function doVerify(){
-      document.removeEventListener('sb-ready', doVerify);
-
+      // 2FA not yet migrated to Mongo — this will fail gracefully
+      if (typeof sb === 'undefined' || !sb || !sb.rpc) {
+        showError('2FA temporarily unavailable. Contact support@apexipoholdings.com');
+        return;
+      }
       sb.rpc('verify_2fa_code', {
         p_user_id: uid,
         p_code: code
@@ -261,7 +264,7 @@
                 var u = await sb.auth.getUser();
                 if(u.data && u.data.user){
                   var { data: prof } = await sb.from('profiles').select('kyc_status,is_admin,banned').eq('id', u.data.user.id).single();
-                  if(prof && prof.banned){ await sb.auth.signOut(); window.location.href='login.html'; return; }
+                  if(prof && prof.banned){ await sb.auth.signOut(); window.location.href='/login.html'; return; }
                   if(prof && !prof.is_admin && prof.kyc_status !== 'verified'){
                     window.location.href = 'pending-approval.html';
                     return;
@@ -353,13 +356,12 @@
       });
     }
 
-    if(window.sb) doResend();
-    else document.addEventListener('sb-ready', doResend, { once: true });
+    doResend();
   });
 
 })();
 </script>
 
-<script src="js/floating-widget.js?v=1781343118" defer></script>
+<script src="/js/floating-widget.js?v=1786129802" defer></script>
 </body>
 </html>

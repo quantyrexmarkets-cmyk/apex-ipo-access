@@ -204,6 +204,18 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
         Browse IPOs
       </a>
+      <a class="ax-sb-item" data-page="markets.html" href="/markets">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 3 5-8"/></svg>
+        Markets
+      </a>
+      <a class="ax-sb-item" data-page="trade-hub.html" href="/trade">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Trade
+      </a>
+      <a class="ax-sb-item" data-page="positions.html" href="/positions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Positions
+      </a>
       <a class="ax-sb-item" data-page="docs.html" href="docs.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         Documents
@@ -222,8 +234,11 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
         Withdraw
       </a>
-      <a class="ax-sb-item" href="#">
-            <a class="ax-sb-item" data-page="activity.html" href="activity.html">
+      <a class="ax-sb-item" data-page="kyc.html" href="kyc.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+        Identity Verification
+      </a>
+      <a class="ax-sb-item" data-page="activity.html" href="activity.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         Activity
       </a>
@@ -275,40 +290,70 @@
     }
   });
 
-  // Highlight active page
-  const currentPage = location.pathname.split('/').pop() || 'dashboard.html';
-  sidebar.querySelectorAll('.ax-sb-item[data-page]').forEach(a => {
-    if(a.dataset.page === currentPage) a.classList.add('active');
-  });
+  // Highlight active page — robust matching (handles .html, no-.html, query strings, trailing slash)
+  (function highlightActive(){
+    // Normalize current path: strip query, strip trailing slash, ensure .html suffix if missing
+    var path = (location.pathname || '/').split('?')[0].replace(/\/$/, '');
+    var last = path.split('/').pop() || 'dashboard';   // "" → dashboard for root
+    // If URL has no extension (e.g. "/markets"), add ".html" for comparison
+    if (last && last.indexOf('.') === -1) last = last + '.html';
+    // Map root/index to dashboard so Home stays highlighted after login
+    if (!last || last === '.html' || last === 'index.html') last = 'dashboard.html';
+
+    var matched = false;
+    sidebar.querySelectorAll('.ax-sb-item[data-page]').forEach(function(a){
+      var dp = (a.dataset.page || '').toLowerCase();
+      // Exact match OR base-filename match (e.g. "markets.html" matches "/markets")
+      if (dp === last || dp.split('.')[0] === last.split('.')[0]) {
+        a.classList.add('active');
+        matched = true;
+      } else {
+        a.classList.remove('active');
+      }
+    });
+    // Debug hook: window._sbDebug() shows what matched
+    window._sbDebug = function(){
+      console.log('[sidebar] path:', location.pathname, '→ normalized:', last, '→ matched:', matched);
+    };
+  })();
 
   // Logout handler
   sidebar.querySelector('#axLogoutBtn').addEventListener('click', async (e) => {
     e.preventDefault();
     if(!confirm('Sign out of your APEX account?')) return;
-    if(window.sb){
-      await sb.auth.signOut();
-    }
+    try {
+      await fetch('/api/auth?action=logout', { method:'POST', credentials:'include' });
+    } catch(e){}
     sessionStorage.clear();
     localStorage.removeItem('apex_signup');
-    window.location.href = 'login.html';
+    window.location.href = '/login.html';
   });
 
-  // Populate profile when Supabase is ready
-  function fillProfile(){
-    if(!window.sb || !window.apex) return;
-    window.apex.getProfile().then(p => {
-      if(!p) return;
-      const name = (p.first_name && p.last_name)
-        ? `${p.first_name} ${p.last_name}`
-        : (p.first_name || (p.email||'').split('@')[0] || 'Investor');
-      const initial = (p.first_name || p.email || 'A').charAt(0).toUpperCase();
-      document.getElementById('axSbName').textContent = name;
-      document.getElementById('axSbEmail').textContent = p.email || '';
-      // avatar uses SVG, no text needed
-    });
+  // Populate profile from /api/auth?action=me (Mongo backend)
+  async function fillProfile(){
+    try {
+      const r = await fetch('/api/auth?action=me', { credentials: 'include' });
+      const j = await r.json();
+      if (!j.ok || !j.user) return;
+      const p = j.user;
+      const first = p.first_name || p.firstName || '';
+      const last  = p.last_name  || p.lastName  || '';
+      const full  = p.fullName   || p.full_name || '';
+      const email = p.email      || '';
+      let name;
+      if (full) name = full;
+      else if (first && last) name = first + ' ' + last;
+      else if (first) name = first;
+      else name = (email.split('@')[0] || 'Investor');
+      const nameEl  = document.getElementById('axSbName');
+      const emailEl = document.getElementById('axSbEmail');
+      if (nameEl)  nameEl.textContent  = name;
+      if (emailEl) emailEl.textContent = email;
+    } catch(e) {
+      console.warn('[sidebar] Could not load profile:', e);
+    }
   }
-  if(window.sb) fillProfile();
-  else document.addEventListener('sb-ready', fillProfile);
+  fillProfile();
 
 
   // ========== Click handlers for nav items ==========
@@ -380,18 +425,20 @@
       e.preventDefault();
       var info = '';
       try {
-        if (window.sb) {
-          var { data } = await sb.auth.getUser();
-          if (data && data.user) {
-            info = '\n\n---\nAccount: ' + (data.user.email || '') +
-                   '\nUser ID: ' + data.user.id +
+        var r = await fetch('/api/auth?action=me', { credentials:'include' });
+        if (r.ok) {
+          var j = await r.json();
+          var u = j && j.user;
+          if (u) {
+            info = '\n\n---\nAccount: ' + (u.email || '') +
+                   '\nUser ID: ' + (u.id || u._id || '') +
                    '\nPage: ' + location.pathname;
           }
         }
       } catch(_) {}
       var subject = 'APEX Support Request';
       var body = 'Hi APEX team,\n\n[describe your question]' + info;
-      window.location.href = 'mailto:support@apexipoaccess.com' +
+      window.location.href = 'mailto:support@apexipoholdings.com' +
         '?subject=' + encodeURIComponent(subject) +
         '&body=' + encodeURIComponent(body);
       // close sidebar after click
@@ -404,19 +451,23 @@
 
   // Enhanced profile populate (badges)
   async function axPopulateBadges(){
-    if(!window.sb) return;
     try {
-      var { data: { user } } = await sb.auth.getUser();
-      if(!user) return;
-      var { data: profile } = await sb.from('profiles').select('kyc_status, first_name, last_name').eq('id', user.id).single();
+      var profile = await (window.apex && window.apex.getProfile ? window.apex.getProfile() : null);
+      if(!profile) {
+        // Fallback direct fetch if apex shim unavailable
+        var r = await fetch('/api/auth?action=me', { credentials:'include' });
+        if (!r.ok) return;
+        var j = await r.json();
+        profile = j && j.user ? j.user : null;
+      }
       if(!profile) return;
 
       var kycBadge = document.getElementById('axSbBadgeKyc');
       var tierBadge = document.getElementById('axSbBadgeTier');
 
       if(kycBadge){
-        var kyc = (profile.kyc_status || 'pending').toLowerCase();
-        if(kyc === 'verified'){
+        var kyc = (profile.kycStatus || profile.kyc_status || 'pending').toLowerCase();
+        if(kyc === 'verified' || kyc === 'approved'){
           kycBadge.className = 'ax-sb-badge verified';
           kycBadge.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Verified';
         } else if(kyc === 'pending'){
@@ -431,14 +482,13 @@
       }
 
       if(tierBadge){
-        var tier = profile.account_tier || 'Founding';
+        var tier = profile.accountTier || profile.account_tier || 'Founding';
         tierBadge.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> ' + tier;
       }
     } catch(e){ /* silent */ }
   }
 
-  if(window.sb) axPopulateBadges();
-  else document.addEventListener('sb-ready', axPopulateBadges, { once: true });
+  axPopulateBadges();
 
 
 
