@@ -59,6 +59,10 @@ module.exports = async (req, res) => {
           avatar_url: user.avatarUrl || '',
           twoFactorEnabled: !!user.twoFactorEnabled,
           two_factor_enabled: !!user.twoFactorEnabled,
+          lastLoginAt: user.lastLoginAt || null,
+          last_login_at: user.lastLoginAt || null,
+          lastLoginIp: user.lastLoginIp || '',
+          last_login_ip: user.lastLoginIp || '',
           createdAt: user.createdAt,
           created_at: user.createdAt,
         },
@@ -202,6 +206,11 @@ module.exports = async (req, res) => {
       }
     }
 
+      // ---- Track last login (save prev, set new) ----
+      const clientIp = (req.headers["x-forwarded-for"] || "").split(",")[0].trim() || (req.socket && req.socket.remoteAddress) || "";
+      user.lastLoginAt = new Date();
+      user.lastLoginIp = clientIp;
+      try { await user.save(); } catch(e) { console.warn("[login] failed to save lastLogin:", e.message); }
       const token = signToken(user);
       setAuthCookie(res, token);
       return res.status(200).json({

@@ -73,6 +73,9 @@ const ProfileSchema = new mongoose.Schema(
     employer: { type: String, default: '' },
     avatarUrl: { type: String, default: '' },
     accountTypes: { type: [String], default: [] },
+    lastLoginAt: { type: Date, default: null },
+    lastLoginIp: { type: String, default: '' },
+    twoFactorEnabled: { type: Boolean, default: false },
   },
   {
     timestamps: true,
