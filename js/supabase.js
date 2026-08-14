@@ -409,7 +409,7 @@
         const amt = d.amountUSD || d.amount || 0;
         const status = (d.status || 'pending').toLowerCase();
         let title = 'Deposit submitted', color = 'blue';
-        let desc = 'Your deposit of $' + fmt(amt) + ' is pending review.';
+        let desc = 'Your deposit of $' + fmt(amt) + ' is being processed.';
         if (status === 'approved' || status === 'completed' || status === 'credited') {
           title = 'Deposit approved'; color = 'green';
           desc  = 'Your deposit of $' + fmt(amt) + ' has been credited.';
@@ -429,7 +429,7 @@
         const amt = w.amountUSD || w.amount || 0;
         const status = (w.status || 'pending').toLowerCase();
         let title = 'Withdrawal requested', color = 'blue';
-        let desc = 'Your withdrawal of $' + fmt(amt) + ' is pending review.';
+        let desc = 'Your withdrawal of $' + fmt(amt) + ' is being processed.';
         if (status === 'approved' || status === 'completed' || status === 'paid') {
           title = 'Withdrawal completed'; color = 'green';
           desc  = 'Your withdrawal of $' + fmt(amt) + ' was sent.';
@@ -1012,7 +1012,7 @@ if (!window.apex.getProfile) {
               const chk = await fetch('/api/kyc', { credentials: 'include' });
               const chkJ = await chk.json();
               if (chkJ.kycStatus === 'pending') {
-                return { data: null, error: { message: 'KYC submission already pending review' } };
+                return { data: null, error: { message: 'KYC submission is already being processed' } };
               }
               if (chkJ.kycStatus === 'approved') {
                 return { data: null, error: { message: 'KYC already approved' } };

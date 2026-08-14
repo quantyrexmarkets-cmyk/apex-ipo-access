@@ -228,7 +228,7 @@
     </div>
     <div class="rec-row">
       <span>Status</span>
-      <span class="v" style="color:#ffb800">Pending review</span>
+      <span class="v" style="color:#ffb800">Processing</span>
     </div>
     <div class="rec-row big">
       <span class="lbl">Amount</span>
@@ -286,7 +286,7 @@
     spinner.classList.add('hide');
     successIcon.classList.add('show');
     statusLbl.className = 'status success';
-    statusLbl.textContent = 'AWAITING REVIEW';
+    statusLbl.textContent = 'PROCESSING';
     titleLbl.textContent = method === 'crypto' ? 'Crypto deposit recorded' : 'Wire proof submitted';
     subLbl.textContent = method === 'crypto'
       ? 'We\'ll credit your account once the network confirms your transaction.'
