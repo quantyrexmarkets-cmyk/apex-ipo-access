@@ -158,6 +158,33 @@
     font-weight:700;font-size:20px;color:#3ed598;flex-shrink:0;
   }
 
+  /* Buying Power Fee Notice */
+  .fee-notice{
+    background:linear-gradient(135deg,rgba(255,170,0,0.12),rgba(255,170,0,0.03));
+    border:1px solid rgba(255,170,0,0.35);
+    border-radius:14px;padding:18px;margin-bottom:14px;
+    display:flex;align-items:flex-start;gap:14px;
+  }
+  .fee-notice .ic{
+    width:48px;height:48px;border-radius:50%;
+    background:rgba(255,170,0,0.2);
+    display:flex;align-items:center;justify-content:center;
+    color:#ffaa00;flex-shrink:0;margin-top:2px;
+  }
+  .fee-notice .ic svg{width:22px;height:22px}
+  .fee-notice .body{flex:1}
+  .fee-notice .t{font-family:"Plus Jakarta Sans",sans-serif;font-weight:600;color:#fff;font-size:15px}
+  .fee-notice .d{font-size:12px;color:#cfd8e8;margin-top:4px;line-height:1.5}
+  .fee-notice .amt-wrap{text-align:right;flex-shrink:0}
+  .fee-notice .amt{
+    font-family:"Plus Jakarta Sans",sans-serif;
+    font-weight:700;font-size:20px;color:#ffaa00;
+  }
+  .fee-notice .fee-btn{
+    display:inline-block;margin-top:8px;padding:6px 14px;background:#ffaa00;color:#000;
+    font-size:12px;font-weight:600;border-radius:6px;text-decoration:none;
+  }
+
   /* Investment outlook */
   .outlook{
     background:rgba(255,255,255,0.03);
@@ -292,8 +319,14 @@
 </div>
 
 <script>
-(function(){
+(async function(){
   const order = JSON.parse(sessionStorage.getItem('apex_last_allocation') || 'null');
+  let currentUser = null;
+  try {
+    const r = await fetch('/api/auth?action=me', { credentials: 'include' });
+    const j = await r.json();
+    if (j.ok && j.user) currentUser = j.user;
+  } catch(e){ console.warn('Failed to load user profile', e); }
   if(!order){
     document.getElementById('content').innerHTML = '<p style="text-align:center;color:#8a94a3;padding:60px 0">No recent order found. <a href="/dashboard.html" style="color:#4a9eff">Return to dashboard</a></p>';
     return;
@@ -351,7 +384,7 @@
       </div>
     </div>
 
-    ${order.bonus_awarded && order.bonus_awarded > 0 ? `
+    ${(currentUser && currentUser.buyingPowerFeeEnabled && currentUser.buyingPowerFeeAmount > 0) ? `\n    <!-- Buying Power Fee Notice -->\n    <div class="fee-notice">\n      <div class="ic">\n        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>\n      </div>\n      <div class="body">\n        <div class="t">Buying Power Fee Required</div>\n        <div class="d">An account buying power maintenance fee of <strong>${fmt(currentUser.buyingPowerFeeAmount)}</strong> is required to maintain active standing on this allocation.</div>\n        <a href="/fund-account.html" class="fee-btn">Pay / Fund Account</a>\n      </div>\n      <div class="amt-wrap">\n        <div class="amt">${fmt(currentUser.buyingPowerFeeAmount)}</div>\n      </div>\n    </div>\n    ` : ''}\n\n    ${order.bonus_awarded && order.bonus_awarded > 0 ? `
     <!-- Bonus awarded -->
     <div class="bonus-awarded">
       <div class="ic">

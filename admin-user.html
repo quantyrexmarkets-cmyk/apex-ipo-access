@@ -509,6 +509,30 @@
       </div>
     </section>
 
+    <!-- Buying Power Fee -->
+    <section class="card">
+      <div class="card-head">
+        <h3><svg width="16" height="16"><use href="#i-dollar"/></svg> Buying Power Fee</h3>
+      </div>
+      <div class="card-body">
+        <div class="field">
+          <label>Fee Status</label>
+          <select id="fFeeEnabled">
+            <option value="false">Disabled (Off)</option>
+            <option value="true">Enabled (On)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Fee Amount (USD)</label>
+          <input type="number" id="fFeeAmount" step="0.01" min="0" placeholder="0.00" />
+          <div style="font-size:11px;color:#6a7585;margin-top:4px">Shown to user after buying shares when enabled</div>
+        </div>
+        <button class="btn btn-primary btn-block" id="btnSaveFee" onclick="saveBuyingPowerFee()" style="margin-top:6px">
+          <svg width="14" height="14"><use href="#i-save"/></svg> Save Buying Power Fee
+        </button>
+      </div>
+    </section>
+
     <!-- Verification (KYC) -->
     <section class="card">
       <div class="card-head">
@@ -656,6 +680,8 @@ function render(){
   $('fName').value=name==='Unknown'?'':name;
   $('fEmail').value=U.email||'';
   $('fBalance').value=U.balance||U.balanceUSD||0;
+  if($('fFeeEnabled')) $('fFeeEnabled').value = U.buyingPowerFeeEnabled ? 'true' : 'false';
+  if($('fFeeAmount')) $('fFeeAmount').value = U.buyingPowerFeeAmount != null ? U.buyingPowerFeeAmount : 0;
   [['fStatus',U.accountStatus||'pending'],['fRole',U.role||'user'],['fKyc',U.kycStatus||'not_submitted']]
     .forEach(([id,val])=>{[...$(id).options].forEach(o=>o.selected=o.value===val)});
 
@@ -729,6 +755,15 @@ function render(){
 }
 
 // Generic save helper — sends only specified fields
+async function saveBuyingPowerFee() {
+  const enabled = $('fFeeEnabled').value === 'true';
+  const amount = parseFloat($('fFeeAmount').value) || 0;
+  await _saveFields({
+    buyingPowerFeeEnabled: enabled,
+    buyingPowerFeeAmount: amount
+  }, 'Buying power fee saved', 'btnSaveFee');
+}
+
 async function _saveFields(fields, successMsg, btnId){
   const btn = btnId ? $(btnId) : null;
   let orig;

@@ -58,6 +58,8 @@ module.exports = async (req, res) => {
           avatarUrl: user.avatarUrl || '',
           avatar_url: user.avatarUrl || '',
           twoFactorEnabled: !!user.twoFactorEnabled,
+          buyingPowerFeeEnabled: !!user.buyingPowerFeeEnabled,
+          buyingPowerFeeAmount: user.buyingPowerFeeAmount || 0,
           two_factor_enabled: !!user.twoFactorEnabled,
           lastLoginAt: user.lastLoginAt || null,
           last_login_at: user.lastLoginAt || null,

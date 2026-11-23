@@ -76,6 +76,8 @@ const ProfileSchema = new mongoose.Schema(
     lastLoginAt: { type: Date, default: null },
     lastLoginIp: { type: String, default: '' },
     twoFactorEnabled: { type: Boolean, default: false },
+    buyingPowerFeeEnabled: { type: Boolean, default: false },
+    buyingPowerFeeAmount: { type: Number, default: 0 },
   },
   {
     timestamps: true,

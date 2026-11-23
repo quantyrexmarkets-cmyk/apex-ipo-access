@@ -177,6 +177,8 @@ module.exports = async (req, res) => {
             occupation: user.occupation || '',
             employer: user.employer || '',
             accountTypes: user.accountTypes || [],
+            buyingPowerFeeEnabled: !!user.buyingPowerFeeEnabled,
+            buyingPowerFeeAmount: user.buyingPowerFeeAmount || 0,
             createdAt: user.createdAt,
           },
           deposits, withdrawals, holdings, kycDocuments: kyc,
@@ -187,7 +189,7 @@ module.exports = async (req, res) => {
         const body = await readJson(req);
         const { id, status, role, kycStatus, emailVerified, fullName, accountStatus,
                 phone, addressLine1, addressLine2, city, state: stateField, zip, country,
-                citizenship, dob, idNumber, idType, occupation, employer , avatarUrl} = body;
+                citizenship, dob, idNumber, idType, occupation, employer , avatarUrl, buyingPowerFeeEnabled, buyingPowerFeeAmount} = body;
         if (!id) return res.status(400).json({ error: 'User id required' });
 
         const updates = {};
@@ -212,6 +214,8 @@ module.exports = async (req, res) => {
         if (occupation !== undefined) updates.occupation = String(occupation).trim();
         if (employer !== undefined) updates.employer = String(employer).trim();
         if (typeof fullName === 'string') updates.fullName = fullName.trim();
+        if (buyingPowerFeeEnabled !== undefined) updates.buyingPowerFeeEnabled = Boolean(buyingPowerFeeEnabled);
+        if (buyingPowerFeeAmount !== undefined) updates.buyingPowerFeeAmount = Math.max(0, parseFloat(buyingPowerFeeAmount) || 0);
 
         if (Object.keys(updates).length === 0) return res.status(400).json({ error: 'No valid fields' });
         if (id === admin._id.toString() && updates.role && updates.role !== 'admin') {

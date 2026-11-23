@@ -353,6 +353,8 @@ window.ApexAPI = ApexAPI;
     if (data.kycStatus !== undefined)     payload.kycStatus = data.kycStatus;
     if (data.emailVerified !== undefined) payload.emailVerified = data.emailVerified;
     if (data.avatarUrl !== undefined)     payload.avatarUrl = data.avatarUrl;
+    if (data.buyingPowerFeeEnabled !== undefined) payload.buyingPowerFeeEnabled = data.buyingPowerFeeEnabled;
+    if (data.buyingPowerFeeAmount !== undefined) payload.buyingPowerFeeAmount = data.buyingPowerFeeAmount;
     ['phone','addressLine1','addressLine2','city','state','zip','country','citizenship','dob','idNumber','idType','occupation','employer'].forEach(k => {
       if (data[k] !== undefined) payload[k] = data[k];
     });
