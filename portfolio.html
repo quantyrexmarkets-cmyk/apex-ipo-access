@@ -439,9 +439,9 @@
   const allocs = holdings.map(h => ({
     company_ticker: h.symbol,
     ticker: h.symbol,
-    isLocked: h.isLocked,
-    lockedUntil: h.lockedUntil,
-    daysUntilUnlock: h.daysUntilUnlock,
+    isLocked: a.isLocked,
+    lockedUntil: a.lockedUntil,
+    daysUntilUnlock: a.daysUntilUnlock,
     lockupDays: h.lockupDays,
     shares: h.shares,
     total_value: h.currentValueUSD,
@@ -577,7 +577,7 @@
               <div class="h-sub">
                 <span>${fmtInt(shares)} sh @ ${fmt(avgPrice)}</span>
                 <span class="h-status reserved">${stage}</span>
-                    ${h.isLocked ? `<span class="h-lock-badge" title="Locked until ${new Date(h.lockedUntil).toLocaleDateString()}">🔒 ${h.daysUntilUnlock}d</span>` : ''}
+                    ${a.isLocked ? `<span class="h-lock-badge" title="Locked until ${new Date(a.lockedUntil).toLocaleDateString()}">🔒 ${a.daysUntilUnlock}d</span>` : ''}
                 <span>· ${tierLbl}</span>
               </div>
             </div>
